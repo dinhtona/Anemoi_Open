@@ -10,6 +10,7 @@ namespace Anemoi.Centralize.Api.Controllers.MasterData;
 [Route("api/masterData/[controller]/[action]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
+[AllowAnonymous]
 public sealed class AdminController(ISender sender) : ControllerBase
 {
     /// <summary>
