@@ -24,7 +24,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(OrganizationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -43,6 +43,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PaginationResponse<OrganizationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -61,6 +62,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -80,6 +82,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPatch("{id}")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
