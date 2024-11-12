@@ -19,7 +19,7 @@ builder.UseSerilog((host, configuration) => configuration.Enrich
     .ReadFrom.Configuration(host.Configuration)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .MinimumLevel.Override("System", LogEventLevel.Information)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning));
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information));
 
 builder.ConfigureServices((context, service) =>
     service.InstallServicesInAssembly<IMasterDataInfrastructureAssemblyMarker>(context.Configuration));
