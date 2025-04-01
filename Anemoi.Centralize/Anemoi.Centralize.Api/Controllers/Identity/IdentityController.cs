@@ -73,6 +73,7 @@ public class IdentityController(ISender sender) : ControllerBase
     public async Task<IActionResult> Login([FromBody] UserLoginCommand command,
         CancellationToken cancellationToken)
     {
+        Serilog.Log.Logger.Information("__Login command: {command}", command);
         var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }

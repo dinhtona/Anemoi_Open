@@ -1,7 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
+# EXPOSE 8080
 EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -17,7 +17,7 @@ COPY ["Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/Anemoi.Contract.Cross
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Anemoi.BuildingBlock.Infrastructure.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/Anemoi.BuildingBlock.Application.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Domain.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/"]
-COPY ["Anemoi.Orchestration/Anemoi.Orchestration.Contract/Anemoi.Orchestration.Contract.csproj", "Anemoi.Orchestration/Anemoi.Orchestration.Contract/"]
+# COPY ["Anemoi.Orchestration/Anemoi.Orchestration.Contract/Anemoi.Orchestration.Contract.csproj", "Anemoi.Orchestration/Anemoi.Orchestration.Contract/"]
 RUN dotnet restore "Anemoi.Identity/Anemoi.Identity.WorkerService/Anemoi.Identity.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Identity/Anemoi.Identity.WorkerService"

@@ -9,7 +9,7 @@ WORKDIR /src
 COPY ["Anemoi.Centralize/Anemoi.Centralize.Api/Anemoi.Centralize.Api.csproj", "Anemoi.Centralize/Anemoi.Centralize.Api/"]
 COPY ["Anemoi.Centralize/Anemoi.Centralize.Infrastructure/Anemoi.Centralize.Infrastructure.csproj", "Anemoi.Centralize/Anemoi.Centralize.Infrastructure/"]
 COPY ["Anemoi.Centralize/Anemoi.Centralize.Application/Anemoi.Centralize.Application.csproj", "Anemoi.Centralize/Anemoi.Centralize.Application/"]
-COPY ["Anemoi.Contract/Anemoi.Contract.Notification/Anemoi.Contract.Notification.csproj", "Anemoi.Contract/Anemoi.Contract.Notification/"]
+# COPY ["Anemoi.Contract/Anemoi.Contract.Notification/Anemoi.Contract.Notification.csproj", "Anemoi.Contract/Anemoi.Contract.Notification/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/Anemoi.Contract.CrossCuttingConcern.csproj", "Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Anemoi.BuildingBlock.Infrastructure.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/Anemoi.BuildingBlock.Application.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/"]
