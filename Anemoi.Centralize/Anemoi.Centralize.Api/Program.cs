@@ -35,12 +35,33 @@ builder.Host.ConfigureServices((context, services) =>
         => options.LoggingFields = HttpLoggingFields.All);
     services.AddRateLimiter(options =>
     {
-        options.AddFixedWindowLimiter("FixedLimiter", opt =>
+        // Strict limit for authentication endpoints (login, register, password reset)
+        // Protects against brute-force and credential-stuffing attacks
+        options.AddSlidingWindowLimiter("auth-limit", opt =>
         {
             opt.Window = TimeSpan.FromSeconds(60);
-            opt.PermitLimit = 3;
+            opt.SegmentsPerWindow = 6;
+            opt.PermitLimit = 5;
+            opt.QueueLimit = 0;
         });
+
+        // General limit for all other API endpoints
+        options.AddFixedWindowLimiter("general-limit", opt =>
+        {
+            opt.Window = TimeSpan.FromSeconds(60);
+            opt.PermitLimit = 100;
+            opt.QueueLimit = 10;
+        });
+
         options.RejectionStatusCode = 429;
+        options.OnRejected = async (ctx, token) =>
+        {
+            ctx.HttpContext.Response.StatusCode = 429;
+            ctx.HttpContext.Response.ContentType = "application/json";
+            await ctx.HttpContext.Response.WriteAsync(
+                "{\"error\":\"Too many requests. Please try again later.\"}",
+                cancellationToken: token);
+        };
     });
 });
 

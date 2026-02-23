@@ -1,4 +1,7 @@
-version: '3.8'
+# version: '3.8'
+
+# Load environment variables from .env file (copy from .env.example and fill real values)
+# NEVER commit .env to version control!
 
 services:
   # RabbitMQ service for event-driven messaging
@@ -9,23 +12,33 @@ services:
       - "5672:5672"      # RabbitMQ port
       - "15672:15672"    # RabbitMQ management UI
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     networks:
       - anemoi_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
       
 
   # PostgreSQL service for relational data storage
   postgres:
-    image: postgres:13
+    image: postgres:16-alpine
     container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: SomePassWord
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     networks:
       - anemoi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   # MongoDB service for NoSQL data storage
   mongodb:
@@ -34,8 +47,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: SomePassword
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - anemoi_network
 
@@ -43,15 +56,21 @@ services:
   anemoi_centralize:
     image: anemoi/centralize
     build:
-      context: ./Anemoi/Anemoi.Centralize
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Anemoi.Centralize/Anemoi.Centralize.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
+      - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+      - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+      - GrpcSetting__IdentityAddress=http://anemoi_identity:5021
+    ports:
+      - "8080:8080"
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      anemoi_identity:
+        condition: service_started
     networks:
       - anemoi_network
 
@@ -59,17 +78,25 @@ services:
   anemoi_identity:
     image: anemoi/identity
     build:
-      context: ./Anemoi/Anemoi.Identity
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Anemoi.Identity/Anemoi.Identity.WorkerService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - PostgresDbSetting__ConnectionString="Host=postgres;Username=postgres;Password=SomePassWord;Database=Identity"
+      - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Identity
       - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
+      - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+      - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+      - JwtSetting__Issuer=${JWT_ISSUER}
+      - JwtSetting__Audience=${JWT_AUDIENCE}
+      - Kestrel__Endpoints__Http2__Url=http://0.0.0.0:5021
+      - Kestrel__Endpoints__Http1__Url=http://0.0.0.0:5031
+    volumes:
+      - identity_keys:/home/app/.aspnet/DataProtection-Keys
     depends_on:
-      - rabbitmq
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     networks:
       - anemoi_network
 
@@ -77,92 +104,111 @@ services:
   anemoi_masterdata:
     image: anemoi/masterdata
     build:
-      context: ./Anemoi/Anemoi.MasterData
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Anemoi.MasterData/Anemoi.MasterData.WorkerService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - PostgresDbSetting__ConnectionString="Host=postgres;Username=postgres;Password=SomePassWord;Database=MasterData"
+      - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=MasterData
       - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
+      - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+      - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - masterdata_keys:/home/app/.aspnet/DataProtection-Keys
     depends_on:
-      - rabbitmq
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     networks:
       - anemoi_network
 
   # Notification service (for sending emails)
-  anemoi_notification:
-    image: anemoi/notification
-    build:
-      context: ./Anemoi/Anemoi.Notification
-      dockerfile: Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - PostgresDbSetting__ConnectionString="Host=postgres;Username=postgres;Password=SomePassWord;Database=Notification"
-      - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
-    depends_on:
-      - rabbitmq
-      - postgres
-    networks:
-      - anemoi_network
+  # anemoi_notification:
+  #   image: anemoi/notification
+  #   build:
+  #     context: ./Anemoi.Notification
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Notification
+  #     - MassTransitSetting__Host=rabbitmq
+  #     - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+  #     - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - anemoi_network
 
   # Orchestrator service (for Saga orchestration)
-  anemoi_orchestrator:
-    image: anemoi/orchestrator
-    build:
-      context: ./Anemoi/Anemoi.Orchestrator
-      dockerfile: Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - PostgresDbSetting__ConnectionString="Host=postgres;Username=postgres;Password=SomePassWord;Database=Orchestrator"
-      - ConnectionStrings__MongoDb=mongodb://root:examplepassword@mongodb:27017
-      - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
-    depends_on:
-      - rabbitmq
-      - postgres
-      - mongodb
-    networks:
-      - anemoi_network
+  # anemoi_orchestrator:
+  #   image: anemoi/orchestrator
+  #   build:
+  #     context: ./Anemoi.Orchestrator
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Orchestrator
+  #     - ConnectionStrings__MongoDb=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
+  #     - MassTransitSetting__Host=rabbitmq
+  #     - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+  #     - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     postgres:
+  #       condition: service_healthy
+  #     mongodb:
+  #       condition: service_started
+  #   networks:
+  #     - anemoi_network
 
   # Secure service
-  anemoi_secure:
-    image: anemoi/secure
-    build:
-      context: ./Anemoi/Anemoi.Secure
-      dockerfile: Dockerfile
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
-    depends_on:
-      - rabbitmq
-    networks:
-      - anemoi_network
+  # anemoi_secure:
+  #   image: anemoi/secure
+  #   build:
+  #     context: ./Anemoi.Secure
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - MassTransitSetting__Host=rabbitmq
+  #     - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+  #     - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   networks:
+  #     - anemoi_network
 
   # Workspace service
   anemoi_workspace:
     image: anemoi/workspace
     build:
-      context: ./Anemoi/Anemoi.Workspace
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Anemoi.Workspace/Anemoi.Workspace.WorkerService/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - PostgresDbSetting__ConnectionString="Host=postgres;Username=postgres;Password=SomePassWord;Database=Workspace"
+      - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Workspace
       - MassTransitSetting__Host=rabbitmq
-      - MassTransitSetting__UserName=guest
-      - MassTransitSetting__Password=guest
+      - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+      - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - workspace_keys:/home/app/.aspnet/DataProtection-Keys
     depends_on:
-      - rabbitmq
-      - postgres
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     networks:
       - anemoi_network
 
 networks:
   anemoi_network:
     driver: bridge
+
+volumes:
+  identity_keys:
+  masterdata_keys:
+  workspace_keys:

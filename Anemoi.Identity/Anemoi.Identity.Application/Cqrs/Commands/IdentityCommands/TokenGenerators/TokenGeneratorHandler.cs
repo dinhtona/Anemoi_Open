@@ -41,6 +41,8 @@ public sealed class TokenGeneratorHandler(
         {
             Subject = claimsIdentity,
             Expires = DateTime.UtcNow.Add(jwtSetting.TokenLifetime),
+            Issuer = jwtSetting.Issuer,
+            Audience = jwtSetting.Audience,
             SigningCredentials = signingCredentials,
         };
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);

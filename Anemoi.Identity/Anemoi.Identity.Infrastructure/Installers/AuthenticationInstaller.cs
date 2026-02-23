@@ -26,11 +26,14 @@ public sealed class AuthenticationInstaller : IInstaller
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = privateSecurityKey,
-            ValidateAudience = false,
+            ValidateAudience = true,
+            ValidAudience = jwtSetting.Audience,
             ValidateLifetime = true,
-            ValidateIssuer = false,
+            ValidateIssuer = true,
+            ValidIssuer = jwtSetting.Issuer,
             ClockSkew = TimeSpan.Zero
         };
+        // System-to-system token: no lifetime check but still validates iss/aud
         var tokenValidationParametersForSystem = tokenValidationParameters.Clone();
         tokenValidationParametersForSystem.ValidateLifetime = false;
 

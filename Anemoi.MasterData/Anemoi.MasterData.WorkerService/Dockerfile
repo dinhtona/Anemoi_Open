@@ -25,5 +25,6 @@ RUN dotnet publish "Anemoi.MasterData.WorkerService.csproj" -c $BUILD_CONFIGURAT
 
 FROM base AS final
 WORKDIR /app
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Anemoi.MasterData.WorkerService.dll"]

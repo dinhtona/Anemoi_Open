@@ -14,7 +14,7 @@ COPY ["Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/Anemoi.Contract.Cross
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Anemoi.BuildingBlock.Infrastructure.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/Anemoi.BuildingBlock.Application.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Domain.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/"]
-COPY ["Anemoi.Orchestration/Anemoi.Orchestration.Contract/Anemoi.Orchestration.Contract.csproj", "Anemoi.Orchestration/Anemoi.Orchestration.Contract/"]
+# COPY ["Anemoi.Orchestration/Anemoi.Orchestration.Contract/Anemoi.Orchestration.Contract.csproj", "Anemoi.Orchestration/Anemoi.Orchestration.Contract/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj", "Anemoi.Contract/Anemoi.Contract.Identity/"]
 RUN dotnet restore "Anemoi.Workspace/Anemoi.Workspace.WorkerService/Anemoi.Workspace.WorkerService.csproj"
 COPY . .
@@ -27,5 +27,6 @@ RUN dotnet publish "Anemoi.Workspace.WorkerService.csproj" -c $BUILD_CONFIGURATI
 
 FROM base AS final
 WORKDIR /app
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Anemoi.Workspace.WorkerService.dll"]

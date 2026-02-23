@@ -18,6 +18,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Anemoi.Centralize.Api.Controllers.Identity;
 
@@ -68,6 +69,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(typeof(AuthenticationSuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Login([FromBody] UserLoginCommand command,
@@ -105,6 +107,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(typeof(AuthenticationSuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RefreshToken([FromBody] UserRefreshTokenCommand command,
@@ -139,6 +142,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -196,6 +200,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

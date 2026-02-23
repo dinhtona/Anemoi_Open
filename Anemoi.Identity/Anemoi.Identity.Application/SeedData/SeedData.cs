@@ -14,6 +14,7 @@ using Anemoi.Identity.Application.Configurations;
 using Anemoi.Identity.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 // ReSharper disable All
 
@@ -29,6 +30,7 @@ public static class SeedData
         var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
         var userClaimRepository = serviceScope.ServiceProvider.GetRequiredService<IUserClaimRepository>();
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
         var seedUserData = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>();
         var defaultApplicationPolicies = serviceScope.ServiceProvider.GetRequiredService<DefaultApplicationPolices>();
         var users = seedUserData.SupperAdminUsers;
@@ -57,7 +59,12 @@ public static class SeedData
                 IsActivated = true
             };
             var newUserResult = await mediator.Send(newAdminCommand);
-            if (newUserResult.IsT1) continue;
+            if (newUserResult.IsT1)
+            {
+                logger.Warning("[SeedData] Failed to create admin user {@Email}: {@Error}",
+                    user.UserName, newUserResult.AsT1);
+                continue;
+            }
             var createdUser = await userDbRepository.GetFirstByConditionAsync(x =>
                 x.UserId == new UserId(Guid.Parse(newUserResult.AsT0.Id)));
             await userRepository.AddToRolesAsync(createdUser, [administrator]);
