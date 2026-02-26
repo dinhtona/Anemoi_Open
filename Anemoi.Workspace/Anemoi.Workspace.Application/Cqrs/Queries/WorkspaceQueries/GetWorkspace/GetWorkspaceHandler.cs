@@ -4,23 +4,22 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.WorkspaceQueries.GetWorkspace;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.WorkspaceQueries.GetWorkspace;
 
 public sealed class GetWorkspaceHandler(
     ISqlRepository<Anemoi.Workspace.Domain.Models.Workspace> sqlRepository,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
     : EfQueryOneHandler<Anemoi.Workspace.Domain.Models.Workspace, GetWorkspaceQuery, WorkspaceResponse>(sqlRepository,
-        mapper, logger)
+        logger)
 {
     protected override IQueryOneFlowBuilder<Anemoi.Workspace.Domain.Models.Workspace, WorkspaceResponse> BuildQueryFlow(
         IQueryOneFilter<Anemoi.Workspace.Domain.Models.Workspace, WorkspaceResponse> fromFlow, GetWorkspaceQuery query)
         => fromFlow
             .WithFilter(x => x.Id == query.Id)
-            .WithSpecialAction(x => x.ProjectTo<WorkspaceResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToWorkspaceResponse)
             .WithErrorIfNull(WorkspaceErrorDetail.WorkspaceError.NotFound());
 }

@@ -9,20 +9,18 @@ using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.UserChangePassword;
 
 public sealed class UserChangePasswordHandler(
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork,
     IUserIdGetter userIdGetter)
     : EfCommandOneResultHandler<User, UserChangePasswordCommand, UserIdResponse>(
-        userDbRepository, unitOfWork, mapper, logger)
+        userDbRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<User, UserIdResponse> BuildCommand(
         IStartOneCommandResult<User, UserIdResponse> fromFlow,

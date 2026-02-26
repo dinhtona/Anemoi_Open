@@ -19,8 +19,8 @@ using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.RoleQueries.GetUserRolesByRoleGroupClaims;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -33,7 +33,7 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
     SigningCredentials signingCredentials,
     TokenValidationParameters tokenValidationParameters,
     ILogger logger,
-    IMapper mapper,
+    IdentityMapper mapper,
     ISqlRepository<User> userRepository,
     ISqlRepository<RefreshToken> sqlRepository,
     IUnitOfWork unitOfWork,
@@ -41,7 +41,7 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
     ITokenGetter tokenGetter,
     IUserClaimRepository userClaimRepository)
     : EfCommandOneResultHandler<RefreshToken, GenerateTokenByRoleGroupClaimsCommand, AuthenticationSuccessResponse>(
-        sqlRepository, unitOfWork, mapper, logger)
+        sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<RefreshToken, AuthenticationSuccessResponse> BuildCommand(
         IStartOneCommandResult<RefreshToken, AuthenticationSuccessResponse> fromFlow,
@@ -66,7 +66,7 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
                 return None.Value;
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.IdentityError.LoginFailed())
-            .WithResultIfSucceed(Mapper.Map<AuthenticationSuccessResponse>);
+            .WithResultIfSucceed(mapper.ToAuthenticationSuccessResponse);
 
     private async Task<OneOf<string, ErrorDetail>> GenerateWorkspaceTokenAsync(User user,
         List<RoleGroupClaimContract> RoleGroupClaims, CancellationToken cancellationToken)

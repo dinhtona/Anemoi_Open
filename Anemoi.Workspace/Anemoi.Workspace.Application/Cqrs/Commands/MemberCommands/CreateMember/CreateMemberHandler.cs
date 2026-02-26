@@ -10,7 +10,7 @@ using Anemoi.Contract.Workspace.Commands.MemberCommands.CreateMember;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
+using Anemoi.Workspace.Application.Mappings;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
@@ -25,9 +25,9 @@ public sealed class CreateMemberHandler(
     IRequestClient<GetUserWithEmailsByEmailsQuery> getUserByEmailClient,
     IWorkspaceIdGetter workspaceIdGetter,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
-    : EfCommandOneResultHandler<Member, CreateMemberCommand, MemberIdResponse>(sqlRepository, unitOfWork, mapper,
+    : EfCommandOneResultHandler<Member, CreateMemberCommand, MemberIdResponse>(sqlRepository, unitOfWork,
         logger)
 {
     public override async Task<OneOf<MemberIdResponse, ErrorDetailResponse>> Handle(CreateMemberCommand request,
@@ -49,7 +49,7 @@ public sealed class CreateMemberHandler(
         var member = await SqlRepository
             .GetFirstByConditionAsync(x => x.WorkspaceId == workspaceId && x.UserId == userId,
                 db => db.AsNoTracking(), token: cancellationToken);
-        if (member is not null) return Mapper.Map<MemberIdResponse>(member);
+        if (member is not null) return mapper.ToMemberIdResponse(member);
         return await base.Handle(request with { UserId = userId }, cancellationToken);
     }
 
@@ -57,8 +57,8 @@ public sealed class CreateMemberHandler(
         IStartOneCommandResult<Member, MemberIdResponse> fromFlow, CreateMemberCommand command,
         CancellationToken cancellationToken)
         => fromFlow
-            .CreateOne(Mapper.Map<Member>(command))
+            .CreateOne(mapper.ToMember(command))
             .WithCondition(_ => None.Value)
             .WithErrorIfSaveChange(WorkspaceErrorDetail.MemberError.CreateFailed())
-            .WithResultIfSucceed(data => Mapper.Map<MemberIdResponse>(data));
+            .WithResultIfSucceed(data => mapper.ToMemberIdResponse(data));
 }

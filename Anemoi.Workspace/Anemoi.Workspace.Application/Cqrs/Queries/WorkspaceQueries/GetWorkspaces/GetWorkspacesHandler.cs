@@ -7,24 +7,23 @@ using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Workspace.Queries.WorkspaceQueries.GetWorkspaces;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.WorkspaceQueries.GetWorkspaces;
 
 public sealed class GetWorkspacesHandler(
     ISqlRepository<Anemoi.Workspace.Domain.Models.Workspace> sqlRepository,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
-    : EfQueryPaginationHandler<Anemoi.Workspace.Domain.Models.Workspace, GetWorkspacesQuery, WorkspaceResponse>(sqlRepository, mapper,
+    : EfQueryPaginationHandler<Anemoi.Workspace.Domain.Models.Workspace, GetWorkspacesQuery, WorkspaceResponse>(sqlRepository,
         logger)
 {
     protected override IQueryListFlowBuilder<Anemoi.Workspace.Domain.Models.Workspace, WorkspaceResponse> BuildQueryFlow(
         IQueryListFilter<Anemoi.Workspace.Domain.Models.Workspace, WorkspaceResponse> fromFlow, GetWorkspacesQuery query)
         => fromFlow
             .WithFilter(BuildFilter(query))
-            .WithSpecialAction(x => x.ProjectTo<WorkspaceResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToWorkspaceResponse)
             .WithSortFieldWhenNotSet(a => a.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
 

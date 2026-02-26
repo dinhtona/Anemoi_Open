@@ -5,17 +5,17 @@ using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Identity.Queries.IdentityPolicyQueries.GetIdentityPolicies;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.IdentityPolicyQueries.GetIdentityPolicies;
 
 public sealed class GetIdentityPoliciesHandler(
     ISqlRepository<IdentityPolicy> sqlRepository,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger)
-    : EfQueryCollectionHandler<IdentityPolicy, GetIdentityPoliciesQuery, IdentityPolicyResponse>(sqlRepository, mapper,
+    : EfQueryCollectionHandler<IdentityPolicy, GetIdentityPoliciesQuery, IdentityPolicyResponse>(sqlRepository,
         logger)
 {
     protected override IQueryListFlowBuilder<IdentityPolicy, IdentityPolicyResponse> BuildQueryFlow(

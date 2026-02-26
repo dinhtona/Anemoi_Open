@@ -5,25 +5,23 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Workspace.Queries.MemberMapRoleGroupQueries.GetRoleGroupsByMember;
 using Anemoi.Contract.Workspace.Responses;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberMapRoleGroupQueries.GetRoleGroupsByMember;
 
 public sealed class GetRoleGroupsByMemberHandler(
     ISqlRepository<MemberMapRoleGroup> sqlRepository,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
     : EfQueryCollectionHandler<MemberMapRoleGroup, GetRoleGroupsByMemberQuery, MemberMapRoleGroupResponse>
-        (sqlRepository, mapper, logger)
+        (sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<MemberMapRoleGroup, MemberMapRoleGroupResponse> BuildQueryFlow(
         IQueryListFilter<MemberMapRoleGroup, MemberMapRoleGroupResponse> fromFlow, GetRoleGroupsByMemberQuery query)
         => fromFlow
             .WithFilter(x => x.Member.UserId == query.UserId && x.Member.WorkspaceId == query.WorkspaceId)
-            .WithSpecialAction(x => x.SelectMany(a => a.Member.MemberMapRoleGroups)
-                .ProjectTo<MemberMapRoleGroupResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(x => mapper.ProjectToMemberMapRoleGroupResponse(x.SelectMany(a => a.Member.MemberMapRoleGroups)))
             .WithSortFieldWhenNotSet(a => a.Order)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
 }

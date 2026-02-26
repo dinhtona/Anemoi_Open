@@ -1,5 +1,6 @@
 ﻿using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
+using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain;
 using Anemoi.MasterData.Infrastructure.DataContext;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ public sealed class ServiceInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<MasterDataMapper>();
         services.AddEfRepositoriesAsScope<MasterDataDbContext>(typeof(IMasterDataDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<MasterDataDbContext>();
     }

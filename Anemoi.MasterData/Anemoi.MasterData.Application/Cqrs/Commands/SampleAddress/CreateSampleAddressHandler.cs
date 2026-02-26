@@ -8,20 +8,20 @@ using Anemoi.Contract.MasterData.Commands.SampleAddressCommands.CreateSampleAddr
 using Anemoi.Contract.MasterData.Errors;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.MasterData.Application.Configurations;
+using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain.Models;
-using AutoMapper;
-using Newtonsoft.Json;
 using Serilog;
+using Newtonsoft.Json;
 
 namespace Anemoi.MasterData.Application.Cqrs.Commands.SampleAddress;
 
 public sealed class CreateSampleAddressHandler(
     ISqlRepository<Province> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    MasterDataMapper mapper,
     ILogger logger,
     ISqlRepository<Province> provinceRepository)
-    : EfCommandManyVoidHandler<Province, CreateSampleAddressCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandManyVoidHandler<Province, CreateSampleAddressCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandManyFlowBuilderVoid<Province> BuildCommand(
         IStartManyCommandVoid<Province> fromFlow, CreateSampleAddressCommand command,

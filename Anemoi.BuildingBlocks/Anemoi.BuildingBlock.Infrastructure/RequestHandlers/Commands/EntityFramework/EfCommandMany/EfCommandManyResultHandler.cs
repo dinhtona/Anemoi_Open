@@ -7,22 +7,20 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
-using AutoMapper;
 using OneOf;
 using Serilog;
+using Riok.Mapperly;
 
 namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 
 public abstract class EfCommandManyResultHandler<TModel, TCommand, TResult>(
     ISqlRepository<TModel> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
     : ICommandHandler<TCommand, OneOf<TResult, ErrorDetailResponse>>
     where TModel : class
     where TCommand : class, ICommand<OneOf<TResult, ErrorDetailResponse>>
 {
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
     protected ILogger Logger { get; } = logger;
@@ -70,7 +68,7 @@ public abstract class EfCommandManyResultHandler<TModel, TCommand, TResult>(
 
         var saveResult = await UnitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return Mapper.Map<ErrorDetailResponse>(buildResult.SaveChangesErrorDetail);
+            return buildResult.SaveChangesErrorDetail.ToErrorDetailResponse();
         var result = buildResult.ResultFunc.Invoke(items);
         await AfterSaveChangesAsync(request, items, result, cancellationToken);
         return result;

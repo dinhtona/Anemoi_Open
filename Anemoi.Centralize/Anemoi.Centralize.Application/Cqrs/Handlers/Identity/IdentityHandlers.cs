@@ -7,8 +7,9 @@ using Anemoi.Contract.Identity.Commands.IdentityCommands.UserLogout;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.UserLogin;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Grpc.Identity;
+using Anemoi.Grpc.Identity;
 using Anemoi.Grpc.Identity.Client;
-using AutoMapper;
+using Anemoi.Centralize.Application.Mappings;
 using Microsoft.AspNetCore.Http;
 using OneOf;
 
@@ -16,7 +17,7 @@ namespace Anemoi.Centralize.Application.Cqrs.Handlers.Identity;
 
 public sealed class IdentityHandlers(
     IRequestClientService requestClientService,
-    IMapper mapper,
+    CentralizeMapper mapper,
     GrpcSetting grpcSetting,
     IHttpContextAccessor httpContextAccessor)
     :
@@ -31,7 +32,7 @@ public sealed class IdentityHandlers(
         var result = await IdentityClientServices.LogOutAsync(grpcSetting.IdentityAddress,
             httpContextAccessor.HttpContext.GetToken(), cancellationToken);
         if (result.ResultCase == CommandWithVoidResult.ResultOneofCase.Succeed) return None.Value;
-        return mapper.Map<ErrorDetailResponse>(result.ErrorDetail);
+        return mapper.ToErrorDetailResponse(result.ErrorDetail);
     }
 
     public async Task<OneOf<AuthenticationSuccessResponse, ErrorDetailResponse>> Handle(UserLoginCommand request,
@@ -41,7 +42,7 @@ public sealed class IdentityHandlers(
         var result = await IdentityClientServices
             .LoginAsync(grpcSetting.IdentityAddress, loginRequest, cancellationToken);
         if (result.ResultCase != AuthenticateResult.ResultOneofCase.Succeed)
-            return mapper.Map<ErrorDetailResponse>(result.ErrorDetail);
-        return mapper.Map<AuthenticationSuccessResponse>(result.Succeed);
+            return mapper.ToErrorDetailResponse(result.ErrorDetail);
+        return mapper.ToAuthenticationSuccessResponse(result.Succeed);
     }
 }

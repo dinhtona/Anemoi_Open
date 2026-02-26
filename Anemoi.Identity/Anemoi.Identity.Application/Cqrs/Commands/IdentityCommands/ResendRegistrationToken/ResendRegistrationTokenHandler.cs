@@ -5,7 +5,6 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.ResendRegistrationToken;
 using Anemoi.Contract.Identity.Errors;
-using AutoMapper;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
 
@@ -14,9 +13,8 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.ResendRegis
 public sealed class ResendRegistrationTokenHandler(
     ISqlRepository<User> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<User, ResendRegistrationTokenCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, ResendRegistrationTokenCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(
         IStartOneCommandVoid<User> fromFlow, ResendRegistrationTokenCommand command,

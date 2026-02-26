@@ -7,7 +7,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
-using AutoMapper;
 using OneOf;
 using Serilog;
 
@@ -16,13 +15,11 @@ namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFra
 public abstract class EfCommandOneVoidHandler<TModel, TCommand>(
     ISqlRepository<TModel> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
     : ICommandHandler<TCommand, OneOf<None, ErrorDetailResponse>>
     where TModel : class
     where TCommand : class, ICommand<OneOf<None, ErrorDetailResponse>>
 {
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
     protected ILogger Logger { get; } = logger;
@@ -57,9 +54,9 @@ public abstract class EfCommandOneVoidHandler<TModel, TCommand>(
             case CommandTypeOne.Remove:
                 var removeItem = await SqlRepository.GetFirstByConditionAsync(buildResult.CommandFilter,
                     buildResult.CommandSpecialAction, token: cancellationToken);
-                if (removeItem is null) return Mapper.Map<ErrorDetailResponse>(buildResult.NullErrorDetail);
+                if (removeItem is null) return buildResult.NullErrorDetail.ToErrorDetailResponse();
                 var removeOneCondition = await buildResult.CommandOneCondition.Invoke(removeItem);
-                if (removeOneCondition.IsT1) return Mapper.Map<ErrorDetailResponse>(removeOneCondition.AsT1);
+                if (removeOneCondition.IsT1) return removeOneCondition.AsT1.ToErrorDetailResponse();
                 await SqlRepository.RemoveOneAsync(removeItem, cancellationToken);
                 model = removeItem;
                 break;
@@ -70,7 +67,7 @@ public abstract class EfCommandOneVoidHandler<TModel, TCommand>(
 
         var saveResult = await UnitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return Mapper.Map<ErrorDetailResponse>(buildResult.SaveChangesErrorDetail);
+            return buildResult.SaveChangesErrorDetail.ToErrorDetailResponse();
         await AfterSaveChangesAsync(request, model, cancellationToken);
         return None.Value;
     }

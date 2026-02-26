@@ -8,7 +8,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
-using AutoMapper;
 using OneOf;
 using Serilog;
 
@@ -17,14 +16,12 @@ namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFra
 public abstract class EfCommandManyVoidHandler<TModel, TCommand>(
     ISqlRepository<TModel> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
     :
         ICommandHandler<TCommand, OneOf<None, ErrorDetailResponse>>
     where TModel : class
     where TCommand : class, ICommand<OneOf<None, ErrorDetailResponse>>
 {
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
     protected ILogger Logger { get; } = logger;
@@ -51,7 +48,7 @@ public abstract class EfCommandManyVoidHandler<TModel, TCommand>(
                     .GetManyByConditionAsync(buildResult.CommandFilter, buildResult.CommandSpecialAction,
                         token: cancellationToken);
                 var updateManyCondition = await buildResult.CommandManyCondition.Invoke(updateItems);
-                if (updateManyCondition.IsT1) return Mapper.Map<ErrorDetailResponse>(updateManyCondition.AsT1);
+                if (updateManyCondition.IsT1) return updateManyCondition.AsT1.ToErrorDetailResponse();
                 await buildResult.UpdateManyFunc.Invoke(updateItems);
                 models = updateItems;
                 break;
@@ -59,7 +56,7 @@ public abstract class EfCommandManyVoidHandler<TModel, TCommand>(
                 var removeItems = await SqlRepository.GetManyByConditionAsync(buildResult.CommandFilter,
                     buildResult.CommandSpecialAction, token: cancellationToken);
                 var removeManyCondition = await buildResult.CommandManyCondition.Invoke(removeItems);
-                if (removeManyCondition.IsT1) return Mapper.Map<ErrorDetailResponse>(removeManyCondition.AsT1);
+                if (removeManyCondition.IsT1) return removeManyCondition.AsT1.ToErrorDetailResponse();
                 await SqlRepository.RemoveManyAsync(removeItems, cancellationToken);
                 models = removeItems;
                 break;
@@ -70,7 +67,7 @@ public abstract class EfCommandManyVoidHandler<TModel, TCommand>(
 
         var saveResult = await UnitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return Mapper.Map<ErrorDetailResponse>(buildResult.SaveChangesErrorDetail);
+            return buildResult.SaveChangesErrorDetail.ToErrorDetailResponse();
         await AfterSaveChangesAsync(request, models, cancellationToken);
         return None.Value;
     }

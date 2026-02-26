@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.RemoveMembers;
 using Anemoi.Contract.Workspace.Errors;
-using AutoMapper;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
@@ -13,8 +12,7 @@ namespace Anemoi.Workspace.Application.Cqrs.Commands.MemberCommands.RemovedMembe
 public sealed class RemovedMembersHandler(
     ISqlRepository<Member> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
-    ILogger logger) : EfCommandManyVoidHandler<Member, RemoveMembersCommand>(sqlRepository, unitOfWork, mapper, logger)
+    ILogger logger) : EfCommandManyVoidHandler<Member, RemoveMembersCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandManyFlowBuilderVoid<Member> BuildCommand(IStartManyCommandVoid<Member> fromFlow,
         RemoveMembersCommand command, CancellationToken cancellationToken)

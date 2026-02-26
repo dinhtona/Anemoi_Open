@@ -7,17 +7,15 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramewo
 using Anemoi.Contract.Identity.Commands.IdentityCommands.RemoveUsers;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.RemoveUsers;
 
 public sealed class RemoveUsersHandler(
-    IMapper mapper,
     ILogger logger,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork)
-    : EfCommandManyVoidHandler<User, RemoveUsersCommand>(userDbRepository, unitOfWork, mapper, logger)
+    : EfCommandManyVoidHandler<User, RemoveUsersCommand>(userDbRepository, unitOfWork, logger)
 {
     protected override ICommandManyFlowBuilderVoid<User> BuildCommand(
         IStartManyCommandVoid<User> fromFlow, RemoveUsersCommand command,

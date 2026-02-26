@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -7,7 +8,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
@@ -16,7 +16,6 @@ namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFram
 
 public abstract class EfQueryOneHandler<TModel, TQuery, TResponse>(
     ISqlRepository<TModel> sqlRepository,
-    IMapper mapper,
     ILogger logger)
     :
         IQueryHandler<TQuery, OneOf<TResponse, ErrorDetailResponse>>
@@ -25,7 +24,6 @@ public abstract class EfQueryOneHandler<TModel, TQuery, TResponse>(
     where TResponse : class
 {
     private readonly IQueryOneFilter<TModel, TResponse> _startQueryFlow = new QueryOneFlow<TModel, TResponse>();
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected ILogger Logger { get; } = logger;
 
@@ -76,7 +74,11 @@ public abstract class EfQueryOneHandler<TModel, TQuery, TResponse>(
         CancellationToken cancellationToken) => Task.CompletedTask;
 
     protected virtual Task<TResponse> MapToResultAsync(TQuery query, OneOf<TModel, TResponse> modelOrResponse)
-        => Task.FromResult(modelOrResponse.Match(i => Mapper.Map<TResponse>(i), rs => rs));
+        => Task.FromResult(modelOrResponse.Match(i =>
+        {
+            throw new InvalidOperationException(
+                $"Please override {nameof(MapToResultAsync)} if you don't use SpecialAction to project to {nameof(TResponse)}");
+        }, rs => rs));
 
     protected abstract IQueryOneFlowBuilder<TModel, TResponse> BuildQueryFlow(
         IQueryOneFilter<TModel, TResponse> fromFlow, TQuery query);

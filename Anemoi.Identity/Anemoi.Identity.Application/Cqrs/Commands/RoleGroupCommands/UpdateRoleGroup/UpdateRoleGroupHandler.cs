@@ -9,7 +9,7 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramewo
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.UpdateRoleGroup;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
-using AutoMapper;
+using Anemoi.Identity.Application.Mappings;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
@@ -19,11 +19,11 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.RoleGroupCommands.UpdateRole
 public sealed class UpdateRoleGroupHandler(
     ISqlRepository<RoleGroup> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     ISqlRepository<RoleGroupMapRole> dbRoleGroupIdentityRoleRepository)
     : EfCommandOneVoidHandler<RoleGroup, UpdateRoleGroupCommand>(sqlRepository,
-        unitOfWork, mapper, logger)
+        unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<RoleGroup> BuildCommand(IStartOneCommandVoid<RoleGroup> fromFlow,
         UpdateRoleGroupCommand command,
@@ -38,7 +38,7 @@ public sealed class UpdateRoleGroupHandler(
                     x => x.Id == command.Id && x.IsDefault, cancellationToken);
                 if (checkDefault) return IdentityErrorDetail.RoleGroupError.RoleGroupDefault();
 
-                Mapper.Map(command, roleGroup);
+                mapper.UpdateRoleGroup(command, roleGroup);
                 var roleIds = command.IdentityRoleIds;
                 if (!roleIds.HasAny()) return None.Value;
                 var roleGroupIdentityRoleIds = roleGroup.RoleGroupMapRoles
@@ -58,7 +58,7 @@ public sealed class UpdateRoleGroupHandler(
                 await dbRoleGroupIdentityRoleRepository.CreateManyAsync(roleGroupIdentityRoles, cancellationToken);
                 return None.Value;
             })
-            .WithModify(roleGroup => Mapper.Map(command, roleGroup))
+            .WithModify(roleGroup => mapper.UpdateRoleGroup(command, roleGroup))
             .WithErrorIfNull(IdentityErrorDetail.RoleGroupError.NotFound())
             .WithErrorIfSaveChange(IdentityErrorDetail.RoleGroupError.UpdateFailed());
 }

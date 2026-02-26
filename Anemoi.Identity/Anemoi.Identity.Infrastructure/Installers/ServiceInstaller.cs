@@ -2,6 +2,7 @@
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.BuildingBlock.Infrastructure.Services;
 using Anemoi.Identity.Application.Abstractions;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain;
 using Anemoi.Identity.Domain.Models;
 using Anemoi.Identity.Infrastructure.DataContext;
@@ -18,6 +19,7 @@ public sealed class ServiceInstaller : IInstaller
     {
         services.AddHttpContextAccessor();
         services.AddHttpClient();
+        services.AddScoped<IdentityMapper>();
 
         services.TryAddScoped<ISqlRepository<Role>, UserRoleRepository>();
         services.TryAddScoped<ISignInRepository, SignInRepository>();

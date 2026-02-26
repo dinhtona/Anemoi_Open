@@ -4,25 +4,24 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Queries.IdentityQueries.CheckUserExist;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.IdentityQueries.CheckUserExist;
 
 public sealed class CheckUserExistHandler(
     ISqlRepository<User> sqlRepository,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger)
     : EfQueryOneHandler<User,
-        CheckUserExistQuery, UserWithEmailResponse>(sqlRepository, mapper, logger)
+        CheckUserExistQuery, UserWithEmailResponse>(sqlRepository, logger)
 {
     protected override IQueryOneFlowBuilder<User, UserWithEmailResponse> BuildQueryFlow(
         IQueryOneFilter<User, UserWithEmailResponse> fromFlow,
         CheckUserExistQuery query)
         => fromFlow
             .WithFilter(x => x.Email == query.Email && x.IsActivated)
-            .WithSpecialAction(x => x.ProjectTo<UserWithEmailResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToUserWithEmailResponse)
             .WithErrorIfNull(IdentityErrorDetail.UserError.NotFound());
 }

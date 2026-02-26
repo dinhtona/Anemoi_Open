@@ -12,7 +12,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
-using AutoMapper;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -20,11 +19,10 @@ namespace Anemoi.BuildingBlock.Infrastructure.Helpers;
 
 public class EfQueryCrossCuttingHandler<TModel, TQuery>(
     ISqlRepository<TModel> sqlRepository,
-    IMapper mapper,
     ILogger logger,
     Func<TQuery, Expression<Func<TModel, bool>>> filterFunc,
     Expression<Func<TModel, CrossCuttingDataResponse>> howToGetDataDefault)
-    : EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, mapper, logger)
+    : EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, logger)
     where TModel : class
     where TQuery : GetDataMappableQuery
 {

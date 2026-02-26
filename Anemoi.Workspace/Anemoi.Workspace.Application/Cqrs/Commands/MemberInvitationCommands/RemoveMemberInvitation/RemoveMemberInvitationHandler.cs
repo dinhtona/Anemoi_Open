@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Workspace.Commands.MemberInvitationCommands.RemoveMemberInvitation;
 using Anemoi.Contract.Workspace.Errors;
-using AutoMapper;
 using MassTransit;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
@@ -14,12 +13,11 @@ namespace Anemoi.Workspace.Application.Cqrs.Commands.MemberInvitationCommands.Re
 public sealed class RemoveMemberInvitationHandler(
     ISqlRepository<MemberInvitation> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger,
     IPublishEndpoint publishEndpoint)
     :
         EfCommandOneVoidHandler<MemberInvitation, RemoveMemberInvitationCommand>(sqlRepository, unitOfWork,
-            mapper, logger)
+            logger)
 {
     protected override ICommandOneFlowBuilderVoid<MemberInvitation> BuildCommand(
         IStartOneCommandVoid<MemberInvitation> fromFlow, RemoveMemberInvitationCommand command,

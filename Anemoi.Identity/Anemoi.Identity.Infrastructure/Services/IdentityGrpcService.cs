@@ -3,7 +3,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.UserLogout;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.UserLogin;
 using Anemoi.Grpc.Identity;
-using AutoMapper;
+using Anemoi.Identity.Application.Mappings;
 using Grpc.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,7 +15,7 @@ namespace Anemoi.Identity.Infrastructure.Services;
 
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class IdentityGrpcService(
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     ISender sender,
     IHttpContextAccessor httpContextAccessor)
@@ -29,8 +29,8 @@ public sealed class IdentityGrpcService(
             new UserLoginCommand(request.UserName, request.Password),
             context.CancellationToken);
         var response = new AuthenticateResult();
-        loginResult.Switch(res => response.Succeed = mapper.Map<AuthenticateSucceed>(res), err =>
-            response.ErrorDetail = mapper.Map<ErrorDetailResult>(err));
+        loginResult.Switch(res => response.Succeed = mapper.ToAuthenticateSucceed(res), err =>
+            response.ErrorDetail = mapper.ToErrorDetailResult(err));
         return response;
     }
 
@@ -40,7 +40,7 @@ public sealed class IdentityGrpcService(
         var result = await sender.Send(new UserLogoutCommand(token));
         var response = new CommandWithVoidResult();
         result.Switch(_ => response.Succeed = new VoidValue(),
-            err => response.ErrorDetail = mapper.Map<ErrorDetailResult>(err));
+            err => response.ErrorDetail = mapper.ToErrorDetailResult(err));
         return response;
     }
 }

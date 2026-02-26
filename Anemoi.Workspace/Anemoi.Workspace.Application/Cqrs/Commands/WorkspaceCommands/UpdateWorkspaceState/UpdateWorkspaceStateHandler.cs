@@ -3,7 +3,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Workspace.Errors;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Commands.WorkspaceCommands.UpdateWorkspaceState;
@@ -11,9 +10,8 @@ namespace Anemoi.Workspace.Application.Cqrs.Commands.WorkspaceCommands.UpdateWor
 public sealed class UpdateWorkspaceStateHandler(
     ISqlRepository<Domain.Models.Workspace> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<Domain.Models.Workspace, UpdateWorkspaceStateCommand>(sqlRepository, unitOfWork, mapper,
+    : EfCommandOneVoidHandler<Domain.Models.Workspace, UpdateWorkspaceStateCommand>(sqlRepository, unitOfWork,
         logger)
 {
     protected override ICommandOneFlowBuilderVoid<Domain.Models.Workspace> BuildCommand(

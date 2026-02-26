@@ -16,8 +16,8 @@ using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Application.IdentityResults;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,7 +27,7 @@ using Serilog;
 namespace Anemoi.Identity.Application.Cqrs.Commands.RefreshTokenCommands.UserRefreshToken;
 
 public sealed class UserRefreshTokenHandler(
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     TokenValidationParameters tokenValidationParameters,
     ISqlRepository<RefreshToken> sqlRepository,
@@ -35,7 +35,7 @@ public sealed class UserRefreshTokenHandler(
     IUnitOfWork unitOfWork,
     ISqlRepository<User> userDbRepository)
     : EfCommandOneResultHandler<RefreshToken, UserRefreshTokenCommand, AuthenticationSuccessResponse>(
-        sqlRepository, unitOfWork, mapper, logger)
+        sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<RefreshToken, AuthenticationSuccessResponse> BuildCommand(
         IStartOneCommandResult<RefreshToken, AuthenticationSuccessResponse> fromFlow,
@@ -51,12 +51,12 @@ public sealed class UserRefreshTokenHandler(
                 return authResult.MapT0(success =>
                 {
                     oldRefreshToken.IsUsed = true;
-                    Mapper.Map(success, refreshToken);
+                    mapper.UpdateRefreshToken(success, refreshToken);
                     return None.Value;
                 });
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.TokenError.CreateRefreshTokenFailed())
-            .WithResultIfSucceed(Mapper.Map<AuthenticationSuccessResponse>);
+            .WithResultIfSucceed(mapper.ToAuthenticationSuccessResponse);
 
     private async Task<OneOf<IdentitySuccess, ErrorDetail>> RefreshTokenAsync(RefreshToken refreshToken,
         CancellationToken cancellationToken = default)

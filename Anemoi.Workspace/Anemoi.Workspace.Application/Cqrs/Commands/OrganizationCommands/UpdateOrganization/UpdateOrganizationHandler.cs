@@ -4,7 +4,7 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Workspace.Commands.OrganizationCommands.UpdateOrganization;
 using Anemoi.Contract.Workspace.Errors;
-using AutoMapper;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
@@ -13,9 +13,9 @@ namespace Anemoi.Workspace.Application.Cqrs.Commands.OrganizationCommands.Update
 public sealed class UpdateOrganizationHandler(
     ISqlRepository<Organization> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<Organization, UpdateOrganizationCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<Organization, UpdateOrganizationCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<Organization> BuildCommand(
         IStartOneCommandVoid<Organization> fromFlow, UpdateOrganizationCommand command,
@@ -24,7 +24,7 @@ public sealed class UpdateOrganizationHandler(
             .UpdateOne(x => x.Id == command.Id)
             .WithSpecialAction(null)
             .WithCondition(_ => None.Value)
-            .WithModify(organization => Mapper.Map(command, organization))
+            .WithModify(organization => mapper.UpdateOrganization(command, organization))
             .WithErrorIfNull(WorkspaceErrorDetail.OrganizationError.NotFound())
             .WithErrorIfSaveChange(WorkspaceErrorDetail.OrganizationError.UpdateFailed());
 }

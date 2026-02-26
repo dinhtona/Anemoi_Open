@@ -5,7 +5,6 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramewo
 using Anemoi.Contract.Identity.Commands.IdentityCommands.CheckEmailResetTokenCommand;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Abstractions;
-using AutoMapper;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
 
@@ -14,11 +13,10 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.CheckEmailR
 public sealed class CheckEmailResetTokenHandler(
     ISqlRepository<User> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository)
     : EfCommandOneVoidHandler<User, CheckEmailResetTokenCommand>(sqlRepository,
-        unitOfWork, mapper, logger)
+        unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(
         IStartOneCommandVoid<User> fromFlow, CheckEmailResetTokenCommand command,

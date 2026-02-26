@@ -5,16 +5,15 @@ using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.OrganizationQueries.CheckIfSubDomainIsValid;
 using Anemoi.Contract.Workspace.Responses;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
+using Anemoi.Workspace.Domain.Models;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.OrganizationQueries.CheckIfSubDomainIsValid;
 
 public sealed class CheckIfSubDomainIsValidHandler(
     ISqlRepository<Organization> sqlRepository,
-    IMapper mapper,
     ILogger logger)
-    : EfQueryOneHandler<Organization, CheckIfSubDomainIsValidQuery, OrganizationIdResponse>(sqlRepository, mapper,
+    : EfQueryOneHandler<Organization, CheckIfSubDomainIsValidQuery, OrganizationIdResponse>(sqlRepository,
         logger)
 {
     protected override IQueryOneFlowBuilder<Organization, OrganizationIdResponse> BuildQueryFlow(

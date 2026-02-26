@@ -12,16 +12,14 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.BuildingBlock.Infrastructure.Helpers;
 
 public class EfQueryCountingCrossCuttingHandler<TModel, TQuery>(
     ISqlRepository<TModel> sqlRepository,
-    IMapper mapper,
     ILogger logger) :
-    EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, mapper, logger)
+    EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, logger)
     where TModel : class
     where TQuery : GetDataCountingQuery
 {

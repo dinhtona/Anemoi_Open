@@ -4,21 +4,20 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.MemberQueries.GetMember;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberQueries.GetMember;
 
-public sealed class GetMemberHandler(ISqlRepository<Member> sqlRepository, IMapper mapper, ILogger logger)
+public sealed class GetMemberHandler(ISqlRepository<Member> sqlRepository, WorkspaceMapper mapper, ILogger logger)
     : EfQueryOneHandler<Member, GetMemberQuery, MemberResponse>(sqlRepository,
-        mapper, logger)
+        logger)
 {
     protected override IQueryOneFlowBuilder<Member, MemberResponse> BuildQueryFlow(
         IQueryOneFilter<Member, MemberResponse> fromFlow, GetMemberQuery query)
         => fromFlow
             .WithFilter(x => x.Id == query.Id)
-            .WithSpecialAction(x => x.ProjectTo<MemberResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToMemberResponse)
             .WithErrorIfNull(WorkspaceErrorDetail.MemberError.NotFound());
 }

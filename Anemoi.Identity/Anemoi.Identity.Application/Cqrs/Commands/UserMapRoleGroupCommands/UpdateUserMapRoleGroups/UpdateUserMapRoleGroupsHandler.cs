@@ -8,7 +8,6 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramewo
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -17,9 +16,8 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.UserMapRoleGroupCommands.Upd
 public sealed class UpdateUserMapRoleGroupsHandler(
     ISqlRepository<UserMapRoleGroup> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandManyVoidHandler<UserMapRoleGroup, UpdateUserMapRoleGroupsCommand>(sqlRepository, unitOfWork, mapper,
+    : EfCommandManyVoidHandler<UserMapRoleGroup, UpdateUserMapRoleGroupsCommand>(sqlRepository, unitOfWork,
         logger)
 {
     protected override ICommandManyFlowBuilderVoid<UserMapRoleGroup> BuildCommand(

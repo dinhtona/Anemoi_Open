@@ -10,15 +10,14 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetRoleGroups;
 using Anemoi.Contract.Identity.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Serilog;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
+using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.RoleGroupQueries.GetRoleGroups;
 
-public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository, IMapper mapper, ILogger logger)
-    : EfQueryPaginationHandler<RoleGroup, GetRoleGroupsQuery, RoleGroupsResponse>(sqlRepository, mapper, logger)
+public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository, IdentityMapper mapper, ILogger logger)
+    : EfQueryPaginationHandler<RoleGroup, GetRoleGroupsQuery, RoleGroupsResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<RoleGroup, RoleGroupsResponse> BuildQueryFlow(
         IQueryListFilter<RoleGroup, RoleGroupsResponse> fromFlow, GetRoleGroupsQuery query)
@@ -52,7 +51,7 @@ public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository
             .CombineAnd(searchKeyFilter, defaultFilter, creatorIdsFilter, roleGroupClaimsFilter);
         return fromFlow
             .WithFilter(finalFilter)
-            .WithSpecialAction(r => r.ProjectTo<RoleGroupsResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToRoleGroupsResponse)
             .WithSortFieldWhenNotSet(x => x.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
     }

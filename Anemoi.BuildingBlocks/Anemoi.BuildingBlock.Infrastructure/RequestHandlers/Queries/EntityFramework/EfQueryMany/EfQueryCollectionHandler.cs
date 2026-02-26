@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
@@ -17,14 +17,12 @@ namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFram
 
 public abstract class EfQueryCollectionHandler<TModel, TQuery, TResponse>(
     ISqlRepository<TModel> sqlRepository,
-    IMapper mapper,
     ILogger logger)
     : IQueryHandler<TQuery, CollectionResponse<TResponse>>
     where TModel : class
     where TQuery : IQueryCollection<TResponse>
     where TResponse : class
 {
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected ILogger Logger { get; } = logger;
     private readonly IQueryListFilter<TModel, TResponse> _queryFlow = new QueryManyFlow<TModel, TResponse>();
@@ -76,5 +74,9 @@ public abstract class EfQueryCollectionHandler<TModel, TQuery, TResponse>(
 
     protected virtual Task<List<TResponse>> MapToResultAsync(TQuery query,
         OneOf<List<TModel>, List<TResponse>> modelsOrResponses)
-        => modelsOrResponses.Match(m => Task.FromResult(Mapper.Map<List<TResponse>>(m)), Task.FromResult);
+        => modelsOrResponses.Match(m =>
+        {
+            throw new InvalidOperationException(
+                $"Please override {nameof(MapToResultAsync)} if you don't use SpecialAction to project to {nameof(TResponse)}");
+        }, Task.FromResult);
 }

@@ -11,17 +11,15 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.BuildingBlock.Infrastructure.Helpers;
 
 public class EfQueryNameMapIdCrossCuttingHandler<TModel, TQuery>(
     ISqlRepository<TModel> sqlRepository,
-    IMapper mapper,
     ILogger logger,
     Func<TQuery, Expression<Func<TModel, bool>>> filterFunc)
-    : EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, mapper, logger)
+    : EfQueryCollectionHandler<TModel, TQuery, CrossCuttingDataResponse>(sqlRepository, logger)
     where TModel : class
     where TQuery : GetNameMapIdQuery
 {

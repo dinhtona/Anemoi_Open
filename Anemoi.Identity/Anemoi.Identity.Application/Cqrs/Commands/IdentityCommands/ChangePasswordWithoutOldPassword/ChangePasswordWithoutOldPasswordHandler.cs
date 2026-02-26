@@ -7,20 +7,18 @@ using Anemoi.Contract.Identity.Commands.IdentityCommands.ChangePasswordWithoutOl
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
-using AutoMapper;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.ChangePasswordWithoutOldPassword;
 
 public sealed class ChangePasswordWithoutOldPasswordHandler(
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork)
     : EfCommandOneResultHandler<User, ChangePasswordWithoutOldPasswordCommand, UserIdResponse>(
-        userDbRepository, unitOfWork, mapper, logger)
+        userDbRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<User, UserIdResponse> BuildCommand(
         IStartOneCommandResult<User, UserIdResponse> fromFlow,

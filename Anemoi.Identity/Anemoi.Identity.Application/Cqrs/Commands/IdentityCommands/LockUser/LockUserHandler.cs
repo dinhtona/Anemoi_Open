@@ -7,18 +7,16 @@ using Anemoi.Contract.Identity.Commands.IdentityCommands.LockUser;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.LockUser;
 
 public sealed class LockUserHandler(
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork)
-    : EfCommandOneVoidHandler<User, LockUserCommand>(userDbRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, LockUserCommand>(userDbRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(
         IStartOneCommandVoid<User> fromFlow, LockUserCommand command,

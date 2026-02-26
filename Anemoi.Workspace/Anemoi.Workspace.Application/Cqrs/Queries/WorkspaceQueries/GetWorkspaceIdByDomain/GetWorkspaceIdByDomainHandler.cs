@@ -5,17 +5,16 @@ using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.OrganizationQueries.GetOrganizationIdByDomain;
 using Anemoi.Contract.Workspace.Responses;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
+using Anemoi.Workspace.Domain.Models;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.WorkspaceQueries.GetWorkspaceIdByDomain;
 
 public sealed class GetWorkspaceIdByDomainHandler(
     ISqlRepository<Organization> sqlRepository,
-    IMapper mapper,
     ILogger logger)
     : EfQueryOneHandler<Organization, GetOrganizationIdByDomainQuery, OrganizationIdResponse>(
-        sqlRepository, mapper, logger)
+        sqlRepository, logger)
 {
     protected override IQueryOneFlowBuilder<Organization, OrganizationIdResponse>
         BuildQueryFlow(IQueryOneFilter<Organization, OrganizationIdResponse> fromFlow,

@@ -4,22 +4,21 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.MemberInvitationQueries.GetMemberInvitation;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberInvitationQueries.GetMemberInvitation;
 
 public sealed class
-    GetMemberInvitationHandler(ISqlRepository<MemberInvitation> sqlRepository, IMapper mapper, ILogger logger)
-    : EfQueryOneHandler<MemberInvitation, GetMemberInvitationQuery, MemberInvitationResponse>(sqlRepository, mapper,
+    GetMemberInvitationHandler(ISqlRepository<MemberInvitation> sqlRepository, WorkspaceMapper mapper, ILogger logger)
+    : EfQueryOneHandler<MemberInvitation, GetMemberInvitationQuery, MemberInvitationResponse>(sqlRepository,
         logger)
 {
     protected override IQueryOneFlowBuilder<MemberInvitation, MemberInvitationResponse> BuildQueryFlow(
         IQueryOneFilter<MemberInvitation, MemberInvitationResponse> fromFlow, GetMemberInvitationQuery query)
         => fromFlow
             .WithFilter(x => x.Id == query.Id)
-            .WithSpecialAction(x => x.ProjectTo<MemberInvitationResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToMemberInvitationResponse)
             .WithErrorIfNull(WorkspaceErrorDetail.MemberInvitationError.NotFound());
 }

@@ -9,7 +9,7 @@ using Anemoi.Contract.Identity.Responses;
 using Anemoi.Contract.Workspace.Commands.MemberInvitationCommands.CreateMemberInvitation;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.ModelIds;
-using AutoMapper;
+using Anemoi.Workspace.Application.Mappings;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -23,11 +23,11 @@ public sealed class CreateMemberInvitationsHandler(
     ISqlRepository<Member> memberRepository,
     IRequestClient<GetUserWithEmailsByEmailsQuery> userWithEmailsByEmailsClient,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger,
     IPublishEndpoint publishEndpoint,
     IWorkspaceIdGetter workspaceIdGetter)
-    : EfCommandManyVoidHandler<MemberInvitation, CreateMemberInvitationsCommand>(sqlRepository, unitOfWork, mapper,
+    : EfCommandManyVoidHandler<MemberInvitation, CreateMemberInvitationsCommand>(sqlRepository, unitOfWork,
         logger)
 {
     public override async Task<OneOf<None, ErrorDetailResponse>> Handle(CreateMemberInvitationsCommand request,
@@ -72,7 +72,7 @@ public sealed class CreateMemberInvitationsHandler(
         IStartManyCommandVoid<MemberInvitation> fromFlow, CreateMemberInvitationsCommand command,
         CancellationToken cancellationToken)
         => fromFlow
-            .CreateMany(Mapper.Map<List<MemberInvitation>>(command.Users))
+            .CreateMany(command.Users.Select(mapper.ToMemberInvitation).ToList())
             .WithCondition(_ => None.Value)
             .WithErrorIfSaveChange(WorkspaceErrorDetail.MemberInvitationError.CreateFailed());
 }

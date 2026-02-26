@@ -10,19 +10,17 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Identity.Contracts;
 using Anemoi.Contract.Identity.Queries.RoleQueries.GetUserRolesByRoleGroupClaims;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.RoleQueries.GetUserRolesByWorkspace;
 
 public sealed class GetUserRolesByWorkspaceHandler(
     ISqlRepository<UserMapRoleGroup> sqlRepository,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger)
     : EfQueryCollectionHandler<UserMapRoleGroup, GetUserRolesByRoleGroupClaimsQuery, RoleGroupResponse>(sqlRepository,
-        mapper,
         logger)
 {
     protected override IQueryListFlowBuilder<UserMapRoleGroup, RoleGroupResponse> BuildQueryFlow(
@@ -39,9 +37,7 @@ public sealed class GetUserRolesByWorkspaceHandler(
         };
         return fromFlow
             .WithFilter(roleGroupClaimsFilter.And(a => a.UserId == query.UserId))
-            .WithSpecialAction(a => a
-                .Select(x => x.RoleGroup)
-                .ProjectTo<RoleGroupResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(a => mapper.ProjectToRoleGroupResponse(a.Select(x => x.RoleGroup)))
             .WithSortFieldWhenNotSet(a => a.Id)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
     }

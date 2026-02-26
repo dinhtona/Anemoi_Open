@@ -18,6 +18,7 @@
       <PackageReference Include="EPPlus" Version="6.2.4" />
       <PackageReference Include="jose-jwt" Version="4.1.0" />
       <PackageReference Include="Nager.PublicSuffix" Version="2.4.0" />
+      <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
     </ItemGroup>
 

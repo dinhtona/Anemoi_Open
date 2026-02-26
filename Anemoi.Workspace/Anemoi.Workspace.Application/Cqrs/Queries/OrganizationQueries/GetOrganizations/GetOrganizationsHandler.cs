@@ -5,8 +5,7 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Queries.OrganizationQueries.GetOrganizations;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
@@ -14,16 +13,16 @@ namespace Anemoi.Workspace.Application.Cqrs.Queries.OrganizationQueries.GetOrgan
 
 public sealed class GetOrganizationsHandler(
     ISqlRepository<Organization> sqlRepository,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger,
     IWorkspaceIdGetter workspaceIdGetter)
-    : EfQueryPaginationHandler<Organization, GetOrganizationsQuery, OrganizationResponse>(sqlRepository, mapper, logger)
+    : EfQueryPaginationHandler<Organization, GetOrganizationsQuery, OrganizationResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<Organization, OrganizationResponse> BuildQueryFlow(
         IQueryListFilter<Organization, OrganizationResponse> fromFlow, GetOrganizationsQuery query)
         => fromFlow
             .WithFilter(x => x.WorkspaceId == new WorkspaceId(Guid.Parse(workspaceIdGetter.WorkspaceId)))
-            .WithSpecialAction(x => x.ProjectTo<OrganizationResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToOrganizationResponse)
             .WithSortFieldWhenNotSet(x => x.Id)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
 }

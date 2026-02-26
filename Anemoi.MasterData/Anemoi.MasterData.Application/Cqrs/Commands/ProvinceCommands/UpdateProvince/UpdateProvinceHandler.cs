@@ -4,8 +4,8 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.MasterData.Commands.ProvinceCommands.UpdateProvince;
 using Anemoi.Contract.MasterData.Errors;
+using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.MasterData.Application.Cqrs.Commands.ProvinceCommands.UpdateProvince;
@@ -13,9 +13,9 @@ namespace Anemoi.MasterData.Application.Cqrs.Commands.ProvinceCommands.UpdatePro
 public sealed class UpdateProvinceHandler(
     ISqlRepository<Province> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    MasterDataMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<Province, UpdateProvinceCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<Province, UpdateProvinceCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<Province> BuildCommand(
         IStartOneCommandVoid<Province> fromFlow, UpdateProvinceCommand command,
@@ -24,7 +24,7 @@ public sealed class UpdateProvinceHandler(
             .UpdateOne(x => x.Id == command.Id)
             .WithSpecialAction(null)
             .WithCondition(_ => None.Value)
-            .WithModify(province => Mapper.Map(command, province))
+            .WithModify(province => mapper.UpdateProvince(command, province))
             .WithErrorIfNull(MasterDataErrorDetail.ProvinceError.NotFound())
             .WithErrorIfSaveChange(MasterDataErrorDetail.ProvinceError.UpdateFailed());
 }

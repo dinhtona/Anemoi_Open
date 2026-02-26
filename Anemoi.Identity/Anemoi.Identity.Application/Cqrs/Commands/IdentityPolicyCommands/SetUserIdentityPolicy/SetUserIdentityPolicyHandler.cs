@@ -9,7 +9,6 @@ using Anemoi.Contract.Identity.Commands.IdentityPolicyCommands.SetUserIdentityPo
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityPolicyCommands.SetUserIdentityPolicy;
@@ -19,9 +18,8 @@ public sealed class SetUserIdentityPolicyHandler(
     ISqlRepository<IdentityPolicy> identityPolicyRepository,
     IUserClaimRepository userClaimRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<User, SetUserIdentityPolicyCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, SetUserIdentityPolicyCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(IStartOneCommandVoid<User> fromFlow,
         SetUserIdentityPolicyCommand command,

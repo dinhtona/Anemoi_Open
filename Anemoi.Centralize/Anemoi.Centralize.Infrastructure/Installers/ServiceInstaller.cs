@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Anemoi.Centralize.Application.Abstractions;
 using Anemoi.Centralize.Application.ContractAssemblies;
 using Anemoi.Centralize.Application.Filters;
+using Anemoi.Centralize.Application.Mappings;
 using Anemoi.Centralize.Infrastructure.Services;
 
 namespace Anemoi.Centralize.Infrastructure.Installers;
@@ -18,6 +19,7 @@ public sealed class ServiceInstaller : IInstaller
     {
         services.AddHttpContextAccessor();
         services.AddHttpClient();
+        services.AddScoped<CentralizeMapper>();
         services.AddTransient<IRequestClientService, RequestClientService>();
         services.AddScoped<AutoMapDataFilter>();
         services.AddScoped<IFileService, S3FileService>();

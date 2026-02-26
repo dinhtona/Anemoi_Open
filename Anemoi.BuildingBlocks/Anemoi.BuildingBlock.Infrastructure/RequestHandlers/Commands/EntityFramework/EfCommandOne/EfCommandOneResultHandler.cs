@@ -6,7 +6,6 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
-using AutoMapper;
 using OneOf;
 using Serilog;
 
@@ -15,13 +14,11 @@ namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFra
 public abstract class EfCommandOneResultHandler<TModel, TCommand, TResult>(
     ISqlRepository<TModel> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
     : ICommandHandler<TCommand, OneOf<TResult, ErrorDetailResponse>>
     where TModel : class
     where TCommand : class, ICommand<OneOf<TResult, ErrorDetailResponse>>
 {
-    protected IMapper Mapper { get; } = mapper;
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
     protected ILogger Logger { get; } = logger;

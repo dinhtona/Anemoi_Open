@@ -5,7 +5,7 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.RemoveRoleGroup;
 using Anemoi.Contract.Identity.Errors;
-using AutoMapper;
+using Anemoi.Identity.Application.Mappings;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
 
@@ -14,10 +14,10 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.RoleGroupCommands.RemoveRole
 public sealed class RemoveRoleGroupHandler(
     ISqlRepository<RoleGroup> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     ISqlRepository<UserMapRoleGroup> userRoleGroupDbRepository)
-    : EfCommandOneVoidHandler<RoleGroup, RemoveRoleGroupCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<RoleGroup, RemoveRoleGroupCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<RoleGroup> BuildCommand(IStartOneCommandVoid<RoleGroup> fromFlow,
         RemoveRoleGroupCommand command,

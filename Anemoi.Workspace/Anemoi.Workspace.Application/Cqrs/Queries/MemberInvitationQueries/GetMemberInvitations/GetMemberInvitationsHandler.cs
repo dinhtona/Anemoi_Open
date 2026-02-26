@@ -6,8 +6,7 @@ using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Queries.MemberInvitationQueries.GetMemberInvitations;
 using Anemoi.Contract.Workspace.Responses;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberInvitationQueries.GetMemberInvitations;
@@ -15,17 +14,17 @@ namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberInvitationQueries.GetM
 public sealed class GetMemberInvitationsHandler(
     ISqlRepository<MemberInvitation> sqlRepository,
     IWorkspaceIdGetter workspaceIdGetter,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
     : EfQueryPaginationHandler<MemberInvitation,
-        GetMemberInvitationsQuery, MemberInvitationResponse>(sqlRepository, mapper, logger)
+        GetMemberInvitationsQuery, MemberInvitationResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<MemberInvitation, MemberInvitationResponse> BuildQueryFlow(
         IQueryListFilter<MemberInvitation, MemberInvitationResponse> fromFlow,
         GetMemberInvitationsQuery query)
         => fromFlow
             .WithFilter(x => x.WorkspaceId == new WorkspaceId(Guid.Parse(workspaceIdGetter.WorkspaceId)))
-            .WithSpecialAction(x => x.ProjectTo<MemberInvitationResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToMemberInvitationResponse)
             .WithSortFieldWhenNotSet(x => x.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
 }

@@ -1,24 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUsers;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
+using OneOf;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.UserQueries.GetUsers;
 
 public sealed class GetUsersHandler(
     ISqlRepository<User> sqlRepository,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger)
-    : EfQueryPaginationHandler<User, GetUsersQuery, UserResponse>(sqlRepository, mapper, logger)
+    : EfQueryPaginationHandler<User, GetUsersQuery, UserResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<User, UserResponse> BuildQueryFlow(
         IQueryListFilter<User, UserResponse> fromFlow, GetUsersQuery query) =>
@@ -51,4 +56,10 @@ public sealed class GetUsersHandler(
 
         return ExpressionHelper.CombineAnd(searchFilterEmails, nameFilter, phoneNumber);
     }
+
+    protected override Task<PaginationResponse<UserResponse>> MapToResultAsync(GetUsersQuery query,
+        OneOf<List<User>, List<UserResponse>> modelsOrResponses, long totalRecord)
+        => Task.FromResult(new PaginationResponse<UserResponse>(
+            modelsOrResponses.Match(i => i.Select(mapper.ToUserResponse).ToList(), rs => rs),
+            totalRecord));
 }
