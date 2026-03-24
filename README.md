@@ -98,3 +98,24 @@ Please adhere to this project's `code of conduct`.
 
 [![Medium](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@sigma.vu)
 
+
+## AI Coding Guidelines
+
+### Cách nạp kế hoạch (Prompt Workflow) mới nhất cho Anemoi_Open
+Khi bạn yêu cầu AI tạo tính năng mới, bạn có thể chat theo luồng sau đây để đảm bảo AI tuân thủ đúng kiến trúc:
+
+**Prompt 1 (Thiết lập Context):**
+> "Tôi muốn thêm tính năng [X] vào project. Hãy đọc file @ArchitectureGuide.md để hiểu quy ước Clean Architecture, CQRS, Mapperly, xử lý lỗi bằng OneOf<>, Event-driven qua MassTransit và đặc biệt chú ý **Mục 5: Iterative Execution Steps**. Chỉ phản hồi 'Đã hiểu' nếu bạn nắm rõ luật và quy trình 3 bước."
+
+**Prompt 2 (Giao việc):**
+> "Tốt, đây là Implementation Plan (File Manifest) cho tính năng này: [Dán nội dung @FeatureImplementationTemplate.md vào đây]. Hãy xác nhận danh sách file này có hợp lý không, sau đó bắt đầu code **Bước 1 (Domain & Data)**. Tuyệt đối không code Bước 2 cho đến khi tôi review xong Bước 1."
+
+---
+
+### EN version (For English-speaking AI)
+
+**Prompt 1 (Set Context):**
+> "I need to add a new feature [X] to the project. Please read @ArchitectureGuide.md thoroughly to understand my Clean Architecture, CQRS, Mapperly usage, Error handling with OneOf<>, Event-driven messaging via MassTransit, and pay special attention to **Section 5: Iterative Execution Steps**. Reply 'Understood' if you grasped all the rules and the 3-step workflow."
+
+**Prompt 2 (Assign Task):**
+> "Great, here is the Implementation Plan (File Manifest): [Paste the content of @FeatureImplementationTemplate.md here]. Please review to see if the file list aligns with the project structure, then execute **Step 1 (Domain & Data)**. Do not proceed to Step 2 until I review and approve Step 1."
