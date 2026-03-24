@@ -51,7 +51,21 @@ public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository
             .CombineAnd(searchKeyFilter, defaultFilter, creatorIdsFilter, roleGroupClaimsFilter);
         return fromFlow
             .WithFilter(finalFilter)
-            .WithSpecialAction(mapper.ProjectToRoleGroupsResponse)
+            .WithSpecialAction(q => q.Select(r => new RoleGroupsResponse
+            {
+                Id = r.Id.ToString(),
+                Name = r.Name,
+                Description = r.Description,
+                CreatedTime = r.CreatedTime,
+                CreatorId = r.CreatorId != null ? r.CreatorId.ToString() : null,
+                CreatorName = r.Creator != null ? r.Creator.FirstName : null,
+                CreatorEmail = r.Creator != null ? r.Creator.Email : null,
+                UpdaterId = r.UpdaterId != null ? r.UpdaterId.ToString() : null,
+                UpdaterName = r.Updater != null ? r.Updater.FirstName : null,
+                UpdaterEmail = r.Updater != null ? r.Updater.Email : null,
+                UpdatedTime = r.UpdatedTime,
+                IsDefault = r.IsDefault
+            }))
             .WithSortFieldWhenNotSet(x => x.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
     }
