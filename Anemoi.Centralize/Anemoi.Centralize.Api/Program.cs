@@ -85,6 +85,17 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
+// Setup Localization
+var supportedCultures = new[] { "en-US", "vi-VN" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("vi-VN")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+// Automatically extract language from Accept-Language header
+localizationOptions.ApplyCurrentCultureToResponseHeaders = true;
+app.UseRequestLocalization(localizationOptions);
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
