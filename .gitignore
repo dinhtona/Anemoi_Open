@@ -14,6 +14,23 @@
 *.user
 *.userosscache
 *.sln.docstates
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -371,3 +388,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+cody-web-app
