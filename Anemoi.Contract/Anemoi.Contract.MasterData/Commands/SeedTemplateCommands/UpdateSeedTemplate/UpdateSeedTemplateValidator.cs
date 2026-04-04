@@ -6,7 +6,6 @@ public sealed class UpdateSeedTemplateValidator : AbstractValidator<UpdateSeedTe
 {
     public UpdateSeedTemplateValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(512);
     }
 }

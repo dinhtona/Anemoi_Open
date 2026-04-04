@@ -44,7 +44,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 
     [HttpPatch("{id}")]
     [Authorize(Policy = "Internal", Roles = "Administrator")]
-    public async Task<IActionResult> UpdateSeedServer(SeedServerId id, [FromBody] UpdateSeedServerCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateSeedServer([FromRoute] SeedServerId id, [FromBody] UpdateSeedServerCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
         var res = await sender.Send(request, cancellationToken);
@@ -71,7 +71,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 
     [HttpPatch("{id}")]
     [Authorize(Policy = "Internal", Roles = "Administrator")]
-    public async Task<IActionResult> UpdateSeedFunction(SeedFunctionId id, [FromBody] UpdateSeedFunctionCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateSeedFunction([FromRoute] SeedFunctionId id, [FromBody] UpdateSeedFunctionCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
         var res = await sender.Send(request, cancellationToken);
@@ -98,7 +98,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 
     [HttpPatch("{id}")]
     [Authorize(Policy = "Internal", Roles = "Administrator")]
-    public async Task<IActionResult> UpdateSeedTemplate(SeedTemplateId id, [FromBody] UpdateSeedTemplateCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateSeedTemplate([FromRoute] SeedTemplateId id, [FromBody] UpdateSeedTemplateCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
         var res = await sender.Send(request, cancellationToken);
@@ -109,7 +109,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 
     [HttpGet("{serverId}")]
     [ProducesResponseType(typeof(DbSchemaResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetDbSchema(SeedServerId serverId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetDbSchema([FromRoute] SeedServerId serverId, CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetDbSchemaQuery(serverId), cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);

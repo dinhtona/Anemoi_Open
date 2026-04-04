@@ -6,7 +6,6 @@ public sealed class UpdateSeedServerValidator : AbstractValidator<UpdateSeedServ
 {
     public UpdateSeedServerValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(512);
         RuleFor(x => x.ConnectionString).NotEmpty();
     }

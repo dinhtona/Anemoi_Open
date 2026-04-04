@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 namespace Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.UpdateSeedFunction;
 
 public sealed record UpdateSeedFunctionCommand(
-    [property: JsonIgnore] SeedFunctionId Id,
-    SeedServerId? SeedServerId,
-    SeedTemplateId? SeedTemplateId,
     string Name,
     string Description,
-    string TablesJson) : ICommandVoid;
+    string TablesJson,
+    SeedServerId? SeedServerId = default,
+    SeedTemplateId? SeedTemplateId = default,
+    [property: JsonIgnore] SeedFunctionId Id = default) : ICommandVoid;

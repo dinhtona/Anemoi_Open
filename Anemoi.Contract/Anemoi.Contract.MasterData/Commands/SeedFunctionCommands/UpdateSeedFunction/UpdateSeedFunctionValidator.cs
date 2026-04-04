@@ -6,7 +6,6 @@ public sealed class UpdateSeedFunctionValidator : AbstractValidator<UpdateSeedFu
 {
     public UpdateSeedFunctionValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(512);
     }
 }
