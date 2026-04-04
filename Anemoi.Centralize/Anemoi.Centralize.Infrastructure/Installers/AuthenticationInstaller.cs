@@ -1,4 +1,4 @@
-﻿using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,6 +39,17 @@ public sealed class AuthenticationInstaller : IInstaller
         {
             x.SaveToken = true;
             x.TokenValidationParameters = tokenValidationParameters;
+            x.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    if (context.Request.Cookies.ContainsKey("access_token"))
+                    {
+                        context.Token = context.Request.Cookies["access_token"];
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         });
     }
 }

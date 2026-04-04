@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
@@ -32,9 +32,12 @@ public static class Extensions
     public static string GetToken(this HttpRequest httpRequest)
     {
         var authorizationHeader = httpRequest?.Headers[HeaderNames.Authorization] ?? StringValues.Empty;
-        return authorizationHeader == StringValues.Empty
-            ? string.Empty
-            : authorizationHeader.Single().Split(" ").Last();
+        if (authorizationHeader != StringValues.Empty)
+        {
+            return authorizationHeader.Single().Split(" ").Last();
+        }
+
+        return httpRequest?.Cookies["access_token"] ?? string.Empty;
     }
 
     public static string GetUserId(this HttpContext httpContext) =>

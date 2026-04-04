@@ -1,4 +1,4 @@
-﻿using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Centralize.Application.Cqrs.Requests.Workspace;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.CheckEmailResetTokenCommand;
@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Anemoi.Contract.Identity.ModelIds;
 
 namespace Anemoi.Centralize.Api.Controllers.Identity;
 
@@ -76,7 +77,13 @@ public class IdentityController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
+        return res.Match<IActionResult>(
+            success =>
+            {
+                SetTokenCookies(success.Token, success.RefreshToken);
+                return Ok(success);
+            },
+            BadRequest);
     }
 
     /// <summary>
@@ -96,7 +103,14 @@ public class IdentityController(ISender sender) : ControllerBase
             .Send(new GenerateTokenByRoleGroupClaimsCommand([
                 new RoleGroupClaimContract("workspaceId", command.WorkspaceId)
             ]), cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
+        
+        return res.Match<IActionResult>(
+            success =>
+            {
+                SetTokenCookies(success.Token, success.RefreshToken);
+                return Ok(success);
+            },
+            BadRequest);
     }
 
     /// <summary>
@@ -113,8 +127,25 @@ public class IdentityController(ISender sender) : ControllerBase
     public async Task<IActionResult> RefreshToken([FromBody] UserRefreshTokenCommand command,
         CancellationToken cancellationToken)
     {
-        var res = await sender.Send(command, cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
+        var refreshTokenStr = command.RefreshToken?.ToString();
+        if (string.IsNullOrEmpty(refreshTokenStr))
+        {
+            Request.Cookies.TryGetValue("refresh_token", out refreshTokenStr);
+        }
+
+        if (string.IsNullOrEmpty(refreshTokenStr) || !Guid.TryParse(refreshTokenStr, out var guid))
+        {
+            return BadRequest(new ErrorDetailResponse { Messages = new[] { "Refresh token is missing or invalid." } });
+        }
+
+        var res = await sender.Send(new UserRefreshTokenCommand(new RefreshTokenId(guid)), cancellationToken);
+        return res.Match<IActionResult>(
+            success =>
+            {
+                SetTokenCookies(success.Token, success.RefreshToken);
+                return Ok(success);
+            },
+            BadRequest);
     }
 
 
@@ -124,14 +155,34 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize]
-    [ProducesResponseType(typeof(AuthenticationSuccessResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        var res = await sender
-            .Send(new UserLogoutCommand(HttpContext.GetToken()), cancellationToken);
-        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+        var token = HttpContext.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            await sender.Send(new UserLogoutCommand(token), cancellationToken);
+        }
+        
+        Response.Cookies.Delete("access_token");
+        Response.Cookies.Delete("refresh_token");
+        
+        return Ok();
+    }
+
+    private void SetTokenCookies(string accessToken, string refreshToken)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false, // Set to true in production with HTTPS
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
+        };
+
+        Response.Cookies.Append("access_token", accessToken, cookieOptions);
+        Response.Cookies.Append("refresh_token", refreshToken, cookieOptions);
     }
 
     /// <summary>
