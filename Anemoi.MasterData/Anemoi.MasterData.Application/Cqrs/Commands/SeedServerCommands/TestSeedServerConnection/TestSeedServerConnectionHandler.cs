@@ -20,7 +20,7 @@ public sealed class TestSeedServerConnectionHandler(
     {
         try
         {
-            var isSuccess = await dbDiscoveryService.TestConnectionAsync(request.ConnectionString, cancellationToken);
+            var isSuccess = await dbDiscoveryService.TestConnectionAsync(request.ConnectionString, request.Provider, cancellationToken);
             if (!isSuccess)
             {
                 return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedServerError.ConnectionFailed());

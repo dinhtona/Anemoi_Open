@@ -8,4 +8,5 @@ public sealed record UpdateSeedServerCommand(
     string Name, 
     string ConnectionString, 
     string Environment,
+    string Provider,
     [property: JsonIgnore] SeedServerId Id = default) : ICommandVoid;

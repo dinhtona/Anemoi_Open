@@ -121,4 +121,12 @@ public static class MasterDataErrorDetail
         };
 
     }
+
+    public static class SeedExecutionError
+    {
+        public static ErrorDetail CustomError(string message) => new()
+        {
+            Messages = [message], Code = "SEE_01"
+        };
+    }
 }

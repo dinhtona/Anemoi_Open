@@ -4,6 +4,6 @@ namespace Anemoi.MasterData.Application.Abstractions;
 
 public interface IDbDiscoveryService
 {
-    Task<DbSchemaResponse> GetSchemaAsync(string connectionString, CancellationToken cancellationToken = default);
-    Task<bool> TestConnectionAsync(string connectionString, CancellationToken cancellationToken = default);
+    Task<DbSchemaResponse> GetSchemaAsync(string connectionString, string provider, CancellationToken cancellationToken = default);
+    Task<bool> TestConnectionAsync(string connectionString, string provider, CancellationToken cancellationToken = default);
 }

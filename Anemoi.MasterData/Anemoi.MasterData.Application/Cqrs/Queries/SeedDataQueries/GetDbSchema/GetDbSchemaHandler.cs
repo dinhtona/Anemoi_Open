@@ -24,7 +24,7 @@ public sealed class GetDbSchemaHandler(
         var server = await sqlRepository.GetFirstByConditionAsync(x => x.Id == request.SeedServerId);
         if (server is null) return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedServerError.NotFound());
 
-        var schema = await dbDiscoveryService.GetSchemaAsync(server.ConnectionString, cancellationToken);
+        var schema = await dbDiscoveryService.GetSchemaAsync(server.ConnectionString, server.Provider, cancellationToken);
         return schema;
     }
 }
