@@ -3,6 +3,7 @@ using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.CreateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.UpdateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedServerCommands.CreateSeedServer;
+using Anemoi.Contract.MasterData.Commands.SeedServerCommands.TestSeedServerConnection;
 using Anemoi.Contract.MasterData.Commands.SeedServerCommands.UpdateSeedServer;
 using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.CreateSeedTemplate;
 using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.UpdateSeedTemplate;
@@ -48,6 +49,14 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     {
         var request = command with { Id = id };
         var res = await sender.Send(request, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    public async Task<IActionResult> TestSeedServerConnection([FromBody] TestSeedServerConnectionCommand command, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
     }
 

@@ -67,6 +67,11 @@ public static class MasterDataErrorDetail
             Messages = ["Seed server name already exists!"], Code = "SSE_04"
         };
 
+        public static ErrorDetail ConnectionFailed() => new()
+        {
+            Messages = ["Database connection test failed!"], Code = "SSE_05"
+        };
+
     }
 
     public static class SeedFunctionError

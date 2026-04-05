@@ -38,4 +38,19 @@ public sealed class DbDiscoveryService : IDbDiscoveryService
 
         return response;
     }
+
+    public async Task<bool> TestConnectionAsync(string connectionString, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TestConnection Error]: {ex.Message}");
+            return false;
+        }
+    }
 }
