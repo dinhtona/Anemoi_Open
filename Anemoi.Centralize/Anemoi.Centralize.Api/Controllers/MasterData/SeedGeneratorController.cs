@@ -127,11 +127,11 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "Internal", Roles = "Administrator")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TriggerSeedingResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> TriggerSeeding([FromBody] TriggerSeedingCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
-        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpPost]

@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
 using Anemoi.Contract.MasterData.Errors;
+using Anemoi.Contract.MasterData.Responses;
 using Anemoi.MasterData.Application.Abstractions;
 using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Application.Models;
@@ -29,9 +30,9 @@ public sealed class TriggerSeedingHandler(
     IDataIngestionService dataIngestionService,
     MasterDataMapper mapper,
     ILogger logger)
-    : IRequestHandler<TriggerSeedingCommand, OneOf<None, ErrorDetailResponse>>
+    : IRequestHandler<TriggerSeedingCommand, OneOf<TriggerSeedingResponse, ErrorDetailResponse>>
 {
-    public async Task<OneOf<None, ErrorDetailResponse>> Handle(TriggerSeedingCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<TriggerSeedingResponse, ErrorDetailResponse>> Handle(TriggerSeedingCommand request, CancellationToken cancellationToken)
     {
         var function = await functionRepository.GetQueryable()
             .Include(x => x.SeedTemplate)
@@ -156,7 +157,7 @@ public sealed class TriggerSeedingHandler(
             }
 
             logger.Information("[TriggerSeeding] Seeding completed successfully for function {FunctionName}", function.Name);
-            return None.Value;
+            return new TriggerSeedingResponse(seedingContext);
         }
         catch (Exception ex)
         {
