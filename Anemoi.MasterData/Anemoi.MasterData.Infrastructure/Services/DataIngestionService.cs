@@ -37,7 +37,7 @@ public sealed class DataIngestionService : IDataIngestionService
         var dataTable = new DataTable();
         foreach (var key in data[0].Keys)
         {
-            dataTable.Columns.Add(key);
+            dataTable.Columns.Add(key, typeof(object));
         }
 
         foreach (var row in data)
@@ -45,19 +45,31 @@ public sealed class DataIngestionService : IDataIngestionService
             var dataRow = dataTable.NewRow();
             foreach (var kvp in row)
             {
-                dataRow[kvp.Key] = kvp.Value ?? DBNull.Value;
+                var val = kvp.Value;
+                // Convert empty strings to null to avoid SqlBulkCopy conversion errors for numeric columns
+                if (val is string s && string.IsNullOrWhiteSpace(s)) val = null;
+                
+                dataRow[kvp.Key] = val ?? DBNull.Value;
             }
             dataTable.Rows.Add(dataRow);
         }
 
-        using var bulkCopy = new SqlBulkCopy(connectionString);
-        bulkCopy.DestinationTableName = tableName;
-        foreach (DataColumn column in dataTable.Columns)
+        try
         {
-            bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
-        }
+            using var bulkCopy = new SqlBulkCopy(connectionString, SqlBulkCopyOptions.KeepIdentity | SqlBulkCopyOptions.TableLock);
+            bulkCopy.DestinationTableName = tableName;
+            bulkCopy.BulkCopyTimeout = 600; // 10 minutes
+            foreach (DataColumn column in dataTable.Columns)
+            {
+                bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+            }
 
-        await bulkCopy.WriteToServerAsync(dataTable, cancellationToken);
+            await bulkCopy.WriteToServerAsync(dataTable, cancellationToken);
+        }
+        catch (SqlException ex)
+        {
+            throw new Exception($"SQL Server Ingestion failed for table {tableName}: {ex.Message}", ex);
+        }
     }
 
     private async Task IngestPostgreSqlAsync(string connectionString, string tableName, List<Dictionary<string, object>> data, CancellationToken cancellationToken)

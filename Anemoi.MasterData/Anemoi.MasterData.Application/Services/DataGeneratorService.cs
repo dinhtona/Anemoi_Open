@@ -91,14 +91,24 @@ public sealed class DataGeneratorService : IDataGeneratorService
         // First pass: Generate values for columns without custom rules or with STATIC rules
         foreach (var column in tableSchema.Columns)
         {
-            var rule = rules.FirstOrDefault(r => r.ColumnName == column.ColumnName);
+            var rule = rules.FirstOrDefault(r => r.ColumnName.Equals(column.ColumnName, StringComparison.OrdinalIgnoreCase));
+            
+            Console.WriteLine($"[DataGenerator] Processing column {column.ColumnName} (IsIdentity: {column.IsIdentity}, Type: {column.DataType}) with Rule: {rule?.RuleType ?? "None"}");
+            
             if (rule != null && rule.RuleType == "STATIC")
             {
-                row[column.ColumnName] = rule.Parameters.FirstOrDefault() ?? "";
+                var staticValue = rule.Parameters.FirstOrDefault();
+                row[column.ColumnName] = string.IsNullOrWhiteSpace(staticValue) ? (column.IsNullable ? null : DefaultValue(column)) : staticValue;
             }
             else if (rule == null || rule.RuleType != "SUM") // Sum needs other columns to be ready
             {
                 row[column.ColumnName] = GenerateBogusValue(column, rule);
+            }
+            
+            if (row[column.ColumnName] == null && !column.IsNullable)
+            {
+                Console.WriteLine($"[DataGenerator] WARNING: Column {column.ColumnName} is NOT NULL but value is null. Forcing default.");
+                row[column.ColumnName] = DefaultValue(column);
             }
         }
 
@@ -123,22 +133,74 @@ public sealed class DataGeneratorService : IDataGeneratorService
     {
         if (rule?.RuleType == "CUSTOM")
         {
-            // Placeholder for custom scripts (e.g. JS or C# scripts)
+            var param = rule.Parameters.FirstOrDefault()?.ToLower();
+            if (param == "price") return _faker.Finance.Amount(10, 1000);
+            if (param == "quantity") return _faker.Random.Int(1, 100);
+            if (param == "sku") return _faker.Commerce.Ean13();
             return _faker.Lorem.Word();
         }
 
         var dataType = column.DataType.ToLower();
+        var columnName = column.ColumnName.ToLower();
 
+        // 1. Check by Column Name Patterns
+        if (columnName.Contains("email")) return _faker.Internet.Email();
+        if (columnName.Contains("phone")) return _faker.Phone.PhoneNumber();
+        if (columnName.Contains("address")) return _faker.Address.FullAddress();
+        if (columnName.Contains("city")) return _faker.Address.City();
+        if (columnName.Contains("country")) return _faker.Address.Country();
+        if (columnName.Contains("zip") || columnName.Contains("postal")) return _faker.Address.ZipCode();
+        if (columnName.Contains("company")) return _faker.Company.CompanyName();
+        
+        if (columnName.Contains("price") || columnName.Contains("amount") || columnName.Contains("cost") || columnName.Contains("total")) 
+            return _faker.Finance.Amount(5, 5000);
+            
+        if (columnName.Contains("quantity") || columnName.Contains("qty") || columnName.Contains("count") || columnName.Contains("stock"))
+            return _faker.Random.Int(0, 1000);
+
+        if (columnName.Contains("name")) 
+        {
+            if (columnName.Contains("first")) return _faker.Name.FirstName();
+            if (columnName.Contains("last")) return _faker.Name.LastName();
+            if (columnName.Contains("product")) return _faker.Commerce.ProductName();
+            return _faker.Name.FullName();
+        }
+
+        if (columnName.Contains("description") || columnName.Contains("comment") || columnName.Contains("note"))
+            return _faker.Lorem.Paragraph();
+
+        // 2. Fallback to Data Type
+        if (dataType.Contains("tinyint")) return (byte)_faker.Random.Int(0, 255);
+        if (dataType.Contains("smallint")) return (short)_faker.Random.Int(0, 32767);
         if (dataType.Contains("int")) return _faker.Random.Int(1, 10000);
         if (dataType.Contains("decimal") || dataType.Contains("numeric") || dataType.Contains("money")) return _faker.Finance.Amount();
         if (dataType.Contains("bit") || dataType.Contains("bool")) return _faker.Random.Bool();
-        if (dataType.Contains("datetime") || dataType.Contains("date")) return _faker.Date.Past();
+        
+        if (dataType.Contains("datetimeoffset")) return _faker.Date.RecentOffset(30);
+        if (dataType.Contains("datetime") || dataType.Contains("date")) return _faker.Date.Recent(30);
+        
+        // Exact match for 'time' to avoid partial matches with 'datetime' (though handled by order, this is safer)
+        if (dataType.Contains("time")) return TimeSpan.FromTicks(_faker.Random.Long(0, TimeSpan.FromDays(1).Ticks - 1));
+        
+        if (dataType.Contains("binary") || dataType.Contains("image") || dataType.Contains("varbinary"))
+        {
+            var length = column.MaxLength is > 0 and <= 8000 ? column.MaxLength.Value : 16;
+            return _faker.Random.Bytes(length);
+        }
+
+        if (dataType.Contains("xml")) return $"<root><id>{_faker.Random.Int()}</id><data>{_faker.Lorem.Word()}</data></root>";
+        
         if (dataType.Contains("guid") || dataType.Contains("uniqueidentifier")) return Guid.NewGuid();
         
-        if (column.ColumnName.ToLower().Contains("email")) return _faker.Internet.Email();
-        if (column.ColumnName.ToLower().Contains("name")) return _faker.Name.FullName();
-        if (column.ColumnName.ToLower().Contains("phone")) return _faker.Phone.PhoneNumber();
+        if (dataType.Contains("float") || dataType.Contains("real")) return _faker.Random.Double();
+
+        if (dataType.Contains("text") || dataType.Contains("ntext")) return _faker.Lorem.Paragraphs(2);
         
         return _faker.Lorem.Word();
+    }
+
+    private object DefaultValue(ColumnSchema column)
+    {
+        return GenerateBogusValue(column, null);
     }
 }

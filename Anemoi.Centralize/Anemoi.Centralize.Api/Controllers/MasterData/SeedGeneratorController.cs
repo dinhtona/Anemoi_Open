@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
+using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.ManualInsertData;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.CreateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.UpdateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedServerCommands.CreateSeedServer;
@@ -128,6 +129,15 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     [Authorize(Policy = "Internal", Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> TriggerSeeding([FromBody] TriggerSeedingCommand command, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ManualInsertData([FromBody] ManualInsertDataCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
