@@ -10,6 +10,7 @@ using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.CreateSeedTemplat
 using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.UpdateSeedTemplate;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetDbSchema;
+using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedHistory;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedFunctions;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedServers;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedTemplates;
@@ -123,6 +124,14 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     {
         var res = await sender.Send(new GetDbSchemaQuery(serverId), cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
+    }
+    
+    [HttpGet("{functionId}")]
+    [ProducesResponseType(typeof(List<SeedHistoryResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSeedHistory([FromRoute] SeedFunctionId functionId, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetSeedHistoryQuery(functionId), cancellationToken);
+        return Ok(res);
     }
 
     [HttpPost]

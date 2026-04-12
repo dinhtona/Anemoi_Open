@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
 using Anemoi.Contract.MasterData.Errors;
+using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Responses;
 using Anemoi.MasterData.Application.Abstractions;
 using Anemoi.MasterData.Application.Mappings;
@@ -28,6 +29,7 @@ public sealed class TriggerSeedingHandler(
     IDbDiscoveryService dbDiscoveryService,
     IDataGeneratorService dataGeneratorService,
     IDataIngestionService dataIngestionService,
+    ISqlRepository<SeedHistory> historyRepository,
     MasterDataMapper mapper,
     ILogger logger)
     : IRequestHandler<TriggerSeedingCommand, OneOf<TriggerSeedingResponse, ErrorDetailResponse>>
@@ -155,6 +157,17 @@ public sealed class TriggerSeedingHandler(
                     logger.Warning("[TriggerSeeding] No data generated for table {TableName}.", tableConfig.TableName);
                 }
             }
+
+            // 4. Record History
+            var history = new SeedHistory
+            {
+                Id = SeedHistoryId.New(),
+                SeedFunctionId = function.Id,
+                RunAt = DateTime.UtcNow,
+                ConfigJson = configJson,
+                ResultJson = JsonConvert.SerializeObject(new TriggerSeedingResponse(seedingContext))
+            };
+            await historyRepository.CreateOneAsync(history, cancellationToken);
 
             logger.Information("[TriggerSeeding] Seeding completed successfully for function {FunctionName}", function.Name);
             return new TriggerSeedingResponse(seedingContext);

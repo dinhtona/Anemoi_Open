@@ -1,3 +1,4 @@
+#nullable enable
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.Contract.MasterData.ModelIds;
 

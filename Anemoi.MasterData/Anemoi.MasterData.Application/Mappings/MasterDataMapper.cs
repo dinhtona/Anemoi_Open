@@ -136,6 +136,9 @@ public partial class MasterDataMapper
     public partial SeedTemplateResponse ToSeedTemplateResponse(SeedTemplate template);
     public partial IQueryable<SeedTemplateResponse> ProjectToSeedTemplateResponse(IQueryable<SeedTemplate> query);
 
+    public partial SeedHistoryResponse ToSeedHistoryResponse(SeedHistory history);
+    public partial IQueryable<SeedHistoryResponse> ProjectToSeedHistoryResponse(IQueryable<SeedHistory> query);
+
 
     // Common Mappings
     public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);

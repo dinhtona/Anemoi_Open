@@ -10,7 +10,8 @@ public sealed class ModelMapping :
     IEntityTypeConfiguration<District>,
     IEntityTypeConfiguration<SeedServer>,
     IEntityTypeConfiguration<SeedFunction>,
-    IEntityTypeConfiguration<SeedTemplate>
+    IEntityTypeConfiguration<SeedTemplate>,
+    IEntityTypeConfiguration<SeedHistory>
 
 {
     public void Configure(EntityTypeBuilder<Province> builder)
@@ -93,5 +94,23 @@ public sealed class ModelMapping :
             .HasMaxLength(512);
         builder.HasIndex(x => x.Name)
             .IsUnique();
+    }
+
+    public void Configure(EntityTypeBuilder<SeedHistory> builder)
+    {
+        builder.ToTable("SeedHistories");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new SeedHistoryId(id));
+        builder.HasKey(x => x.Id);
+        builder.HasOne(x => x.SeedFunction)
+            .WithMany()
+            .HasForeignKey(x => x.SeedFunctionId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(x => x.RunAt)
+            .IsRequired();
+        builder.Property(x => x.ConfigJson)
+            .IsRequired();
+        builder.Property(x => x.ResultJson)
+            .IsRequired();
     }
 }
