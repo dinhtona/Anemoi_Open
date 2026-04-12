@@ -127,6 +127,21 @@ public sealed class TriggerSeedingHandler(
                         generatedData.Count, tableConfig.TableName, JsonConvert.SerializeObject(generatedData[0]));
                     
                     // 2. Ingest Data into Target DB
+                    // Filter out system-managed columns like 'timestamp' or 'rowversion' before ingestion
+                    var readOnlyColumns = tableSchema.Columns
+                        .Where(c => c.DataType.Contains("timestamp", StringComparison.OrdinalIgnoreCase) || 
+                                   c.DataType.Contains("rowversion", StringComparison.OrdinalIgnoreCase))
+                        .Select(c => c.ColumnName)
+                        .ToList();
+
+                    if (readOnlyColumns.Any())
+                    {
+                        foreach (var row in generatedData)
+                        {
+                            foreach (var col in readOnlyColumns) row.Remove(col);
+                        }
+                    }
+
                     logger.Information("[TriggerSeeding] Ingesting {RowCount} rows into {TableName}...", generatedData.Count, tableConfig.TableName);
                     await dataIngestionService.IngestDataAsync(server.ConnectionString, server.Provider, tableConfig.TableName, generatedData, cancellationToken);
 

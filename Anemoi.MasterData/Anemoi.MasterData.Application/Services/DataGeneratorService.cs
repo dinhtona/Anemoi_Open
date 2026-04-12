@@ -131,6 +131,19 @@ public sealed class DataGeneratorService : IDataGeneratorService
 
     private object GenerateBogusValue(ColumnSchema column, ColumnRule rule)
     {
+        var value = GenerateRawBogusValue(column, rule);
+
+        // Enforce MaxLength for string values
+        if (value is string s && column.MaxLength > 0)
+        {
+            return s.Length <= column.MaxLength.Value ? s : s.Substring(0, column.MaxLength.Value);
+        }
+
+        return value;
+    }
+
+    private object GenerateRawBogusValue(ColumnSchema column, ColumnRule rule)
+    {
         if (rule?.RuleType == "CUSTOM")
         {
             var param = rule.Parameters.FirstOrDefault()?.ToLower();
@@ -179,6 +192,9 @@ public sealed class DataGeneratorService : IDataGeneratorService
         if (dataType.Contains("datetimeoffset")) return _faker.Date.RecentOffset(30);
         if (dataType.Contains("datetime") || dataType.Contains("date")) return _faker.Date.Recent(30);
         
+        // Exact match for 'rowversion' or 'timestamp' (which technically is an 8-byte binary)
+        if (dataType.Contains("rowversion") || dataType.Contains("timestamp")) return _faker.Random.Bytes(8);
+
         // Exact match for 'time' to avoid partial matches with 'datetime' (though handled by order, this is safer)
         if (dataType.Contains("time")) return TimeSpan.FromTicks(_faker.Random.Long(0, TimeSpan.FromDays(1).Ticks - 1));
         
