@@ -111,7 +111,8 @@ public sealed class DataGeneratorService : IDataGeneratorService
                 row[column.ColumnName] = GenerateBogusValue(column, rule);
             }
             
-            if (row[column.ColumnName] == null && !column.IsNullable)
+            // Ensure we have a value for NOT NULL columns (skip SUM columns as they are handled in the second pass)
+            if (rule?.RuleType != "SUM" && (!row.TryGetValue(column.ColumnName, out var val) || val == null) && !column.IsNullable)
             {
                 Console.WriteLine($"[DataGenerator] WARNING: Column {column.ColumnName} is NOT NULL but value is null. Forcing default.");
                 row[column.ColumnName] = DefaultValue(column);
@@ -162,33 +163,8 @@ public sealed class DataGeneratorService : IDataGeneratorService
         var dataType = column.DataType.ToLower();
         var columnName = column.ColumnName.ToLower();
 
-        // 1. Check by Column Name Patterns
-        if (columnName.Contains("email")) return _faker.Internet.Email();
-        if (columnName.Contains("phone")) return _faker.Phone.PhoneNumber();
-        if (columnName.Contains("address")) return _faker.Address.FullAddress();
-        if (columnName.Contains("city")) return _faker.Address.City();
-        if (columnName.Contains("country")) return _faker.Address.Country();
-        if (columnName.Contains("zip") || columnName.Contains("postal")) return _faker.Address.ZipCode();
-        if (columnName.Contains("company")) return _faker.Company.CompanyName();
-        
-        if (columnName.Contains("price") || columnName.Contains("amount") || columnName.Contains("cost") || columnName.Contains("total")) 
-            return _faker.Finance.Amount(5, 5000);
-            
-        if (columnName.Contains("quantity") || columnName.Contains("qty") || columnName.Contains("count") || columnName.Contains("stock"))
-            return _faker.Random.Int(0, 1000);
-
-        if (columnName.Contains("name")) 
-        {
-            if (columnName.Contains("first")) return _faker.Name.FirstName();
-            if (columnName.Contains("last")) return _faker.Name.LastName();
-            if (columnName.Contains("product")) return _faker.Commerce.ProductName();
-            return _faker.Name.FullName();
-        }
-
-        if (columnName.Contains("description") || columnName.Contains("comment") || columnName.Contains("note"))
-            return _faker.Lorem.Paragraph();
-
-        // 2. Fallback to Data Type
+        // 1. Check by Data Type (Numeric, Date, Bit, Binary, Guid, XML)
+        // These are prioritized to avoid type conversion errors if a column name matches a pattern (e.g., an 'int' column named 'status_name')
         if (dataType.Contains("tinyint")) return (byte)_faker.Random.Int(0, 255);
         if (dataType.Contains("smallint")) return (short)_faker.Random.Int(0, 32767);
         if (dataType.Contains("int")) return _faker.Random.Int(1, 10000);
@@ -216,6 +192,33 @@ public sealed class DataGeneratorService : IDataGeneratorService
         
         if (dataType.Contains("float") || dataType.Contains("real")) return _faker.Random.Double();
 
+        // 2. Check by Column Name Patterns (Best effort for string-like columns)
+        if (columnName.Contains("email")) return _faker.Internet.Email();
+        if (columnName.Contains("phone")) return _faker.Phone.PhoneNumber();
+        if (columnName.Contains("address")) return _faker.Address.FullAddress();
+        if (columnName.Contains("city")) return _faker.Address.City();
+        if (columnName.Contains("country")) return _faker.Address.Country();
+        if (columnName.Contains("zip") || columnName.Contains("postal")) return _faker.Address.ZipCode();
+        if (columnName.Contains("company")) return _faker.Company.CompanyName();
+        
+        if (columnName.Contains("price") || columnName.Contains("amount") || columnName.Contains("cost") || columnName.Contains("total")) 
+            return _faker.Finance.Amount(5, 5000);
+            
+        if (columnName.Contains("quantity") || columnName.Contains("qty") || columnName.Contains("count") || columnName.Contains("stock"))
+            return _faker.Random.Int(0, 1000);
+
+        if (columnName.Contains("name")) 
+        {
+            if (columnName.Contains("first")) return _faker.Name.FirstName();
+            if (columnName.Contains("last")) return _faker.Name.LastName();
+            if (columnName.Contains("product")) return _faker.Commerce.ProductName();
+            return _faker.Name.FullName();
+        }
+
+        if (columnName.Contains("description") || columnName.Contains("comment") || columnName.Contains("note"))
+            return _faker.Lorem.Paragraph();
+
+        // 3. Fallback for other string types
         if (dataType.Contains("text") || dataType.Contains("ntext")) return _faker.Lorem.Paragraphs(2);
         
         return _faker.Lorem.Word();
