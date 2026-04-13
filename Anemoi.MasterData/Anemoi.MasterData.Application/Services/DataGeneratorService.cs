@@ -91,6 +91,12 @@ public sealed class DataGeneratorService : IDataGeneratorService
         // First pass: Generate values for columns without custom rules or with STATIC rules
         foreach (var column in tableSchema.Columns)
         {
+            if (column.IsIdentity)
+            {
+                Console.WriteLine($"[DataGenerator] Skipping Identity column {column.ColumnName}. Let DB auto-generate.");
+                continue;
+            }
+
             var rule = rules.FirstOrDefault(r => r.ColumnName.Equals(column.ColumnName, StringComparison.OrdinalIgnoreCase));
             
             Console.WriteLine($"[DataGenerator] Processing column {column.ColumnName} (IsIdentity: {column.IsIdentity}, Type: {column.DataType}) with Rule: {rule?.RuleType ?? "None"}");
