@@ -56,7 +56,7 @@ public sealed class DataGeneratorService : IDataGeneratorService
                 var currentParentChildren = new List<Dictionary<string, object>>();
                 for (var i = 0; i < tableConfig.RowCount; i++)
                 {
-                    var row = GenerateRow(tableSchema, tableConfig.ColumnRules);
+                    var row = GenerateRow(tableSchema, tableConfig.ColumnRules, i);
                     
                     // Set Join Keys
                     foreach (var key in relationship.JoinKeys)
@@ -77,14 +77,14 @@ public sealed class DataGeneratorService : IDataGeneratorService
             // Standard generation (no parent context or parent not found)
             for (var i = 0; i < tableConfig.RowCount; i++)
             {
-                result.Add(GenerateRow(tableSchema, tableConfig.ColumnRules));
+                result.Add(GenerateRow(tableSchema, tableConfig.ColumnRules, i));
             }
         }
 
         return Task.FromResult(result);
     }
 
-    private Dictionary<string, object> GenerateRow(TableSchema tableSchema, List<ColumnRule> rules)
+    private Dictionary<string, object> GenerateRow(TableSchema tableSchema, List<ColumnRule> rules, int rowIndex)
     {
         var row = new Dictionary<string, object>();
         
@@ -105,6 +105,20 @@ public sealed class DataGeneratorService : IDataGeneratorService
             {
                 var staticValue = rule.Parameters.FirstOrDefault();
                 row[column.ColumnName] = string.IsNullOrWhiteSpace(staticValue) ? (column.IsNullable ? null : DefaultValue(column)) : staticValue;
+            }
+            else if (rule != null && rule.RuleType == "SEQUENCE")
+            {
+                var pattern = rule.Parameters.ElementAtOrDefault(0) ?? "{SEQ}";
+                var startValueStr = rule.Parameters.ElementAtOrDefault(1) ?? "1";
+                if (long.TryParse(startValueStr, out var startValue))
+                {
+                    var currentVal = startValue + rowIndex;
+                    row[column.ColumnName] = pattern.Replace("{SEQ}", currentVal.ToString($"D{startValueStr.Length}"));
+                }
+                else
+                {
+                    row[column.ColumnName] = pattern.Replace("{SEQ}", rowIndex.ToString());
+                }
             }
             else if (rule == null || rule.RuleType != "SUM") // Sum needs other columns to be ready
             {

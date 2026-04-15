@@ -1,9 +1,9 @@
-# IMPLEMENTATION PLAN: [Feature Name]
+# IMPLEMENTATION PLAN: [User management]
 
 ## 1. Context & Objective
-- **Feature**: [Brief description, e.g., Add Store Management]
-- **Target Service**: [e.g., anemoi_masterdata]
-- **Reference Pattern**: Based on [e.g., Province in MasterData]
+- **Feature**: [User management]
+- **Target Service**: [anemoi_identity]
+- **Reference Pattern**: Based on [User in anemoi_identity]
 
 ## 2. Structural Changes & File Manifest
 

@@ -105,4 +105,78 @@ public sealed class DataIngestionService : IDataIngestionService
             await connection.ExecuteAsync(sql.ToString(), parameters);
         }
     }
+
+    public async Task UpdateColumnDataAsync(string connectionString, string provider, string tableName, string keyColumn, string updateColumn, Dictionary<object, object> updateData, CancellationToken cancellationToken = default)
+    {
+        if (updateData == null || updateData.Count == 0) return;
+
+        if (string.IsNullOrWhiteSpace(provider)) provider = SeedProviderType.SqlServer;
+
+        if (provider == SeedProviderType.SqlServer)
+        {
+            await UpdateColumnSqlServerAsync(connectionString, tableName, keyColumn, updateColumn, updateData, cancellationToken);
+        }
+        else if (provider == SeedProviderType.PostgreSQL)
+        {
+            await UpdateColumnPostgreSqlAsync(connectionString, tableName, keyColumn, updateColumn, updateData, cancellationToken);
+        }
+    }
+
+    private async Task UpdateColumnSqlServerAsync(string connectionString, string tableName, string keyColumn, string updateColumn, Dictionary<object, object> updateData, CancellationToken cancellationToken)
+    {
+        await using var connection = new SqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+        
+        var batchSize = 1000;
+        var keys = updateData.Keys.ToList();
+        for (int i = 0; i < keys.Count; i += batchSize)
+        {
+            var batchKeys = keys.Skip(i).Take(batchSize).ToList();
+            var sql = new StringBuilder();
+            var parameters = new DynamicParameters();
+
+            for (int r = 0; r < batchKeys.Count; r++)
+            {
+                var key = batchKeys[r];
+                var val = updateData[key];
+                var keyParam = $"k_{r}";
+                var valParam = $"v_{r}";
+                
+                sql.AppendLine($"UPDATE [{tableName}] SET [{updateColumn}] = @{valParam} WHERE [{keyColumn}] = @{keyParam};");
+                parameters.Add(keyParam, key);
+                parameters.Add(valParam, val);
+            }
+
+            await connection.ExecuteAsync(sql.ToString(), parameters);
+        }
+    }
+
+    private async Task UpdateColumnPostgreSqlAsync(string connectionString, string tableName, string keyColumn, string updateColumn, Dictionary<object, object> updateData, CancellationToken cancellationToken)
+    {
+        await using var connection = new NpgsqlConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+        
+        var batchSize = 1000;
+        var keys = updateData.Keys.ToList();
+        for (int i = 0; i < keys.Count; i += batchSize)
+        {
+            var batchKeys = keys.Skip(i).Take(batchSize).ToList();
+            var sql = new StringBuilder();
+            var parameters = new DynamicParameters();
+
+            for (int r = 0; r < batchKeys.Count; r++)
+            {
+                var key = batchKeys[r];
+                var val = updateData[key];
+                var keyParam = $"k_{r}";
+                var valParam = $"v_{r}";
+                
+                sql.AppendLine($"UPDATE \"{tableName}\" SET \"{updateColumn}\" = @{valParam} WHERE \"{keyColumn}\" = @{keyParam};");
+                parameters.Add(keyParam, key);
+                parameters.Add(valParam, val);
+            }
+
+            await connection.ExecuteAsync(sql.ToString(), parameters);
+        }
+    }
 }

@@ -158,7 +158,72 @@ public sealed class TriggerSeedingHandler(
                 }
             }
 
-            // 4. Record History
+            // 4. Post-Processing for CHILD_SUM_OF
+            foreach (var tableConfig in sortedTables)
+            {
+                foreach (var rule in tableConfig.ColumnRules.Where(r => r.RuleType == "CHILD_SUM_OF"))
+                {
+                    var childTableName = rule.Parameters.ElementAtOrDefault(0);
+                    var childColumnsToSum = rule.Parameters.Skip(1).Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c.Trim()).ToList();
+                    
+                    if (string.IsNullOrEmpty(childTableName) || !childColumnsToSum.Any()) continue;
+
+                    var relationship = config.Relationships.FirstOrDefault(r => 
+                        r.ParentTable.Equals(tableConfig.TableName, StringComparison.OrdinalIgnoreCase) && 
+                        r.ChildTable.Equals(childTableName, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (relationship == null || !relationship.JoinKeys.Any()) continue;
+                    var joinKey = relationship.JoinKeys.First();
+
+                    if (seedingContext.TryGetValue(childTableName, out var childRows) && 
+                        seedingContext.TryGetValue(tableConfig.TableName, out var parentRows))
+                    {
+                        var updateData = new Dictionary<object, object>();
+
+                        // Group child rows by ParentKey and sum the configured columns
+                        var childSums = childRows
+                            .Where(r => r.ContainsKey(joinKey.ChildColumn) && r[joinKey.ChildColumn] != null)
+                            .GroupBy(r => r[joinKey.ChildColumn].ToString())
+                            .ToDictionary(
+                                g => g.Key, 
+                                g => g.Sum(r => 
+                                {
+                                    decimal rowSum = 0;
+                                    foreach(var col in childColumnsToSum)
+                                    {
+                                        if (r.TryGetValue(col, out var val) && decimal.TryParse(val?.ToString(), out var d))
+                                        {
+                                            rowSum += d;
+                                        }
+                                    }
+                                    return rowSum;
+                                })
+                            );
+
+                        // Map to Parent row and gather updates
+                        foreach (var pRow in parentRows)
+                        {
+                            if (pRow.TryGetValue(joinKey.ParentColumn, out var parentKeyVal) && parentKeyVal != null)
+                            {
+                                var pKeyStr = parentKeyVal.ToString();
+                                if (childSums.TryGetValue(pKeyStr, out var sumVal))
+                                {
+                                    updateData[parentKeyVal] = sumVal;
+                                    pRow[rule.ColumnName] = sumVal;
+                                }
+                            }
+                        }
+
+                        if (updateData.Any())
+                        {
+                            logger.Information("[TriggerSeeding] Updating {RowCount} rows for CHILD_SUM_OF on {TableName}.{ColumnName}", updateData.Count, tableConfig.TableName, rule.ColumnName);
+                            await dataIngestionService.UpdateColumnDataAsync(server.ConnectionString, server.Provider, tableConfig.TableName, joinKey.ParentColumn, rule.ColumnName, updateData, cancellationToken);
+                        }
+                    }
+                }
+            }
+
+            // 5. Record History
             var history = new SeedHistory
             {
                 Id = SeedHistoryId.New(),
