@@ -163,6 +163,7 @@ public sealed class TriggerSeedingHandler(
             {
                 foreach (var rule in tableConfig.ColumnRules.Where(r => r.RuleType == "CHILD_SUM_OF"))
                 {
+                    if (string.IsNullOrWhiteSpace(rule.ColumnName)) continue;
                     var childTableName = rule.Parameters.ElementAtOrDefault(0);
                     var childColumnsToSum = rule.Parameters.Skip(1).Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c.Trim()).ToList();
                     

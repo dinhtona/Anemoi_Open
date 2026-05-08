@@ -34,6 +34,15 @@ public sealed class DataIngestionService : IDataIngestionService
 
     private async Task IngestSqlServerAsync(string connectionString, string tableName, List<Dictionary<string, object>> data, CancellationToken cancellationToken)
     {
+        // Cleanup: Remove any entries with empty or whitespace keys
+        foreach (var row in data)
+        {
+            var emptyKeys = row.Keys.Where(string.IsNullOrWhiteSpace).ToList();
+            foreach (var key in emptyKeys) row.Remove(key);
+        }
+
+        if (data.Count == 0) return;
+
         var dataTable = new DataTable();
         foreach (var key in data[0].Keys)
         {
@@ -74,6 +83,15 @@ public sealed class DataIngestionService : IDataIngestionService
 
     private async Task IngestPostgreSqlAsync(string connectionString, string tableName, List<Dictionary<string, object>> data, CancellationToken cancellationToken)
     {
+        // Cleanup: Remove any entries with empty or whitespace keys
+        foreach (var row in data)
+        {
+            var emptyKeys = row.Keys.Where(string.IsNullOrWhiteSpace).ToList();
+            foreach (var key in emptyKeys) row.Remove(key);
+        }
+
+        if (data.Count == 0) return;
+
         await using var connection = new NpgsqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
 

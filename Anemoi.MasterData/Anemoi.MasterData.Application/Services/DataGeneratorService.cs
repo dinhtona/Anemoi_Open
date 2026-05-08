@@ -5,6 +5,7 @@ using Bogus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -97,6 +98,8 @@ public sealed class DataGeneratorService : IDataGeneratorService
                 continue;
             }
 
+            if (string.IsNullOrWhiteSpace(column.ColumnName)) continue;
+
             var rule = rules.FirstOrDefault(r => r.ColumnName.Equals(column.ColumnName, StringComparison.OrdinalIgnoreCase));
             
             Console.WriteLine($"[DataGenerator] Processing column {column.ColumnName} (IsIdentity: {column.IsIdentity}, Type: {column.DataType}) with Rule: {rule?.RuleType ?? "None"}");
@@ -109,15 +112,35 @@ public sealed class DataGeneratorService : IDataGeneratorService
             else if (rule != null && rule.RuleType == "SEQUENCE")
             {
                 var pattern = rule.Parameters.ElementAtOrDefault(0) ?? "{SEQ}";
-                var startValueStr = rule.Parameters.ElementAtOrDefault(1) ?? "1";
-                if (long.TryParse(startValueStr, out var startValue))
+
+                // Enhanced Logic: Search for {number} pattern (e.g., 1000{013059}000)
+                var match = Regex.Match(pattern, @"\{(\d+)\}");
+                if (match.Success)
                 {
-                    var currentVal = startValue + rowIndex;
-                    row[column.ColumnName] = pattern.Replace("{SEQ}", currentVal.ToString($"D{startValueStr.Length}"));
+                    var rawValue = match.Groups[1].Value;
+                    if (long.TryParse(rawValue, out var startValue))
+                    {
+                        var currentVal = startValue + rowIndex + 1;
+                        row[column.ColumnName] = pattern.Replace(match.Value, currentVal.ToString($"D{rawValue.Length}"));
+                    }
+                    else
+                    {
+                        row[column.ColumnName] = pattern.Replace(match.Value, rowIndex.ToString());
+                    }
                 }
                 else
                 {
-                    row[column.ColumnName] = pattern.Replace("{SEQ}", rowIndex.ToString());
+                    // Fallback to legacy {SEQ} logic
+                    var startValueStr = rule.Parameters.ElementAtOrDefault(1) ?? "1";
+                    if (long.TryParse(startValueStr, out var startValue))
+                    {
+                        var currentVal = startValue + rowIndex + 1;
+                        row[column.ColumnName] = pattern.Replace("{SEQ}", currentVal.ToString($"D{startValueStr.Length}"));
+                    }
+                    else
+                    {
+                        row[column.ColumnName] = pattern.Replace("{SEQ}", rowIndex.ToString());
+                    }
                 }
             }
             else if (rule == null || rule.RuleType != "SUM") // Sum needs other columns to be ready
@@ -136,6 +159,7 @@ public sealed class DataGeneratorService : IDataGeneratorService
         // Second pass: Calculate SUM rules
         foreach (var rule in rules.Where(r => r.RuleType == "SUM"))
         {
+            if (string.IsNullOrWhiteSpace(rule.ColumnName)) continue;
             decimal sum = 0;
             foreach (var param in rule.Parameters)
             {
