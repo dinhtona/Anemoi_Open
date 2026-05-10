@@ -14,6 +14,7 @@ using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedHistory;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedFunctions;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedServers;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedTemplates;
+using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSampleData;
 using Anemoi.Contract.MasterData.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -132,6 +133,14 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     {
         var res = await sender.Send(new GetSeedHistoryQuery(functionId), cancellationToken);
         return Ok(res);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSampleData([FromQuery] GetSampleDataQuery query, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpPost]

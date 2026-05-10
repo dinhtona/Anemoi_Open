@@ -84,6 +84,51 @@ public sealed class DbDiscoveryService : IDbDiscoveryService
         return response;
     }
 
+    public async Task<TableSchema> GetTableSchemaAsync(string connectionString, string provider, string tableName, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(provider)) provider = SeedProviderType.SqlServer;
+        
+        using var connection = CreateConnection(connectionString, provider);
+        try
+        {
+            if (connection is SqlConnection sqlConn) await sqlConn.OpenAsync(cancellationToken);
+            else if (connection is NpgsqlConnection npgConn) await npgConn.OpenAsync(cancellationToken);
+            else await ((DbConnection)connection).OpenAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to open connection to target database: {ex.Message}", ex);
+        }
+
+        var schemaName = provider == SeedProviderType.PostgreSQL ? "public" : "dbo";
+        var tableParts = tableName.Split('.');
+        if (tableParts.Length > 1)
+        {
+            schemaName = tableParts[0];
+            tableName = tableParts[1];
+        }
+
+        var columnsQuery = provider == SeedProviderType.PostgreSQL
+            ? @"SELECT column_name as ColumnName, data_type as DataType, (is_nullable = 'YES') as IsNullable, 
+                       (column_default IS NOT NULL AND column_default LIKE 'nextval%') as IsIdentity,
+                       character_maximum_length as MaxLength
+                FROM information_schema.columns WHERE table_name = @tableName AND table_schema = @schemaName"
+            : @"SELECT COLUMN_NAME as ColumnName, DATA_TYPE as DataType, CAST(CASE WHEN IS_NULLABLE = 'YES' THEN 1 ELSE 0 END AS BIT) as IsNullable,
+                       CAST(COLUMNPROPERTY(OBJECT_ID(@schemaName + '.' + @tableName), COLUMN_NAME, 'IsIdentity') AS BIT) as IsIdentity,
+                       CHARACTER_MAXIMUM_LENGTH as MaxLength
+                FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName AND TABLE_SCHEMA = @schemaName";
+
+        var columns = await connection.QueryAsync<ColumnSchema>(columnsQuery, new { tableName, schemaName });
+
+        if (!columns.Any()) return null;
+
+        return new TableSchema
+        {
+            TableName = tableName,
+            Columns = columns.ToList()
+        };
+    }
+
     private sealed class TableInfo
     {
         public string TableName { get; set; }
