@@ -36,7 +36,22 @@ When developing within this project, you **MUST** use the following predefined l
 
 ---
 
-## 3. Standard Service Directory Structure (Clean Architecture)
+## 3. Localization & Multi-language Standards
+
+All backend services that expose user-facing messages MUST follow the shared localization contract so the frontend and backend stay consistent across languages.
+
+- **Localization Framework**: Use ASP.NET Core Localization with `IStringLocalizer<SharedResource>` for shared user-facing messages.
+- **Supported Cultures**: The platform supports `vi-VN` and `en-US`.
+- **Default Culture**: The default backend culture is `vi-VN`.
+- **Language Negotiation**: APIs MUST read the requested language from the `Accept-Language` header. The response culture must be applied consistently to validation messages, business errors, exception messages intended for users, rate-limit responses, and other API response text.
+- **Stable Error Codes**: Business errors MUST expose stable, language-agnostic error codes. Localized messages should be resolved from those codes through resource files instead of being hard-coded in controllers, handlers, validators, or middleware.
+- **Resource Ownership**: Shared error and validation messages belong in `Anemoi.BuildingBlocks` resources when reused across services. Service-specific messages may live in the owning service, but must follow the same key/culture conventions.
+- **Invariant Data**: Do not localize identifiers, enum/status codes, event names, integration message contracts, or machine-readable fields. Localize only user-facing labels/messages.
+- **Frontend Contract**: The frontend maps locale routes to backend cultures as `vi -> vi-VN` and `en -> en-US`, then sends the mapped culture through `Accept-Language`.
+
+---
+
+## 4. Standard Service Directory Structure (Clean Architecture)
 Each Microservice (e.g., class library like `Anemoi.MasterData`) is divided into 4 main sub-projects, maintaining strict boundary rules:
 
 1. **`{Service}.Domain`**: 
@@ -63,7 +78,7 @@ Each Microservice (e.g., class library like `Anemoi.MasterData`) is divided into
 
 ---
 
-## 4. STRICT Coding Conventions
+## 5. STRICT Coding Conventions
 
 When an AI or Developer receives a request to add a new feature, use the following as a mandatory checklist:
 
@@ -80,13 +95,17 @@ When an AI or Developer receives a request to add a new feature, use the followi
 5. **Event-driven Cross-Service Communication**:
    - When Service A needs to interact with or trigger an action in Service B, it MUST use Event Messages via `MassTransit` (publishing/consuming over RabbitMQ). Minimize synchronous HTTP/REST calls between services to prevent tight coupling.
 6. **Do not introduce arbitrary external libraries**: The core toolkit is already defined in `Anemoi.BuildingBlock`. Use the existing `MediatR` for dispatching, `FluentValidation` for validation, and `Polly` for retries.
+7. **Localize user-facing messages**:
+   - Do not hard-code user-facing text in Controllers, CommandHandlers, QueryHandlers, Validators, Filters, or Middleware.
+   - Return stable error codes and resolve localized messages with `IStringLocalizer<SharedResource>` or service-owned resources.
+   - Keep API status/code values invariant (for example: `running`, `stopped`, `error`) so clients can map them to localized display labels.
 
 ### 💡 Note for AI Assistants
 Whenever instructed to code a new Endpoint/API or worker logic for this project, always review this document, properly configure the Command/Query, setup the Mapper, place files in their correct directories, and return Response objects wrapped in the Mediator `OneOf<>` pattern rather than returning Db Entities directly!
 
 ---
 
-## 5. Iterative Execution Steps for AI
+## 6. Iterative Execution Steps for AI
 When an AI receives an `IMPLEMENTATION PLAN` prompt from the user, the AI **MUST** execute the task iteratively in 3 strict steps. **Do not proceed to the next step until the user reviews and approves the current step.**
 
 - **Step 1 (Domain & Data)**: 
