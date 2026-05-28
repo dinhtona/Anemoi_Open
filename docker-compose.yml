@@ -32,6 +32,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - anemoi_network
     healthcheck:
@@ -89,6 +91,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
     networks:
       - anemoi_network
 
@@ -253,3 +257,5 @@ volumes:
   masterdata_keys:
   workspace_keys:
   mssql_data:
+  postgres_data:
+  mongodb_data:

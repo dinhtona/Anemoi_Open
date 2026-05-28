@@ -4,5 +4,8 @@ using Anemoi.Contract.MasterData.Responses;
 
 namespace Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSampleData;
 
-public sealed record GetSampleDataQuery(SeedFunctionId SeedFunctionId, string TableName) : IQueryOne<SampleDataResponse>;
+public sealed record GetSampleDataQuery(
+    SeedFunctionId? SeedFunctionId,
+    SeedServerId? SeedServerId,
+    string TableName) : IQueryOne<SampleDataResponse>;
 

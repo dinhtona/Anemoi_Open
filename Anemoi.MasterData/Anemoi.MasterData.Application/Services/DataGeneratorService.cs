@@ -25,11 +25,13 @@ public sealed class DataGeneratorService : IDataGeneratorService
         var result = new List<Dictionary<string, object>>();
 
         // Find the "primary" relationship (for Parent-Child distribution)
-        // In this simple version, we assume a table has at most one parent relationship influencing its generation count
-        var relationship = activeRelationships.FirstOrDefault(r => r.ChildTable == tableConfig.TableName);
+        // In this version, we look for an active relationship where the parent table has generated rows in seedingContext
+        var primaryRelationship = activeRelationships.FirstOrDefault(r => 
+            seedingContext.ContainsKey(r.ParentTable) && seedingContext[r.ParentTable].Any());
 
-        if (relationship != null && seedingContext.TryGetValue(relationship.ParentTable, out var parentRows))
+        if (primaryRelationship != null)
         {
+            var parentRows = seedingContext[primaryRelationship.ParentTable];
             List<Dictionary<string, object>> firstParentChildren = null;
 
             for (var pIdx = 0; pIdx < parentRows.Count; pIdx++)
@@ -37,17 +39,34 @@ public sealed class DataGeneratorService : IDataGeneratorService
                 var parentRow = parentRows[pIdx];
 
                 // Strategy: COPY_FROM_FIRST_PARENT
-                if (pIdx > 0 && relationship.ChildDataStrategy == "COPY_FROM_FIRST_PARENT" && firstParentChildren != null)
+                if (pIdx > 0 && primaryRelationship.ChildDataStrategy == "COPY_FROM_FIRST_PARENT" && firstParentChildren != null)
                 {
                     foreach (var baseChild in firstParentChildren)
                     {
                         var clonedChild = new Dictionary<string, object>(baseChild);
-                        // Update Join Keys to point to the current parent
-                        foreach (var key in relationship.JoinKeys)
+                        
+                        // 1. Update Join Keys to point to the current primary parent
+                        foreach (var key in primaryRelationship.JoinKeys)
                         {
                             if (parentRow.TryGetValue(key.ParentColumn, out var parentVal))
                                 clonedChild[key.ChildColumn] = parentVal;
                         }
+                        
+                        // 2. Map keys for all other active relationships from random parent rows
+                        foreach (var rel in activeRelationships)
+                        {
+                            if (rel == primaryRelationship) continue;
+                            if (seedingContext.TryGetValue(rel.ParentTable, out var otherParentRows) && otherParentRows.Any())
+                            {
+                                var randomParentRow = otherParentRows[_faker.Random.Int(0, otherParentRows.Count - 1)];
+                                foreach (var key in rel.JoinKeys)
+                                {
+                                    if (randomParentRow.TryGetValue(key.ParentColumn, out var val))
+                                        clonedChild[key.ChildColumn] = val;
+                                }
+                            }
+                        }
+                        
                         result.Add(clonedChild);
                     }
                     continue;
@@ -59,11 +78,26 @@ public sealed class DataGeneratorService : IDataGeneratorService
                 {
                     var row = GenerateRow(tableSchema, tableConfig.ColumnRules, i);
                     
-                    // Set Join Keys
-                    foreach (var key in relationship.JoinKeys)
+                    // 1. Set Join Keys for the primary relationship
+                    foreach (var key in primaryRelationship.JoinKeys)
                     {
                         if (parentRow.TryGetValue(key.ParentColumn, out var parentVal))
                             row[key.ChildColumn] = parentVal;
+                    }
+                    
+                    // 2. Set Join Keys for all other relationships (from random parent rows)
+                    foreach (var rel in activeRelationships)
+                    {
+                        if (rel == primaryRelationship) continue;
+                        if (seedingContext.TryGetValue(rel.ParentTable, out var otherParentRows) && otherParentRows.Any())
+                        {
+                            var randomParentRow = otherParentRows[_faker.Random.Int(0, otherParentRows.Count - 1)];
+                            foreach (var key in rel.JoinKeys)
+                            {
+                                if (randomParentRow.TryGetValue(key.ParentColumn, out var val))
+                                    row[key.ChildColumn] = val;
+                            }
+                        }
                     }
                     
                     currentParentChildren.Add(row);
@@ -75,10 +109,26 @@ public sealed class DataGeneratorService : IDataGeneratorService
         }
         else
         {
-            // Standard generation (no parent context or parent not found)
+            // Standard generation (no primary parent context or parent not found)
             for (var i = 0; i < tableConfig.RowCount; i++)
             {
-                result.Add(GenerateRow(tableSchema, tableConfig.ColumnRules, i));
+                var row = GenerateRow(tableSchema, tableConfig.ColumnRules, i);
+                
+                // Map keys for all active relationships from random parent rows (if any parent table has rows in seedingContext)
+                foreach (var rel in activeRelationships)
+                {
+                    if (seedingContext.TryGetValue(rel.ParentTable, out var parentRows) && parentRows.Any())
+                    {
+                        var randomParentRow = parentRows[_faker.Random.Int(0, parentRows.Count - 1)];
+                        foreach (var key in rel.JoinKeys)
+                        {
+                            if (randomParentRow.TryGetValue(key.ParentColumn, out var val))
+                                row[key.ChildColumn] = val;
+                        }
+                    }
+                }
+                
+                result.Add(row);
             }
         }
 
