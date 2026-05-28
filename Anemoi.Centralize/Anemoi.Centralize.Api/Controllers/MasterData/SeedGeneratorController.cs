@@ -1,6 +1,9 @@
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.ManualInsertData;
+using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.DeleteRowData;
+using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.ClearSeedRowLogs;
+using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedRowLogs;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.CreateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.UpdateSeedFunction;
 using Anemoi.Contract.MasterData.Commands.SeedServerCommands.CreateSeedServer;
@@ -10,7 +13,6 @@ using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.CreateSeedTemplat
 using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.UpdateSeedTemplate;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetDbSchema;
-using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedHistory;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedFunctions;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedServers;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSeedTemplates;
@@ -126,21 +128,13 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
         var res = await sender.Send(new GetDbSchemaQuery(serverId), cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
-    
-    [HttpGet("{functionId}")]
-    [ProducesResponseType(typeof(List<SeedHistoryResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSeedHistory([FromRoute] SeedFunctionId functionId, CancellationToken cancellationToken)
-    {
-        var res = await sender.Send(new GetSeedHistoryQuery(functionId), cancellationToken);
-        return Ok(res);
-    }
 
     [HttpGet]
     [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSampleData([FromQuery] GetSampleDataQuery query, CancellationToken cancellationToken)
     {
         var res = await sender.Send(query, cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
+        return res.Match<IActionResult>(val => Ok(val.Data), BadRequest);
     }
 
     [HttpPost]
@@ -156,6 +150,32 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     [Authorize(Policy = "Internal", Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ManualInsertData([FromBody] ManualInsertDataCommand command, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteRowData([FromBody] DeleteRowDataCommand command, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpGet("{serverId}")]
+    [ProducesResponseType(typeof(List<SeedRowLogResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSeedRowLogs([FromRoute] SeedServerId serverId, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetSeedRowLogsQuery(serverId), cancellationToken);
+        return res.Match<IActionResult>(val => Ok(val.Logs), BadRequest);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ClearSeedRowLogs([FromBody] ClearSeedRowLogsCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);

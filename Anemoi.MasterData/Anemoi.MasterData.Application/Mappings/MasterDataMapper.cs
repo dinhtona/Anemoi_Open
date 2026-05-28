@@ -136,9 +136,23 @@ public partial class MasterDataMapper
     public partial SeedTemplateResponse ToSeedTemplateResponse(SeedTemplate template);
     public partial IQueryable<SeedTemplateResponse> ProjectToSeedTemplateResponse(IQueryable<SeedTemplate> query);
 
-    public partial SeedHistoryResponse ToSeedHistoryResponse(SeedHistory history);
-    public partial IQueryable<SeedHistoryResponse> ProjectToSeedHistoryResponse(IQueryable<SeedHistory> query);
 
+
+
+    public SeedRowLogResponse ToSeedRowLogResponse(SeedRowLog log)
+    {
+        return new SeedRowLogResponse
+        {
+            Id = log.Id.Value.ToString(),
+            SeedServerId = log.SeedServerId.Value.ToString(),
+            TableName = log.TableName,
+            RunAt = log.RunAt,
+            PrimaryKeyCondition = log.PrimaryKeyCondition,
+            Data = string.IsNullOrWhiteSpace(log.RowDataJson)
+                ? new Dictionary<string, object>()
+                : Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(log.RowDataJson)
+        };
+    }
 
     // Common Mappings
     public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);

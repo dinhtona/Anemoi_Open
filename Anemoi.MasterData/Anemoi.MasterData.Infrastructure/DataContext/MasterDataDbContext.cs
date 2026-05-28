@@ -10,7 +10,7 @@ public sealed class MasterDataDbContext(DbContextOptions<MasterDataDbContext> op
     public DbSet<SeedServer> SeedServers { get; set; }
     public DbSet<SeedFunction> SeedFunctions { get; set; }
     public DbSet<SeedTemplate> SeedTemplates { get; set; }
-    public DbSet<SeedHistory> SeedHistories { get; set; }
+    public DbSet<SeedRowLog> SeedRowLogs { get; set; }
 
 
 

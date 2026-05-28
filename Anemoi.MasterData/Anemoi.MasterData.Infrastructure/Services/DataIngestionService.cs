@@ -197,4 +197,24 @@ public sealed class DataIngestionService : IDataIngestionService
             await connection.ExecuteAsync(sql.ToString(), parameters);
         }
     }
+
+    public async Task DeleteRowDataAsync(string connectionString, string provider, string tableName, string primaryKeyCondition, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(provider)) provider = SeedProviderType.SqlServer;
+
+        if (provider == SeedProviderType.SqlServer)
+        {
+            await using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+            var sql = $"DELETE FROM [{tableName}] WHERE {primaryKeyCondition};";
+            await connection.ExecuteAsync(sql);
+        }
+        else if (provider == SeedProviderType.PostgreSQL)
+        {
+            await using var connection = new NpgsqlConnection(connectionString);
+            await connection.OpenAsync(cancellationToken);
+            var sql = $"DELETE FROM \"{tableName}\" WHERE {primaryKeyCondition};";
+            await connection.ExecuteAsync(sql);
+        }
+    }
 }

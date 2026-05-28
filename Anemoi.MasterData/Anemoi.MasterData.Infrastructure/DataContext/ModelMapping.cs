@@ -11,7 +11,7 @@ public sealed class ModelMapping :
     IEntityTypeConfiguration<SeedServer>,
     IEntityTypeConfiguration<SeedFunction>,
     IEntityTypeConfiguration<SeedTemplate>,
-    IEntityTypeConfiguration<SeedHistory>
+    IEntityTypeConfiguration<SeedRowLog>
 
 {
     public void Configure(EntityTypeBuilder<Province> builder)
@@ -96,21 +96,25 @@ public sealed class ModelMapping :
             .IsUnique();
     }
 
-    public void Configure(EntityTypeBuilder<SeedHistory> builder)
+
+
+    public void Configure(EntityTypeBuilder<SeedRowLog> builder)
     {
-        builder.ToTable("SeedHistories");
+        builder.ToTable("SeedRowLogs");
         builder.Property(x => x.Id)
-            .HasConversion(x => x.Value, id => new SeedHistoryId(id));
+            .HasConversion(x => x.Value, id => new SeedRowLogId(id));
         builder.HasKey(x => x.Id);
-        builder.HasOne(x => x.SeedFunction)
+        builder.HasOne(x => x.SeedServer)
             .WithMany()
-            .HasForeignKey(x => x.SeedFunctionId)
+            .HasForeignKey(x => x.SeedServerId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(x => x.TableName)
+            .IsRequired()
+            .HasMaxLength(512);
         builder.Property(x => x.RunAt)
             .IsRequired();
-        builder.Property(x => x.ConfigJson)
+        builder.Property(x => x.RowDataJson)
             .IsRequired();
-        builder.Property(x => x.ResultJson)
-            .IsRequired();
+        builder.Property(x => x.PrimaryKeyCondition);
     }
 }

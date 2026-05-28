@@ -3,6 +3,7 @@ using System;
 using Anemoi.MasterData.Infrastructure.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Anemoi.MasterData.Infrastructure.Migrations
 {
     [DbContext(typeof(MasterDataDbContext))]
-    partial class MasterDataDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260528011526_AddSeedRowLogsTable")]
+    partial class AddSeedRowLogsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,6 +115,32 @@ namespace Anemoi.MasterData.Infrastructure.Migrations
                     b.HasIndex("SeedTemplateId");
 
                     b.ToTable("SeedFunctions");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConfigJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResultJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("SeedFunctionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeedFunctionId");
+
+                    b.ToTable("SeedHistories", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedRowLog", b =>
@@ -222,6 +251,16 @@ namespace Anemoi.MasterData.Infrastructure.Migrations
                     b.Navigation("SeedServer");
 
                     b.Navigation("SeedTemplate");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedHistory", b =>
+                {
+                    b.HasOne("Anemoi.MasterData.Domain.Models.SeedFunction", "SeedFunction")
+                        .WithMany()
+                        .HasForeignKey("SeedFunctionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SeedFunction");
                 });
 
             modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedRowLog", b =>

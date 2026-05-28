@@ -29,7 +29,8 @@ public sealed class TriggerSeedingHandler(
     IDbDiscoveryService dbDiscoveryService,
     IDataGeneratorService dataGeneratorService,
     IDataIngestionService dataIngestionService,
-    ISqlRepository<SeedHistory> historyRepository,
+    ISqlRepository<SeedRowLog> rowLogRepository,
+    IUnitOfWork unitOfWork,
     MasterDataMapper mapper,
     ILogger logger)
     : IRequestHandler<TriggerSeedingCommand, OneOf<TriggerSeedingResponse, ErrorDetailResponse>>
@@ -148,6 +149,22 @@ public sealed class TriggerSeedingHandler(
                     logger.Information("[TriggerSeeding] Ingesting {RowCount} rows into {TableName}...", generatedData.Count, tableConfig.TableName);
                     await dataIngestionService.IngestDataAsync(server.ConnectionString, server.Provider, tableConfig.TableName, generatedData, cancellationToken);
 
+                    // Log generated rows to repository
+                    foreach (var row in generatedData)
+                    {
+                        var pkCondition = GetPrimaryKeyCondition(tableSchema, row);
+                        var rowLog = new SeedRowLog
+                        {
+                            Id = SeedRowLogId.New(),
+                            SeedServerId = function.SeedServerId,
+                            TableName = tableConfig.TableName,
+                            RunAt = DateTime.UtcNow,
+                            RowDataJson = JsonConvert.SerializeObject(row),
+                            PrimaryKeyCondition = pkCondition
+                        };
+                        await rowLogRepository.CreateOneAsync(rowLog, cancellationToken);
+                    }
+
                     // 3. Cache for subsequent parent/formula references
                     seedingContext[tableConfig.TableName] = generatedData;
                     logger.Information("[TriggerSeeding] Successfully seeded {TableName}.", tableConfig.TableName);
@@ -224,16 +241,7 @@ public sealed class TriggerSeedingHandler(
                 }
             }
 
-            // 5. Record History
-            var history = new SeedHistory
-            {
-                Id = SeedHistoryId.New(),
-                SeedFunctionId = function.Id,
-                RunAt = DateTime.UtcNow,
-                ConfigJson = configJson,
-                ResultJson = JsonConvert.SerializeObject(new TriggerSeedingResponse(seedingContext))
-            };
-            await historyRepository.CreateOneAsync(history, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             logger.Information("[TriggerSeeding] Seeding completed successfully for function {FunctionName}", function.Name);
             return new TriggerSeedingResponse(seedingContext);
@@ -243,5 +251,54 @@ public sealed class TriggerSeedingHandler(
             logger.Error(ex, "[TriggerSeeding] Unexpected error during seeding execution for function {FunctionId}", request.SeedFunctionId);
             return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError($"Seeding failed: {ex.Message}"));
         }
+    }
+
+    private string GetPrimaryKeyCondition(TableSchema tableSchema, Dictionary<string, object> rowData)
+    {
+        if (tableSchema == null || rowData == null) return string.Empty;
+
+        // 1. Identity check
+        var identityCol = tableSchema.Columns.FirstOrDefault(c => c.IsIdentity);
+        if (identityCol != null && rowData.TryGetValue(identityCol.ColumnName, out var identityVal) && identityVal != null)
+        {
+            return $"{identityCol.ColumnName}={FormatValue(identityVal)}";
+        }
+
+        // 2. PK name check (id, memid, memberid, etc.)
+        var pkNames = new[] { "id", "memid", "memberid", $"{tableSchema.TableName.ToLower()}id", $"{tableSchema.TableName.ToLower()}_id" };
+        foreach (var name in pkNames)
+        {
+            var col = tableSchema.Columns.FirstOrDefault(c => c.ColumnName.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (col != null && rowData.TryGetValue(col.ColumnName, out var pkVal) && pkVal != null)
+            {
+                return $"{col.ColumnName}={FormatValue(pkVal)}";
+            }
+        }
+
+        // 3. Ending with id check
+        var endsWithIdCol = tableSchema.Columns.FirstOrDefault(c => c.ColumnName.EndsWith("id", StringComparison.OrdinalIgnoreCase));
+        if (endsWithIdCol != null && rowData.TryGetValue(endsWithIdCol.ColumnName, out var endsWithIdVal) && endsWithIdVal != null)
+        {
+            return $"{endsWithIdCol.ColumnName}={FormatValue(endsWithIdVal)}";
+        }
+
+        // 4. Default to first column
+        if (tableSchema.Columns.Count > 0)
+        {
+            var col = tableSchema.Columns[0];
+            if (rowData.TryGetValue(col.ColumnName, out var firstVal) && firstVal != null)
+            {
+                return $"{col.ColumnName}={FormatValue(firstVal)}";
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private string FormatValue(object val)
+    {
+        if (val is int || val is long || val is double || val is decimal || val is float)
+            return val.ToString();
+        return $"'{val.ToString().Replace("'", "''")}'";
     }
 }

@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.SeedDataQueries.GetSampleData;
+using Anemoi.Contract.MasterData.Responses;
 using Anemoi.MasterData.Application.Abstractions;
 using Anemoi.MasterData.Application.Models;
 using Anemoi.MasterData.Domain.Models;
@@ -22,9 +23,9 @@ public sealed class GetSampleDataHandler(
     ISqlRepository<SeedServer> serverRepository,
     IDbDiscoveryService dbDiscoveryService,
     IDataGeneratorService dataGeneratorService)
-    : IRequestHandler<GetSampleDataQuery, OneOf<Dictionary<string, object>, ErrorDetailResponse>>
+    : IRequestHandler<GetSampleDataQuery, OneOf<SampleDataResponse, ErrorDetailResponse>>
 {
-    public async Task<OneOf<Dictionary<string, object>, ErrorDetailResponse>> Handle(GetSampleDataQuery request, CancellationToken cancellationToken)
+    public async Task<OneOf<SampleDataResponse, ErrorDetailResponse>> Handle(GetSampleDataQuery request, CancellationToken cancellationToken)
     {
         try
         {
@@ -90,7 +91,7 @@ public sealed class GetSampleDataHandler(
             if (generatedData == null || !generatedData.Any())
                 return new ErrorDetailResponse { Messages = ["Failed to generate sample data."], Code = "BadRequest" };
 
-            return generatedData[0];
+            return new SampleDataResponse(generatedData[0]);
         }
         catch (Exception ex)
         {
