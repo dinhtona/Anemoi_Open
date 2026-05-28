@@ -79,15 +79,15 @@ public sealed class TriggerSeedingHandler(
                 }
             }
 
-            // Sort tables by defined Order
-            // If no specific tables selected, include ALL tables from the template
-            var sortedTables = config.Tables
+            // Topologically sort tables based on parent-child relationships
+            var filteredTables = config.Tables
                 .Where(t => selectedTables.Count == 0 || selectedTables.Contains(t.TableName))
-                .OrderBy(t => t.Order)
                 .ToList();
 
-            if (!sortedTables.Any())
+            if (!filteredTables.Any())
                 return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError("None of the selected tables are defined in the template or no tables are configured."));
+
+            var sortedTables = SortTablesTopologically(filteredTables, config.Relationships);
 
             logger.Information("[TriggerSeeding] Starting seeding for function {FunctionName} (ID: {FunctionId})", function.Name, function.Id);
             logger.Information("[TriggerSeeding] Template Config: {Config}", configJson);
@@ -300,5 +300,66 @@ public sealed class TriggerSeedingHandler(
         if (val is int || val is long || val is double || val is decimal || val is float)
             return val.ToString();
         return $"'{val.ToString().Replace("'", "''")}'";
+    }
+
+    private List<TableConfig> SortTablesTopologically(List<TableConfig> tables, List<RelationshipConfig> relationships)
+    {
+        var result = new List<TableConfig>();
+        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var visiting = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Build adjacency list: Parent -> List of Children
+        var adj = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var table in tables)
+        {
+            adj[table.TableName] = new List<string>();
+        }
+
+        foreach (var rel in relationships)
+        {
+            if (adj.ContainsKey(rel.ParentTable) && adj.ContainsKey(rel.ChildTable))
+            {
+                adj[rel.ParentTable].Add(rel.ChildTable);
+            }
+        }
+
+        void Dfs(string tableName)
+        {
+            if (visited.Contains(tableName)) return;
+            if (visiting.Contains(tableName))
+            {
+                // Cycle detected - break to prevent infinite loops
+                return;
+            }
+
+            visiting.Add(tableName);
+
+            if (adj.TryGetValue(tableName, out var children))
+            {
+                foreach (var child in children)
+                {
+                    Dfs(child);
+                }
+            }
+
+            visiting.Remove(tableName);
+            visited.Add(tableName);
+
+            var tableConfig = tables.FirstOrDefault(t => t.TableName.Equals(tableName, StringComparison.OrdinalIgnoreCase));
+            if (tableConfig != null)
+            {
+                result.Add(tableConfig);
+            }
+        }
+
+        // Sort descending by Order first to preserve defined order for independent tables
+        var orderedTables = tables.OrderByDescending(t => t.Order).ToList();
+        foreach (var table in orderedTables)
+        {
+            Dfs(table.TableName);
+        }
+
+        result.Reverse();
+        return result;
     }
 }

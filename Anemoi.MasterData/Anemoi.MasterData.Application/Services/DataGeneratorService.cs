@@ -82,6 +82,21 @@ public sealed class DataGeneratorService : IDataGeneratorService
             }
         }
 
+        // Final pass: Enforce MaxLength truncation for all string values in the generated rows
+        foreach (var row in result)
+        {
+            foreach (var column in tableSchema.Columns)
+            {
+                if (column.MaxLength > 0 && row.TryGetValue(column.ColumnName, out var val) && val is string s)
+                {
+                    if (s.Length > column.MaxLength.Value)
+                    {
+                        row[column.ColumnName] = s.Substring(0, column.MaxLength.Value);
+                    }
+                }
+            }
+        }
+
         return Task.FromResult(result);
     }
 
@@ -102,7 +117,7 @@ public sealed class DataGeneratorService : IDataGeneratorService
 
             var rule = rules.FirstOrDefault(r => r.ColumnName.Equals(column.ColumnName, StringComparison.OrdinalIgnoreCase));
             
-            Console.WriteLine($"[DataGenerator] Processing column {column.ColumnName} (IsIdentity: {column.IsIdentity}, Type: {column.DataType}) with Rule: {rule?.RuleType ?? "None"}");
+            Console.WriteLine($"[DataGenerator] Processing column {column.ColumnName} (IsIdentity: {column.IsIdentity}, Type: {column.DataType}, MaxLength: {column.MaxLength}) with Rule: {rule?.RuleType ?? "None"}");
             
             if (rule != null && rule.RuleType == "STATIC")
             {
@@ -232,11 +247,27 @@ public sealed class DataGeneratorService : IDataGeneratorService
 
         // 2. Check by Column Name Patterns (Best effort for string-like columns)
         if (columnName.Contains("email")) return _faker.Internet.Email();
-        if (columnName.Contains("phone")) return _faker.Phone.PhoneNumber();
+        if (columnName.Contains("phone") || columnName.Contains("tel") || columnName.Contains("mobile") || columnName.Contains("fax"))
+        {
+            var len = column.MaxLength is > 0 ? column.MaxLength.Value : 10;
+            if (len <= 6)
+            {
+                return _faker.Random.ReplaceNumbers(new string('#', len));
+            }
+            return _faker.Phone.PhoneNumber();
+        }
         if (columnName.Contains("address")) return _faker.Address.FullAddress();
         if (columnName.Contains("city")) return _faker.Address.City();
         if (columnName.Contains("country")) return _faker.Address.Country();
-        if (columnName.Contains("zip") || columnName.Contains("postal")) return _faker.Address.ZipCode();
+        if (columnName.Contains("zip") || columnName.Contains("postal") || columnName.Contains("postcode"))
+        {
+            var zip = _faker.Address.ZipCode();
+            if (column.MaxLength is > 0 && zip.Length > column.MaxLength.Value)
+            {
+                return zip.Substring(0, column.MaxLength.Value);
+            }
+            return zip;
+        }
         if (columnName.Contains("company")) return _faker.Company.CompanyName();
         
         if (columnName.Contains("price") || columnName.Contains("amount") || columnName.Contains("cost") || columnName.Contains("total")) 
