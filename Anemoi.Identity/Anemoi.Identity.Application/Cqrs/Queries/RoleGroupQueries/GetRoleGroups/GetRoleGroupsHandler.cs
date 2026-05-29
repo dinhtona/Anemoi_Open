@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -35,7 +35,7 @@ public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository
 
         Expression<Func<RoleGroup, bool>> creatorIdsFilter = query.CreatorIds switch
         {
-            { } val => r => val.Select(x => new UserId(Guid.Parse(x))).Contains(r.CreatorId),
+            { Count: > 0 } val => r => val.Select(x => new UserId(Guid.Parse(x))).Contains(r.CreatorId),
             _ => _ => true
         };
 
