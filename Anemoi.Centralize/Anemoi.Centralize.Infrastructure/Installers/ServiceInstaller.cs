@@ -40,6 +40,10 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ICustomWorkspaceIdSetter, CustomWorkspaceIdService>();
         services.AddScoped<ICustomWorkspaceIdGetter>(sp => sp.GetRequiredService<ICustomWorkspaceIdSetter>() as CustomWorkspaceIdService);
 
+        // Active SignalR developer registry
+        services.AddSingleton<IConnectedUsersRegistry, ConnectedUsersRegistry>();
+        services.AddScoped<IEnvironmentNotificationService, EnvironmentNotificationService>();
+
         // Dev environments integration services
         services.AddSingleton<IDockerService, DockerService>();
         services.AddSingleton<ISftpFileManager, SftpFileManager>();

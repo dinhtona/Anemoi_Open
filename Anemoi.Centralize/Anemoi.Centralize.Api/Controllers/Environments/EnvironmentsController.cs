@@ -15,7 +15,10 @@ namespace Anemoi.Centralize.Api.Controllers.Environments;
 
 [ApiController]
 [Route("api/environments")]
-public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftpFileManager) : ControllerBase
+public sealed class EnvironmentsController(
+    ISender sender, 
+    ISftpFileManager sftpFileManager,
+    IEnvironmentNotificationService environmentNotificationService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetEnvironments(CancellationToken cancellationToken)
@@ -98,6 +101,13 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
 
         using var stream = file.OpenReadStream();
         var success = await sender.Send(new UploadSftpFileCommand(path, file.FileName, stream), cancellationToken);
+        if (success)
+        {
+            await environmentNotificationService.NotifyEnvironmentActivityAsync(
+                "SFTP for Dev", 
+                $"Uploaded file: {file.FileName} to path: {path ?? "/"}"
+            );
+        }
         return Ok(new { success });
     }
 
@@ -109,6 +119,10 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
             var stream = sftpFileManager.DownloadFile(path);
             var fileName = Path.GetFileName(path);
             var contentType = "application/octet-stream";
+            _ = Task.Run(() => environmentNotificationService.NotifyEnvironmentActivityAsync(
+                "SFTP for Dev", 
+                $"Downloaded file: {fileName} from path: {Path.GetDirectoryName(path) ?? "/"}"
+            ));
             return File(stream, contentType, fileName, enableRangeProcessing: true);
         }
         catch (FileNotFoundException)
@@ -125,6 +139,13 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
     public async Task<IActionResult> DeleteSftpFile([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new DeleteSftpFileCommand(path), cancellationToken);
+        if (success)
+        {
+            await environmentNotificationService.NotifyEnvironmentActivityAsync(
+                "SFTP for Dev", 
+                $"Deleted item: {path}"
+            );
+        }
         return Ok(new { success });
     }
 
@@ -132,6 +153,13 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
     public async Task<IActionResult> CreateSftpDirectory([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new CreateSftpDirectoryCommand(path), cancellationToken);
+        if (success)
+        {
+            await environmentNotificationService.NotifyEnvironmentActivityAsync(
+                "SFTP for Dev", 
+                $"Created directory: {Path.GetFileName(path)} at path: {Path.GetDirectoryName(path) ?? "/"}"
+            );
+        }
         return Ok(new { success });
     }
 

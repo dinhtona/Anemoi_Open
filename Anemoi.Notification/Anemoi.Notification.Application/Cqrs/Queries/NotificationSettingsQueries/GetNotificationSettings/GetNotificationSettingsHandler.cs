@@ -41,7 +41,7 @@ public sealed class GetNotificationSettingsHandler(
             models =>
             {
                 var list = models.Select(mapper.ToSettingResponse).ToList();
-                var defaultCategories = new[] { "System", "Workspace", "Task" };
+                var defaultCategories = new[] { "System", "Workspace", "Task", "Environment" };
                 foreach (var cat in defaultCategories)
                 {
                     if (!list.Any(x => x.Category.Equals(cat, StringComparison.OrdinalIgnoreCase)))

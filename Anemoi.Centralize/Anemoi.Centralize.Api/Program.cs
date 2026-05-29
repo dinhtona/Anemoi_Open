@@ -33,6 +33,7 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
 builder.Host.ConfigureServices((context, services) =>
 {
     services.InstallServicesInAssembly<ICentralizeInfrastructureAssemblyMarker>(context.Configuration);
+    services.AddHostedService<Anemoi.Centralize.Api.Services.Smtp4DevMonitoringWorker>();
     services.AddSignalR();
     services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
     services.AddHttpLogging(options
