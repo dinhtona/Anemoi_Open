@@ -389,3 +389,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 cody-web-app
+
+# Dev Environment files
+local_env/

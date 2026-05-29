@@ -96,6 +96,7 @@ services:
 
   # Aggregation and Controllers service
   anemoi_centralize:
+    user: root
     image: anemoi/centralize
     build:
       context: .
@@ -115,6 +116,11 @@ services:
         condition: service_started
     networks:
       - anemoi_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./local_env/env_data:/app/env_data
+      - ./local_env/sftp_data:/app/sftp_data
+      - ./local_env/sftp_keys:/app/sftp_keys
 
   # Identity service
   anemoi_identity:
@@ -245,6 +251,30 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    networks:
+      - anemoi_network
+
+  sftp:
+    platform: linux/amd64
+    image: atmoz/sftp:latest
+    container_name: sftp_server
+    restart: unless-stopped
+    ports:
+      - "2222:22"
+    volumes:
+      - ./local_env/sftp_data:/home/user1/upload
+      - ./local_env/sftp_keys:/home/user1/.ssh/keys:ro
+    command: user1:123456:1001
+    networks:
+      - anemoi_network
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    container_name: smtp4dev_server
+    restart: unless-stopped
+    ports:
+      - "25:25"
+      - "5555:80"
     networks:
       - anemoi_network
 

@@ -1,4 +1,4 @@
-﻿using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,5 +12,6 @@ public sealed class SettingsInstaller : IInstaller
     {
         services.AddSingleton(configuration.GetSection(nameof(S3Setting)).Get<S3Setting>()!);
         services.AddSingleton(configuration.GetSection(nameof(GrpcSetting)).Get<GrpcSetting>()!);
+        services.AddSingleton(configuration.GetSection(nameof(DevEnvironmentsSetting)).Get<DevEnvironmentsSetting>() ?? new DevEnvironmentsSetting());
     }
 }

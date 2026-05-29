@@ -1,4 +1,4 @@
-﻿using Amazon.Runtime;
+using Amazon.Runtime;
 using Amazon.S3;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Anemoi.Centralize.Application.Abstractions;
+using Anemoi.Centralize.Application.Configurations;
 using Anemoi.Centralize.Application.ContractAssemblies;
 using Anemoi.Centralize.Application.Filters;
 using Anemoi.Centralize.Application.Mappings;
@@ -38,5 +39,19 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ICustomUserIdGetter>(sp => sp.GetRequiredService<ICustomUserIdSetter>() as CustomUserIdService);
         services.AddScoped<ICustomWorkspaceIdSetter, CustomWorkspaceIdService>();
         services.AddScoped<ICustomWorkspaceIdGetter>(sp => sp.GetRequiredService<ICustomWorkspaceIdSetter>() as CustomWorkspaceIdService);
+
+        // Dev environments integration services
+        services.AddSingleton<IDockerService, DockerService>();
+        services.AddSingleton<ISftpFileManager, SftpFileManager>();
+        services.AddSingleton<IMockRouteRepository, MockRouteRepository>();
+
+        // Ensure SFTP SSH keys exist at startup
+        var devSettings = configuration.GetSection(nameof(DevEnvironmentsSetting)).Get<DevEnvironmentsSetting>() ?? new DevEnvironmentsSetting();
+        var sftpKeysPath = "/app/sftp_keys";
+        if (!System.IO.Directory.Exists(sftpKeysPath))
+        {
+            sftpKeysPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), devSettings.LocalEnvDir, "sftp_keys");
+        }
+        SshKeyGenerator.EnsureKeysExist(sftpKeysPath);
     }
 }
