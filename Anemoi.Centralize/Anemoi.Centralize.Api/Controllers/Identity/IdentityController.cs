@@ -135,7 +135,7 @@ public class IdentityController(ISender sender) : ControllerBase
 
         if (string.IsNullOrEmpty(refreshTokenStr) || !Guid.TryParse(refreshTokenStr, out var guid))
         {
-            return BadRequest(new ErrorDetailResponse { Messages = new[] { "Refresh token is missing or invalid." } });
+            return BadRequest(new ErrorDetailResponse { Code = "RefreshTokenInvalid", Messages = new[] { "Refresh token is missing or invalid." } });
         }
 
         var res = await sender.Send(new UserRefreshTokenCommand(new RefreshTokenId(guid)), cancellationToken);

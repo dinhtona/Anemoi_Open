@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.Centralize.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Centralize.Application.Cqrs.Environments.Commands;
 using Anemoi.Centralize.Application.Cqrs.Environments.Queries;
 using MediatR;
@@ -29,7 +30,7 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
         var success = await sender.Send(new StartEnvironmentCommand(id), cancellationToken);
         if (!success)
         {
-            return BadRequest(new { error = $"Failed to start environment service {id}." });
+            return BadRequest(new ErrorDetailResponse { Code = "FailedToStartEnvironment", Messages = new[] { $"Failed to start environment service {id}." } });
         }
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
@@ -46,7 +47,7 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
         var success = await sender.Send(new StopEnvironmentCommand(id), cancellationToken);
         if (!success)
         {
-            return BadRequest(new { error = $"Failed to stop environment service {id}." });
+            return BadRequest(new ErrorDetailResponse { Code = "FailedToStopEnvironment", Messages = new[] { $"Failed to stop environment service {id}." } });
         }
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
@@ -68,7 +69,7 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
         );
         if (updated == null)
         {
-            return NotFound(new { error = $"Environment service {id} not found." });
+            return NotFound(new ErrorDetailResponse { Code = "EnvironmentNotFound", Messages = new[] { $"Environment service {id} not found." } });
         }
         return Ok(new { data = updated });
     }
@@ -92,7 +93,7 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
     {
         if (file == null || file.Length == 0)
         {
-            return BadRequest(new { error = "No file uploaded." });
+            return BadRequest(new ErrorDetailResponse { Code = "NoFileUploaded", Messages = new[] { "No file uploaded." } });
         }
 
         using var stream = file.OpenReadStream();
@@ -112,11 +113,11 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
         }
         catch (FileNotFoundException)
         {
-            return NotFound(new { error = "File not found." });
+            return NotFound(new ErrorDetailResponse { Code = "FileNotFound", Messages = new[] { "File not found." } });
         }
         catch (Exception ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorDetailResponse { Messages = new[] { ex.Message } });
         }
     }
 
@@ -162,7 +163,7 @@ public sealed class EnvironmentsController(ISender sender, ISftpFileManager sftp
         var route = await sender.Send(command, cancellationToken);
         if (route == null)
         {
-            return NotFound(new { error = "Mock route not found." });
+            return NotFound(new ErrorDetailResponse { Code = "MockRouteNotFound", Messages = new[] { "Mock route not found." } });
         }
         return Ok(new { data = route });
     }

@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Resources;
+using Anemoi.BuildingBlock.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
@@ -11,12 +12,26 @@ public sealed class LocalizedErrorFilter(IStringLocalizer<SharedResource> locali
 {
     public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {
-        if (context.Result is ObjectResult result && result.Value is ErrorDetail errorDetail)
+        if (context.Result is ObjectResult result)
         {
-            var translation = localizer[errorDetail.Code];
-            if (!translation.ResourceNotFound)
+            if (result.Value is ErrorDetail errorDetail)
             {
-                errorDetail.Messages = [translation.Value];
+                var translation = localizer[errorDetail.Code];
+                if (!translation.ResourceNotFound)
+                {
+                    errorDetail.Messages = [translation.Value];
+                }
+            }
+            else if (result.Value is ErrorDetailResponse errorDetailResponse)
+            {
+                if (!string.IsNullOrEmpty(errorDetailResponse.Code))
+                {
+                    var translation = localizer[errorDetailResponse.Code];
+                    if (!translation.ResourceNotFound)
+                    {
+                        errorDetailResponse.Messages = [translation.Value];
+                    }
+                }
             }
         }
         await next();
