@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
 using Serilog.Events;
 using Anemoi.Centralize.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
+using Anemoi.Centralize.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,8 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
 builder.Host.ConfigureServices((context, services) =>
 {
     services.InstallServicesInAssembly<ICentralizeInfrastructureAssemblyMarker>(context.Configuration);
+    services.AddSignalR();
+    services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
     services.AddHttpLogging(options
         => options.LoggingFields = HttpLoggingFields.All);
     services.AddRateLimiter(options =>
@@ -101,5 +105,6 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notification");
 
 await app.RunAsync();

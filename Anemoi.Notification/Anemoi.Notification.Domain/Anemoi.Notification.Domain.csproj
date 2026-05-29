@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Notification\Anemoi.Contract.Notification.csproj"/>
+        <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Domain\Anemoi.BuildingBlock.Domain.csproj"/>
+    </ItemGroup>
+
+</Project>

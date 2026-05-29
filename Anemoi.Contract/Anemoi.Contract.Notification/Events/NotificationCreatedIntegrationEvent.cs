@@ -1,0 +1,13 @@
+using System;
+
+namespace Anemoi.Contract.Notification.Events;
+
+public sealed record NotificationCreatedIntegrationEvent
+{
+    public string Id { get; init; }
+    public string UserId { get; init; }
+    public string Title { get; init; }
+    public string Content { get; init; }
+    public string Category { get; init; }
+    public DateTime CreatedTime { get; init; }
+}

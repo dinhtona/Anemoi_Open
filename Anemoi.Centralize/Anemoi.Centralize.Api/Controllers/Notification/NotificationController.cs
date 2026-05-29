@@ -1,0 +1,112 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
+using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAllAsRead;
+using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAsRead;
+using Anemoi.Contract.Notification.Commands.NotificationSettingsCommands.UpdateNotificationSettings;
+using Anemoi.Contract.Notification.ModelIds;
+using Anemoi.Contract.Notification.Queries.NotificationQueries.GetNotifications;
+using Anemoi.Contract.Notification.Queries.NotificationQueries.GetUnreadNotificationCount;
+using Anemoi.Contract.Notification.Queries.NotificationSettingsQueries.GetNotificationSettings;
+using Anemoi.Contract.Notification.Responses;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Anemoi.Centralize.Api.Controllers.Notification;
+
+[Route("api/notification/[controller]/[action]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Produces("application/json")]
+public sealed class NotificationController(ISender sender) : ControllerBase
+{
+    [HttpGet]
+    [ProducesResponseType(typeof(PaginationResponse<NotificationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetNotifications([FromQuery] int page, [FromQuery] int size, CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var query = new GetNotificationsQuery(userId)
+        {
+            PageIndex = page <= 0 ? 1 : page,
+            PageSize = size <= 0 ? 10 : size
+        };
+        var res = await sender.Send(query, cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(CountingResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetUnreadCount(CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var query = new GetUnreadNotificationCountQuery(userId);
+        var res = await sender.Send(query, cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(typeof(CollectionResponse<NotificationSettingResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetSettings(CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var query = new GetNotificationSettingsQuery(userId);
+        var res = await sender.Send(query, cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateSettings([FromBody] List<NotificationSettingResponse> settings, CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var command = new UpdateNotificationSettingsCommand(userId, settings);
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> MarkAsRead(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var command = new MarkNotificationAsReadCommand(new NotificationHistoryId(id), userId);
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var command = new MarkAllNotificationsAsReadCommand(userId);
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationCommand command, CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+}
+

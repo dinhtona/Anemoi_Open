@@ -1,11 +1,14 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
+using Anemoi.BuildingBlock.Infrastructure.Filters;
+using Anemoi.BuildingBlock.Infrastructure.HandlerConsumers;
+using Anemoi.Contract.Notification;
+using Anemoi.Notification.Application;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Anemoi.Centralize.Application;
 
-namespace Anemoi.Centralize.Infrastructure.Installers;
+namespace Anemoi.Notification.Infrastructure.Installers;
 
 public sealed class MassTransitInstaller : IInstaller
 {
@@ -16,9 +19,10 @@ public sealed class MassTransitInstaller : IInstaller
         services.AddMassTransit(configurator =>
         {
             configurator.SetKebabCaseEndpointNameFormatter();
-            configurator.AddConsumersFromNamespaceContaining<ICentralizeApplicationAssemblyMarker>();
-            configurator.AddConsumers(System.Reflection.Assembly.GetEntryAssembly());
-            configurator.AddActivitiesFromNamespaceContaining<ICentralizeApplicationAssemblyMarker>();
+            configurator.AddConsumersFromNamespaceContaining<INotificationApplicationAssemblyMarker>();
+            var serviceConsumer = ConsumersHelper
+                .CreateDynamicConsumerHandlers<INotificationContractAssemblyMarker>("NotificationHandlersConsumer");
+            configurator.AddConsumer(serviceConsumer);
             configurator.UsingRabbitMq((context, bus) =>
             {
                 bus.Host(host, virtualHost, c =>
@@ -26,6 +30,7 @@ public sealed class MassTransitInstaller : IInstaller
                     c.Username(userName);
                     c.Password(password);
                 });
+                bus.UseConsumeFilter(typeof(RequestHeaderFilter<>), context);
                 bus.ConfigureEndpoints(context);
             });
         });

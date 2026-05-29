@@ -1,0 +1,16 @@
+using Anemoi.Notification.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace Anemoi.Notification.Infrastructure.DataContext;
+
+public sealed class NotificationDbContext(DbContextOptions<NotificationDbContext> options) : DbContext(options)
+{
+    public DbSet<NotificationHistory> NotificationHistories { get; set; }
+    public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(INotificationInfrastructureAssemblyMarker).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
+}

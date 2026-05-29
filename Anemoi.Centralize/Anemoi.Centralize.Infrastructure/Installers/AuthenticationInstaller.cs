@@ -43,7 +43,13 @@ public sealed class AuthenticationInstaller : IInstaller
             {
                 OnMessageReceived = context =>
                 {
-                    if (context.Request.Cookies.ContainsKey("access_token"))
+                    var path = context.HttpContext.Request.Path;
+                    if (path.StartsWithSegments("/hubs/notification") &&
+                        context.Request.Query.TryGetValue("access_token", out var accessToken))
+                    {
+                        context.Token = accessToken;
+                    }
+                    else if (context.Request.Cookies.ContainsKey("access_token"))
                     {
                         context.Token = context.Request.Cookies["access_token"];
                     }
