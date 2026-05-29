@@ -42,11 +42,10 @@ services:
       timeout: 10s
       retries: 5
 
-  # Microsoft SQL Server for seed/data ingestion scenarios.
-  # SQL Server images are amd64-only; platform is pinned for Apple Silicon (M1/M2/M3).mssql:
+  # Microsoft SQL Server (Azure SQL Edge) for seed/data ingestion scenarios.
+  # Azure SQL Edge is natively compiled for ARM64 (Apple Silicon), providing maximum stability.
   mssql:
-    image: mcr.microsoft.com/mssql/server:2022-CU23-ubuntu-22.04
-    platform: linux/amd64
+    image: mcr.microsoft.com/azure-sql-edge:latest
     container_name: mssql
     hostname: mssql
 
@@ -55,7 +54,6 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-      MSSQL_PID: "Developer"
 
     ports:
       - "1433:1433"
@@ -75,7 +73,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\""
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\""
         ]
       interval: 30s
       timeout: 10s
