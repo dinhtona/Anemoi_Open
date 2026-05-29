@@ -54,6 +54,24 @@ public sealed class AuthenticationInstaller : IInstaller
                         context.Token = context.Request.Cookies["access_token"];
                     }
                     return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    var userIdClaim = context.Principal?.FindFirst("id")?.Value;
+                    if (!string.IsNullOrEmpty(userIdClaim))
+                    {
+                        var memoryCache = context.HttpContext.RequestServices.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+                        var cacheKey = $"revoked_user:{userIdClaim}";
+                        if (memoryCache.TryGetValue(cacheKey, out var revokedAtObj) && revokedAtObj is DateTime revokedAt)
+                        {
+                            var tokenValidFrom = context.SecurityToken.ValidFrom;
+                            if (tokenValidFrom < revokedAt)
+                            {
+                                context.Fail("Token has been revoked.");
+                            }
+                        }
+                    }
+                    return Task.CompletedTask;
                 }
             };
         });

@@ -16,6 +16,8 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
         if (!string.IsNullOrEmpty(userId))
         {
             registry.AddUser(userId);
+            // Broadcast UserOnline event to the Administrators group
+            await Clients.Group("Administrators").SendAsync("UserOnline", userId);
         }
         logger.LogInformation("SignalR Client Connected: User {UserId}, ConnectionId {ConnectionId}", userId, Context.ConnectionId);
         await base.OnConnectedAsync();
@@ -27,6 +29,8 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
         if (!string.IsNullOrEmpty(userId))
         {
             registry.RemoveUser(userId);
+            // Broadcast UserOffline event to the Administrators group
+            await Clients.Group("Administrators").SendAsync("UserOffline", userId);
         }
         logger.LogInformation("SignalR Client Disconnected: User {UserId}, ConnectionId {ConnectionId}, Error: {Error}", 
             userId, Context.ConnectionId, exception?.Message ?? "None");

@@ -71,4 +71,58 @@ public class UserController(ISender sender) : ControllerBase
         var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
     }
+
+    /// <summary>
+    /// UpdateUserRoleGroups
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateUserRoleGroups([FromBody] Anemoi.Contract.Identity.Commands.UserMapRoleGroupCommands.UpdateUserMapRoleGroups.UpdateUserMapRoleGroupsCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    /// <summary>
+    /// RevokeUserSession
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RevokeUserSession([FromBody] Anemoi.Contract.Identity.Commands.UserCommands.RevokeUserSession.RevokeUserSessionCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    /// <summary>
+    /// GetOnlineUsers
+    /// </summary>
+    /// <param name="registry"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize(Roles = "Administrator")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public IActionResult GetOnlineUsers([FromServices] Anemoi.Centralize.Application.Abstractions.IConnectedUsersRegistry registry)
+    {
+        var activeUserIds = registry.GetActiveUserIds();
+        return Ok(activeUserIds);
+    }
 }

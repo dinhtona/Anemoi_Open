@@ -281,4 +281,27 @@ public class IdentityController(ISender sender) : ControllerBase
         var result = await sender.Send(command, cancellationToken);
         return result.Match<IActionResult>(_ => Ok(), BadRequest);
     }
+
+    /// <summary>
+    /// ExternalLogin
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthenticationSuccessResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ExternalLogin([FromBody] Anemoi.Contract.Identity.Commands.RefreshTokenCommands.ExternalLogin.ExternalLoginCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(
+            success =>
+            {
+                SetTokenCookies(success.Token, success.RefreshToken);
+                return Ok(success);
+            },
+            BadRequest);
+    }
 }

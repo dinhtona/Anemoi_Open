@@ -1,4 +1,6 @@
-﻿using Anemoi.BuildingBlock.Application.Responses;
+using System;
+using System.Collections.Generic;
+using Anemoi.BuildingBlock.Application.Responses;
 
 namespace Anemoi.Contract.Identity.Responses;
 
@@ -12,4 +14,6 @@ public sealed class UserResponse : ModelResponse
     public string PhoneNumber { get; set; }
     public string Avatar { get; set; }
     public DateTime CreatedTime { get; set; }
+    public List<string> Roles { get; set; } = [];
+    public List<string> RoleGroupIds { get; set; } = [];
 }
