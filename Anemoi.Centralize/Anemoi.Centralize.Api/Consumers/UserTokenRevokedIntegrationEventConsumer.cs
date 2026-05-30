@@ -1,8 +1,10 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using Anemoi.Centralize.Api.Hubs;
 using Anemoi.Contract.Identity.Events;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Serilog;
 
@@ -10,6 +12,7 @@ namespace Anemoi.Centralize.Api.Consumers;
 
 public sealed class UserTokenRevokedIntegrationEventConsumer(
     IDistributedCache distributedCache,
+    IHubContext<NotificationHub> hubContext,
     Serilog.ILogger logger)
     : IConsumer<UserTokenRevokedIntegrationEvent>
 {
@@ -21,6 +24,8 @@ public sealed class UserTokenRevokedIntegrationEventConsumer(
             @event.RevokedAt.Ticks.ToString(CultureInfo.InvariantCulture),
             new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2) },
             context.CancellationToken);
+        await hubContext.Clients.User(@event.UserId.ToString())
+            .SendAsync("UserSessionRevoked", cancellationToken: context.CancellationToken);
         logger.Information("Cached token revocation for user {UserId} at {RevokedAt}", @event.UserId, @event.RevokedAt);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.Repositories;
 using Anemoi.Identity.Application.Abstractions;
@@ -90,12 +91,17 @@ public sealed class UserRepository(
     public Task<IList<string>> GetDirectRolesAsync(User user) =>
         userManager.GetRolesAsync(user);
 
+    public Task<IList<User>> GetUsersInRoleAsync(string roleName) =>
+        userManager.GetUsersInRoleAsync(roleName);
+
     public async Task<IList<string>> GetEffectiveRolesAsync(User user)
     {
         var directRoles = await GetDirectRolesAsync(user);
 
         var roleGroupRoles = await dbContext.UserMapRoleGroups
-            .Where(um => um.UserId == user.UserId)
+            .Where(um => um.UserId == user.UserId &&
+                !um.RoleGroup.RoleGroupClaims.Any(claim =>
+                    claim.Key == AuthorizationClaimTypes.WorkspaceId))
             .SelectMany(um => um.RoleGroup.RoleGroupMapRoles)
             .Select(rg => rg.Role.Name)
             .ToListAsync();

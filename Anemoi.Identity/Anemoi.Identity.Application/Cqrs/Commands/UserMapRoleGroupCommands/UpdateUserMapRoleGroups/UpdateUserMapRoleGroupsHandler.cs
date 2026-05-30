@@ -20,13 +20,17 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.UserMapRoleGroupCommands.Upd
 public sealed class UpdateUserMapRoleGroupsHandler(
     ISqlRepository<UserMapRoleGroup> sqlRepository,
     ISqlRepository<RoleGroup> roleGroupRepository,
+    ISqlRepository<User> userDbRepository,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork,
     IUserSessionRevocationService sessionRevocationService,
+    IUserPermissionChangeNotifier permissionChangeNotifier,
     ILogger logger)
     : EfCommandManyVoidHandler<UserMapRoleGroup, UpdateUserMapRoleGroupsCommand>(sqlRepository, unitOfWork,
         logger)
 {
     private PreparedSessionRevocation _preparedRevocation;
+    private bool _publishPermissionChange;
 
     protected override ICommandManyFlowBuilderVoid<UserMapRoleGroup> BuildCommand(
         IStartManyCommandVoid<UserMapRoleGroup> fromFlow, UpdateUserMapRoleGroupsCommand command,
@@ -52,20 +56,56 @@ public sealed class UpdateUserMapRoleGroupsHandler(
                     return IdentityErrorDetail.RoleGroupError.NotFound();
 
                 var existRoleGroups = await SqlRepository
-                    .GetQueryable(a => a.UserId == command.UserId)
+                    .GetQueryable(a => a.UserId == command.UserId &&
+                        !a.RoleGroup.RoleGroupClaims.Any(claim =>
+                            claim.Key == AuthorizationClaimTypes.WorkspaceId))
+                    .ToListAsync(cancellationToken);
+                var previousRoles = await SqlRepository
+                    .GetQueryable(a => a.UserId == command.UserId &&
+                        !a.RoleGroup.RoleGroupClaims.Any(claim =>
+                            claim.Key == AuthorizationClaimTypes.WorkspaceId))
+                    .SelectMany(a => a.RoleGroup.RoleGroupMapRoles)
+                    .Select(map => map.Role.Name)
+                    .Distinct()
+                    .ToListAsync(cancellationToken);
+                var nextRoles = await roleGroupRepository
+                    .GetQueryable(roleGroup => roleGroupIds.Contains(roleGroup.Id))
+                    .SelectMany(roleGroup => roleGroup.RoleGroupMapRoles)
+                    .Select(map => map.Role.Name)
+                    .Distinct()
                     .ToListAsync(cancellationToken);
                 await SqlRepository.RemoveManyAsync(existRoleGroups, cancellationToken);
 
-                var prepareResult = await sessionRevocationService.PrepareAsync(
-                    [command.UserId], cancellationToken);
-                if (prepareResult.IsT1) return prepareResult.AsT1;
+                var user = await userDbRepository.GetQueryable(x => x.UserId == command.UserId)
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (user is null) return IdentityErrorDetail.UserError.NotFound();
+                var directRoles = await userRepository.GetDirectRolesAsync(user);
+                if (directRoles.Contains("Administrator"))
+                    return None.Value;
 
-                _preparedRevocation = prepareResult.AsT0;
+                if (previousRoles.Except(nextRoles).Any())
+                {
+                    var prepareResult = await sessionRevocationService.PrepareAsync(
+                        [command.UserId], cancellationToken);
+                    if (prepareResult.IsT1) return prepareResult.AsT1;
+
+                    _preparedRevocation = prepareResult.AsT0;
+                }
+                else
+                {
+                    _publishPermissionChange = nextRoles.Except(previousRoles).Any();
+                }
                 return None.Value;
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.UserMapRoleGroupError.CreateFailed());
 
     protected override Task AfterSaveChangesAsync(UpdateUserMapRoleGroupsCommand command,
-        List<UserMapRoleGroup> models, CancellationToken cancellationToken) =>
-        sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
+        List<UserMapRoleGroup> models, CancellationToken cancellationToken)
+    {
+        if (_preparedRevocation is not null)
+            return sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
+        return _publishPermissionChange
+            ? permissionChangeNotifier.PublishAsync([command.UserId], cancellationToken)
+            : Task.CompletedTask;
+    }
 }

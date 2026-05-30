@@ -5,14 +5,17 @@ using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramewor
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetSystemRoleGroup;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.RoleGroupQueries.GetSystemRoleGroup;
 
-public sealed class GetSystemRoleGroupHandler(ISqlRepository<RoleGroup> sqlRepository, ILogger logger)
+public sealed class GetSystemRoleGroupHandler(
+    ISqlRepository<RoleGroup> sqlRepository,
+    IdentityMapper mapper,
+    ILogger logger)
     : EfQueryOneHandler<RoleGroup, GetSystemRoleGroupQuery, RoleGroupResponse>(sqlRepository, logger)
 {
     protected override IQueryOneFlowBuilder<RoleGroup, RoleGroupResponse> BuildQueryFlow(
@@ -20,8 +23,6 @@ public sealed class GetSystemRoleGroupHandler(ISqlRepository<RoleGroup> sqlRepos
         => fromFlow
             .WithFilter(roleGroup => roleGroup.Id == query.RoleGroupId &&
                 !roleGroup.RoleGroupClaims.Any(claim => claim.Key == AuthorizationClaimTypes.WorkspaceId))
-            .WithSpecialAction(queryable => queryable
-                .Include(roleGroup => roleGroup.RoleGroupMapRoles)
-                .ThenInclude(mapRole => mapRole.Role))
+            .WithSpecialAction(mapper.ProjectToRoleGroupResponse)
             .WithErrorIfNull(IdentityErrorDetail.RoleGroupError.NotFound());
 }

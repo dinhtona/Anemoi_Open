@@ -111,6 +111,36 @@ public class UserController(ISender sender) : ControllerBase
     }
 
     /// <summary>
+    /// PromoteSystemAdministrator
+    /// </summary>
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PromoteSystemAdministrator(
+        [FromBody] Anemoi.Contract.Identity.Commands.UserCommands.PromoteSystemAdministrator.PromoteSystemAdministratorCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    /// <summary>
+    /// DemoteSystemAdministrator
+    /// </summary>
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DemoteSystemAdministrator(
+        [FromBody] Anemoi.Contract.Identity.Commands.UserCommands.DemoteSystemAdministrator.DemoteSystemAdministratorCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    /// <summary>
     /// GetOnlineUsers
     /// </summary>
     /// <param name="registry"></param>

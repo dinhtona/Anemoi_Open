@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,6 +73,76 @@ public static class SeedData
             await userClaimRepository.RemoveClaimsAsync(new UserId(userId), reservedClaimTypes,
                 CancellationToken.None);
         }
+    }
+
+    public static async Task NormalizeAuthorizationAssignmentsAsync(IServiceScope serviceScope)
+    {
+        const string administrator = "Administrator";
+        var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+        var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var roleGroupMapRoleRepository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<RoleGroupMapRole>>();
+        var userMapRoleGroupRepository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<UserMapRoleGroup>>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var sessionRevocationService = serviceScope.ServiceProvider
+            .GetRequiredService<IUserSessionRevocationService>();
+
+        var seedUsers = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>()?.SupperAdminUsers ?? [];
+        var seedAdminEmails = seedUsers.Select(user => user.UserName)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var affectedUserIds = new HashSet<UserId>();
+
+        var users = await userDbRepository.GetQueryable().ToListAsync();
+        foreach (var user in users)
+        {
+            var directRoles = await userRepository.GetDirectRolesAsync(user);
+            var rolesToRemove = directRoles.Where(role =>
+                    role != administrator || !seedAdminEmails.Contains(user.Email))
+                .ToList();
+            if (rolesToRemove.Count == 0) continue;
+
+            var removeResult = await userRepository.RemoveFromRolesAsync(user, rolesToRemove);
+            if (removeResult.IsT1)
+            {
+                logger.Warning("[SeedData] Failed to remove obsolete direct roles from {Email}: {Error}",
+                    user.Email, removeResult.AsT1.Message);
+                continue;
+            }
+
+            affectedUserIds.Add(user.UserId);
+        }
+
+        var invalidSystemAdministratorMappings = await roleGroupMapRoleRepository.GetQueryable(mapping =>
+                mapping.Role.Name == administrator &&
+                !mapping.RoleGroup.RoleGroupClaims.Any(claim =>
+                    claim.Key == AuthorizationClaimTypes.WorkspaceId))
+            .ToListAsync();
+        if (invalidSystemAdministratorMappings.Count > 0)
+        {
+            var affectedByMappings = await userMapRoleGroupRepository.GetQueryable(mapping =>
+                    mapping.RoleGroup.RoleGroupMapRoles.Any(role => role.Role.Name == administrator) &&
+                    !mapping.RoleGroup.RoleGroupClaims.Any(claim =>
+                        claim.Key == AuthorizationClaimTypes.WorkspaceId))
+                .Select(mapping => mapping.UserId)
+                .Distinct()
+                .ToListAsync();
+            affectedUserIds.UnionWith(affectedByMappings);
+            await roleGroupMapRoleRepository.RemoveManyAsync(invalidSystemAdministratorMappings);
+        }
+
+        if (affectedUserIds.Count > 0)
+        {
+            var revokeResult = await sessionRevocationService.RevokeAsync(affectedUserIds, CancellationToken.None);
+            if (revokeResult.IsT1)
+                logger.Warning("[SeedData] Failed to revoke normalized authorization sessions: {Error}",
+                    revokeResult.AsT1.Code);
+            return;
+        }
+
+        await unitOfWork.SaveChangesAsync();
     }
 
     public static async Task SeedRolesAsync(IServiceScope serviceScope)

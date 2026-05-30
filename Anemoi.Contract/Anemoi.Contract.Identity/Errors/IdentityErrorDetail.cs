@@ -145,6 +145,26 @@ public static class IdentityErrorDetail
         {
             Messages = ["Password not valid!"], Code = "AUE_11"
         };
+
+        public static ErrorDetail AlreadyAdministrator() => new()
+        {
+            Messages = ["User is already a system administrator!"], Code = "AUE_12"
+        };
+
+        public static ErrorDetail NotAdministrator() => new()
+        {
+            Messages = ["User is not a system administrator!"], Code = "AUE_13"
+        };
+
+        public static ErrorDetail CannotDemoteSelf() => new()
+        {
+            Messages = ["A system administrator cannot demote their own account!"], Code = "AUE_14"
+        };
+
+        public static ErrorDetail CannotDemoteLastAdministrator() => new()
+        {
+            Messages = ["The last system administrator cannot be demoted!"], Code = "AUE_15"
+        };
     }
 
     public static class RoleError
@@ -172,6 +192,12 @@ public static class IdentityErrorDetail
         public static ErrorDetail RolesRequestMustNotBeNull() => new()
         {
             Messages = ["Roles request must not be null!"], Code = "ROE_05"
+        };
+
+        public static ErrorDetail ReservedSystemRole() => new()
+        {
+            Messages = ["Administrator is a reserved system role and cannot be assigned through a system role group!"],
+            Code = "ROE_06"
         };
     }
 

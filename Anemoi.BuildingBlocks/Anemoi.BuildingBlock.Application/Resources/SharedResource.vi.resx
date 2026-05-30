@@ -42,4 +42,11 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>Không tìm thấy tệp tin.</value>
   </data>
+  <data name="ROE_06" xml:space="preserve">
+    <value>Administrator là vai trò hệ thống đặc biệt và không thể được gán thông qua nhóm vai trò hệ thống.</value>
+  </data>
+  <data name="AUE_12" xml:space="preserve"><value>Người dùng đã là quản trị viên hệ thống.</value></data>
+  <data name="AUE_13" xml:space="preserve"><value>Người dùng không phải là quản trị viên hệ thống.</value></data>
+  <data name="AUE_14" xml:space="preserve"><value>Quản trị viên hệ thống không thể tự hạ quyền tài khoản của mình.</value></data>
+  <data name="AUE_15" xml:space="preserve"><value>Không thể hạ quyền quản trị viên hệ thống cuối cùng.</value></data>
 </root>

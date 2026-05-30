@@ -10,6 +10,8 @@ namespace Anemoi.Centralize.Api.Hubs;
 [Authorize]
 public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedUsersRegistry registry) : Hub
 {
+    private const string AdministratorsGroup = "Administrators";
+
     public override async Task OnConnectedAsync()
     {
         var userId = Context.UserIdentifier;
@@ -17,7 +19,7 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
         {
             registry.AddUser(userId);
             // Broadcast UserOnline event to the Administrators group
-            await Clients.Group("Administrators").SendAsync("UserOnline", userId);
+            await Clients.Group(AdministratorsGroup).SendAsync("UserOnline", userId);
         }
         logger.LogInformation("SignalR Client Connected: User {UserId}, ConnectionId {ConnectionId}", userId, Context.ConnectionId);
         await base.OnConnectedAsync();
@@ -30,7 +32,7 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
         {
             registry.RemoveUser(userId);
             // Broadcast UserOffline event to the Administrators group
-            await Clients.Group("Administrators").SendAsync("UserOffline", userId);
+            await Clients.Group(AdministratorsGroup).SendAsync("UserOffline", userId);
         }
         logger.LogInformation("SignalR Client Disconnected: User {UserId}, ConnectionId {ConnectionId}, Error: {Error}", 
             userId, Context.ConnectionId, exception?.Message ?? "None");
@@ -39,11 +41,21 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
 
     public async Task JoinGroup(string groupName)
     {
+        if (groupName != AdministratorsGroup || !CanObserveUsers())
+            throw new HubException("You are not allowed to join this group.");
+
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
     }
 
     public async Task LeaveGroup(string groupName)
     {
+        if (groupName != AdministratorsGroup)
+            throw new HubException("Unknown group.");
+
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }
+
+    private bool CanObserveUsers() =>
+        Context.User?.HasClaim("applicationPolicyInternal", "Internal") == true &&
+        (Context.User.IsInRole("Administrator") || Context.User.IsInRole("UserQuery"));
 }

@@ -45,6 +45,8 @@ await SeedData.SeedApplicationPoliciesAsync(serviceScope);
 
 await SeedData.RegisterAdministratorAsync(serviceScope);
 
+await SeedData.NormalizeAuthorizationAssignmentsAsync(serviceScope);
+
 await SeedData.RemoveReservedApplicationPolicyClaimsAsync(serviceScope);
 
 app.UseCors("CorsPolicy");

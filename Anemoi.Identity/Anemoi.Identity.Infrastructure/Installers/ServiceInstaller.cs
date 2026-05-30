@@ -28,6 +28,7 @@ public sealed class ServiceInstaller : IInstaller
         services.TryAddScoped<ISqlRepository<User>, UserRepository>();
         services.TryAddScoped<IUserClaimRepository, UserClaimRepository>();
         services.AddScoped<IUserSessionRevocationService, UserSessionRevocationService>();
+        services.AddScoped<IUserPermissionChangeNotifier, UserPermissionChangeNotifier>();
         services.AddEfRepositoriesAsScope<IdentityDbContext>(typeof(IIdentityDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<IdentityDbContext>();
         services.AddScoped<IUserIdSetter, UserService>();

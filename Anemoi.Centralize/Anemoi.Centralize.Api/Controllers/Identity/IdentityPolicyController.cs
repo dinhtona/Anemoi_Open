@@ -32,7 +32,7 @@ public class IdentityPolicyController(ISender sender) : ControllerBase
             PageIndex = 1,
             PageSize = int.MaxValue
         }, cancellationToken);
-        return Ok(res.Items);
+        return Ok(res.Items.Where(role => role.Name != "Administrator"));
     }
 
     /// <summary>

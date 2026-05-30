@@ -29,6 +29,7 @@ public interface IUserRepository
     Task<string> GeneratePasswordResetTokenAsync(User user);
     Task<IList<string>> GetDirectRolesAsync(User user);
     Task<IList<string>> GetEffectiveRolesAsync(User user);
+    Task<IList<User>> GetUsersInRoleAsync(string roleName);
 
     Task<OneOf<None, Exception>> AddToRolesAsync(User user,
         IEnumerable<string> rolesName);

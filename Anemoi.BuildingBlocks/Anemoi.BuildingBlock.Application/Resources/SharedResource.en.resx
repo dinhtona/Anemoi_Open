@@ -42,4 +42,11 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>File not found.</value>
   </data>
+  <data name="ROE_06" xml:space="preserve">
+    <value>Administrator is a reserved system role and cannot be assigned through a system role group.</value>
+  </data>
+  <data name="AUE_12" xml:space="preserve"><value>User is already a system administrator.</value></data>
+  <data name="AUE_13" xml:space="preserve"><value>User is not a system administrator.</value></data>
+  <data name="AUE_14" xml:space="preserve"><value>A system administrator cannot demote their own account.</value></data>
+  <data name="AUE_15" xml:space="preserve"><value>The last system administrator cannot be demoted.</value></data>
 </root>

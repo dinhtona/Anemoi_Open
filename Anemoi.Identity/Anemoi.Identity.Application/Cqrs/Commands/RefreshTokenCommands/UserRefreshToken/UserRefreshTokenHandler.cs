@@ -84,11 +84,8 @@ public sealed class UserRefreshTokenHandler(
         if (validateToken is null) return IdentityErrorDetail.TokenError.InvalidToken();
 
         if (!long.TryParse(validateToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value,
-                out var expiryDateUnix)) return IdentityErrorDetail.TokenError.InvalidToken();
+                out _)) return IdentityErrorDetail.TokenError.InvalidToken();
 
-        var expiryTimeUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(expiryDateUnix);
-        if (expiryTimeUtc > DateTime.UtcNow)
-            return IdentityErrorDetail.TokenError.TokenIsNotExpired();
         return validateToken;
     }
 

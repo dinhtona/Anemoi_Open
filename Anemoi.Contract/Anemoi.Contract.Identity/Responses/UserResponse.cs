@@ -15,5 +15,6 @@ public sealed class UserResponse : ModelResponse
     public string Avatar { get; set; }
     public DateTime CreatedTime { get; set; }
     public List<string> Roles { get; set; } = [];
+    public List<string> DirectRoles { get; set; } = [];
     public List<string> RoleGroupIds { get; set; } = [];
 }

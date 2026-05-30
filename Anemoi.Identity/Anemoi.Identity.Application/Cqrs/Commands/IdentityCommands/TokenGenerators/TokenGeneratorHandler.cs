@@ -45,7 +45,8 @@ public sealed class TokenGeneratorHandler(
 
         // Dynamically add policy claims based on user roles
         var policyClaims = await identityPolicyRepository.GetManyByConditionAsync(
-            p => p.IdentityPolicyMapRoles.Any(mr => userRoles.Contains(mr.Role.Name)),
+            p => p.Key != AuthorizationClaimTypes.ApplicationPolicyAgency &&
+                p.IdentityPolicyMapRoles.Any(mr => userRoles.Contains(mr.Role.Name)),
             token: cancellationToken);
         foreach (var policy in policyClaims)
         {

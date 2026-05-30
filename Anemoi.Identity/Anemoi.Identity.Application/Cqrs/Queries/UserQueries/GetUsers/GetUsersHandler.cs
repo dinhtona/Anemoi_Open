@@ -74,13 +74,16 @@ public sealed class GetUsersHandler(
             {
                 var userId = new UserId(userGuid);
                 var roleGroups = await userMapRoleGroupRepository.GetManyByConditionAsync(
-                    x => x.UserId == userId,
+                    x => x.UserId == userId &&
+                        !x.RoleGroup.RoleGroupClaims.Any(claim =>
+                            claim.Key == AuthorizationClaimTypes.WorkspaceId),
                     token: default);
                 response.RoleGroupIds = roleGroups.Select(rg => rg.RoleGroupId.ToString()).ToList();
 
                 var user = users.FirstOrDefault(u => u.UserId == userId);
                 if (user is not null)
                 {
+                    response.DirectRoles = (await userRepository.GetDirectRolesAsync(user)).ToList();
                     response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
                 }
             }

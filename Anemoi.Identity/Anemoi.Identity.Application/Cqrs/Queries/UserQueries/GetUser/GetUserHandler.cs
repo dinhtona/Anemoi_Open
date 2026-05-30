@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUser;
@@ -39,10 +40,13 @@ public sealed class GetUserHandler(
 
         // Fetch role group mapping
         var roleGroups = await userMapRoleGroupRepository.GetManyByConditionAsync(
-            x => x.UserId == user.UserId,
+            x => x.UserId == user.UserId &&
+                !x.RoleGroup.RoleGroupClaims.Any(claim =>
+                    claim.Key == AuthorizationClaimTypes.WorkspaceId),
             token: default);
         response.RoleGroupIds = roleGroups.Select(rg => rg.RoleGroupId.ToString()).ToList();
 
+        response.DirectRoles = (await userRepository.GetDirectRolesAsync(user)).ToList();
         response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
 
         return response;

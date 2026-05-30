@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -26,11 +27,15 @@ public sealed class UpdateRoleGroupHandler(
     ISqlRepository<RoleGroupMapRole> dbRoleGroupIdentityRoleRepository,
     ISqlRepository<Role> roleRepository,
     ISqlRepository<UserMapRoleGroup> userMapRoleGroupRepository,
-    IUserSessionRevocationService sessionRevocationService)
+    ISqlRepository<User> userDbRepository,
+    IUserRepository userRepository,
+    IUserSessionRevocationService sessionRevocationService,
+    IUserPermissionChangeNotifier permissionChangeNotifier)
     : EfCommandOneVoidHandler<RoleGroup, UpdateRoleGroupCommand>(sqlRepository,
         unitOfWork, logger)
 {
     private PreparedSessionRevocation _preparedRevocation;
+    private List<UserId> _permissionChangedUserIds = [];
 
     protected override ICommandOneFlowBuilderVoid<RoleGroup> BuildCommand(IStartOneCommandVoid<RoleGroup> fromFlow,
         UpdateRoleGroupCommand command,
@@ -61,6 +66,13 @@ public sealed class UpdateRoleGroupHandler(
                     return IdentityErrorDetail.RoleError.RolesRequestDuplicated();
 
                 var roleIds = command.IdentityRoleIds;
+                var isSystemWide = !roleGroup.RoleGroupClaims.Any(claim =>
+                    claim.Key == AuthorizationClaimTypes.WorkspaceId);
+                if (isSystemWide && await roleRepository.ExistByConditionAsync(
+                        role => roleIds.Contains(role.RoleId) && role.Name == "Administrator",
+                        cancellationToken))
+                    return IdentityErrorDetail.RoleError.ReservedSystemRole();
+
                 var validRoleCount = await roleRepository.GetQueryable(x => roleIds.Contains(x.RoleId))
                     .CountAsync(cancellationToken);
                 if (validRoleCount != roleIds.Distinct().Count())
@@ -90,17 +102,61 @@ public sealed class UpdateRoleGroupHandler(
                     .Select(x => x.UserId)
                     .Distinct()
                     .ToListAsync(cancellationToken);
-                var prepareResult = await sessionRevocationService.PrepareAsync(userIds, cancellationToken);
-                if (prepareResult.IsT1) return prepareResult.AsT1;
+                var workspaceId = roleGroup.RoleGroupClaims
+                    .FirstOrDefault(claim => claim.Key == AuthorizationClaimTypes.WorkspaceId)?.Value;
+                var otherRoleMaps = await userMapRoleGroupRepository.GetQueryable(x =>
+                        userIds.Contains(x.UserId) &&
+                        x.RoleGroupId != command.Id &&
+                        (isSystemWide
+                            ? !x.RoleGroup.RoleGroupClaims.Any(claim =>
+                                claim.Key == AuthorizationClaimTypes.WorkspaceId)
+                            : x.RoleGroup.RoleGroupClaims.Any(claim =>
+                                claim.Key == AuthorizationClaimTypes.WorkspaceId &&
+                                claim.Value == workspaceId)))
+                    .SelectMany(x => x.RoleGroup.RoleGroupMapRoles.Select(map =>
+                        new { x.UserId, map.RoleId }))
+                    .ToListAsync(cancellationToken);
+                var otherRolesByUser = otherRoleMaps
+                    .GroupBy(x => x.UserId)
+                    .ToDictionary(group => group.Key,
+                        group => group.Select(x => x.RoleId).ToHashSet());
+                var revokedUserIds = new List<UserId>();
+                var users = await userDbRepository.GetQueryable(x => userIds.Contains(x.UserId))
+                    .ToListAsync(cancellationToken);
+                foreach (var userId in userIds)
+                {
+                    var user = users.Single(x => x.UserId == userId);
+                    var directRoles = await userRepository.GetDirectRolesAsync(user);
+                    if (directRoles.Contains("Administrator"))
+                        continue;
 
-                _preparedRevocation = prepareResult.AsT0;
+                    var otherRoles = otherRolesByUser.GetValueOrDefault(userId) ?? [];
+                    var previousRoles = otherRoles.Union(roleGroupIdentityRoleIds);
+                    var nextRoles = otherRoles.Union(roleIds);
+                    if (previousRoles.Except(nextRoles).Any())
+                        revokedUserIds.Add(userId);
+                    else if (nextRoles.Except(previousRoles).Any())
+                        _permissionChangedUserIds.Add(userId);
+                }
+
+                if (revokedUserIds.Count > 0)
+                {
+                    var prepareResult = await sessionRevocationService.PrepareAsync(
+                        revokedUserIds, cancellationToken);
+                    if (prepareResult.IsT1) return prepareResult.AsT1;
+                    _preparedRevocation = prepareResult.AsT0;
+                }
                 return None.Value;
             })
             .WithModify(roleGroup => mapper.UpdateRoleGroup(command, roleGroup))
             .WithErrorIfNull(IdentityErrorDetail.RoleGroupError.NotFound())
             .WithErrorIfSaveChange(IdentityErrorDetail.RoleGroupError.UpdateFailed());
 
-    protected override Task AfterSaveChangesAsync(UpdateRoleGroupCommand command,
-        RoleGroup model, CancellationToken cancellationToken) =>
-        sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
+    protected override async Task AfterSaveChangesAsync(UpdateRoleGroupCommand command,
+        RoleGroup model, CancellationToken cancellationToken)
+    {
+        if (_preparedRevocation is not null)
+            await sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
+        await permissionChangeNotifier.PublishAsync(_permissionChangedUserIds, cancellationToken);
+    }
 }
