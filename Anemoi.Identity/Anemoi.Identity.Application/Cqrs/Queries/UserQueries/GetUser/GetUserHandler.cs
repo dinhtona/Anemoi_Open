@@ -43,9 +43,7 @@ public sealed class GetUserHandler(
             token: default);
         response.RoleGroupIds = roleGroups.Select(rg => rg.RoleGroupId.ToString()).ToList();
 
-        // Fetch Roles
-        var roles = await userRepository.GetRolesAsync(user);
-        response.Roles = roles.ToList();
+        response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
 
         return response;
     }

@@ -35,6 +35,9 @@ namespace Anemoi.Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Key", "Value")
+                        .IsUnique();
+
                     b.ToTable("IdentityPolicies");
                 });
 
@@ -51,7 +54,8 @@ namespace Anemoi.Identity.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdentityPolicyId");
+                    b.HasIndex("IdentityPolicyId", "UserRoleId")
+                        .IsUnique();
 
                     b.HasIndex("UserRoleId");
 

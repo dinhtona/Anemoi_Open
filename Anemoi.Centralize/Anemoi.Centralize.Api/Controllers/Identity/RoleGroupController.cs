@@ -1,11 +1,14 @@
-﻿using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Centralize.Application.Cqrs.Requests.Workspace;
+using Anemoi.Centralize.Application.Cqrs.Requests.Identity;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.RemoveRoleGroup;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.UpdateRoleGroup;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetRoleGroup;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetRoleGroups;
+using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetSystemRoleGroup;
+using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetSystemRoleGroups;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Queries.MemberMapRoleGroupQueries.GetRoleGroupsByMember;
@@ -30,7 +33,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// A list of RoleGroupListResponse objects.
     /// </returns>
     [HttpGet]
-    [Authorize(Roles = "Administrator,RoleQuery")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
     [ProducesResponseType(typeof(RoleGroupsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -87,7 +90,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// A list of role groups.
     /// </returns>
     [HttpGet]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
     [ProducesResponseType(typeof(PaginationResponse<RoleGroupsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -108,7 +111,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPost]
-    [Authorize(Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -131,7 +134,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPatch("{id}")]
-    [Authorize(Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -139,7 +142,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     public async Task<IActionResult> UpdateRoleGroup(RoleGroupId id, [FromBody] UpdateRoleGroupCommand command,
         CancellationToken cancellationToken)
     {
-        var request = command with { Id = id };
+        var request = command with { Id = id, WorkspaceId = HttpContext.GetWorkspaceId() };
         var res = await sender.Send(request, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
     }
@@ -154,7 +157,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command.
     /// </returns>
     [HttpDelete]
-    [Authorize(Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -162,7 +165,54 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     public async Task<IActionResult> RemoveRoleGroup([FromBody] RemoveRoleGroupCommand command,
         CancellationToken cancellationToken)
     {
-        var res = await sender.Send(command, cancellationToken);
+        var res = await sender.Send(command with { WorkspaceId = HttpContext.GetWorkspaceId() }, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [ProducesResponseType(typeof(PaginationResponse<RoleGroupsResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSystemRoleGroups([FromQuery] GetSystemRoleGroupsQuery query,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [ProducesResponseType(typeof(RoleGroupResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSystemRoleGroup([FromQuery] GetSystemRoleGroupQuery query,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(query, cancellationToken);
+        return result.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    public async Task<IActionResult> CreateSystemRoleGroup([FromBody] CreateSystemRoleGroupRequest command,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpPatch("{id}")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    public async Task<IActionResult> UpdateSystemRoleGroup(RoleGroupId id,
+        [FromBody] UpdateSystemRoleGroupRequest command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command with { Id = id }, cancellationToken);
+        return result.Match<IActionResult>(_ => Ok(), BadRequest);
+    }
+
+    [HttpDelete]
+    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    public async Task<IActionResult> RemoveSystemRoleGroup([FromBody] RemoveSystemRoleGroupRequest command,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.Match<IActionResult>(_ => Ok(), BadRequest);
     }
 }

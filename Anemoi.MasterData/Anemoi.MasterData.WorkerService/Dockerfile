@@ -17,7 +17,6 @@ COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Do
 RUN dotnet restore "Anemoi.MasterData/Anemoi.MasterData.WorkerService/Anemoi.MasterData.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.MasterData/Anemoi.MasterData.WorkerService"
-RUN dotnet build "Anemoi.MasterData.WorkerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

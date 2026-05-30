@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -28,27 +27,18 @@ public static class SeedData
         var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
         var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
         var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
-        var userClaimRepository = serviceScope.ServiceProvider.GetRequiredService<IUserClaimRepository>();
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
         var seedUserData = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>();
-        var defaultApplicationPolicies = serviceScope.ServiceProvider.GetRequiredService<DefaultApplicationPolices>();
         var users = seedUserData.SupperAdminUsers;
-        var internalUser = defaultApplicationPolicies.ApplicationPolicies.First();
         foreach (var user in users)
         {
             var existUser = await userDbRepository.GetFirstByConditionAsync(x => x.Email == user.UserName);
             if (existUser is { })
             {
-                var userRoles = await userRepository.GetRolesAsync(existUser);
+                var userRoles = await userRepository.GetDirectRolesAsync(existUser);
                 if (!userRoles.Contains(administrator))
                     await userRepository.AddToRolesAsync(existUser, [administrator]);
-                var claims = await userClaimRepository
-                    .GetUserClaimsAsync(existUser.UserId, CancellationToken.None);
-                if (claims.Any(x => x.Type == internalUser.Key && x.Value == internalUser.Value))
-                    continue;
-                await userClaimRepository.AddClaimsAsync(existUser.UserId,
-                    [new Claim(internalUser.Key, internalUser.Value)], CancellationToken.None);
                 continue;
             }
 
@@ -68,8 +58,19 @@ public static class SeedData
             var createdUser = await userDbRepository.GetFirstByConditionAsync(x =>
                 x.UserId == new UserId(Guid.Parse(newUserResult.AsT0.Id)));
             await userRepository.AddToRolesAsync(createdUser, [administrator]);
-            await userClaimRepository.AddClaimsAsync(createdUser.UserId,
-                [new Claim(internalUser.Key, internalUser.Value)], CancellationToken.None);
+        }
+    }
+
+    public static async Task RemoveReservedApplicationPolicyClaimsAsync(IServiceScope serviceScope)
+    {
+        var userClaimRepository = serviceScope.ServiceProvider.GetRequiredService<IUserClaimRepository>();
+        var reservedClaimTypes = AuthorizationClaimTypes.ReservedApplicationPolicyClaims.ToList();
+        var userIds = await userClaimRepository.GetUserIdsByClaimTypes(reservedClaimTypes);
+
+        foreach (var userId in userIds.Distinct())
+        {
+            await userClaimRepository.RemoveClaimsAsync(new UserId(userId), reservedClaimTypes,
+                CancellationToken.None);
         }
     }
 

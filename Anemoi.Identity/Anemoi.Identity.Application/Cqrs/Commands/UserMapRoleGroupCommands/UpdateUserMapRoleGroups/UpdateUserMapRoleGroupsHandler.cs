@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,10 +9,9 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
-using Anemoi.Contract.Identity.Events;
+using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
 using Anemoi.Contract.Identity.Commands.UserMapRoleGroupCommands.UpdateUserMapRoleGroups;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -20,46 +19,53 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.UserMapRoleGroupCommands.Upd
 
 public sealed class UpdateUserMapRoleGroupsHandler(
     ISqlRepository<UserMapRoleGroup> sqlRepository,
-    ISqlRepository<User> userRepository,
+    ISqlRepository<RoleGroup> roleGroupRepository,
     IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint,
+    IUserSessionRevocationService sessionRevocationService,
     ILogger logger)
     : EfCommandManyVoidHandler<UserMapRoleGroup, UpdateUserMapRoleGroupsCommand>(sqlRepository, unitOfWork,
         logger)
 {
+    private PreparedSessionRevocation _preparedRevocation;
+
     protected override ICommandManyFlowBuilderVoid<UserMapRoleGroup> BuildCommand(
         IStartManyCommandVoid<UserMapRoleGroup> fromFlow, UpdateUserMapRoleGroupsCommand command,
         CancellationToken cancellationToken)
         => fromFlow
-            .CreateMany(async () =>
+            .CreateMany(() => Task.FromResult((command.RoleGroupIds ?? []).Select(roleGroupId => new UserMapRoleGroup
+                {
+                    Id = new UserMapRoleGroupId(IdGenerator.NextGuid()), UserId = command.UserId,
+                    RoleGroupId = roleGroupId
+                }).ToList()))
+            .WithCondition(async _ =>
             {
-                // Remove all existing roles for this user
+                var roleGroupIds = command.RoleGroupIds ?? [];
+                if (roleGroupIds.Distinct().Count() != roleGroupIds.Count)
+                    return IdentityErrorDetail.UserMapRoleGroupError.RoleGroupsRequestDuplicated();
+
+                var validRoleGroupCount = await roleGroupRepository
+                    .GetQueryable(roleGroup => roleGroupIds.Contains(roleGroup.Id) &&
+                        !roleGroup.RoleGroupClaims.Any(claim =>
+                            claim.Key == AuthorizationClaimTypes.WorkspaceId))
+                    .CountAsync(cancellationToken);
+                if (validRoleGroupCount != roleGroupIds.Count)
+                    return IdentityErrorDetail.RoleGroupError.NotFound();
+
                 var existRoleGroups = await SqlRepository
                     .GetQueryable(a => a.UserId == command.UserId)
                     .ToListAsync(cancellationToken);
                 await SqlRepository.RemoveManyAsync(existRoleGroups, cancellationToken);
 
-                // Update Security Stamp to force token refresh
-                var user = await userRepository.GetFirstByConditionAsync(x => x.UserId == command.UserId, token: cancellationToken);
-                if (user is not null)
-                {
-                    user.SecurityStamp = IdGenerator.NextGuid().ToString();
-                    // EF Core tracks this mutation automatically
-                }
+                var prepareResult = await sessionRevocationService.PrepareAsync(
+                    [command.UserId], cancellationToken);
+                if (prepareResult.IsT1) return prepareResult.AsT1;
 
-                // Publish revocation event so the API Gateway rejects current JWT and forces RefreshToken
-                await publishEndpoint.Publish(new UserTokenRevokedIntegrationEvent
-                {
-                    UserId = command.UserId.Value,
-                    RevokedAt = DateTime.UtcNow
-                }, cancellationToken);
-
-                return command.RoleGroupIds.Select(roleGroupId => new UserMapRoleGroup
-                {
-                    Id = new UserMapRoleGroupId(IdGenerator.NextGuid()), UserId = command.UserId,
-                    RoleGroupId = roleGroupId
-                }).ToList();
+                _preparedRevocation = prepareResult.AsT0;
+                return None.Value;
             })
-            .WithCondition(_ => None.Value)
             .WithErrorIfSaveChange(IdentityErrorDetail.UserMapRoleGroupError.CreateFailed());
+
+    protected override Task AfterSaveChangesAsync(UpdateUserMapRoleGroupsCommand command,
+        List<UserMapRoleGroup> models, CancellationToken cancellationToken) =>
+        sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
 }

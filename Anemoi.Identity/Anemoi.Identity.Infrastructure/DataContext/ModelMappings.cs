@@ -102,6 +102,7 @@ public sealed class ModelMappings :
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new IdentityPolicyId(id));
+        builder.HasIndex(x => new { x.Key, x.Value }).IsUnique();
     }
 
     public void Configure(EntityTypeBuilder<IdentityPolicyMapRole> builder)
@@ -109,6 +110,7 @@ public sealed class ModelMappings :
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new IdentityPolicyMapRoleId(id));
+        builder.HasIndex(x => new { x.IdentityPolicyId, x.UserRoleId }).IsUnique();
         builder.HasOne(x => x.Role)
             .WithMany(x => x.IdentityPolicyMapRoles)
             .HasForeignKey(x => x.UserRoleId)

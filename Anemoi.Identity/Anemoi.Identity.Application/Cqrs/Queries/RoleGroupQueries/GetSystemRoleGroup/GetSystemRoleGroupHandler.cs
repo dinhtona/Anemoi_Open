@@ -1,0 +1,27 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
+using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
+using Anemoi.Contract.Identity.Errors;
+using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetSystemRoleGroup;
+using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Domain.Models;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+namespace Anemoi.Identity.Application.Cqrs.Queries.RoleGroupQueries.GetSystemRoleGroup;
+
+public sealed class GetSystemRoleGroupHandler(ISqlRepository<RoleGroup> sqlRepository, ILogger logger)
+    : EfQueryOneHandler<RoleGroup, GetSystemRoleGroupQuery, RoleGroupResponse>(sqlRepository, logger)
+{
+    protected override IQueryOneFlowBuilder<RoleGroup, RoleGroupResponse> BuildQueryFlow(
+        IQueryOneFilter<RoleGroup, RoleGroupResponse> fromFlow, GetSystemRoleGroupQuery query)
+        => fromFlow
+            .WithFilter(roleGroup => roleGroup.Id == query.RoleGroupId &&
+                !roleGroup.RoleGroupClaims.Any(claim => claim.Key == AuthorizationClaimTypes.WorkspaceId))
+            .WithSpecialAction(queryable => queryable
+                .Include(roleGroup => roleGroup.RoleGroupMapRoles)
+                .ThenInclude(mapRole => mapRole.Role))
+            .WithErrorIfNull(IdentityErrorDetail.RoleGroupError.NotFound());
+}

@@ -1,15 +1,17 @@
-﻿using System;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.IdentityResults;
+using Anemoi.Identity.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 using OneOf;
 
@@ -19,7 +21,8 @@ public sealed class TokenGeneratorHandler(
     SigningCredentials signingCredentials,
     JwtSetting jwtSetting,
     IUserRepository userRepository,
-    IUserClaimRepository userClaimRepository)
+    IUserClaimRepository userClaimRepository,
+    ISqlRepository<IdentityPolicy> identityPolicyRepository)
     : ICommandHandler<TokenGeneratorCommand, OneOf<IdentitySuccess, ErrorDetail>>
 {
     public async Task<OneOf<IdentitySuccess, ErrorDetail>> Handle(TokenGeneratorCommand request,
@@ -28,15 +31,31 @@ public sealed class TokenGeneratorHandler(
         var user = request.User;
         var tokenHandler = new JwtSecurityTokenHandler();
         var claimsIdentity = new ClaimsIdentity();
+        var issuedAt = DateTimeOffset.UtcNow;
         claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, IdGenerator.NextGuid().ToString()));
+        claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iat,
+            issuedAt.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+        claimsIdentity.AddClaim(new Claim(AuthorizationClaimTypes.TokenIssuedAtUtcTicks,
+            issuedAt.UtcTicks.ToString(), ClaimValueTypes.Integer64));
         claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName ?? string.Empty));
         claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName ?? string.Empty));
         claimsIdentity.AddClaim(new Claim("id", user.UserId.ToString()));
-        var userRoles = await userRepository.GetRolesAsync(user);
+        var userRoles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
         claimsIdentity.AddClaims(userRoles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+
+        // Dynamically add policy claims based on user roles
+        var policyClaims = await identityPolicyRepository.GetManyByConditionAsync(
+            p => p.IdentityPolicyMapRoles.Any(mr => userRoles.Contains(mr.Role.Name)),
+            token: cancellationToken);
+        foreach (var policy in policyClaims)
+        {
+            claimsIdentity.AddClaim(new Claim(policy.Key, policy.Value));
+        }
+
         var claims = await userClaimRepository
             .GetUserClaimsAsync(user.UserId, cancellationToken);
-        claimsIdentity.AddClaims(claims);
+        claimsIdentity.AddClaims(claims.Where(claim =>
+            !AuthorizationClaimTypes.ReservedApplicationPolicyClaims.Contains(claim.Type)));
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = claimsIdentity,

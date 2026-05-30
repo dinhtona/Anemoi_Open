@@ -81,8 +81,7 @@ public sealed class GetUsersHandler(
                 var user = users.FirstOrDefault(u => u.UserId == userId);
                 if (user is not null)
                 {
-                    var roles = await userRepository.GetRolesAsync(user);
-                    response.Roles = roles.ToList();
+                    response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
                 }
             }
         }

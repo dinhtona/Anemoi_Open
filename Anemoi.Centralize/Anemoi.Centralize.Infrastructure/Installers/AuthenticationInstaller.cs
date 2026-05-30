@@ -1,9 +1,12 @@
+using System.Globalization;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Anemoi.Centralize.Infrastructure.Installers;
@@ -21,9 +24,11 @@ public sealed class AuthenticationInstaller : IInstaller
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = publicSigningCredential,
-            ValidateAudience = false,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
             ValidateLifetime = true,
-            ValidateIssuer = false,
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
             ClockSkew = TimeSpan.Zero
         };
         var tokenParameterWithoutExpired = tokenValidationParameters.Clone();
@@ -55,23 +60,40 @@ public sealed class AuthenticationInstaller : IInstaller
                     }
                     return Task.CompletedTask;
                 },
-                OnTokenValidated = context =>
+                OnTokenValidated = async context =>
                 {
-                    var userIdClaim = context.Principal?.FindFirst("id")?.Value;
-                    if (!string.IsNullOrEmpty(userIdClaim))
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILogger<AuthenticationInstaller>>();
+                    var issuedAtClaim = context.Principal?
+                        .FindFirst(AuthorizationClaimTypes.TokenIssuedAtUtcTicks)?.Value;
+                    if (!long.TryParse(issuedAtClaim, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                            out var issuedAtTicks))
                     {
-                        var memoryCache = context.HttpContext.RequestServices.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
-                        var cacheKey = $"revoked_user:{userIdClaim}";
-                        if (memoryCache.TryGetValue(cacheKey, out var revokedAtObj) && revokedAtObj is DateTime revokedAt)
+                        context.Fail("Token issuance metadata is missing or invalid.");
+                        return;
+                    }
+
+                    var userIdClaim = context.Principal?.FindFirst("id")?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim)) return;
+
+                    try
+                    {
+                        var distributedCache = context.HttpContext.RequestServices
+                            .GetRequiredService<IDistributedCache>();
+                        var revokedAtValue = await distributedCache
+                            .GetStringAsync($"revoked_user:{userIdClaim}", context.HttpContext.RequestAborted);
+                        if (long.TryParse(revokedAtValue, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                                out var revokedAtTicks) && issuedAtTicks <= revokedAtTicks)
                         {
-                            var tokenValidFrom = context.SecurityToken.ValidFrom;
-                            if (tokenValidFrom < revokedAt)
-                            {
-                                context.Fail("Token has been revoked.");
-                            }
+                            context.Fail("Token has been revoked.");
                         }
                     }
-                    return Task.CompletedTask;
+                    catch (Exception exception)
+                    {
+                        logger.LogError(exception, "Unable to validate JWT revocation state for user {UserId}",
+                            userIdClaim);
+                        context.Fail("Unable to validate token revocation state.");
+                    }
                 }
             };
         });

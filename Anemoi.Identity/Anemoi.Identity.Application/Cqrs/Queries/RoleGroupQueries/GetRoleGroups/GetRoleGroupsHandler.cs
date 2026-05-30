@@ -16,7 +16,7 @@ using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.RoleGroupQueries.GetRoleGroups;
 
-public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository, IdentityMapper mapper, ILogger logger)
+public sealed class GetRoleGroupsHandler(ISqlRepository<RoleGroup> sqlRepository, ILogger logger)
     : EfQueryPaginationHandler<RoleGroup, GetRoleGroupsQuery, RoleGroupsResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<RoleGroup, RoleGroupsResponse> BuildQueryFlow(

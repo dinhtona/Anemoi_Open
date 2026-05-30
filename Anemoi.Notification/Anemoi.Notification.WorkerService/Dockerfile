@@ -17,7 +17,6 @@ COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Do
 RUN dotnet restore "Anemoi.Notification/Anemoi.Notification.WorkerService/Anemoi.Notification.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Notification/Anemoi.Notification.WorkerService"
-RUN dotnet build "Anemoi.Notification.WorkerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

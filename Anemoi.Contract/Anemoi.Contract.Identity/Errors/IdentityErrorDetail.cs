@@ -211,6 +211,16 @@ public static class IdentityErrorDetail
         {
             Messages = ["This is Role Group Default Error"], Code = "RGE_08"
         };
+
+        public static ErrorDetail WorkspaceRoleGroup() => new()
+        {
+            Messages = ["Workspace Role Group cannot be managed as a system Role Group!"], Code = "RGE_09"
+        };
+
+        public static ErrorDetail WorkspaceScope() => new()
+        {
+            Messages = ["Role Group does not belong to the current Workspace!"], Code = "RGE_10"
+        };
     }
 
     public static class ApplicationPolicyError
@@ -256,6 +266,11 @@ public static class IdentityErrorDetail
         public static ErrorDetail RemoveFailed() => new()
         {
             Messages = ["Remove UserMapRoleGroup failed!"], Code = "UMG_04"
+        };
+
+        public static ErrorDetail RoleGroupsRequestDuplicated() => new()
+        {
+            Messages = ["Role Group Ids must not be duplicated!"], Code = "UMG_05"
         };
     }
 }

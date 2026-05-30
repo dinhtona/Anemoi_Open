@@ -24,7 +24,7 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,UserQuery")]
     [ProducesResponseType(typeof(PaginationResponse<UserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -79,7 +79,7 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,UserCommand")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -98,7 +98,7 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,UserCommand")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -116,7 +116,7 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="registry"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "Internal", Roles = "Administrator,UserQuery")]
     [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

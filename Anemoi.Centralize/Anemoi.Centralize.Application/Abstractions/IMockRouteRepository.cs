@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Helpers;
 
 namespace Anemoi.Centralize.Application.Abstractions;
 
 public class MockRouteDto
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; } = IdGenerator.NextGuid();
     public string Method { get; set; } = "GET";
     public string Path { get; set; } = "/";
     public int StatusCode { get; set; } = 200;

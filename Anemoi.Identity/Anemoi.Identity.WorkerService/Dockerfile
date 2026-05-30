@@ -21,7 +21,6 @@ COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Do
 RUN dotnet restore "Anemoi.Identity/Anemoi.Identity.WorkerService/Anemoi.Identity.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Identity/Anemoi.Identity.WorkerService"
-RUN dotnet build "Anemoi.Identity.WorkerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

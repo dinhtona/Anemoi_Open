@@ -11,6 +11,8 @@ public sealed class PipelineInstaller : IInstaller
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddMemoryCache();
+        services.AddStackExchangeRedisCache(options =>
+            options.Configuration = configuration["RedisSetting:ConnectionString"]);
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PaginationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));

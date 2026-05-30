@@ -17,7 +17,8 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.RoleCommands;
 public sealed class SetUserRolesHandler(
     IUserRepository userRepository,
     ISqlRepository<Role> userRoleRepository,
-    ISqlRepository<User> userDbRepository)
+    ISqlRepository<User> userDbRepository,
+    IUserSessionRevocationService sessionRevocationService)
     : ICommandHandler<SetUserRolesCommand, OneOf<List<Role>, ErrorDetail>>
 {
     public async Task<OneOf<List<Role>, ErrorDetail>> Handle(SetUserRolesCommand request,
@@ -35,15 +36,21 @@ public sealed class SetUserRolesHandler(
         if (roles.Count != roleIds.Count) return IdentityErrorDetail.RoleError.RolesNotExist();
         var removeRolesResult = await RemoveRolesFromUserAsync(user);
         if (removeRolesResult.IsT1) return removeRolesResult.AsT1;
-        if (roleIds is { Count: 0 }) return roles;
-        var addRolesResult = await userRepository.AddToRolesAsync(user, roles.Select(r => r.Name));
-        return addRolesResult.MapT0(_ => roles)
-            .MapT1(_ => IdentityErrorDetail.RoleError.AddRolesError());
+        if (roleIds is { Count: > 0 })
+        {
+            var addRolesResult = await userRepository.AddToRolesAsync(user, roles.Select(r => r.Name));
+            if (addRolesResult.IsT1) return IdentityErrorDetail.RoleError.AddRolesError();
+        }
+
+        var revokeResult = await sessionRevocationService.RevokeAsync([user.UserId], cancellationToken);
+        return revokeResult.Match<OneOf<List<Role>, ErrorDetail>>(
+            _ => roles,
+            error => error);
     }
 
     private async Task<OneOf<None, ErrorDetail>> RemoveRolesFromUserAsync(User user)
     {
-        var existRoles = await userRepository.GetRolesAsync(user);
+        var existRoles = await userRepository.GetDirectRolesAsync(user);
         var removeRolesResult = await userRepository.RemoveFromRolesAsync(user, existRoles);
         return removeRolesResult.MapT1(_ => IdentityErrorDetail.RoleError.RemoveRolesError());
     }

@@ -42,6 +42,22 @@ services:
       timeout: 10s
       retries: 5
 
+  # Redis stores JWT revocation markers shared by every gateway instance.
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - anemoi_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Microsoft SQL Server (Azure SQL Edge) for seed/data ingestion scenarios.
   # Azure SQL Edge is natively compiled for ARM64 (Apple Silicon), providing maximum stability.
   mssql:
@@ -107,6 +123,9 @@ services:
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
       - GrpcSetting__IdentityAddress=http://anemoi_identity:5021
+      - RedisSetting__ConnectionString=redis:6379
+      - JwtSetting__Issuer=${JWT_ISSUER}
+      - JwtSetting__Audience=${JWT_AUDIENCE}
     ports:
       - "8080:8080"
     depends_on:
@@ -114,6 +133,8 @@ services:
         condition: service_healthy
       anemoi_identity:
         condition: service_started
+      redis:
+        condition: service_healthy
     networks:
       - anemoi_network
     volumes:
@@ -290,3 +311,4 @@ volumes:
   mssql_data:
   postgres_data:
   mongodb_data:
+  redis_data:

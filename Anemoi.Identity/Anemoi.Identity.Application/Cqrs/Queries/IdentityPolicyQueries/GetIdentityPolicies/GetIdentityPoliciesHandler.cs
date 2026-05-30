@@ -22,8 +22,7 @@ public sealed class GetIdentityPoliciesHandler(
         IQueryListFilter<IdentityPolicy, IdentityPolicyResponse> fromFlow, GetIdentityPoliciesQuery query)
         => fromFlow
             .WithFilter(null)
-            .WithSpecialAction(x => x
-                .Select(i => new IdentityPolicyResponse { Key = i.Key, Value = i.Value, Id = i.Id.ToString() }))
+            .WithSpecialAction(mapper.ProjectToIdentityPolicyResponse)
             .WithSortFieldWhenNotSet(a => a.Key)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
 }

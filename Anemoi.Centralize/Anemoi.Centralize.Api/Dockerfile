@@ -22,7 +22,6 @@ COPY ["Anemoi.Centralize/Anemoi.Centralize.Domain/Anemoi.Centralize.Domain.cspro
 RUN dotnet restore "Anemoi.Centralize/Anemoi.Centralize.Api/Anemoi.Centralize.Api.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Centralize/Anemoi.Centralize.Api"
-RUN dotnet build "Anemoi.Centralize.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

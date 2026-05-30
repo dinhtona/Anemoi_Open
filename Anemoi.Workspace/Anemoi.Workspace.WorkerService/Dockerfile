@@ -19,7 +19,6 @@ COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj"
 RUN dotnet restore "Anemoi.Workspace/Anemoi.Workspace.WorkerService/Anemoi.Workspace.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Workspace/Anemoi.Workspace.WorkerService"
-RUN dotnet build "Anemoi.Workspace.WorkerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release

@@ -3,7 +3,10 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Centralize.Application.Abstractions;
 using Anemoi.Centralize.Application.Cqrs.Requests.Workspace;
+using Anemoi.Centralize.Application.Cqrs.Requests.Identity;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.CreateRoleGroup;
+using Anemoi.Contract.Identity.Commands.RoleGroupCommands.RemoveRoleGroup;
+using Anemoi.Contract.Identity.Commands.RoleGroupCommands.UpdateRoleGroup;
 using Anemoi.Contract.Identity.Contracts;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +18,10 @@ public sealed class RoleGroupHandlers(
     IRequestClientService requestClientService,
     ISender sender,
     IHttpContextAccessor httpContextAccessor)
-    : ICommandVoidHandler<CreateWorkspaceRoleGroupRequest>
+    : ICommandVoidHandler<CreateWorkspaceRoleGroupRequest>,
+        ICommandVoidHandler<CreateSystemRoleGroupRequest>,
+        ICommandVoidHandler<UpdateSystemRoleGroupRequest>,
+        ICommandVoidHandler<RemoveSystemRoleGroupRequest>
 {
     public IRequestClientService RequestClientService { get; } = requestClientService;
 
@@ -27,4 +33,18 @@ public sealed class RoleGroupHandlers(
                 [new RoleGroupClaimContract(nameof(workspaceId), workspaceId)], request.IdentityRoleIds, false),
             cancellationToken);
     }
+
+    public Task<OneOf<None, ErrorDetailResponse>> Handle(CreateSystemRoleGroupRequest request,
+        CancellationToken cancellationToken) =>
+        sender.Send(new CreateRoleGroupCommand(request.Name, request.Description,
+            [], request.IdentityRoleIds, false), cancellationToken);
+
+    public Task<OneOf<None, ErrorDetailResponse>> Handle(UpdateSystemRoleGroupRequest request,
+        CancellationToken cancellationToken) =>
+        sender.Send(new UpdateRoleGroupCommand(request.Id, request.Name, request.Description,
+            request.IdentityRoleIds, true), cancellationToken);
+
+    public Task<OneOf<None, ErrorDetailResponse>> Handle(RemoveSystemRoleGroupRequest request,
+        CancellationToken cancellationToken) =>
+        sender.Send(new RemoveRoleGroupCommand(request.Id, true), cancellationToken);
 }

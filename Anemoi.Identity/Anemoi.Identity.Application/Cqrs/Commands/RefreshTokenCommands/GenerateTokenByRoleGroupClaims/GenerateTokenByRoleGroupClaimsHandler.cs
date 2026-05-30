@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Extensions;
@@ -39,7 +40,9 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
     IUnitOfWork unitOfWork,
     ISender sender,
     ITokenGetter tokenGetter,
-    IUserClaimRepository userClaimRepository)
+    IUserClaimRepository userClaimRepository,
+    ISqlRepository<IdentityPolicy> identityPolicyRepository,
+    JwtSetting jwtSetting)
     : EfCommandOneResultHandler<RefreshToken, GenerateTokenByRoleGroupClaimsCommand, AuthenticationSuccessResponse>(
         sqlRepository, unitOfWork, logger)
 {
@@ -75,12 +78,26 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
         if (validateTokenResult.IsT1) return validateTokenResult.AsT1;
         var tokenHandler = new JwtSecurityTokenHandler();
         var claimsIdentity = new ClaimsIdentity();
+        var issuedAt = DateTimeOffset.UtcNow;
+        claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, IdGenerator.NextGuid().ToString()));
+        claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Iat,
+            issuedAt.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
+        claimsIdentity.AddClaim(new Claim(AuthorizationClaimTypes.TokenIssuedAtUtcTicks,
+            issuedAt.UtcTicks.ToString(), ClaimValueTypes.Integer64));
         var rolesResult = await sender
             .Send(new GetUserRolesByRoleGroupClaimsQuery(user.UserId, RoleGroupClaims), cancellationToken);
         var claims = await userClaimRepository
             .GetUserClaimsAsync(user.UserId, cancellationToken);
-        claimsIdentity.AddClaims(claims);
+        claimsIdentity.AddClaims(claims.Where(claim =>
+            !AuthorizationClaimTypes.ReservedApplicationPolicyClaims.Contains(claim.Type)));
         var roles = rolesResult.Items.SelectMany(x => x.IdentityRoles).Select(a => a.Name).ToList();
+
+        // Dynamically add policy claims based on roles
+        var policyClaims = await identityPolicyRepository.GetManyByConditionAsync(
+            p => p.IdentityPolicyMapRoles.Any(mr => roles.Contains(mr.Role.Name)),
+            token: cancellationToken);
+        claimsIdentity.AddClaims(policyClaims.Select(p => new Claim(p.Key, p.Value)));
+
         var roleGroupClaims = rolesResult.Items.SelectMany(a => a.RoleGroupClaims);
         claimsIdentity.AddClaim(new Claim("id", user.UserId.ToString()));
         claimsIdentity.AddClaims(roleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
@@ -91,6 +108,8 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
         {
             Subject = claimsIdentity,
             Expires = expiredTime,
+            Issuer = jwtSetting.Issuer,
+            Audience = jwtSetting.Audience,
             SigningCredentials = signingCredentials,
         };
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);
