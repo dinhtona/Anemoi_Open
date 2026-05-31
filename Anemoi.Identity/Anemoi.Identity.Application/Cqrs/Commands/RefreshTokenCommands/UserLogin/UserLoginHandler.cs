@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
@@ -65,8 +65,12 @@ public sealed class UserLoginHandler(
             return IdentityErrorDetail.IdentityError.PasswordNotCorrect();
         if (passwordCheckResult == PasswordVerificationResult.SuccessRehashNeeded)
             return IdentityErrorDetail.IdentityError.PasswordSuccessRehashNeeded();
+        // Use CheckPasswordSignInAsync instead of PasswordSignInAsync:
+        // PasswordSignInAsync writes authentication cookies and requires an active HttpContext,
+        // which is NOT available when the command is handled inside a MassTransit consumer.
+        // CheckPasswordSignInAsync only validates the password and lockout state — no HttpContext needed.
         var signInResult = await signInRepository
-            .PasswordSignInAsync(user, password, false, true);
+            .CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
         return signInResult switch
         {
             SignInResult.IsLockedOut => IdentityErrorDetail.IdentityError.UserLockedOut(),

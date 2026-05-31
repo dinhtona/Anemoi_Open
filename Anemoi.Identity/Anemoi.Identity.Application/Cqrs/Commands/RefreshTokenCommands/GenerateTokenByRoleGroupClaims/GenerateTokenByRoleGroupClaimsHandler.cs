@@ -93,9 +93,12 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
         var roles = rolesResult.Items.SelectMany(x => x.IdentityRoles).Select(a => a.Name).ToList();
 
         // Dynamically add policy claims based on roles
+        // Include IdentityPolicyMapRoles -> Role so EF Core can translate
+        // the mr.Role.Name sub-query to SQL without a NullReferenceException.
         var policyClaims = await identityPolicyRepository.GetManyByConditionAsync(
             p => p.Key == AuthorizationClaimTypes.ApplicationPolicyAgency &&
                 p.IdentityPolicyMapRoles.Any(mr => roles.Contains(mr.Role.Name)),
+            db => db.Include(p => p.IdentityPolicyMapRoles).ThenInclude(mr => mr.Role),
             token: cancellationToken);
         claimsIdentity.AddClaims(policyClaims.Select(p => new Claim(p.Key, p.Value)));
 

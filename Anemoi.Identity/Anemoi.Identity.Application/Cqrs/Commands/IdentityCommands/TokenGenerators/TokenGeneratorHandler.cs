@@ -12,6 +12,7 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.IdentityResults;
 using Anemoi.Identity.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OneOf;
 
@@ -44,9 +45,12 @@ public sealed class TokenGeneratorHandler(
         claimsIdentity.AddClaims(userRoles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
         // Dynamically add policy claims based on user roles
+        // Include IdentityPolicyMapRoles -> Role so EF Core can translate
+        // the mr.Role.Name sub-query to SQL without a NullReferenceException.
         var policyClaims = await identityPolicyRepository.GetManyByConditionAsync(
             p => p.Key != AuthorizationClaimTypes.ApplicationPolicyAgency &&
                 p.IdentityPolicyMapRoles.Any(mr => userRoles.Contains(mr.Role.Name)),
+            db => db.Include(p => p.IdentityPolicyMapRoles).ThenInclude(mr => mr.Role),
             token: cancellationToken);
         foreach (var policy in policyClaims)
         {
