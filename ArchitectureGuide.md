@@ -80,7 +80,21 @@ Each Microservice (e.g., class library like `Anemoi.MasterData`) is divided into
 
 ---
 
-## 5. STRICT Coding Conventions
+## 5. Authorization & Permission Standards
+
+Authorization MUST be capability-based. Business roles such as `Manager`, `Sale`, or `Staff` must not be hard-coded in Controllers, policies, or feature implementations.
+
+- **Permission per Feature Action**: Every new protected feature or action MUST define an explicit permission before exposing its endpoint. Use separate permissions when read and write operations, sensitive mutations, or operational actions should be granted independently (for example: `SeedGeneratorRead`, `SeedGeneratorManage`, and `SeedExecutionRun`).
+- **Central Permission Catalog**: Permission codes MUST be declared once as stable `const string` values in the shared permission catalog. Controllers, authorization handlers, seed logic, and frontend permission mappings MUST reference these constants or their synchronized frontend equivalents. Do not scatter permission string literals across the codebase.
+- **Permission-based Endpoints**: Protected endpoints MUST authorize against permissions, not business role names. Prefer a typed attribute such as `[HasPermission(Permissions.SeedExecutionRun)]` instead of `[Authorize(Roles = "Administrator,Manager")]`.
+- **Role Groups Compose Permissions**: Business roles are represented by role groups. Administrators grant feature access by adding permissions to a role group and assigning that group to users. Adding a business role must not require backend code changes.
+- **Reserved System Roles**: `Administrator` is a reserved system role and may bypass permission checks through the centralized authorization handler. Endpoints that specifically manage system administrators may remain restricted to this reserved role. Do not repeat administrator bypass strings in individual Controllers.
+- **JWT and Persistence Stability**: Permission codes stored in the database or emitted in JWT claims are stable wire values. Never rename or remove an existing permission code without an explicit data migration and backward-compatibility plan.
+- **Seed and UI Integration**: When adding a permission, update idempotent Identity seed logic so existing databases receive it, expose it through role-group management, and update frontend route/button visibility where applicable. Frontend checks improve UX but never replace backend authorization.
+
+---
+
+## 6. STRICT Coding Conventions
 
 When an AI or Developer receives a request to add a new feature, use the following as a mandatory checklist:
 
@@ -105,13 +119,17 @@ When an AI or Developer receives a request to add a new feature, use the followi
    - Do not hard-code user-facing text in Controllers, CommandHandlers, QueryHandlers, Validators, Filters, or Middleware.
    - Return stable error codes and resolve localized messages with `IStringLocalizer<SharedResource>` or service-owned resources.
    - Keep API status/code values invariant (for example: `running`, `stopped`, `error`) so clients can map them to localized display labels.
+8. **Define authorization permissions for protected features**:
+   - Add stable permission constants for each protected feature action before exposing its endpoint.
+   - Protect endpoints with permission attributes and keep business role names out of feature code.
+   - Update Identity seed logic and frontend permission mappings for every new permission.
 
 ### 💡 Note for AI Assistants
 Whenever instructed to code a new Endpoint/API or worker logic for this project, always review this document, properly configure the Command/Query, setup the Mapper, place files in their correct directories, and return Response objects wrapped in the Mediator `OneOf<>` pattern rather than returning Db Entities directly!
 
 ---
 
-## 6. Iterative Execution Steps for AI
+## 7. Iterative Execution Steps for AI
 When an AI receives an `IMPLEMENTATION PLAN` prompt from the user, the AI **MUST** execute the task iteratively in 3 strict steps. **Do not proceed to the next step until the user reviews and approves the current step.**
 
 - **Step 1 (Domain & Data)**: 
