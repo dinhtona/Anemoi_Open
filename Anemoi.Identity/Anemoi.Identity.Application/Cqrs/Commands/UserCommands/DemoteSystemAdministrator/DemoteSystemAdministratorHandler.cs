@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -36,14 +37,14 @@ public sealed class DemoteSystemAdministratorHandler(
         if (user is null) return IdentityErrorDetail.UserError.NotFound().ToErrorDetailResponse();
 
         var roles = await userRepository.GetDirectRolesAsync(user);
-        if (!roles.Contains("Administrator"))
+        if (!roles.Contains(SystemRoles.Administrator))
             return IdentityErrorDetail.UserError.NotAdministrator().ToErrorDetailResponse();
 
-        var administrators = await userRepository.GetUsersInRoleAsync("Administrator");
+        var administrators = await userRepository.GetUsersInRoleAsync(SystemRoles.Administrator);
         if (administrators.Count <= 1)
             return IdentityErrorDetail.UserError.CannotDemoteLastAdministrator().ToErrorDetailResponse();
 
-        var removeResult = await userRepository.RemoveFromRolesAsync(user, ["Administrator"]);
+        var removeResult = await userRepository.RemoveFromRolesAsync(user, [SystemRoles.Administrator]);
         if (removeResult.IsT1) return IdentityErrorDetail.RoleError.RemoveRolesError().ToErrorDetailResponse();
 
         var revokeResult = await sessionRevocationService.RevokeAsync([request.UserId], cancellationToken);

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
@@ -77,7 +78,7 @@ public sealed class UpdateUserMapRoleGroupsHandler(
                     .FirstOrDefaultAsync(cancellationToken);
                 if (user is null) return IdentityErrorDetail.UserError.NotFound();
                 var directRoles = await userRepository.GetDirectRolesAsync(user);
-                if (directRoles.Contains("Administrator"))
+                if (directRoles.Contains(SystemRoles.Administrator))
                     return None.Value;
 
                 if (previousRoles.Except(nextRoles).Any())

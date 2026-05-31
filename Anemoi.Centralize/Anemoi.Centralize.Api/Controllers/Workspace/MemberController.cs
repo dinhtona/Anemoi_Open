@@ -1,5 +1,6 @@
 ﻿using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.RemoveMembers;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.UpdateActivatedMembers;
 using Anemoi.Contract.Workspace.Queries.MemberQueries.GetMember;
 using Anemoi.Contract.Workspace.Queries.MemberQueries.GetMemberCounting;
@@ -24,7 +25,7 @@ public class MemberController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(MemberResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -43,7 +44,7 @@ public class MemberController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(MemberResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -62,7 +63,7 @@ public class MemberController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(PaginationResponse<MemberResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -80,7 +81,7 @@ public class MemberController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPatch]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -99,7 +100,7 @@ public class MemberController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpDelete]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

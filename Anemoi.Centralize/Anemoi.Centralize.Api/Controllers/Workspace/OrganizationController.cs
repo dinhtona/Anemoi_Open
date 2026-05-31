@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.Workspace.Commands.OrganizationCommands.CreateOrganization;
 using Anemoi.Contract.Workspace.Commands.OrganizationCommands.UpdateOrganization;
 using Anemoi.Contract.Workspace.ModelIds;
@@ -25,7 +26,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(OrganizationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -44,7 +45,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(OrganizationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -64,7 +65,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(PaginationResponse<OrganizationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -83,7 +84,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -103,7 +104,7 @@ public sealed class OrganizationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

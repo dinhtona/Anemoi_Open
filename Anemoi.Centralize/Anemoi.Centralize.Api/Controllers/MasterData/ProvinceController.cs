@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.MasterData.Commands.ProvinceCommands.CreateProvince;
 using Anemoi.Contract.MasterData.Commands.ProvinceCommands.UpdateProvince;
 using Anemoi.Contract.MasterData.ModelIds;
@@ -68,7 +69,7 @@ public sealed class ProvinceController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -90,7 +91,7 @@ public sealed class ProvinceController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

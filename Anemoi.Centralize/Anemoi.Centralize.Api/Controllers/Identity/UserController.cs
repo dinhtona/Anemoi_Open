@@ -1,5 +1,7 @@
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Contract.Identity.Commands.UserCommands.UpdateUser;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUser;
@@ -24,7 +26,8 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,UserQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.UserRead)]
     [ProducesResponseType(typeof(PaginationResponse<UserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -79,7 +82,8 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator,UserCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.UserManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -98,7 +102,8 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator,UserCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.UserManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -114,7 +119,7 @@ public class UserController(ISender sender) : ControllerBase
     /// PromoteSystemAdministrator
     /// </summary>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PromoteSystemAdministrator(
@@ -129,7 +134,7 @@ public class UserController(ISender sender) : ControllerBase
     /// DemoteSystemAdministrator
     /// </summary>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DemoteSystemAdministrator(
@@ -146,7 +151,8 @@ public class UserController(ISender sender) : ControllerBase
     /// <param name="registry"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,UserQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.UserRead)]
     [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

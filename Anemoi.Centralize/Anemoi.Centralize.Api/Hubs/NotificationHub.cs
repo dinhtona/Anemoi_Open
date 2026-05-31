@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Resources;
+using Anemoi.BuildingBlock.Application.Authorization;
 
 namespace Anemoi.Centralize.Api.Hubs;
 
@@ -62,5 +63,5 @@ public sealed class NotificationHub(
 
     private bool CanObserveUsers() =>
         Context.User?.HasClaim("applicationPolicyInternal", "Internal") == true &&
-        (Context.User.IsInRole("Administrator") || Context.User.IsInRole("UserQuery"));
+        (Context.User.IsInRole(SystemRoles.Administrator) || Context.User.IsInRole(Permissions.UserRead));
 }

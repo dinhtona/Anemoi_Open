@@ -4,7 +4,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.Centralize.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Centralize.Application.Cqrs.Environments.Commands;
 using Anemoi.Centralize.Application.Cqrs.Environments.Queries;
 using Anemoi.Centralize.Domain.ModelIds;
@@ -18,12 +20,13 @@ namespace Anemoi.Centralize.Api.Controllers.Environments;
 
 [ApiController]
 [Route("api/environments")]
-[Authorize(Policy = "Internal", Roles = "Administrator")]
+[Authorize(Policy = AuthorizationPolicies.Internal)]
 [EnableRateLimiting("general-limit")]
 public sealed class EnvironmentsController(
     ISender sender) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.EnvironmentRead)]
     public async Task<IActionResult> GetEnvironments(CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
@@ -31,6 +34,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("{id}/start")]
+    [HasPermission(Permissions.EnvironmentStartStop)]
     public async Task<IActionResult> StartEnvironment([FromRoute] string id, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new StartEnvironmentCommand(id), cancellationToken);
@@ -48,6 +52,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("{id}/stop")]
+    [HasPermission(Permissions.EnvironmentStartStop)]
     public async Task<IActionResult> StopEnvironment([FromRoute] string id, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new StopEnvironmentCommand(id), cancellationToken);
@@ -65,6 +70,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpGet("{id}/status")]
+    [HasPermission(Permissions.EnvironmentRead)]
     public async Task<IActionResult> GetEnvironmentStatus([FromRoute] string id, CancellationToken cancellationToken)
     {
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
@@ -83,6 +89,7 @@ public sealed class EnvironmentsController(
     // --- SFTP File Endpoints ---
 
     [HttpGet("sftp/files")]
+    [HasPermission(Permissions.EnvironmentSftpRead)]
     public async Task<IActionResult> GetSftpFiles([FromQuery] string? path, CancellationToken cancellationToken)
     {
         var files = await sender.Send(new GetSftpFilesQuery(path), cancellationToken);
@@ -90,6 +97,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("sftp/upload")]
+    [HasPermission(Permissions.EnvironmentSftpManage)]
     [RequestSizeLimit(50 * 1024 * 1024)]
     public async Task<IActionResult> UploadSftpFile(
         [FromQuery] string? path,
@@ -108,6 +116,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpGet("sftp/download")]
+    [HasPermission(Permissions.EnvironmentSftpRead)]
     public async Task<IActionResult> DownloadSftpFile([FromQuery] string path, CancellationToken cancellationToken)
     {
         try
@@ -126,6 +135,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpDelete("sftp/files")]
+    [HasPermission(Permissions.EnvironmentSftpManage)]
     public async Task<IActionResult> DeleteSftpFile([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new DeleteSftpFileCommand(path), cancellationToken);
@@ -133,6 +143,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("sftp/directory")]
+    [HasPermission(Permissions.EnvironmentSftpManage)]
     public async Task<IActionResult> CreateSftpDirectory([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new CreateSftpDirectoryCommand(path), cancellationToken);
@@ -142,6 +153,7 @@ public sealed class EnvironmentsController(
     // --- Mock API Route Endpoints ---
 
     [HttpGet("api-test/routes")]
+    [HasPermission(Permissions.EnvironmentMockRouteRead)]
     public async Task<IActionResult> GetMockRoutes(CancellationToken cancellationToken)
     {
         var routes = await sender.Send(new GetMockRoutesQuery(), cancellationToken);
@@ -149,6 +161,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("api-test/routes")]
+    [HasPermission(Permissions.EnvironmentMockRouteManage)]
     public async Task<IActionResult> CreateMockRoute(
         [FromBody] CreateMockRouteCommand command,
         CancellationToken cancellationToken
@@ -159,6 +172,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPut("api-test/routes")]
+    [HasPermission(Permissions.EnvironmentMockRouteManage)]
     public async Task<IActionResult> UpdateMockRoute(
         [FromBody] UpdateMockRouteCommand command,
         CancellationToken cancellationToken
@@ -173,6 +187,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpDelete("api-test/routes/{id}")]
+    [HasPermission(Permissions.EnvironmentMockRouteManage)]
     public async Task<IActionResult> DeleteMockRoute([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new DeleteMockRouteCommand(new MockRouteId(id)), cancellationToken);

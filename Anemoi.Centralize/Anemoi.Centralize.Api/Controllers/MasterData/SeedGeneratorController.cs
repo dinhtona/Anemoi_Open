@@ -1,4 +1,6 @@
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.ManualInsertData;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.DeleteRowData;
@@ -26,13 +28,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Anemoi.Centralize.Api.Controllers.MasterData;
 
 [Route("api/masterData/[controller]/[action]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = AuthorizationPolicies.Internal)]
 [Produces("application/json")]
 public sealed class SeedGeneratorController(ISender sender) : ControllerBase
 {
     // --- Seed Server ---
 
     [HttpGet]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(PaginationResponse<SeedServerResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSeedServers([FromQuery] GetSeedServersQuery query, CancellationToken cancellationToken)
     {
@@ -41,7 +44,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> CreateSeedServer([FromBody] CreateSeedServerCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
@@ -49,7 +52,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> UpdateSeedServer([FromRoute] SeedServerId id, [FromBody] UpdateSeedServerCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
@@ -58,7 +61,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> TestSeedServerConnection([FromBody] TestSeedServerConnectionCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
@@ -68,6 +71,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     // --- Seed Function ---
 
     [HttpGet]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(PaginationResponse<SeedFunctionResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSeedFunctions([FromQuery] GetSeedFunctionsQuery query, CancellationToken cancellationToken)
     {
@@ -76,7 +80,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> CreateSeedFunction([FromBody] CreateSeedFunctionCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
@@ -84,7 +88,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> UpdateSeedFunction([FromRoute] SeedFunctionId id, [FromBody] UpdateSeedFunctionCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
@@ -95,6 +99,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     // --- Seed Template ---
 
     [HttpGet]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(PaginationResponse<SeedTemplateResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSeedTemplates([FromQuery] GetSeedTemplatesQuery query, CancellationToken cancellationToken)
     {
@@ -103,7 +108,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> CreateSeedTemplate([FromBody] CreateSeedTemplateCommand command, CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);
@@ -111,7 +116,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedGeneratorManage)]
     public async Task<IActionResult> UpdateSeedTemplate([FromRoute] SeedTemplateId id, [FromBody] UpdateSeedTemplateCommand command, CancellationToken cancellationToken)
     {
         var request = command with { Id = id };
@@ -122,6 +127,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     // --- Schema & Execution ---
 
     [HttpGet("{serverId}")]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(DbSchemaResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDbSchema([FromRoute] SeedServerId serverId, CancellationToken cancellationToken)
     {
@@ -130,6 +136,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSampleData([FromQuery] GetSampleDataQuery query, CancellationToken cancellationToken)
     {
@@ -138,7 +145,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedExecutionRun)]
     [ProducesResponseType(typeof(TriggerSeedingResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> TriggerSeeding([FromBody] TriggerSeedingCommand command, CancellationToken cancellationToken)
     {
@@ -147,7 +154,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedExecutionManualWrite)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ManualInsertData([FromBody] ManualInsertDataCommand command, CancellationToken cancellationToken)
     {
@@ -156,7 +163,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedExecutionDeleteRow)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteRowData([FromBody] DeleteRowDataCommand command, CancellationToken cancellationToken)
     {
@@ -165,6 +172,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{serverId}")]
+    [HasPermission(Permissions.SeedGeneratorRead)]
     [ProducesResponseType(typeof(List<SeedRowLogResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSeedRowLogs([FromRoute] SeedServerId serverId, CancellationToken cancellationToken)
     {
@@ -173,7 +181,7 @@ public sealed class SeedGeneratorController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [HasPermission(Permissions.SeedExecutionLogClear)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ClearSeedRowLogs([FromBody] ClearSeedRowLogsCommand command, CancellationToken cancellationToken)
     {

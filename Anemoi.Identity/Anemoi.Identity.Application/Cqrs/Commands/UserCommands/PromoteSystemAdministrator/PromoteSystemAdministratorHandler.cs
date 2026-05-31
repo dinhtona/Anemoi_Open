@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -31,10 +32,10 @@ public sealed class PromoteSystemAdministratorHandler(
         if (user is null) return IdentityErrorDetail.UserError.NotFound().ToErrorDetailResponse();
 
         var roles = await userRepository.GetDirectRolesAsync(user);
-        if (roles.Contains("Administrator"))
+        if (roles.Contains(SystemRoles.Administrator))
             return IdentityErrorDetail.UserError.AlreadyAdministrator().ToErrorDetailResponse();
 
-        var addResult = await userRepository.AddToRolesAsync(user, ["Administrator"]);
+        var addResult = await userRepository.AddToRolesAsync(user, [SystemRoles.Administrator]);
         if (addResult.IsT1) return IdentityErrorDetail.RoleError.AddRolesError().ToErrorDetailResponse();
 
         var revokeResult = await sessionRevocationService.RevokeAsync([request.UserId], cancellationToken);

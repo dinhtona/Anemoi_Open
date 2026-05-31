@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -66,7 +67,7 @@ public sealed class UpdateRoleGroupHandler(
                 var isSystemWide = !roleGroup.RoleGroupClaims.Any(claim =>
                     claim.Key == AuthorizationClaimTypes.WorkspaceId);
                 if (isSystemWide && await roleRepository.ExistByConditionAsync(
-                        role => roleIds.Contains(role.RoleId) && role.Name == "Administrator",
+                        role => roleIds.Contains(role.RoleId) && role.Name == SystemRoles.Administrator,
                         cancellationToken))
                     return IdentityErrorDetail.RoleError.ReservedSystemRole();
 
@@ -125,7 +126,7 @@ public sealed class UpdateRoleGroupHandler(
                 {
                     var user = users.Single(x => x.UserId == userId);
                     var directRoles = await userRepository.GetDirectRolesAsync(user);
-                    if (directRoles.Contains("Administrator"))
+                    if (directRoles.Contains(SystemRoles.Administrator))
                         continue;
 
                     var otherRoles = otherRolesByUser.GetValueOrDefault(userId) ?? [];

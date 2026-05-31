@@ -1,5 +1,6 @@
 ﻿using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Workspace.Commands.MemberInvitationCommands.CreateMemberInvitation;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.Workspace.Commands.MemberInvitationCommands.RemoveMemberInvitation;
 using Anemoi.Contract.Workspace.Commands.MemberInvitationCommands.ResendMemberInvitations;
 using Anemoi.Contract.Workspace.Queries.MemberInvitationQueries.GetMemberInvitations;
@@ -23,7 +24,7 @@ public sealed class MemberInvitationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(PaginationResponse<MemberInvitationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -42,7 +43,7 @@ public sealed class MemberInvitationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -61,7 +62,7 @@ public sealed class MemberInvitationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPatch]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -80,7 +81,7 @@ public sealed class MemberInvitationController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpDelete]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

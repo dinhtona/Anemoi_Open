@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Contract.Identity.Commands.UserCommands.CreateUser;
 using Anemoi.Contract.Identity.ModelIds;
@@ -24,7 +25,7 @@ public static class SeedData
 {
     public static async Task RegisterAdministratorAsync(IServiceScope serviceScope)
     {
-        const string administrator = "Administrator";
+        const string administrator = SystemRoles.Administrator;
         var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
         var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
         var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
@@ -77,7 +78,7 @@ public static class SeedData
 
     public static async Task NormalizeAuthorizationAssignmentsAsync(IServiceScope serviceScope)
     {
-        const string administrator = "Administrator";
+        const string administrator = SystemRoles.Administrator;
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
         var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
@@ -152,7 +153,9 @@ public static class SeedData
         var defaultApplicationPolicies = serviceScope.ServiceProvider.GetRequiredService<DefaultApplicationPolices>();
 
         var roles = defaultApplicationPolicies.ApplicationPolicies
-            .SelectMany(x => x.Roles).Distinct();
+            .SelectMany(x => x.Roles)
+            .Concat(Permissions.All)
+            .Distinct();
         var isChangeed = false;
         foreach (var role in roles)
         {
@@ -175,20 +178,47 @@ public static class SeedData
         var defaultApplicationPolicies = serviceScope.ServiceProvider.GetRequiredService<DefaultApplicationPolices>();
         var systemRoles = await roleRepository.GetQueryable().AsNoTracking().ToListAsync();
 
-        var roles = defaultApplicationPolicies.ApplicationPolicies
-            .SelectMany(x => x.Roles).Distinct();
-        var isChangeed = false;
+        var roleByName = systemRoles.ToDictionary(role => role.Name!);
+        var isChanged = false;
         foreach (var applicationPolicy in defaultApplicationPolicies.ApplicationPolicies)
         {
-            var existOne = await identityPolicyRepository.ExistByConditionAsync(x =>
-                x.Key == applicationPolicy.Key && x.Value == applicationPolicy.Value);
-            if (existOne) continue;
-            isChangeed = true;
-            var identityPolicyMapRoles = applicationPolicy.Roles
+            var roleNames = applicationPolicy.Roles
+                .Concat(applicationPolicy.Key == AuthorizationClaimTypes.ApplicationPolicyInternal
+                    ? Permissions.All
+                    : [])
+                .Distinct()
+                .ToList();
+            var existingPolicy = await identityPolicyRepository.GetFirstByConditionAsync(
+                x => x.Key == applicationPolicy.Key && x.Value == applicationPolicy.Value,
+                query => query.Include(policy => policy.IdentityPolicyMapRoles));
+            if (existingPolicy is { })
+            {
+                existingPolicy.IdentityPolicyMapRoles ??= [];
+                var mappedRoleIds = existingPolicy.IdentityPolicyMapRoles
+                    .Select(mapping => mapping.UserRoleId)
+                    .ToHashSet();
+                foreach (var roleName in roleNames)
+                {
+                    var roleId = roleByName[roleName].RoleId;
+                    if (mappedRoleIds.Contains(roleId)) continue;
+
+                    existingPolicy.IdentityPolicyMapRoles.Add(new IdentityPolicyMapRole
+                    {
+                        Id = new IdentityPolicyMapRoleId(IdGenerator.NextGuid()),
+                        IdentityPolicyId = existingPolicy.Id,
+                        UserRoleId = roleId
+                    });
+                    isChanged = true;
+                }
+                continue;
+            }
+
+            isChanged = true;
+            var identityPolicyMapRoles = roleNames
                 .Select(a => new IdentityPolicyMapRole
                 {
                     Id = new IdentityPolicyMapRoleId(IdGenerator.NextGuid()),
-                    UserRoleId = systemRoles.FirstOrDefault(x => x.Name == a)?.RoleId
+                    UserRoleId = roleByName[a].RoleId
                 });
             var newOne = new IdentityPolicy
             {
@@ -198,6 +228,6 @@ public static class SeedData
             await identityPolicyRepository.CreateOneAsync(newOne);
         }
 
-        if (isChangeed) await unitOfWork.SaveChangesAsync();
+        if (isChanged) await unitOfWork.SaveChangesAsync();
     }
 }

@@ -1,5 +1,7 @@
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Centralize.Application.Cqrs.Requests.Workspace;
 using Anemoi.Centralize.Application.Cqrs.Requests.Identity;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.RemoveRoleGroup;
@@ -33,7 +35,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// A list of RoleGroupListResponse objects.
     /// </returns>
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleRead)]
     [ProducesResponseType(typeof(RoleGroupsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -50,7 +53,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(RoleGroupsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -69,7 +72,7 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(typeof(RoleGroupsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -91,7 +94,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// A list of role groups.
     /// </returns>
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleRead)]
     [ProducesResponseType(typeof(PaginationResponse<RoleGroupsResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -112,7 +116,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPost]
-    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
+    [HasPermission(Permissions.RoleManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -135,7 +140,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
+    [HasPermission(Permissions.RoleManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -158,7 +164,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     /// The result of the command.
     /// </returns>
     [HttpDelete]
-    [Authorize(Policy = "Agency", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
+    [HasPermission(Permissions.RoleManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -171,7 +178,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleRead)]
     [ProducesResponseType(typeof(PaginationResponse<RoleGroupsResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSystemRoleGroups([FromQuery] GetSystemRoleGroupsQuery query,
         CancellationToken cancellationToken)
@@ -181,7 +189,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleQuery")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleRead)]
     [ProducesResponseType(typeof(RoleGroupResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSystemRoleGroup([FromQuery] GetSystemRoleGroupQuery query,
         CancellationToken cancellationToken)
@@ -191,7 +200,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleManage)]
     public async Task<IActionResult> CreateSystemRoleGroup([FromBody] CreateSystemRoleGroupRequest command,
         CancellationToken cancellationToken)
     {
@@ -200,7 +210,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     }
 
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleManage)]
     public async Task<IActionResult> UpdateSystemRoleGroup(RoleGroupId id,
         [FromBody] UpdateSystemRoleGroupRequest command, CancellationToken cancellationToken)
     {
@@ -209,7 +220,8 @@ public sealed class RoleGroupController(ISender sender) : ControllerBase
     }
 
     [HttpDelete]
-    [Authorize(Policy = "Internal", Roles = "Administrator,RoleCommand")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
+    [HasPermission(Permissions.RoleManage)]
     public async Task<IActionResult> RemoveSystemRoleGroup([FromBody] RemoveSystemRoleGroupRequest command,
         CancellationToken cancellationToken)
     {

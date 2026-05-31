@@ -1,5 +1,6 @@
 ﻿using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.MasterData.Commands.DistrictCommands.CreateDistrict;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.MasterData.Commands.DistrictCommands.UpdateDistrict;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.DistrictQueries.GetDistrict;
@@ -69,7 +70,7 @@ public sealed class DistrictController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -91,7 +92,7 @@ public sealed class DistrictController(ISender sender) : ControllerBase
     /// The result of the command is being returned.
     /// </returns>
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

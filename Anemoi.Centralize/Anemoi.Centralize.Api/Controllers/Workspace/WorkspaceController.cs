@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.Workspace.Commands.WorkspaceCommands.CreateWorkspace;
 using Anemoi.Contract.Workspace.Commands.WorkspaceCommands.UpdateWorkspace;
 using Anemoi.Contract.Workspace.ModelIds;
@@ -26,7 +27,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(WorkspaceResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -44,7 +45,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(CountingResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -62,7 +63,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(typeof(PaginationResponse<WorkspaceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -80,7 +81,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = "Internal")]
+    [Authorize(Policy = AuthorizationPolicies.Internal)]
     [Authorize]
     [ProducesResponseType(typeof(PaginationResponse<WorkspaceResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -99,7 +100,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    [Authorize(Policy = "Agency")]
+    [Authorize(Policy = AuthorizationPolicies.Agency)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -119,7 +120,7 @@ public sealed class WorkspaceController(ISender sender) : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPatch("{id}")]
-    [Authorize(Policy = "Agency", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Agency, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

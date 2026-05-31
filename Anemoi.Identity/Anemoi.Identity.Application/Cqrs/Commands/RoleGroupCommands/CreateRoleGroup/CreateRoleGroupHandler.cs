@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Serilog;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
@@ -42,7 +43,7 @@ public sealed class CreateRoleGroupHandler(
                 var isSystemWide = !(command.RoleGroupClaims ?? []).Any(claim =>
                     claim.Key == AuthorizationClaimTypes.WorkspaceId);
                 if (isSystemWide && await roleRepository.ExistByConditionAsync(
-                        role => roleIds.Contains(role.RoleId) && role.Name == "Administrator",
+                        role => roleIds.Contains(role.RoleId) && role.Name == SystemRoles.Administrator,
                         cancellationToken))
                     return IdentityErrorDetail.RoleError.ReservedSystemRole();
 
