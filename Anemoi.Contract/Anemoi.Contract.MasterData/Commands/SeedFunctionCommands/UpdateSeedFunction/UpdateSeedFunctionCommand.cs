@@ -11,4 +11,4 @@ public sealed record UpdateSeedFunctionCommand(
     string TablesJson,
     SeedServerId? SeedServerId = default,
     SeedTemplateId? SeedTemplateId = default,
-    [property: JsonIgnore] SeedFunctionId Id = default) : ICommandVoid;
+    [property: JsonIgnore] SeedFunctionId Id = default!) : ICommandVoid;

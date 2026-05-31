@@ -7,6 +7,7 @@ using MassTransit;
 using Anemoi.Identity.Application;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Anemoi.Identity.Infrastructure.DataContext;
 
 namespace Anemoi.Identity.Infrastructure.Installers;
 
@@ -19,6 +20,11 @@ public sealed class MassTransitInstaller : IInstaller
         services.AddMassTransit(configurator =>
         {
             configurator.SetKebabCaseEndpointNameFormatter();
+            configurator.AddEntityFrameworkOutbox<IdentityDbContext>(outbox =>
+            {
+                outbox.UsePostgres();
+                outbox.UseBusOutbox();
+            });
             configurator.AddConsumersFromNamespaceContaining<IIdentityApplicationAssemblyMarker>();
             var serviceConsumer = ConsumersHelper
                 .CreateDynamicConsumerHandlers<IIdentityContractAssemblyMarker>("IdentityHandlersConsumer");

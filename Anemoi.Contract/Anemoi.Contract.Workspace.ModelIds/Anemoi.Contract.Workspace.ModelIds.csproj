@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Anemoi.Contract.Workspace\ModelIds\**\*.cs" Link="ModelIds\%(RecursiveDir)%(Filename)%(Extension)" />
+    <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Domain\Anemoi.BuildingBlock.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.QueryHelpers;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetCrossCuttingUsers;
-using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
 using Serilog;
 
@@ -12,7 +11,6 @@ namespace Anemoi.Identity.Application.Cqrs.Queries.UserQueries.GetCrossCuttingUs
 
 public sealed class GetCrossCuttingUsersHandler(
     ISqlRepository<User> sqlRepository,
-    IdentityMapper mapper,
     ILogger logger)
     : EfQueryCrossCuttingHandler<User, GetCrossCuttingUsersQuery>(sqlRepository, logger,
         x => d => x.SelectorIds.Select(a => new UserId(a)).Contains(d.UserId),

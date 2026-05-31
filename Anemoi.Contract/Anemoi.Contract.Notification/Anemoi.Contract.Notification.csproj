@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="ModelIds\**\*.cs" />
+      <ProjectReference Include="..\Anemoi.Contract.Notification.ModelIds\Anemoi.Contract.Notification.ModelIds.csproj" />
       <ProjectReference Include="..\Anemoi.Contract.CrossCuttingConcern\Anemoi.Contract.CrossCuttingConcern.csproj" />
     </ItemGroup>
 </Project>

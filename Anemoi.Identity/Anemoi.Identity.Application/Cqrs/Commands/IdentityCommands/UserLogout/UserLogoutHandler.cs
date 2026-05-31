@@ -32,11 +32,10 @@ public sealed class UserLogoutHandler(
             // It writes authentication cookies and requires HttpContext, which is not
             // available in MassTransit consumers. For stateless JWT auth, cookie sign-out
             // is irrelevant — token invalidation is handled by deleting the RefreshToken
-            // from DB (done by RemoveOne above) and revoking the access token in Redis below.
+            // from DB (done by RemoveOne above) and publishing the Redis revocation marker below.
 
-            // Best-effort: revoke access token in distributed cache so the JWT cannot
-            // be reused before it naturally expires.
-            // Wrapped in try-catch so logout always succeeds even if RabbitMQ is temporarily down.
+            // Best-effort: enqueue revocation in the EF outbox so the access token cannot
+            // be reused before it naturally expires. Logout still succeeds if enqueueing fails.
             if (refreshToken?.UserId is UserId userId)
             {
                 try
@@ -47,7 +46,7 @@ public sealed class UserLogoutHandler(
                 }
                 catch (Exception ex)
                 {
-                    logger.Warning(ex,
+                    Logger.Warning(ex,
                         "Failed to publish token revocation event for user {UserId}. " +
                         "Access token will expire naturally. Logout still succeeded.", userId);
                 }

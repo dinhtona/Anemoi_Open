@@ -64,10 +64,10 @@ public sealed class UserSessionRevocationService(
         var prepareResult = await PrepareAsync(userIds, cancellationToken);
         if (prepareResult.IsT1) return prepareResult.AsT1;
 
+        await PublishAsync(prepareResult.AsT0, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1) return IdentityErrorDetail.UserError.UpdateFailed();
 
-        await PublishAsync(prepareResult.AsT0, cancellationToken);
         return None.Value;
     }
 }

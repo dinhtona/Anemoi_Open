@@ -74,7 +74,11 @@ public sealed class AuthenticationInstaller : IInstaller
                     }
 
                     var userIdClaim = context.Principal?.FindFirst("id")?.Value;
-                    if (string.IsNullOrEmpty(userIdClaim)) return;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                    {
+                        context.Fail("Token user metadata is missing.");
+                        return;
+                    }
 
                     try
                     {

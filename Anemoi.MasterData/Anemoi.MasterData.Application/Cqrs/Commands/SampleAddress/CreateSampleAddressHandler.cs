@@ -18,7 +18,6 @@ namespace Anemoi.MasterData.Application.Cqrs.Commands.SampleAddress;
 public sealed class CreateSampleAddressHandler(
     ISqlRepository<Province> sqlRepository,
     IUnitOfWork unitOfWork,
-    MasterDataMapper mapper,
     ILogger logger,
     ISqlRepository<Province> provinceRepository)
     : EfCommandManyVoidHandler<Province, CreateSampleAddressCommand>(sqlRepository, unitOfWork, logger)

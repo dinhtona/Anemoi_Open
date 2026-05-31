@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Errors;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.TriggerSeeding;
@@ -155,7 +156,7 @@ public sealed class TriggerSeedingHandler(
                         var pkCondition = GetPrimaryKeyCondition(tableSchema, row);
                         var rowLog = new SeedRowLog
                         {
-                            Id = SeedRowLogId.New(),
+                            Id = new SeedRowLogId(IdGenerator.NextGuid()),
                             SeedServerId = function.SeedServerId,
                             TableName = tableConfig.TableName,
                             RunAt = DateTime.UtcNow,

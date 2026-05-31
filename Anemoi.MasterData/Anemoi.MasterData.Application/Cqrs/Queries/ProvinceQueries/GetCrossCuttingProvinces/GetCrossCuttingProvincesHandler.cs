@@ -3,7 +3,6 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.QueryHelpers;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.ProvinceQueries.GetCrossCuttingProvinces;
-using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain.Models;
 using Serilog;
 
@@ -11,7 +10,6 @@ namespace Anemoi.MasterData.Application.Cqrs.Queries.ProvinceQueries.GetCrossCut
 
 public sealed class GetCrossCuttingProvincesHandler(
     ISqlRepository<Province> sqlRepository,
-    MasterDataMapper mapper,
     ILogger logger)
     : EfQueryCrossCuttingHandler<Province, GetCrossCuttingProvincesQuery>(sqlRepository, logger,
         x => d => x.SelectorIds.Select(a => new ProvinceId(a)).Contains(d.Id),

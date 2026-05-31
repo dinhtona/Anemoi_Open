@@ -107,6 +107,7 @@ public partial class WorkspaceMapper(IUserIdGetter userIdGetter, IWorkspaceIdGet
 
     public partial void UpdateOrganization(UpdateOrganizationCommand command, Organization organization);
 
+    [UserMapping(Default = true)]
     public OrganizationResponse ToOrganizationResponse(Organization organization)
     {
         var response = MapToOrganizationResponse(organization);

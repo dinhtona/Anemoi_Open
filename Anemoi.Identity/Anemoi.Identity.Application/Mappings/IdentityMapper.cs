@@ -76,8 +76,6 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
     public partial UserResponse ToUserResponse(User user);
     public partial UserWithEmailResponse ToUserWithEmailResponse(User user);
     
-    [MapProperty(nameof(User.UserId), nameof(UserResponse.Id))]
-    [MapProperty(nameof(User.UserId), nameof(UserResponse.UserId))]
     public partial IQueryable<UserResponse> ProjectToUserResponse(IQueryable<User> query);
     public partial IQueryable<UserWithEmailResponse> ProjectToUserWithEmailResponse(IQueryable<User> query);
 
@@ -164,6 +162,7 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
     
     public partial IQueryable<RoleGroupResponse> ProjectToRoleGroupResponse(IQueryable<RoleGroup> query);
 
+    [UserMapping(Default = true)]
     public RoleGroupsResponse ToRoleGroupsResponse(RoleGroup roleGroup)
     {
         var response = MapToRoleGroupsResponse(roleGroup);

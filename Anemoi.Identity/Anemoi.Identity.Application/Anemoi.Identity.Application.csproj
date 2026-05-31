@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Anemoi.Identity.Domain\Anemoi.Identity.Domain.csproj" />
+      <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Identity\Anemoi.Contract.Identity.csproj" />
     </ItemGroup>
 
     <ItemGroup>

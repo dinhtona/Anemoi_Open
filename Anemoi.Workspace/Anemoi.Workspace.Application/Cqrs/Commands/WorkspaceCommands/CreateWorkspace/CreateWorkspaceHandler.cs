@@ -6,14 +6,12 @@ using Anemoi.Contract.Workspace.Commands.WorkspaceCommands.CreateWorkspace;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Responses;
 using Anemoi.Workspace.Application.Mappings;
-using MassTransit;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Commands.WorkspaceCommands.CreateWorkspace;
 
 public sealed class CreateWorkspaceHandler(
     ISqlRepository<Anemoi.Workspace.Domain.Models.Workspace> sqlRepository,
-    IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork,
     WorkspaceMapper mapper,
     ILogger logger)

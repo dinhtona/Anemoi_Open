@@ -7,7 +7,6 @@ using Anemoi.Contract.Identity.Commands.IdentityCommands.ChangePasswordWithToken
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
-using Anemoi.Identity.Application.Abstractions;
 using MediatR;
 using Serilog;
 using Anemoi.Identity.Domain.Models;

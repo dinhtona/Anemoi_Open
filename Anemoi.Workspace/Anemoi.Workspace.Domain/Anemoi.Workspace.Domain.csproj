@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Workspace\Anemoi.Contract.Workspace.csproj"/>
+        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Workspace.ModelIds\Anemoi.Contract.Workspace.ModelIds.csproj"/>
     </ItemGroup>
 
 

@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Workspace.Queries.WorkspaceQueries.GetAllWorkspaceIds;
 using Anemoi.Contract.Workspace.Responses;
-using Anemoi.Contract.Workspace.Responses;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Queries.WorkspaceQueries.GetAllWorkspaceIds;

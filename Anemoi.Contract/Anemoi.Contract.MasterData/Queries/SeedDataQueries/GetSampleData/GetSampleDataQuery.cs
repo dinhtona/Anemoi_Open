@@ -1,3 +1,4 @@
+#nullable enable
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Responses;
@@ -8,4 +9,3 @@ public sealed record GetSampleDataQuery(
     SeedFunctionId? SeedFunctionId,
     SeedServerId? SeedServerId,
     string TableName) : IQueryOne<SampleDataResponse>;
-

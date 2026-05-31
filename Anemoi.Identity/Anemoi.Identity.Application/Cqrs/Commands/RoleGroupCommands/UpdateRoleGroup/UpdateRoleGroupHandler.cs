@@ -34,9 +34,6 @@ public sealed class UpdateRoleGroupHandler(
     : EfCommandOneVoidHandler<RoleGroup, UpdateRoleGroupCommand>(sqlRepository,
         unitOfWork, logger)
 {
-    private PreparedSessionRevocation _preparedRevocation;
-    private List<UserId> _permissionChangedUserIds = [];
-
     protected override ICommandOneFlowBuilderVoid<RoleGroup> BuildCommand(IStartOneCommandVoid<RoleGroup> fromFlow,
         UpdateRoleGroupCommand command,
         CancellationToken cancellationToken)
@@ -121,6 +118,7 @@ public sealed class UpdateRoleGroupHandler(
                     .ToDictionary(group => group.Key,
                         group => group.Select(x => x.RoleId).ToHashSet());
                 var revokedUserIds = new List<UserId>();
+                var permissionChangedUserIds = new List<UserId>();
                 var users = await userDbRepository.GetQueryable(x => userIds.Contains(x.UserId))
                     .ToListAsync(cancellationToken);
                 foreach (var userId in userIds)
@@ -136,7 +134,7 @@ public sealed class UpdateRoleGroupHandler(
                     if (previousRoles.Except(nextRoles).Any())
                         revokedUserIds.Add(userId);
                     else if (nextRoles.Except(previousRoles).Any())
-                        _permissionChangedUserIds.Add(userId);
+                        permissionChangedUserIds.Add(userId);
                 }
 
                 if (revokedUserIds.Count > 0)
@@ -144,19 +142,13 @@ public sealed class UpdateRoleGroupHandler(
                     var prepareResult = await sessionRevocationService.PrepareAsync(
                         revokedUserIds, cancellationToken);
                     if (prepareResult.IsT1) return prepareResult.AsT1;
-                    _preparedRevocation = prepareResult.AsT0;
+                    await sessionRevocationService.PublishAsync(prepareResult.AsT0, cancellationToken);
                 }
+                await permissionChangeNotifier.PublishAsync(permissionChangedUserIds, cancellationToken);
                 return None.Value;
             })
             .WithModify(roleGroup => mapper.UpdateRoleGroup(command, roleGroup))
             .WithErrorIfNull(IdentityErrorDetail.RoleGroupError.NotFound())
             .WithErrorIfSaveChange(IdentityErrorDetail.RoleGroupError.UpdateFailed());
 
-    protected override async Task AfterSaveChangesAsync(UpdateRoleGroupCommand command,
-        RoleGroup model, CancellationToken cancellationToken)
-    {
-        if (_preparedRevocation is not null)
-            await sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
-        await permissionChangeNotifier.PublishAsync(_permissionChangedUserIds, cancellationToken);
-    }
 }

@@ -10,7 +10,6 @@ using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using MassTransit;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.CreateUser;
@@ -20,7 +19,6 @@ public sealed class CreateUserHandler(
     IdentityMapper mapper,
     IUnitOfWork unitOfWork,
     IUserRepository userRepository,
-    IPublishEndpoint publishEndpoint,
     ISqlRepository<User> sqlRepository)
     : EfCommandOneResultHandler<User, CreateUserCommand, UserIdResponse>(sqlRepository, unitOfWork, logger)
 {

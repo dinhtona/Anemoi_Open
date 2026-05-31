@@ -26,7 +26,7 @@ namespace Anemoi.Centralize.Api.Controllers.Identity;
 [Route("api/identity/[controller]/[action]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
-public class IdentityController(ISender sender) : ControllerBase
+public class IdentityController(ISender sender, IWebHostEnvironment environment) : ControllerBase
 {
     /// <summary>
     /// Check Account
@@ -176,7 +176,7 @@ public class IdentityController(ISender sender) : ControllerBase
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, // Set to true in production with HTTPS
+            Secure = !environment.IsDevelopment(),
             SameSite = SameSiteMode.Lax,
             Path = "/"
         };
@@ -213,6 +213,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -290,6 +291,7 @@ public class IdentityController(ISender sender) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth-limit")]
     [ProducesResponseType(typeof(AuthenticationSuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ExternalLogin([FromBody] Anemoi.Contract.Identity.Commands.RefreshTokenCommands.ExternalLogin.ExternalLoginCommand command,

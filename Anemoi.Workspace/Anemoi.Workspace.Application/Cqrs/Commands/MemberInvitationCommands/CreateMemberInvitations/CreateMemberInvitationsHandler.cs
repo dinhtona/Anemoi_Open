@@ -25,7 +25,6 @@ public sealed class CreateMemberInvitationsHandler(
     IUnitOfWork unitOfWork,
     WorkspaceMapper mapper,
     ILogger logger,
-    IPublishEndpoint publishEndpoint,
     IWorkspaceIdGetter workspaceIdGetter)
     : EfCommandManyVoidHandler<MemberInvitation, CreateMemberInvitationsCommand>(sqlRepository, unitOfWork,
         logger)

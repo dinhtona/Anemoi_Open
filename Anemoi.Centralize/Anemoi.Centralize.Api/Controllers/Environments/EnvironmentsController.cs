@@ -9,13 +9,17 @@ using Anemoi.Centralize.Application.Cqrs.Environments.Commands;
 using Anemoi.Centralize.Application.Cqrs.Environments.Queries;
 using Anemoi.Centralize.Domain.ModelIds;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Anemoi.Centralize.Api.Controllers.Environments;
 
 [ApiController]
 [Route("api/environments")]
+[Authorize(Policy = "Internal", Roles = "Administrator")]
+[EnableRateLimiting("general-limit")]
 public sealed class EnvironmentsController(
     ISender sender) : ControllerBase
 {
@@ -86,7 +90,7 @@ public sealed class EnvironmentsController(
     }
 
     [HttpPost("sftp/upload")]
-    [DisableRequestSizeLimit]
+    [RequestSizeLimit(50 * 1024 * 1024)]
     public async Task<IActionResult> UploadSftpFile(
         [FromQuery] string? path,
         [FromForm] IFormFile file,

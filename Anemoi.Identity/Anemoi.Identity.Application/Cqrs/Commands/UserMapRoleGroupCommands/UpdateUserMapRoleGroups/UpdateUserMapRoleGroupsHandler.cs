@@ -29,9 +29,6 @@ public sealed class UpdateUserMapRoleGroupsHandler(
     : EfCommandManyVoidHandler<UserMapRoleGroup, UpdateUserMapRoleGroupsCommand>(sqlRepository, unitOfWork,
         logger)
 {
-    private PreparedSessionRevocation _preparedRevocation;
-    private bool _publishPermissionChange;
-
     protected override ICommandManyFlowBuilderVoid<UserMapRoleGroup> BuildCommand(
         IStartManyCommandVoid<UserMapRoleGroup> fromFlow, UpdateUserMapRoleGroupsCommand command,
         CancellationToken cancellationToken)
@@ -89,23 +86,14 @@ public sealed class UpdateUserMapRoleGroupsHandler(
                         [command.UserId], cancellationToken);
                     if (prepareResult.IsT1) return prepareResult.AsT1;
 
-                    _preparedRevocation = prepareResult.AsT0;
+                    await sessionRevocationService.PublishAsync(prepareResult.AsT0, cancellationToken);
                 }
                 else
                 {
-                    _publishPermissionChange = nextRoles.Except(previousRoles).Any();
+                    if (nextRoles.Except(previousRoles).Any())
+                        await permissionChangeNotifier.PublishAsync([command.UserId], cancellationToken);
                 }
                 return None.Value;
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.UserMapRoleGroupError.CreateFailed());
-
-    protected override Task AfterSaveChangesAsync(UpdateUserMapRoleGroupsCommand command,
-        List<UserMapRoleGroup> models, CancellationToken cancellationToken)
-    {
-        if (_preparedRevocation is not null)
-            return sessionRevocationService.PublishAsync(_preparedRevocation, cancellationToken);
-        return _publishPermissionChange
-            ? permissionChangeNotifier.PublishAsync([command.UserId], cancellationToken)
-            : Task.CompletedTask;
-    }
 }

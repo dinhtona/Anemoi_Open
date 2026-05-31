@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Errors;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.MasterData.Commands.SeedExecutionCommands.ManualInsertData;
@@ -57,7 +58,7 @@ public sealed class ManualInsertDataHandler(
             // Save row log
             var rowLog = new SeedRowLog
             {
-                Id = SeedRowLogId.New(),
+                Id = new SeedRowLogId(IdGenerator.NextGuid()),
                 SeedServerId = request.SeedServerId,
                 TableName = request.TableName,
                 RunAt = DateTime.UtcNow,

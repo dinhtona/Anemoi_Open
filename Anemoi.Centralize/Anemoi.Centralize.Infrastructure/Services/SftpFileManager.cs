@@ -21,6 +21,7 @@ public sealed class SftpFileManager : ISftpFileManager
             _basePath = Path.Combine(Directory.GetCurrentDirectory(), settings.LocalEnvDir, "sftp_data");
         }
 
+        _basePath = Path.GetFullPath(_basePath);
         if (!Directory.Exists(_basePath))
         {
             Directory.CreateDirectory(_basePath);
@@ -33,7 +34,7 @@ public sealed class SftpFileManager : ISftpFileManager
         var combined = Path.Combine(_basePath, cleaned);
         var fullPath = Path.GetFullPath(combined);
 
-        if (!fullPath.StartsWith(_basePath, StringComparison.OrdinalIgnoreCase))
+        if (!IsWithinBasePath(fullPath))
         {
             throw new UnauthorizedAccessException("Path traversal detected.");
         }
@@ -72,7 +73,7 @@ public sealed class SftpFileManager : ISftpFileManager
         }
 
         var fullFilePath = Path.Combine(dirPath, fileName);
-        if (!Path.GetFullPath(fullFilePath).StartsWith(_basePath, StringComparison.OrdinalIgnoreCase))
+        if (!IsWithinBasePath(Path.GetFullPath(fullFilePath)))
         {
             throw new UnauthorizedAccessException("Path traversal detected.");
         }
@@ -117,5 +118,14 @@ public sealed class SftpFileManager : ISftpFileManager
         }
         Directory.CreateDirectory(fullPath);
         return true;
+    }
+
+    private bool IsWithinBasePath(string path)
+    {
+        var relativePath = Path.GetRelativePath(_basePath, path);
+        return !Path.IsPathRooted(relativePath) &&
+               relativePath != ".." &&
+               !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal) &&
+               !relativePath.StartsWith($"..{Path.AltDirectorySeparatorChar}", StringComparison.Ordinal);
     }
 }

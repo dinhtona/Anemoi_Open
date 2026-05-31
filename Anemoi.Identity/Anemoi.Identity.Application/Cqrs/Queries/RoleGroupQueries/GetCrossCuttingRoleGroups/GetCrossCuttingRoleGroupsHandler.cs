@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.QueryHelpers;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetCrossCuttingRoleGroups;
-using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
 using Serilog;
 
@@ -12,7 +11,6 @@ namespace Anemoi.Identity.Application.Cqrs.Queries.RoleGroupQueries.GetCrossCutt
 
 public sealed class GetCrossCuttingRoleGroupsHandler(
     ISqlRepository<RoleGroup> sqlRepository,
-    IdentityMapper mapper,
     ILogger logger)
     : EfQueryCrossCuttingHandler<RoleGroup, GetCrossCuttingRoleGroupsQuery>(sqlRepository, logger,
         x => d => x.SelectorIds.Select(a => new RoleGroupId(a)).Contains(d.Id),

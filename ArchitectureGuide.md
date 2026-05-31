@@ -56,14 +56,16 @@ Each Microservice (e.g., class library like `Anemoi.MasterData`) is divided into
 
 1. **`{Service}.Domain`**: 
    - Contains Domain Entities, Value Objects, Domain Events, and Custom Strongly-Typed IDs.
-   - This layer is absolutely independent. It must not depend on Infrastructure or any external logic aside from `MediatR` and `OneOf`.
+   - This layer is absolutely independent. It must not depend on Infrastructure or Application logic.
+   - It may reference `Anemoi.BuildingBlock.Domain` and dedicated `*.ModelIds` primitive projects. A ModelIds project must contain only strongly-typed ID wrappers and depend only on `Anemoi.BuildingBlock.Domain`.
 
 2. **`{Service}.Application`**: 
    - Contains Business Use Cases following the CQRS pattern.
    - **`Cqrs/Commands/`**: Contains Command objects and CommandHandlers (Write/Update operations following CQS principles).
    - **`Cqrs/Queries/`**: Contains Query objects and QueryHandlers (Read operations).
    - **`Mappings/`**: Contains Mappers utilizing `Riok.Mapperly`.
-   - This layer references and depends only on `Domain`.
+   - This layer references `Domain`, shared BuildingBlock application abstractions, and message-contract projects containing commands, queries, responses, and integration events.
+   - It must never reference Infrastructure. Contract dependencies must not leak Infrastructure or application implementations into Domain transitively.
 
 3. **`{Service}.Infrastructure`**: 
    - Contains EF Core DbContext, Database connection configurations, migrations, and implementations of external APIs.
