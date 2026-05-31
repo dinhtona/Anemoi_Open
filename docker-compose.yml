@@ -298,6 +298,54 @@ services:
     networks:
       - anemoi_network
 
+  # Next.js frontend. Browser traffic should enter through Caddy so the
+  # frontend and API share one HTTPS origin.
+  anemoi_web:
+    image: anemoi/web
+    build:
+      context: ./cody-web-app
+      dockerfile: Dockerfile.runtime
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://anemoi_centralize:8080
+    depends_on:
+      - anemoi_centralize
+    networks:
+      - anemoi_network
+
+  # Single HTTP(S) entrypoint for the frontend and API. Caddy creates a local
+  # development CA certificate for https://localhost automatically.
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3000:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - anemoi_web
+      - anemoi_centralize
+    networks:
+      - anemoi_network
+
+  # Optional stable public entrypoint. Create one Cloudflare Tunnel whose
+  # published application targets http://caddy:80, then start profile "public".
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    profiles:
+      - public
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - caddy
+    networks:
+      - anemoi_network
+
 networks:
   anemoi_network:
     driver: bridge
@@ -311,3 +359,5 @@ volumes:
   postgres_data:
   mongodb_data:
   redis_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,16 @@
+(anemoi_routes) {
+	@backend path /api /api/* /hubs /hubs/*
+	reverse_proxy @backend anemoi_centralize:8080
+	reverse_proxy anemoi_web:3000
+}
+
+# Local browser entrypoint. Caddy creates and renews a local CA certificate.
+localhost {
+	import anemoi_routes
+}
+
+# Internal HTTP entrypoint for Cloudflare Tunnel. HTTPS terminates at the
+# Cloudflare edge when the optional "public" compose profile is enabled.
+http:// {
+	import anemoi_routes
+}
