@@ -42,15 +42,15 @@ public sealed class GetSampleDataHandler(
                     .FirstOrDefaultAsync(x => x.Id == request.SeedFunctionId, cancellationToken);
 
                 if (function is null)
-                    return new ErrorDetailResponse { Messages = ["Seed function not found."], Code = "NotFound" };
+                    return CreateError("SFE_03");
 
                 server = await serverRepository.GetFirstByConditionAsync(x => x.Id == function.SeedServerId);
                 if (server is null)
-                    return new ErrorDetailResponse { Messages = ["Seed server not found."], Code = "NotFound" };
+                    return CreateError("SSE_03");
 
                 var configJson = function.SeedTemplate?.ConfigJson;
                 if (string.IsNullOrWhiteSpace(configJson))
-                    return new ErrorDetailResponse { Messages = ["Template configuration is missing."], Code = "BadRequest" };
+                    return CreateError("SEE_02");
 
                 SeedTemplateConfig config;
                 try
@@ -59,16 +59,16 @@ public sealed class GetSampleDataHandler(
                 }
                 catch
                 {
-                    return new ErrorDetailResponse { Messages = ["Failed to parse template configuration."], Code = "BadRequest" };
+                    return CreateError("SEE_03");
                 }
 
                 var tableConfig = config?.Tables.FirstOrDefault(t => t.TableName.Equals(request.TableName, StringComparison.OrdinalIgnoreCase));
                 if (tableConfig is null)
-                    return new ErrorDetailResponse { Messages = [$"Table {request.TableName} not found in template."], Code = "NotFound" };
+                    return CreateError("SEE_04");
 
                 tableSchema = await dbDiscoveryService.GetTableSchemaAsync(server.ConnectionString, server.Provider, request.TableName, cancellationToken);
                 if (tableSchema is null)
-                    return new ErrorDetailResponse { Messages = [$"Table {request.TableName} not found in target database."], Code = "NotFound" };
+                    return CreateError("SEE_05");
 
                 previewConfig = new TableConfig
                 {
@@ -86,11 +86,11 @@ public sealed class GetSampleDataHandler(
             {
                 server = await serverRepository.GetFirstByConditionAsync(x => x.Id == request.SeedServerId);
                 if (server is null)
-                    return new ErrorDetailResponse { Messages = ["Seed server not found."], Code = "NotFound" };
+                    return CreateError("SSE_03");
 
                 tableSchema = await dbDiscoveryService.GetTableSchemaAsync(server.ConnectionString, server.Provider, request.TableName, cancellationToken);
                 if (tableSchema is null)
-                    return new ErrorDetailResponse { Messages = [$"Table {request.TableName} not found in target database."], Code = "NotFound" };
+                    return CreateError("SEE_05");
 
                 previewConfig = new TableConfig
                 {
@@ -101,7 +101,7 @@ public sealed class GetSampleDataHandler(
             }
             else
             {
-                return new ErrorDetailResponse { Messages = ["Either SeedFunctionId or SeedServerId must be provided."], Code = "BadRequest" };
+                return CreateError("SEE_06");
             }
 
             var generatedData = await dataGeneratorService.GenerateDataAsync(
@@ -112,13 +112,19 @@ public sealed class GetSampleDataHandler(
                 cancellationToken);
 
             if (generatedData == null || !generatedData.Any())
-                return new ErrorDetailResponse { Messages = ["Failed to generate sample data."], Code = "BadRequest" };
+                return CreateError("SEE_07");
 
             return new SampleDataResponse(generatedData[0]);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return new ErrorDetailResponse { Messages = [ex.Message], Code = "InternalError" };
+            return CreateError("SEE_07");
         }
     }
+
+    private static ErrorDetailResponse CreateError(string code) => new()
+    {
+        Code = code,
+        Messages = [code]
+    };
 }

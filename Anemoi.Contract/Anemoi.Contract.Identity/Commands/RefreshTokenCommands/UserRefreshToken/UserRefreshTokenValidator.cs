@@ -9,6 +9,6 @@ public sealed class UserRefreshTokenValidator : AbstractValidator<UserRefreshTok
         RuleFor(x => x.RefreshToken)
             .NotNull()
             .Must(rt => rt is { } && rt.Value != Guid.Empty)
-            .WithMessage("Refresh token must not be empty!!");
+            .WithMessage("VAL_REFRESH_TOKEN_REQUIRED");
     }
 }

@@ -11,7 +11,7 @@ using Anemoi.BuildingBlock.Application.Results;
 using OneOf;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 
 public abstract class EfCommandManyVoidHandler<TModel, TCommand>(
     ISqlRepository<TModel> sqlRepository,

@@ -3,7 +3,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Queries;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.MasterData.Queries.ProvinceQueries.GetProvinces;
 using Anemoi.Contract.MasterData.Responses;
 using Anemoi.MasterData.Application.Mappings;

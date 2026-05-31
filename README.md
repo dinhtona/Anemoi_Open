@@ -33,7 +33,6 @@ The project is organized as follows:
 │   ├── Anemoi.BuildingBlocks   # Core codebase and shared utilities
 │   ├── Anemoi.Centralize       # Aggregates services, exposing APIs to external clients
 │   ├── Anemoi.Contract         # Data Transfer Objects (DTOs) and shared identifiers
-│   ├── Anemoi.Grpc             # gRPC service for high-performance communication between microservices
 │   ├── Anemoi.Identity         # Identity management service for authentication and authorization
 │   ├── Anemoi.MasterData       # Provides and manages static or master data shared across services
 │   ├── Anemoi.Workspace        # Workspace management, handling user or resource-specific configurations
@@ -50,9 +49,6 @@ Acts as the central aggregation layer, exposing a unified API interface for exte
 
 ### Anemoi.Contract
 Contains Data Transfer Objects (DTOs) and shared IDs that define how data is transferred between services. This module standardizes data structures across the system, ensuring smooth and consistent communication between services.
-
-### Anemoi.Grpc
-A gRPC-based service for efficient, high-performance communication between microservices. gRPC is used to facilitate fast, binary-encoded communication, making it ideal for inter-service communication where speed and efficiency are priorities.
 
 ### Anemoi.Identity
 Manages authentication and authorization, ensuring secure access to the system. This service is responsible for user management, access control, and identity verification, playing a crucial role in the overall security architecture.

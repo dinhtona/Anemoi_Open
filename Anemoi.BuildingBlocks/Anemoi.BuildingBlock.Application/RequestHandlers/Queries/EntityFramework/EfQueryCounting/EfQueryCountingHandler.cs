@@ -6,7 +6,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.CountingFlow;
 using Anemoi.BuildingBlock.Application.Responses;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryCounting;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryCounting;
 
 public abstract class EfQueryCountingHandler<TModel, TQuery>(ISqlRepository<TModel> sqlRepository, ILogger logger) :
     IQueryHandler<TQuery, CountingResponse>

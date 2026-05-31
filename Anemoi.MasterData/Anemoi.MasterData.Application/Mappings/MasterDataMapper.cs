@@ -155,6 +155,21 @@ public partial class MasterDataMapper
     }
 
     // Common Mappings
-    public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);
-    public partial ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse);
+    public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)
+    {
+        return new ErrorDetailResponse
+        {
+            Code = errorDetail.Code,
+            Messages = errorDetail.Messages
+        };
+    }
+
+    public ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse)
+    {
+        return new ErrorDetail
+        {
+            Code = errorDetailResponse.Code,
+            Messages = errorDetailResponse.Messages
+        };
+    }
 }

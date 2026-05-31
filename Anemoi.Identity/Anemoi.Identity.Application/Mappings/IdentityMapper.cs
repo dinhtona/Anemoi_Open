@@ -11,10 +11,8 @@ using Anemoi.Contract.Identity.Commands.UserCommands.UpdateUser;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.UpdateUserRoleGroup;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
-using Anemoi.Grpc.Identity;
 using Anemoi.Identity.Application.IdentityResults;
 using Anemoi.Identity.Domain.Models;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Identity;
 using Riok.Mapperly.Abstractions;
 using Anemoi.BuildingBlock.Application.Errors;
@@ -82,24 +80,6 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
     [MapProperty(nameof(User.UserId), nameof(UserResponse.UserId))]
     public partial IQueryable<UserResponse> ProjectToUserResponse(IQueryable<User> query);
     public partial IQueryable<UserWithEmailResponse> ProjectToUserWithEmailResponse(IQueryable<User> query);
-
-    // Authentication Mappings
-    public AuthenticateSucceed ToAuthenticateSucceed(AuthenticationSuccessResponse response)
-    {
-        var result = MapToAuthenticateSucceed(response);
-        result.ExpiredIn = Timestamp.FromDateTime(response.ExpiredIn.ToUniversalTime());
-        return result;
-    }
-
-    [MapperIgnoreTarget(nameof(AuthenticateSucceed.ExpiredIn))]
-    private partial AuthenticateSucceed MapToAuthenticateSucceed(AuthenticationSuccessResponse response);
-
-    public ErrorDetailResult ToErrorDetailResult(ErrorDetailResponse response)
-    {
-        var result = new ErrorDetailResult();
-        result.Messages.AddRange(response.Messages);
-        return result;
-    }
 
     public AuthenticationSuccessResponse ToAuthenticationSuccessResponse(RefreshToken refreshToken)
     {
@@ -243,6 +223,21 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
     public partial IQueryable<IdentityPolicyResponse> ProjectToIdentityPolicyResponse(IQueryable<IdentityPolicy> query);
 
     // ErrorDetail Mappings
-    public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);
-    public partial ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse);
+    public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)
+    {
+        return new ErrorDetailResponse
+        {
+            Code = errorDetail.Code,
+            Messages = errorDetail.Messages
+        };
+    }
+
+    public ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse)
+    {
+        return new ErrorDetail
+        {
+            Code = errorDetailResponse.Code,
+            Messages = errorDetailResponse.Messages
+        };
+    }
 }

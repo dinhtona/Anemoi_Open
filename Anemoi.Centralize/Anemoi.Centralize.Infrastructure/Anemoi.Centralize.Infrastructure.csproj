@@ -8,10 +8,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Anemoi.Centralize.Application\Anemoi.Centralize.Application.csproj" />
+        <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Infrastructure\Anemoi.BuildingBlock.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         <PackageReference Include="Unchase.Swashbuckle.AspNetCore.Extensions" Version="2.7.1" />
     </ItemGroup>
 

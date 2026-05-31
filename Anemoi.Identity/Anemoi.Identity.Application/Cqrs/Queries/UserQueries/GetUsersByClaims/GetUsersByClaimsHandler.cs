@@ -4,7 +4,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUsersByClaims;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;

@@ -6,7 +6,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Identity.Application.Abstractions;

@@ -12,7 +12,7 @@ using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.GenerateTokenByRoleGroupClaims;
 using Anemoi.Contract.Identity.Contracts;
 using Anemoi.Contract.Identity.Errors;

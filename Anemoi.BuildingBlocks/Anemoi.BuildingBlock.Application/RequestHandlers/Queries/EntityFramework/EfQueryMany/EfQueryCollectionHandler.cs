@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 
 public abstract class EfQueryCollectionHandler<TModel, TQuery, TResponse>(
     ISqlRepository<TModel> sqlRepository,

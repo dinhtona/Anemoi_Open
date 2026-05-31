@@ -14,7 +14,7 @@ The project follows **Clean Architecture** principles and is structured as a **M
 | **Application** | Use Cases, CQRS Handlers, Mappings, Validators, DTOs (via Contracts). | Domain |
 | **Infrastructure** | Database (EF Core), External Service implementations, Repositories (Implementation). | Domain, Application |
 | **Host/WebAPI** | Entry point, Dependency Injection registration, Middleware, Configuration. | All layers |
-| **Contract** | Shared DTOs, Strongly Typed IDs, Response models, Grpc Definitions. | None |
+| **Contract** | Shared DTOs, Strongly Typed IDs, Response models, Integration Events. | None |
 
 ## 2. Coding Patterns & Standards
 
@@ -70,11 +70,11 @@ When adding a new feature, follow these steps:
    - Update EF Core `DataContext` and configurations.
    - Implement or update repository classes.
 5. **Host**: Register new services in Dependency Injection installers.
-6. **Grpc (Optional)**: If exposed over Grpc, update `.proto` files and implement Grpc services.
+6. **Messaging**: Add MassTransit integration events or narrow request-response contracts when communication crosses service boundaries.
 
 ## 5. Do's and Don'ts
 
-- **DO** keep the Domain layer free of any external dependencies (e.g., EF Core, Grpc).
+- **DO** keep the Domain layer free of external framework dependencies such as EF Core.
 - **DO** use the `IdGenerator` for generating new Guids.
 - **DO** use `IQueryable` projections in mappers (`ProjectTo{Response}`) for performance.
 - **DON'T** inject repositories into other repositories; use Domain Services instead if necessary.

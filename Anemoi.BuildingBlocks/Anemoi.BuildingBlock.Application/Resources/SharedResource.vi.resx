@@ -49,4 +49,146 @@
   <data name="AUE_13" xml:space="preserve"><value>Người dùng không phải là quản trị viên hệ thống.</value></data>
   <data name="AUE_14" xml:space="preserve"><value>Quản trị viên hệ thống không thể tự hạ quyền tài khoản của mình.</value></data>
   <data name="AUE_15" xml:space="preserve"><value>Không thể hạ quyền quản trị viên hệ thống cuối cùng.</value></data>
+  <data name="RateLimitExceeded" xml:space="preserve"><value>Có quá nhiều yêu cầu. Vui lòng thử lại sau.</value></data>
+  <data name="HubJoinForbidden" xml:space="preserve"><value>Bạn không có quyền tham gia nhóm này.</value></data>
+  <data name="HubUnknownGroup" xml:space="preserve"><value>Nhóm không tồn tại.</value></data>
+  <data name="FileOperationFailed" xml:space="preserve"><value>Thao tác với tệp tin thất bại.</value></data>
+  <data name="S3OperationFailed" xml:space="preserve"><value>Thao tác với kho lưu trữ thất bại.</value></data>
+  <data name="ExternalAuthFailed" xml:space="preserve"><value>Xác thực đăng nhập mạng xã hội thất bại.</value></data>
+  <data name="ProviderNotSupported" xml:space="preserve"><value>Nhà cung cấp đăng nhập mạng xã hội này chưa được hỗ trợ.</value></data>
+  <data name="ExternalAuthException" xml:space="preserve"><value>Đăng nhập mạng xã hội thất bại.</value></data>
+  <data name="EmailEmpty" xml:space="preserve"><value>Không thể lấy địa chỉ email từ nhà cung cấp đăng nhập.</value></data>
+  <data name="TokenGenerationFailed" xml:space="preserve"><value>Không thể tạo access token.</value></data>
+  <data name="VAL_REQUIRED" xml:space="preserve"><value>Trường này là bắt buộc.</value></data>
+  <data name="VAL_EMAIL_INVALID" xml:space="preserve"><value>Địa chỉ email không hợp lệ.</value></data>
+  <data name="VAL_MAX_LENGTH" xml:space="preserve"><value>Giá trị vượt quá độ dài tối đa.</value></data>
+  <data name="VAL_MIN_LENGTH" xml:space="preserve"><value>Giá trị chưa đạt độ dài tối thiểu.</value></data>
+  <data name="VAL_FORMAT_INVALID" xml:space="preserve"><value>Định dạng giá trị không hợp lệ.</value></data>
+  <data name="VAL_INVALID" xml:space="preserve"><value>Giá trị không hợp lệ.</value></data>
+  <data name="VAL_REFRESH_TOKEN_REQUIRED" xml:space="preserve"><value>Refresh token là bắt buộc.</value></data>
+  <data name="VAL_IDS_NOT_EMPTY" xml:space="preserve"><value>Danh sách định danh không được chứa giá trị rỗng.</value></data>
+  <data name="VAL_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Danh sách định danh không được trùng lặp.</value></data>
+  <data name="VAL_ROLE_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Danh sách định danh vai trò không được trùng lặp.</value></data>
+  <data name="VAL_LOCK_UNTIL_FUTURE" xml:space="preserve"><value>Thời điểm khóa phải nằm trong tương lai.</value></data>
+  <data name="VAL_USER_ID_REQUIRED" xml:space="preserve"><value>Định danh người dùng là bắt buộc.</value></data>
+  <data name="VAL_PROVINCE_ID_REQUIRED" xml:space="preserve"><value>Định danh tỉnh/thành phố là bắt buộc.</value></data>
+  <data name="VAL_DISTRICT_ID_REQUIRED" xml:space="preserve"><value>Định danh quận/huyện là bắt buộc.</value></data>
+  <data name="VAL_ORGANIZATION_ID_REQUIRED" xml:space="preserve"><value>Định danh tổ chức là bắt buộc.</value></data>
+  <data name="VAL_PRIMARY_KEY_CONDITION_INVALID" xml:space="preserve"><value>Điều kiện khóa chính không hợp lệ.</value></data>
+  <data name="IDE_01" xml:space="preserve"><value>Người dùng đang bị khóa.</value></data>
+  <data name="IDE_02" xml:space="preserve"><value>Người dùng không được phép đăng nhập.</value></data>
+  <data name="IDE_03" xml:space="preserve"><value>Yêu cầu xác thực hai bước.</value></data>
+  <data name="IDE_04" xml:space="preserve"><value>Đăng xuất thất bại.</value></data>
+  <data name="IDE_05" xml:space="preserve"><value>Đổi mật khẩu thất bại.</value></data>
+  <data name="IDE_06" xml:space="preserve"><value>Mật khẩu không chính xác.</value></data>
+  <data name="IDE_07" xml:space="preserve"><value>Đăng nhập thất bại.</value></data>
+  <data name="IDE_08" xml:space="preserve"><value>Khóa người dùng thất bại.</value></data>
+  <data name="IDE_09" xml:space="preserve"><value>Đặt lại mật khẩu thất bại.</value></data>
+  <data name="IDE_10" xml:space="preserve"><value>Phải đổi mật khẩu trong lần đăng nhập đầu tiên.</value></data>
+  <data name="IDE_12" xml:space="preserve"><value>Email người dùng chưa được xác minh.</value></data>
+  <data name="IDE_15" xml:space="preserve"><value>Cần tạo lại mã băm mật khẩu.</value></data>
+  <data name="TEE_01" xml:space="preserve"><value>Refresh token đã được sử dụng.</value></data>
+  <data name="TEE_02" xml:space="preserve"><value>Token chưa hết hạn.</value></data>
+  <data name="TEE_03" xml:space="preserve"><value>Không tìm thấy refresh token.</value></data>
+  <data name="TEE_04" xml:space="preserve"><value>Tạo refresh token thất bại.</value></data>
+  <data name="TEE_05" xml:space="preserve"><value>Token không hợp lệ.</value></data>
+  <data name="TEE_07" xml:space="preserve"><value>Phiên đăng nhập đã hết hạn.</value></data>
+  <data name="TEE_08" xml:space="preserve"><value>Refresh token không hợp lệ.</value></data>
+  <data name="TEE_09" xml:space="preserve"><value>Token đã hết hạn.</value></data>
+  <data name="AUE_01" xml:space="preserve"><value>Không tìm thấy người dùng.</value></data>
+  <data name="AUE_02" xml:space="preserve"><value>Tạo người dùng thất bại.</value></data>
+  <data name="AUE_03" xml:space="preserve"><value>Cập nhật người dùng thất bại.</value></data>
+  <data name="AUE_04" xml:space="preserve"><value>Xóa người dùng thất bại.</value></data>
+  <data name="AUE_05" xml:space="preserve"><value>Tài khoản người dùng đã được xác nhận.</value></data>
+  <data name="AUE_06" xml:space="preserve"><value>Người dùng đã tồn tại.</value></data>
+  <data name="AUE_11" xml:space="preserve"><value>Mật khẩu không hợp lệ.</value></data>
+  <data name="ROE_01" xml:space="preserve"><value>Danh sách vai trò không được trùng lặp.</value></data>
+  <data name="ROE_02" xml:space="preserve"><value>Một hoặc nhiều vai trò không tồn tại.</value></data>
+  <data name="ROE_03" xml:space="preserve"><value>Xóa vai trò thất bại.</value></data>
+  <data name="ROE_04" xml:space="preserve"><value>Thêm vai trò thất bại.</value></data>
+  <data name="ROE_05" xml:space="preserve"><value>Danh sách vai trò là bắt buộc.</value></data>
+  <data name="RGE_01" xml:space="preserve"><value>Không tìm thấy nhóm vai trò.</value></data>
+  <data name="RGE_02" xml:space="preserve"><value>Tạo nhóm vai trò thất bại.</value></data>
+  <data name="RGE_03" xml:space="preserve"><value>Cập nhật nhóm vai trò thất bại.</value></data>
+  <data name="RGE_04" xml:space="preserve"><value>Xóa nhóm vai trò thất bại.</value></data>
+  <data name="RGE_05" xml:space="preserve"><value>Tên nhóm vai trò đã tồn tại.</value></data>
+  <data name="RGE_06" xml:space="preserve"><value>Nhóm vai trò đã được áp dụng.</value></data>
+  <data name="RGE_08" xml:space="preserve"><value>Không thể chỉnh sửa nhóm vai trò mặc định.</value></data>
+  <data name="RGE_09" xml:space="preserve"><value>Không thể quản lý nhóm vai trò workspace như nhóm vai trò hệ thống.</value></data>
+  <data name="RGE_10" xml:space="preserve"><value>Nhóm vai trò không thuộc workspace hiện tại.</value></data>
+  <data name="APE_01" xml:space="preserve"><value>Không tìm thấy chính sách ứng dụng.</value></data>
+  <data name="APE_02" xml:space="preserve"><value>Tạo chính sách ứng dụng thất bại.</value></data>
+  <data name="APE_03" xml:space="preserve"><value>Cập nhật chính sách ứng dụng thất bại.</value></data>
+  <data name="APE_04" xml:space="preserve"><value>Xóa chính sách ứng dụng thất bại.</value></data>
+  <data name="UMG_01" xml:space="preserve"><value>Không tìm thấy ánh xạ người dùng và nhóm vai trò.</value></data>
+  <data name="UMG_02" xml:space="preserve"><value>Tạo ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_03" xml:space="preserve"><value>Cập nhật ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_04" xml:space="preserve"><value>Xóa ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_05" xml:space="preserve"><value>Danh sách định danh nhóm vai trò không được trùng lặp.</value></data>
+  <data name="PEE_01" xml:space="preserve"><value>Tạo tỉnh/thành phố thất bại.</value></data>
+  <data name="PEE_02" xml:space="preserve"><value>Cập nhật tỉnh/thành phố thất bại.</value></data>
+  <data name="PEE_03" xml:space="preserve"><value>Không tìm thấy tỉnh/thành phố.</value></data>
+  <data name="DIE_01" xml:space="preserve"><value>Tạo quận/huyện thất bại.</value></data>
+  <data name="DIE_02" xml:space="preserve"><value>Cập nhật quận/huyện thất bại.</value></data>
+  <data name="DIE_03" xml:space="preserve"><value>Không tìm thấy quận/huyện.</value></data>
+  <data name="SSE_01" xml:space="preserve"><value>Tạo máy chủ seed thất bại.</value></data>
+  <data name="SSE_02" xml:space="preserve"><value>Cập nhật máy chủ seed thất bại.</value></data>
+  <data name="SSE_03" xml:space="preserve"><value>Không tìm thấy máy chủ seed.</value></data>
+  <data name="SSE_05" xml:space="preserve"><value>Kiểm tra kết nối cơ sở dữ liệu thất bại.</value></data>
+  <data name="SFE_01" xml:space="preserve"><value>Tạo hàm seed thất bại.</value></data>
+  <data name="SFE_02" xml:space="preserve"><value>Cập nhật hàm seed thất bại.</value></data>
+  <data name="SFE_03" xml:space="preserve"><value>Không tìm thấy hàm seed.</value></data>
+  <data name="SFE_04" xml:space="preserve"><value>Tên hàm seed đã tồn tại.</value></data>
+  <data name="STE_01" xml:space="preserve"><value>Tạo mẫu seed thất bại.</value></data>
+  <data name="STE_02" xml:space="preserve"><value>Cập nhật mẫu seed thất bại.</value></data>
+  <data name="STE_03" xml:space="preserve"><value>Không tìm thấy mẫu seed.</value></data>
+  <data name="STE_04" xml:space="preserve"><value>Tên mẫu seed đã tồn tại.</value></data>
+  <data name="SEE_01" xml:space="preserve"><value>Thực thi seed thất bại.</value></data>
+  <data name="SEE_02" xml:space="preserve"><value>Thiếu cấu hình mẫu seed.</value></data>
+  <data name="SEE_03" xml:space="preserve"><value>Cấu hình mẫu seed không hợp lệ.</value></data>
+  <data name="SEE_04" xml:space="preserve"><value>Không tìm thấy bảng trong mẫu seed.</value></data>
+  <data name="SEE_05" xml:space="preserve"><value>Không tìm thấy bảng trong cơ sở dữ liệu đích.</value></data>
+  <data name="SEE_06" xml:space="preserve"><value>Cần cung cấp hàm seed hoặc máy chủ seed.</value></data>
+  <data name="SEE_07" xml:space="preserve"><value>Tạo dữ liệu mẫu thất bại.</value></data>
+  <data name="NTE_01" xml:space="preserve"><value>Tạo thông báo thất bại.</value></data>
+  <data name="NTE_02" xml:space="preserve"><value>Cập nhật thông báo thất bại.</value></data>
+  <data name="NTE_03" xml:space="preserve"><value>Không tìm thấy thông báo.</value></data>
+  <data name="NSE_01" xml:space="preserve"><value>Lưu cấu hình thông báo thất bại.</value></data>
+  <data name="WKE_01" xml:space="preserve"><value>Tạo workspace thất bại.</value></data>
+  <data name="WKE_02" xml:space="preserve"><value>Cập nhật workspace thất bại.</value></data>
+  <data name="WKE_03" xml:space="preserve"><value>Không tìm thấy workspace.</value></data>
+  <data name="WKE_04" xml:space="preserve"><value>Workspace đã tồn tại.</value></data>
+  <data name="WKE_05" xml:space="preserve"><value>Tên miền workspace đã tồn tại.</value></data>
+  <data name="WKE_06" xml:space="preserve"><value>Đã vượt quá giới hạn workspace.</value></data>
+  <data name="OGE_01" xml:space="preserve"><value>Tạo tổ chức thất bại.</value></data>
+  <data name="OGE_02" xml:space="preserve"><value>Cập nhật tổ chức thất bại.</value></data>
+  <data name="OGE_03" xml:space="preserve"><value>Không tìm thấy tổ chức.</value></data>
+  <data name="OGE_06" xml:space="preserve"><value>Tổ chức đã tồn tại.</value></data>
+  <data name="OGE_07" xml:space="preserve"><value>Tên miền tổ chức đã tồn tại.</value></data>
+  <data name="MIE_01" xml:space="preserve"><value>Tạo lời mời thành viên thất bại.</value></data>
+  <data name="MIE_02" xml:space="preserve"><value>Cập nhật lời mời thành viên thất bại.</value></data>
+  <data name="MIE_03" xml:space="preserve"><value>Không tìm thấy lời mời thành viên.</value></data>
+  <data name="MIE_04" xml:space="preserve"><value>Lời mời thành viên đã tồn tại.</value></data>
+  <data name="MIE_05" xml:space="preserve"><value>Xóa lời mời thành viên thất bại.</value></data>
+  <data name="MME_01" xml:space="preserve"><value>Tạo thành viên thất bại.</value></data>
+  <data name="MME_02" xml:space="preserve"><value>Cập nhật thành viên thất bại.</value></data>
+  <data name="MME_03" xml:space="preserve"><value>Không tìm thấy thành viên.</value></data>
+  <data name="MME_04" xml:space="preserve"><value>Thành viên đã tồn tại.</value></data>
+  <data name="MME_05" xml:space="preserve"><value>Xóa thành viên thất bại.</value></data>
+  <data name="MME_06" xml:space="preserve"><value>Không tìm thấy người dùng.</value></data>
+  <data name="MMG_01" xml:space="preserve"><value>Tạo ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MMG_02" xml:space="preserve"><value>Cập nhật ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MMG_03" xml:space="preserve"><value>Không tìm thấy ánh xạ thành viên và nhóm vai trò.</value></data>
+  <data name="MMG_04" xml:space="preserve"><value>Xóa ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MockRouteNotConfigured" xml:space="preserve"><value>Chưa cấu hình phản hồi mock đang hoạt động cho {0} /{1}. Hãy cấu hình tại tab Environments trong developer dashboard.</value></data>
+  <data name="EnvironmentActivityTitle" xml:space="preserve"><value>Thao tác môi trường: {0}</value></data>
+  <data name="EnvironmentServiceSftp" xml:space="preserve"><value>SFTP cho môi trường phát triển</value></data>
+  <data name="EnvironmentServiceMockApi" xml:space="preserve"><value>API Mock</value></data>
+  <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Kiểm thử email</value></data>
+  <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Đã tải lên tệp: {0} vào đường dẫn: {1}</value></data>
+  <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Đã xóa mục: {0}</value></data>
+  <data name="EnvironmentSftpDirectoryCreated" xml:space="preserve"><value>Đã tạo thư mục: {0} tại đường dẫn: {1}</value></data>
+  <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Đã tải xuống tệp: {0} từ đường dẫn: {1}</value></data>
+  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>API Mock khớp yêu cầu: {0} /{1} - trả về {2}</value></data>
+  <data name="EnvironmentMailReceived" xml:space="preserve"><value>Nhận email mới từ {0} đến {1} với tiêu đề: "{2}"</value></data>
 </root>

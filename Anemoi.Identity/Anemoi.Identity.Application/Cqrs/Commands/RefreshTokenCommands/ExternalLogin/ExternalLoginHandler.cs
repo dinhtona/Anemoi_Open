@@ -43,11 +43,7 @@ public sealed class ExternalLoginHandler(
                 var response = await httpClient.GetAsync(googleUrl, cancellationToken);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new ErrorDetailResponse
-                    {
-                        Code = "ExternalAuthFailed",
-                        Messages = new[] { "Google token verification failed." }
-                    };
+                    return CreateError("ExternalAuthFailed");
                 }
 
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -55,11 +51,7 @@ public sealed class ExternalLoginHandler(
                 var root = doc.RootElement;
                 if (!root.TryGetProperty("email", out var emailProp))
                 {
-                    return new ErrorDetailResponse
-                    {
-                        Code = "ExternalAuthFailed",
-                        Messages = new[] { "Google token does not contain email." }
-                    };
+                    return CreateError("ExternalAuthFailed");
                 }
 
                 email = emailProp.GetString();
@@ -74,11 +66,7 @@ public sealed class ExternalLoginHandler(
                 var response = await httpClient.GetAsync(msUrl, cancellationToken);
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new ErrorDetailResponse
-                    {
-                        Code = "ExternalAuthFailed",
-                        Messages = new[] { "Microsoft token verification failed." }
-                    };
+                    return CreateError("ExternalAuthFailed");
                 }
 
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -96,11 +84,7 @@ public sealed class ExternalLoginHandler(
 
                 if (string.IsNullOrEmpty(email))
                 {
-                    return new ErrorDetailResponse
-                    {
-                        Code = "ExternalAuthFailed",
-                        Messages = new[] { "Microsoft token does not contain a valid email." }
-                    };
+                    return CreateError("ExternalAuthFailed");
                 }
 
                 if (root.TryGetProperty("givenName", out var givenNameProp)) firstName = givenNameProp.GetString() ?? "";
@@ -108,29 +92,17 @@ public sealed class ExternalLoginHandler(
             }
             else
             {
-                return new ErrorDetailResponse
-                {
-                    Code = "ProviderNotSupported",
-                    Messages = new[] { $"Social login provider '{request.Provider}' is not supported." }
-                };
+                return CreateError("ProviderNotSupported");
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return new ErrorDetailResponse
-            {
-                Code = "ExternalAuthException",
-                Messages = new[] { $"Exception during social login: {ex.Message}" }
-            };
+            return CreateError("ExternalAuthException");
         }
 
         if (string.IsNullOrEmpty(email))
         {
-            return new ErrorDetailResponse
-            {
-                Code = "EmailEmpty",
-                Messages = new[] { "Could not retrieve email from social provider." }
-            };
+            return CreateError("EmailEmpty");
         }
 
         email = email.ToLower();
@@ -164,11 +136,7 @@ public sealed class ExternalLoginHandler(
         var tokenGenResult = await sender.Send(new TokenGeneratorCommand(user), cancellationToken);
         if (tokenGenResult.IsT1)
         {
-            return new ErrorDetailResponse
-            {
-                Code = "TokenGenerationFailed",
-                Messages = new[] { "Failed to generate access tokens for the user." }
-            };
+            return CreateError("TokenGenerationFailed");
         }
 
         var identitySuccess = tokenGenResult.AsT0;
@@ -195,4 +163,10 @@ public sealed class ExternalLoginHandler(
             ExpiredIn = identitySuccess.TokenExpiryTime ?? DateTime.UtcNow.AddMinutes(15)
         };
     }
+
+    private static ErrorDetailResponse CreateError(string code) => new()
+    {
+        Code = code,
+        Messages = [code]
+    };
 }

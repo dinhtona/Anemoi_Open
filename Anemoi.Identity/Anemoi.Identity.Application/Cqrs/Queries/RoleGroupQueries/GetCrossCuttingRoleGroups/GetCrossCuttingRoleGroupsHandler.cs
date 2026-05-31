@@ -1,7 +1,7 @@
 using System.Linq;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.Helpers;
+using Anemoi.BuildingBlock.Application.QueryHelpers;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Queries.RoleGroupQueries.GetCrossCuttingRoleGroups;
 using Anemoi.Identity.Application.Mappings;

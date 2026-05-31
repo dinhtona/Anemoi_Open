@@ -49,4 +49,146 @@
   <data name="AUE_13" xml:space="preserve"><value>User is not a system administrator.</value></data>
   <data name="AUE_14" xml:space="preserve"><value>A system administrator cannot demote their own account.</value></data>
   <data name="AUE_15" xml:space="preserve"><value>The last system administrator cannot be demoted.</value></data>
+  <data name="RateLimitExceeded" xml:space="preserve"><value>Too many requests. Please try again later.</value></data>
+  <data name="HubJoinForbidden" xml:space="preserve"><value>You are not allowed to join this group.</value></data>
+  <data name="HubUnknownGroup" xml:space="preserve"><value>Unknown group.</value></data>
+  <data name="FileOperationFailed" xml:space="preserve"><value>The file operation failed.</value></data>
+  <data name="S3OperationFailed" xml:space="preserve"><value>The storage operation failed.</value></data>
+  <data name="ExternalAuthFailed" xml:space="preserve"><value>Social login verification failed.</value></data>
+  <data name="ProviderNotSupported" xml:space="preserve"><value>This social login provider is not supported.</value></data>
+  <data name="ExternalAuthException" xml:space="preserve"><value>Social login failed.</value></data>
+  <data name="EmailEmpty" xml:space="preserve"><value>Could not retrieve an email address from the social login provider.</value></data>
+  <data name="TokenGenerationFailed" xml:space="preserve"><value>Failed to generate access tokens.</value></data>
+  <data name="VAL_REQUIRED" xml:space="preserve"><value>This field is required.</value></data>
+  <data name="VAL_EMAIL_INVALID" xml:space="preserve"><value>The email address is invalid.</value></data>
+  <data name="VAL_MAX_LENGTH" xml:space="preserve"><value>The value exceeds the maximum length.</value></data>
+  <data name="VAL_MIN_LENGTH" xml:space="preserve"><value>The value does not meet the minimum length.</value></data>
+  <data name="VAL_FORMAT_INVALID" xml:space="preserve"><value>The value format is invalid.</value></data>
+  <data name="VAL_INVALID" xml:space="preserve"><value>The value is invalid.</value></data>
+  <data name="VAL_REFRESH_TOKEN_REQUIRED" xml:space="preserve"><value>Refresh token is required.</value></data>
+  <data name="VAL_IDS_NOT_EMPTY" xml:space="preserve"><value>Identifiers must not be empty.</value></data>
+  <data name="VAL_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Identifiers must not be duplicated.</value></data>
+  <data name="VAL_ROLE_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Role identifiers must not be duplicated.</value></data>
+  <data name="VAL_LOCK_UNTIL_FUTURE" xml:space="preserve"><value>The lock expiration must be in the future.</value></data>
+  <data name="VAL_USER_ID_REQUIRED" xml:space="preserve"><value>User identifier is required.</value></data>
+  <data name="VAL_PROVINCE_ID_REQUIRED" xml:space="preserve"><value>Province identifier is required.</value></data>
+  <data name="VAL_DISTRICT_ID_REQUIRED" xml:space="preserve"><value>District identifier is required.</value></data>
+  <data name="VAL_ORGANIZATION_ID_REQUIRED" xml:space="preserve"><value>Organization identifier is required.</value></data>
+  <data name="VAL_PRIMARY_KEY_CONDITION_INVALID" xml:space="preserve"><value>The primary key condition is invalid.</value></data>
+  <data name="IDE_01" xml:space="preserve"><value>User is locked out.</value></data>
+  <data name="IDE_02" xml:space="preserve"><value>User is not allowed to log in.</value></data>
+  <data name="IDE_03" xml:space="preserve"><value>Two-factor authentication is required.</value></data>
+  <data name="IDE_04" xml:space="preserve"><value>Failed to log out.</value></data>
+  <data name="IDE_05" xml:space="preserve"><value>Failed to change password.</value></data>
+  <data name="IDE_06" xml:space="preserve"><value>Password is incorrect.</value></data>
+  <data name="IDE_07" xml:space="preserve"><value>Failed to log in.</value></data>
+  <data name="IDE_08" xml:space="preserve"><value>Failed to lock user.</value></data>
+  <data name="IDE_09" xml:space="preserve"><value>Failed to reset user password.</value></data>
+  <data name="IDE_10" xml:space="preserve"><value>Password must be changed on first login.</value></data>
+  <data name="IDE_12" xml:space="preserve"><value>User email has not been verified.</value></data>
+  <data name="IDE_15" xml:space="preserve"><value>Password rehash is required.</value></data>
+  <data name="TEE_01" xml:space="preserve"><value>The refresh token has already been used.</value></data>
+  <data name="TEE_02" xml:space="preserve"><value>The token has not expired.</value></data>
+  <data name="TEE_03" xml:space="preserve"><value>Refresh token was not found.</value></data>
+  <data name="TEE_04" xml:space="preserve"><value>Failed to create a refresh token.</value></data>
+  <data name="TEE_05" xml:space="preserve"><value>The token is invalid.</value></data>
+  <data name="TEE_07" xml:space="preserve"><value>The session has expired.</value></data>
+  <data name="TEE_08" xml:space="preserve"><value>The refresh token is invalid.</value></data>
+  <data name="TEE_09" xml:space="preserve"><value>The token has expired.</value></data>
+  <data name="AUE_01" xml:space="preserve"><value>User was not found.</value></data>
+  <data name="AUE_02" xml:space="preserve"><value>Failed to create user.</value></data>
+  <data name="AUE_03" xml:space="preserve"><value>Failed to update user.</value></data>
+  <data name="AUE_04" xml:space="preserve"><value>Failed to remove user.</value></data>
+  <data name="AUE_05" xml:space="preserve"><value>User account has already been confirmed.</value></data>
+  <data name="AUE_06" xml:space="preserve"><value>User already exists.</value></data>
+  <data name="AUE_11" xml:space="preserve"><value>Password is invalid.</value></data>
+  <data name="ROE_01" xml:space="preserve"><value>Requested roles must not be duplicated.</value></data>
+  <data name="ROE_02" xml:space="preserve"><value>One or more roles do not exist.</value></data>
+  <data name="ROE_03" xml:space="preserve"><value>Failed to remove roles.</value></data>
+  <data name="ROE_04" xml:space="preserve"><value>Failed to add roles.</value></data>
+  <data name="ROE_05" xml:space="preserve"><value>Requested roles are required.</value></data>
+  <data name="RGE_01" xml:space="preserve"><value>Role group was not found.</value></data>
+  <data name="RGE_02" xml:space="preserve"><value>Failed to create role group.</value></data>
+  <data name="RGE_03" xml:space="preserve"><value>Failed to update role group.</value></data>
+  <data name="RGE_04" xml:space="preserve"><value>Failed to remove role group.</value></data>
+  <data name="RGE_05" xml:space="preserve"><value>Role group name already exists.</value></data>
+  <data name="RGE_06" xml:space="preserve"><value>Role group has already been applied.</value></data>
+  <data name="RGE_08" xml:space="preserve"><value>The default role group cannot be modified.</value></data>
+  <data name="RGE_09" xml:space="preserve"><value>A workspace role group cannot be managed as a system role group.</value></data>
+  <data name="RGE_10" xml:space="preserve"><value>Role group does not belong to the current workspace.</value></data>
+  <data name="APE_01" xml:space="preserve"><value>Application policy was not found.</value></data>
+  <data name="APE_02" xml:space="preserve"><value>Failed to create application policy.</value></data>
+  <data name="APE_03" xml:space="preserve"><value>Failed to update application policy.</value></data>
+  <data name="APE_04" xml:space="preserve"><value>Failed to remove application policy.</value></data>
+  <data name="UMG_01" xml:space="preserve"><value>User role-group mapping was not found.</value></data>
+  <data name="UMG_02" xml:space="preserve"><value>Failed to create user role-group mapping.</value></data>
+  <data name="UMG_03" xml:space="preserve"><value>Failed to update user role-group mapping.</value></data>
+  <data name="UMG_04" xml:space="preserve"><value>Failed to remove user role-group mapping.</value></data>
+  <data name="UMG_05" xml:space="preserve"><value>Role-group identifiers must not be duplicated.</value></data>
+  <data name="PEE_01" xml:space="preserve"><value>Failed to create province.</value></data>
+  <data name="PEE_02" xml:space="preserve"><value>Failed to update province.</value></data>
+  <data name="PEE_03" xml:space="preserve"><value>Province was not found.</value></data>
+  <data name="DIE_01" xml:space="preserve"><value>Failed to create district.</value></data>
+  <data name="DIE_02" xml:space="preserve"><value>Failed to update district.</value></data>
+  <data name="DIE_03" xml:space="preserve"><value>District was not found.</value></data>
+  <data name="SSE_01" xml:space="preserve"><value>Failed to create seed server.</value></data>
+  <data name="SSE_02" xml:space="preserve"><value>Failed to update seed server.</value></data>
+  <data name="SSE_03" xml:space="preserve"><value>Seed server was not found.</value></data>
+  <data name="SSE_05" xml:space="preserve"><value>Database connection test failed.</value></data>
+  <data name="SFE_01" xml:space="preserve"><value>Failed to create seed function.</value></data>
+  <data name="SFE_02" xml:space="preserve"><value>Failed to update seed function.</value></data>
+  <data name="SFE_03" xml:space="preserve"><value>Seed function was not found.</value></data>
+  <data name="SFE_04" xml:space="preserve"><value>Seed function name already exists.</value></data>
+  <data name="STE_01" xml:space="preserve"><value>Failed to create seed template.</value></data>
+  <data name="STE_02" xml:space="preserve"><value>Failed to update seed template.</value></data>
+  <data name="STE_03" xml:space="preserve"><value>Seed template was not found.</value></data>
+  <data name="STE_04" xml:space="preserve"><value>Seed template name already exists.</value></data>
+  <data name="SEE_01" xml:space="preserve"><value>Seed execution failed.</value></data>
+  <data name="SEE_02" xml:space="preserve"><value>Template configuration is missing.</value></data>
+  <data name="SEE_03" xml:space="preserve"><value>Template configuration is invalid.</value></data>
+  <data name="SEE_04" xml:space="preserve"><value>The table was not found in the template.</value></data>
+  <data name="SEE_05" xml:space="preserve"><value>The table was not found in the target database.</value></data>
+  <data name="SEE_06" xml:space="preserve"><value>A seed function or seed server is required.</value></data>
+  <data name="SEE_07" xml:space="preserve"><value>Failed to generate sample data.</value></data>
+  <data name="NTE_01" xml:space="preserve"><value>Failed to create notification.</value></data>
+  <data name="NTE_02" xml:space="preserve"><value>Failed to update notification.</value></data>
+  <data name="NTE_03" xml:space="preserve"><value>Notification was not found.</value></data>
+  <data name="NSE_01" xml:space="preserve"><value>Failed to save notification settings.</value></data>
+  <data name="WKE_01" xml:space="preserve"><value>Failed to create workspace.</value></data>
+  <data name="WKE_02" xml:space="preserve"><value>Failed to update workspace.</value></data>
+  <data name="WKE_03" xml:space="preserve"><value>Workspace was not found.</value></data>
+  <data name="WKE_04" xml:space="preserve"><value>Workspace already exists.</value></data>
+  <data name="WKE_05" xml:space="preserve"><value>Workspace domain already exists.</value></data>
+  <data name="WKE_06" xml:space="preserve"><value>Workspace limit has been exceeded.</value></data>
+  <data name="OGE_01" xml:space="preserve"><value>Failed to create organization.</value></data>
+  <data name="OGE_02" xml:space="preserve"><value>Failed to update organization.</value></data>
+  <data name="OGE_03" xml:space="preserve"><value>Organization was not found.</value></data>
+  <data name="OGE_06" xml:space="preserve"><value>Organization already exists.</value></data>
+  <data name="OGE_07" xml:space="preserve"><value>Organization domain already exists.</value></data>
+  <data name="MIE_01" xml:space="preserve"><value>Failed to create member invitation.</value></data>
+  <data name="MIE_02" xml:space="preserve"><value>Failed to update member invitation.</value></data>
+  <data name="MIE_03" xml:space="preserve"><value>Member invitation was not found.</value></data>
+  <data name="MIE_04" xml:space="preserve"><value>Member invitation already exists.</value></data>
+  <data name="MIE_05" xml:space="preserve"><value>Failed to remove member invitation.</value></data>
+  <data name="MME_01" xml:space="preserve"><value>Failed to create member.</value></data>
+  <data name="MME_02" xml:space="preserve"><value>Failed to update member.</value></data>
+  <data name="MME_03" xml:space="preserve"><value>Member was not found.</value></data>
+  <data name="MME_04" xml:space="preserve"><value>Member already exists.</value></data>
+  <data name="MME_05" xml:space="preserve"><value>Failed to remove member.</value></data>
+  <data name="MME_06" xml:space="preserve"><value>User was not found.</value></data>
+  <data name="MMG_01" xml:space="preserve"><value>Failed to create member role-group mapping.</value></data>
+  <data name="MMG_02" xml:space="preserve"><value>Failed to update member role-group mapping.</value></data>
+  <data name="MMG_03" xml:space="preserve"><value>Member role-group mapping was not found.</value></data>
+  <data name="MMG_04" xml:space="preserve"><value>Failed to remove member role-group mapping.</value></data>
+  <data name="MockRouteNotConfigured" xml:space="preserve"><value>No active mock response is configured for {0} /{1}. Define it in the developer dashboard Environments tab.</value></data>
+  <data name="EnvironmentActivityTitle" xml:space="preserve"><value>Environment call: {0}</value></data>
+  <data name="EnvironmentServiceSftp" xml:space="preserve"><value>SFTP for Dev</value></data>
+  <data name="EnvironmentServiceMockApi" xml:space="preserve"><value>API Mock</value></data>
+  <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Mail Test</value></data>
+  <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Uploaded file: {0} to path: {1}</value></data>
+  <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Deleted item: {0}</value></data>
+  <data name="EnvironmentSftpDirectoryCreated" xml:space="preserve"><value>Created directory: {0} at path: {1}</value></data>
+  <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Downloaded file: {0} from path: {1}</value></data>
+  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>Mock API matched: {0} /{1} - returned {2}</value></data>
+  <data name="EnvironmentMailReceived" xml:space="preserve"><value>New email received from {0} to {1} with subject: "{2}"</value></data>
 </root>

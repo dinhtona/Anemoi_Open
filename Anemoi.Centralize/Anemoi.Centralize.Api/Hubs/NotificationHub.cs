@@ -1,14 +1,19 @@
 using Anemoi.Centralize.Application.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Resources;
 
 namespace Anemoi.Centralize.Api.Hubs;
 
 [Authorize]
-public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedUsersRegistry registry) : Hub
+public sealed class NotificationHub(
+    ILogger<NotificationHub> logger,
+    IConnectedUsersRegistry registry,
+    IStringLocalizer<SharedResource> localizer) : Hub
 {
     private const string AdministratorsGroup = "Administrators";
 
@@ -42,7 +47,7 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
     public async Task JoinGroup(string groupName)
     {
         if (groupName != AdministratorsGroup || !CanObserveUsers())
-            throw new HubException("You are not allowed to join this group.");
+            throw new HubException(localizer["HubJoinForbidden"].Value);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
     }
@@ -50,7 +55,7 @@ public sealed class NotificationHub(ILogger<NotificationHub> logger, IConnectedU
     public async Task LeaveGroup(string groupName)
     {
         if (groupName != AdministratorsGroup)
-            throw new HubException("Unknown group.");
+            throw new HubException(localizer["HubUnknownGroup"].Value);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }

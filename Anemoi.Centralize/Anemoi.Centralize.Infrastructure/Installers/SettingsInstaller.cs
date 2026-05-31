@@ -11,7 +11,6 @@ public sealed class SettingsInstaller : IInstaller
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton(configuration.GetSection(nameof(S3Setting)).Get<S3Setting>()!);
-        services.AddSingleton(configuration.GetSection(nameof(GrpcSetting)).Get<GrpcSetting>()!);
         services.AddSingleton(configuration.GetSection(nameof(DevEnvironmentsSetting)).Get<DevEnvironmentsSetting>() ?? new DevEnvironmentsSetting());
     }
 }

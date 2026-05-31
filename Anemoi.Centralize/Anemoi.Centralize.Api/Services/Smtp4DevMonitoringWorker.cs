@@ -93,8 +93,12 @@ public sealed class Smtp4DevMonitoringWorker(
             using var scope = serviceProvider.CreateScope();
             var notificationService = scope.ServiceProvider.GetRequiredService<IEnvironmentNotificationService>();
             
-            var details = $"New email received from {msg.From} to {msg.To} with subject: \"{msg.Subject}\"";
-            await notificationService.NotifyEnvironmentActivityAsync("Mail Test", details);
+            await notificationService.NotifyEnvironmentActivityAsync(
+                "EnvironmentServiceMailTest",
+                "EnvironmentMailReceived",
+                msg.From ?? "",
+                msg.To ?? "",
+                msg.Subject ?? "");
         }
     }
 

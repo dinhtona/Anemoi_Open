@@ -1,6 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryOne;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.Queries.WorkspaceQueries.GetWorkspace;
 using Anemoi.Contract.Workspace.Responses;

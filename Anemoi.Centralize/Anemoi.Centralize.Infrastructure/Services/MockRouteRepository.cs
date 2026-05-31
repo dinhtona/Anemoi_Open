@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.Centralize.Application.Abstractions;
 using Anemoi.Centralize.Application.Configurations;
+using Anemoi.Centralize.Domain.ModelIds;
 
 namespace Anemoi.Centralize.Infrastructure.Services;
 
@@ -73,7 +74,7 @@ public sealed class MockRouteRepository : IMockRouteRepository
         }
     }
 
-    public async Task<MockRouteDto?> GetByIdAsync(Guid id)
+    public async Task<MockRouteDto?> GetByIdAsync(MockRouteId id)
     {
         var routes = await GetAllAsync();
         return routes.FirstOrDefault(r => r.Id == id);
@@ -132,7 +133,7 @@ public sealed class MockRouteRepository : IMockRouteRepository
         }
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(MockRouteId id)
     {
         await _semaphore.WaitAsync();
         try

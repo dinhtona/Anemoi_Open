@@ -6,58 +6,59 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Results;
 using OneOf;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 
-public abstract class EfCommandOneResultHandler<TModel, TCommand, TResult>(
+public abstract class EfCommandOneVoidHandler<TModel, TCommand>(
     ISqlRepository<TModel> sqlRepository,
     IUnitOfWork unitOfWork,
     ILogger logger)
-    : ICommandHandler<TCommand, OneOf<TResult, ErrorDetailResponse>>
+    : ICommandHandler<TCommand, OneOf<None, ErrorDetailResponse>>
     where TModel : class
-    where TCommand : class, ICommand<OneOf<TResult, ErrorDetailResponse>>
+    where TCommand : class, ICommand<OneOf<None, ErrorDetailResponse>>
 {
     protected ISqlRepository<TModel> SqlRepository { get; } = sqlRepository;
     protected IUnitOfWork UnitOfWork { get; } = unitOfWork;
     protected ILogger Logger { get; } = logger;
+    private readonly IStartOneCommandVoid<TModel> _startManyCommandFlow = new CommandOneVoidFlow<TModel>();
 
-    private readonly IStartOneCommandResult<TModel, TResult> _startManyCommandFlow =
-        new CommandOneResultFlow<TModel, TResult>();
-
-    public virtual async Task<OneOf<TResult, ErrorDetailResponse>> Handle(TCommand request,
+    public virtual async Task<OneOf<None, ErrorDetailResponse>> Handle(TCommand request,
         CancellationToken cancellationToken)
     {
         Logger.Information("Start command {@RequestType}: {@Request}", request.GetType().Name, request);
         var buildResult = BuildCommand(_startManyCommandFlow, request, cancellationToken);
         var commandType = buildResult.CommandTypeOne;
-        TModel item;
+        TModel model;
         switch (commandType)
         {
             case CommandTypeOne.Create:
                 var createItem = await buildResult.ModelCreateFunc.Invoke();
-                var createOneCondition = await buildResult.CommandOneCondition.Invoke(createItem);
-                if (createOneCondition.IsT1) return createOneCondition.AsT1.ToErrorDetailResponse();
+                var createManyCondition = await buildResult.CommandOneCondition.Invoke(createItem);
+                if (createManyCondition.IsT1) return createManyCondition.AsT1.ToErrorDetailResponse();
+                model = createItem;
                 await SqlRepository.CreateOneAsync(createItem, token: cancellationToken);
-                item = createItem;
                 break;
             case CommandTypeOne.Update:
                 var updateItem = await SqlRepository
                     .GetFirstByConditionAsync(buildResult.CommandFilter, buildResult.CommandSpecialAction,
                         token: cancellationToken);
-                var updateManyCondition = await buildResult.CommandOneCondition.Invoke(updateItem);
-                if (updateManyCondition.IsT1) return updateManyCondition.AsT1.ToErrorDetailResponse();
+                if (updateItem is null) return buildResult.NullErrorDetail.ToErrorDetailResponse();
+                var updateOneCondition = await buildResult.CommandOneCondition.Invoke(updateItem);
+                if (updateOneCondition.IsT1) return updateOneCondition.AsT1.ToErrorDetailResponse();
                 await buildResult.UpdateOneFunc.Invoke(updateItem);
-                item = updateItem;
+                model = updateItem;
                 break;
             case CommandTypeOne.Remove:
                 var removeItem = await SqlRepository.GetFirstByConditionAsync(buildResult.CommandFilter,
                     buildResult.CommandSpecialAction, token: cancellationToken);
-                var removeManyCondition = await buildResult.CommandOneCondition.Invoke(removeItem);
-                if (removeManyCondition.IsT1) return removeManyCondition.AsT1.ToErrorDetailResponse();
+                if (removeItem is null) return buildResult.NullErrorDetail.ToErrorDetailResponse();
+                var removeOneCondition = await buildResult.CommandOneCondition.Invoke(removeItem);
+                if (removeOneCondition.IsT1) return removeOneCondition.AsT1.ToErrorDetailResponse();
                 await SqlRepository.RemoveOneAsync(removeItem, cancellationToken);
-                item = removeItem;
+                model = removeItem;
                 break;
             case CommandTypeOne.Unknown:
             default:
@@ -67,14 +68,13 @@ public abstract class EfCommandOneResultHandler<TModel, TCommand, TResult>(
         var saveResult = await UnitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
             return buildResult.SaveChangesErrorDetail.ToErrorDetailResponse();
-        var result = buildResult.ResultFunc.Invoke(item);
-        await AfterSaveChangesAsync(request, item, result, cancellationToken);
-        return result;
+        await AfterSaveChangesAsync(request, model, cancellationToken);
+        return None.Value;
     }
 
-    protected virtual Task AfterSaveChangesAsync(TCommand command, TModel model, TResult result,
+    protected virtual Task AfterSaveChangesAsync(TCommand command, TModel model,
         CancellationToken cancellationToken) => Task.CompletedTask;
 
-    protected abstract ICommandOneFlowBuilderResult<TModel, TResult> BuildCommand(
-        IStartOneCommandResult<TModel, TResult> fromFlow, TCommand command, CancellationToken cancellationToken);
+    protected abstract ICommandOneFlowBuilderVoid<TModel> BuildCommand(
+        IStartOneCommandVoid<TModel> fromFlow, TCommand command, CancellationToken cancellationToken);
 }

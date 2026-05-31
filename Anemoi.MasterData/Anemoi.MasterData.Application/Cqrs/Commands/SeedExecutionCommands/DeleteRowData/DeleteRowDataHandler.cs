@@ -60,7 +60,7 @@ public sealed class DeleteRowDataHandler(
         catch (Exception ex)
         {
             logger.Error(ex, "[DeleteRowData] Failed to delete row from {TableName}", request.TableName);
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError($"Delete failed: {ex.Message}"));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
         }
     }
 }

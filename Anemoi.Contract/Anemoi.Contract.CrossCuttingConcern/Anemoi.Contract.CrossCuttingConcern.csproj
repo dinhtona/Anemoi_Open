@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Infrastructure\Anemoi.BuildingBlock.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Application\Anemoi.BuildingBlock.Application.csproj" />
     </ItemGroup>
 
 

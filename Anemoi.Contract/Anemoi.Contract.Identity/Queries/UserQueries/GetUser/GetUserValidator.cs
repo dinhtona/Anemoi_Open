@@ -9,6 +9,6 @@ public sealed class GetUserValidator : AbstractValidator<GetUserQuery>
         RuleFor(x => x.Id)
             .NotNull()
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("UserId cannot be empty!");
+            .WithMessage("VAL_USER_ID_REQUIRED");
     }
 }

@@ -1,6 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.Helpers;
+using Anemoi.BuildingBlock.Application.QueryHelpers;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Queries.ProvinceQueries.GetCrossCuttingProvinces;
 using Anemoi.MasterData.Application.Mappings;

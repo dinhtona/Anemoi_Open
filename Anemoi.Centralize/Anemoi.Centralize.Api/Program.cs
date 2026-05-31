@@ -9,6 +9,9 @@ using Serilog.Events;
 using Anemoi.Centralize.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 using Anemoi.Centralize.Api.Hubs;
+using Anemoi.BuildingBlock.Application.Resources;
+using Anemoi.BuildingBlock.Application.Responses;
+using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,9 +66,13 @@ builder.Host.ConfigureServices((context, services) =>
         {
             ctx.HttpContext.Response.StatusCode = 429;
             ctx.HttpContext.Response.ContentType = "application/json";
-            await ctx.HttpContext.Response.WriteAsync(
-                "{\"error\":\"Too many requests. Please try again later.\"}",
-                cancellationToken: token);
+            var localizer = ctx.HttpContext.RequestServices
+                .GetRequiredService<IStringLocalizer<SharedResource>>();
+            await ctx.HttpContext.Response.WriteAsJsonAsync(new ErrorDetailResponse
+            {
+                Code = "RateLimitExceeded",
+                Messages = [localizer["RateLimitExceeded"].Value]
+            }, cancellationToken: token);
         };
     });
 });

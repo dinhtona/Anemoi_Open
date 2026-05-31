@@ -3,7 +3,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUserWithEmailsByEmails;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.CreateMember;

@@ -4,5 +4,8 @@ namespace Anemoi.Centralize.Application.Abstractions;
 
 public interface IEnvironmentNotificationService
 {
-    Task NotifyEnvironmentActivityAsync(string serviceName, string actionDetails);
+    Task NotifyEnvironmentActivityAsync(
+        string serviceNameResourceKey,
+        string actionResourceKey,
+        params object[] arguments);
 }

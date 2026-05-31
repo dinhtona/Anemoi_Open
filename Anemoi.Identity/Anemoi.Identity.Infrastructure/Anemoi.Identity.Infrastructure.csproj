@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Anemoi.Identity.Application\Anemoi.Identity.Application.csproj" />
+        <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Infrastructure\Anemoi.BuildingBlock.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

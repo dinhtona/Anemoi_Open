@@ -1,6 +1,6 @@
 ﻿using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryOne;
 using Anemoi.Contract.MasterData.Errors;
 using Anemoi.Contract.MasterData.Queries.DistrictQueries.GetDistrict;
 using Anemoi.Contract.MasterData.Responses;

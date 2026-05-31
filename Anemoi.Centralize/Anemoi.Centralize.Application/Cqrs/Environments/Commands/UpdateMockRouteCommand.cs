@@ -1,12 +1,12 @@
 #nullable enable
-using System;
 using Anemoi.Centralize.Application.Abstractions;
+using Anemoi.Centralize.Domain.ModelIds;
 using MediatR;
 
 namespace Anemoi.Centralize.Application.Cqrs.Environments.Commands;
 
 public record UpdateMockRouteCommand(
-    Guid Id,
+    MockRouteId Id,
     string Method,
     string Path,
     int StatusCode,

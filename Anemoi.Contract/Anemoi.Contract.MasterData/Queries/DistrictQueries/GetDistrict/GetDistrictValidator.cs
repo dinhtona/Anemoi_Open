@@ -9,6 +9,6 @@ public sealed class GetDistrictValidator : AbstractValidator<GetDistrictQuery>
         RuleFor(x => x.Id)
             .NotNull()
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("DistrictId cannot be empty!");
+            .WithMessage("VAL_DISTRICT_ID_REQUIRED");
     }
 }

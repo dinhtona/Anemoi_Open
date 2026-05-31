@@ -9,7 +9,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Anemoi.MasterData.Domain\Anemoi.MasterData.Domain.csproj" />
         <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Application\Anemoi.BuildingBlock.Application.csproj" />
-        <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Infrastructure\Anemoi.BuildingBlock.Infrastructure.csproj" />
 
 
 

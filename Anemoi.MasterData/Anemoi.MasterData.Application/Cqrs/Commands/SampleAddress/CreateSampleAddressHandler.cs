@@ -3,7 +3,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.MasterData.Commands.SampleAddressCommands.CreateSampleAddress;
 using Anemoi.Contract.MasterData.Errors;
 using Anemoi.Contract.MasterData.ModelIds;

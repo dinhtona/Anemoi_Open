@@ -3,7 +3,7 @@ using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.UserCommands.CreateUser;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Responses;

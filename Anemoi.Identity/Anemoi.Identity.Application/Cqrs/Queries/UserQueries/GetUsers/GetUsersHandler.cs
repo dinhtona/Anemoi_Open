@@ -9,7 +9,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUsers;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;

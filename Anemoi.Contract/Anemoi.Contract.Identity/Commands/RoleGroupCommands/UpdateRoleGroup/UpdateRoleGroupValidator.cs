@@ -10,6 +10,6 @@ public sealed class UpdateRoleGroupValidator : AbstractValidator<UpdateRoleGroup
 
         When(x => x.IdentityRoleIds is { },
             () => RuleFor(x => x.IdentityRoleIds).Must(ids => ids is { } && ids.Count == ids.Distinct().Count())
-                .WithMessage("Role Ids must not be duplicated!"));
+                .WithMessage("VAL_ROLE_IDS_NOT_DUPLICATED"));
     }
 }

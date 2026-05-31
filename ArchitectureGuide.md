@@ -92,8 +92,12 @@ When an AI or Developer receives a request to add a new feature, use the followi
    - Define signatures via partial methods (e.g., `private partial District MapToDistrict(CreateDistrictCommand command);`). Mapperly will auto-generate the underlying implementation at compile time.
 4. **Use Strongly-typed IDs**:
    - Initialize entity IDs using the provided Helper (e.g., `new ProvinceId(IdGenerator.NextGuid())`), never assign raw Guids directly.
+   - IDs owned by a domain entity or local persisted model MUST use strongly-typed ID wrappers inside Domain and Application code.
+   - Primitive IDs are allowed only at serialization boundaries for foreign IDs owned by another service, headers, claims, DTOs, and integration events when required to keep wire contracts stable. Convert them to a strongly-typed ID before using them as a local aggregate ID.
 5. **Event-driven Cross-Service Communication**:
-   - When Service A needs to interact with or trigger an action in Service B, it MUST use Event Messages via `MassTransit` (publishing/consuming over RabbitMQ). Minimize synchronous HTTP/REST calls between services to prevent tight coupling.
+   - When Service A triggers a side effect in Service B without requiring an immediate result, it MUST publish an integration event through `MassTransit`.
+   - When a caller requires an immediate result to complete the current request, use `MassTransit` request-response through RabbitMQ with an explicit timeout. Keep these interactions narrow and avoid synchronous HTTP/REST or gRPC calls between internal services.
+   - External provider calls such as OAuth verification, storage APIs, Docker APIs, and SFTP are infrastructure integrations rather than internal service-to-service communication. Encapsulate them behind Application abstractions.
 6. **Do not introduce arbitrary external libraries**: The core toolkit is already defined in `Anemoi.BuildingBlock`. Use the existing `MediatR` for dispatching, `FluentValidation` for validation, and `Polly` for retries.
 7. **Localize user-facing messages**:
    - Do not hard-code user-facing text in Controllers, CommandHandlers, QueryHandlers, Validators, Filters, or Middleware.

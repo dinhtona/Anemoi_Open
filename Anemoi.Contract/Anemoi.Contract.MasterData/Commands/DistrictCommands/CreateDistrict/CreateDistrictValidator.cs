@@ -9,6 +9,6 @@ public sealed class CreateDistrictValidator : AbstractValidator<CreateDistrictCo
         RuleFor(x => x.Name).NotEmpty();
         RuleFor(x => x.ProvinceId)
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("ProvinceId cannot be empty!");
+            .WithMessage("VAL_PROVINCE_ID_REQUIRED");
     }
 }

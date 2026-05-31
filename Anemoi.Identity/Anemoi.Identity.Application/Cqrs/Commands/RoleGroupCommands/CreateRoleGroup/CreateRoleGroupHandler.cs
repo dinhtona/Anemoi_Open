@@ -5,7 +5,7 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Serilog;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.CreateRoleGroup;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Mappings;

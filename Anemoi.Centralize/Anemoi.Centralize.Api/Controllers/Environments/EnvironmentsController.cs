@@ -7,6 +7,7 @@ using Anemoi.Centralize.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Centralize.Application.Cqrs.Environments.Commands;
 using Anemoi.Centralize.Application.Cqrs.Environments.Queries;
+using Anemoi.Centralize.Domain.ModelIds;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +17,7 @@ namespace Anemoi.Centralize.Api.Controllers.Environments;
 [ApiController]
 [Route("api/environments")]
 public sealed class EnvironmentsController(
-    ISender sender, 
-    ISftpFileManager sftpFileManager,
-    IEnvironmentNotificationService environmentNotificationService) : ControllerBase
+    ISender sender) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetEnvironments(CancellationToken cancellationToken)
@@ -33,7 +32,7 @@ public sealed class EnvironmentsController(
         var success = await sender.Send(new StartEnvironmentCommand(id), cancellationToken);
         if (!success)
         {
-            return BadRequest(new ErrorDetailResponse { Code = "FailedToStartEnvironment", Messages = new[] { $"Failed to start environment service {id}." } });
+            return BadRequest(CreateError("FailedToStartEnvironment"));
         }
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
@@ -50,7 +49,7 @@ public sealed class EnvironmentsController(
         var success = await sender.Send(new StopEnvironmentCommand(id), cancellationToken);
         if (!success)
         {
-            return BadRequest(new ErrorDetailResponse { Code = "FailedToStopEnvironment", Messages = new[] { $"Failed to stop environment service {id}." } });
+            return BadRequest(CreateError("FailedToStopEnvironment"));
         }
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
@@ -72,7 +71,7 @@ public sealed class EnvironmentsController(
         );
         if (updated == null)
         {
-            return NotFound(new ErrorDetailResponse { Code = "EnvironmentNotFound", Messages = new[] { $"Environment service {id} not found." } });
+            return NotFound(CreateError("EnvironmentNotFound"));
         }
         return Ok(new { data = updated });
     }
@@ -96,42 +95,29 @@ public sealed class EnvironmentsController(
     {
         if (file == null || file.Length == 0)
         {
-            return BadRequest(new ErrorDetailResponse { Code = "NoFileUploaded", Messages = new[] { "No file uploaded." } });
+            return BadRequest(CreateError("NoFileUploaded"));
         }
 
         using var stream = file.OpenReadStream();
         var success = await sender.Send(new UploadSftpFileCommand(path, file.FileName, stream), cancellationToken);
-        if (success)
-        {
-            await environmentNotificationService.NotifyEnvironmentActivityAsync(
-                "SFTP for Dev", 
-                $"Uploaded file: {file.FileName} to path: {path ?? "/"}"
-            );
-        }
         return Ok(new { success });
     }
 
     [HttpGet("sftp/download")]
-    public IActionResult DownloadSftpFile([FromQuery] string path)
+    public async Task<IActionResult> DownloadSftpFile([FromQuery] string path, CancellationToken cancellationToken)
     {
         try
         {
-            var stream = sftpFileManager.DownloadFile(path);
-            var fileName = Path.GetFileName(path);
-            var contentType = "application/octet-stream";
-            _ = Task.Run(() => environmentNotificationService.NotifyEnvironmentActivityAsync(
-                "SFTP for Dev", 
-                $"Downloaded file: {fileName} from path: {Path.GetDirectoryName(path) ?? "/"}"
-            ));
-            return File(stream, contentType, fileName, enableRangeProcessing: true);
+            var response = await sender.Send(new DownloadSftpFileQuery(path), cancellationToken);
+            return File(response.Stream, response.ContentType, response.FileName, enableRangeProcessing: true);
         }
         catch (FileNotFoundException)
         {
-            return NotFound(new ErrorDetailResponse { Code = "FileNotFound", Messages = new[] { "File not found." } });
+            return NotFound(CreateError("FileNotFound"));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new ErrorDetailResponse { Messages = new[] { ex.Message } });
+            return BadRequest(CreateError("FileOperationFailed"));
         }
     }
 
@@ -139,13 +125,6 @@ public sealed class EnvironmentsController(
     public async Task<IActionResult> DeleteSftpFile([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new DeleteSftpFileCommand(path), cancellationToken);
-        if (success)
-        {
-            await environmentNotificationService.NotifyEnvironmentActivityAsync(
-                "SFTP for Dev", 
-                $"Deleted item: {path}"
-            );
-        }
         return Ok(new { success });
     }
 
@@ -153,13 +132,6 @@ public sealed class EnvironmentsController(
     public async Task<IActionResult> CreateSftpDirectory([FromQuery] string path, CancellationToken cancellationToken)
     {
         var success = await sender.Send(new CreateSftpDirectoryCommand(path), cancellationToken);
-        if (success)
-        {
-            await environmentNotificationService.NotifyEnvironmentActivityAsync(
-                "SFTP for Dev", 
-                $"Created directory: {Path.GetFileName(path)} at path: {Path.GetDirectoryName(path) ?? "/"}"
-            );
-        }
         return Ok(new { success });
     }
 
@@ -191,7 +163,7 @@ public sealed class EnvironmentsController(
         var route = await sender.Send(command, cancellationToken);
         if (route == null)
         {
-            return NotFound(new ErrorDetailResponse { Code = "MockRouteNotFound", Messages = new[] { "Mock route not found." } });
+            return NotFound(CreateError("MockRouteNotFound"));
         }
         return Ok(new { data = route });
     }
@@ -199,7 +171,13 @@ public sealed class EnvironmentsController(
     [HttpDelete("api-test/routes/{id}")]
     public async Task<IActionResult> DeleteMockRoute([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        var success = await sender.Send(new DeleteMockRouteCommand(id), cancellationToken);
+        var success = await sender.Send(new DeleteMockRouteCommand(new MockRouteId(id)), cancellationToken);
         return Ok(new { success });
     }
+
+    private static ErrorDetailResponse CreateError(string code) => new()
+    {
+        Code = code,
+        Messages = [code]
+    };
 }

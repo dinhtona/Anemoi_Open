@@ -116,7 +116,7 @@ public sealed class DockerService : IDockerService
                 lastUpdated
             );
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // If docker daemon is unreachable
             return new ContainerStatusDto(

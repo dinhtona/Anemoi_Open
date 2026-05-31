@@ -74,7 +74,7 @@ public sealed class ManualInsertDataHandler(
         catch (Exception ex)
         {
             logger.Error(ex, "[ManualInsertData] Failed to insert row into {TableName}", request.TableName);
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError($"Manual insertion failed: {ex.Message}"));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
         }
     }
 

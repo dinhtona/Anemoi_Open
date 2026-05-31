@@ -1,6 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.CountingFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryCounting;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryCounting;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetUnreadNotificationCount;
 using Anemoi.Notification.Domain.Models;
 using Serilog;

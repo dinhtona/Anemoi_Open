@@ -11,7 +11,7 @@ using OneOf;
 using Serilog;
 using Riok.Mapperly;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 
 public abstract class EfCommandManyResultHandler<TModel, TCommand, TResult>(
     ISqlRepository<TModel> sqlRepository,

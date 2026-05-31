@@ -11,11 +11,11 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.CrossCuttingQueries;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Newtonsoft.Json;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.Helpers;
+namespace Anemoi.BuildingBlock.Application.QueryHelpers;
 
 public class EfQueryCrossCuttingHandler<TModel, TQuery>(
     ISqlRepository<TModel> sqlRepository,

@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Infrastructure.RunSqlMigration;
 using Lambda.Identity.Application.SeedData;
 using Anemoi.Identity.Infrastructure;
 using Anemoi.Identity.Infrastructure.DataContext;
-using Anemoi.Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
@@ -63,8 +62,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.MapGrpcService<IdentityGrpcService>();
 
 app.MapGraphQL();
 

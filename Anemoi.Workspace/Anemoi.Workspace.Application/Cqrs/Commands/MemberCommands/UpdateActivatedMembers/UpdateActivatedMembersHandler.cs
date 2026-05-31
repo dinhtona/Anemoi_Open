@@ -1,7 +1,7 @@
 ﻿using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.UpdateActivatedMembers;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.ModelIds;

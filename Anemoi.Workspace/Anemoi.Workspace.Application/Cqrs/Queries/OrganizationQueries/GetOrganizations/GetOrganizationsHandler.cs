@@ -1,7 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Queries.OrganizationQueries.GetOrganizations;
 using Anemoi.Contract.Workspace.Responses;

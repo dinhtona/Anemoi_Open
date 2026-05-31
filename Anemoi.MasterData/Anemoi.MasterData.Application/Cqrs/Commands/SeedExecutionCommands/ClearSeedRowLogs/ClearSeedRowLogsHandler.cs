@@ -44,7 +44,7 @@ public sealed class ClearSeedRowLogsHandler(
         catch (Exception ex)
         {
             logger.Error(ex, "[ClearSeedRowLogs] Failed to clear row logs for server {ServerId}", request.SeedServerId);
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError($"Clear logs failed: {ex.Message}"));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
         }
     }
 }

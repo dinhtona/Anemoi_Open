@@ -50,17 +50,17 @@ public sealed class TriggerSeedingHandler(
         // Parse Template Config
         var configJson = function.SeedTemplate?.ConfigJson;
         if (string.IsNullOrWhiteSpace(configJson))
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError("Template configuration is missing."));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
 
         SeedTemplateConfig config;
         try {
             config = JsonConvert.DeserializeObject<SeedTemplateConfig>(configJson);
         } catch {
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError("Failed to parse template configuration."));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
         }
 
         if (config == null || config.Tables.Count == 0)
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError("No tables configured in template."));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
 
         try
         {
@@ -85,7 +85,7 @@ public sealed class TriggerSeedingHandler(
                 .ToList();
 
             if (!filteredTables.Any())
-                return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError("None of the selected tables are defined in the template or no tables are configured."));
+                return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
 
             var sortedTables = SortTablesTopologically(filteredTables, config.Relationships);
 
@@ -249,7 +249,7 @@ public sealed class TriggerSeedingHandler(
         catch (Exception ex)
         {
             logger.Error(ex, "[TriggerSeeding] Unexpected error during seeding execution for function {FunctionId}", request.SeedFunctionId);
-            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError($"Seeding failed: {ex.Message}"));
+            return mapper.ToErrorDetailResponse(MasterDataErrorDetail.SeedExecutionError.CustomError());
         }
     }
 

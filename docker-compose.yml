@@ -122,7 +122,6 @@ services:
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
-      - GrpcSetting__IdentityAddress=http://anemoi_identity:5021
       - RedisSetting__ConnectionString=redis:6379
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
 
-namespace Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
+namespace Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryOne;
 
 public abstract class EfQueryOneHandler<TModel, TQuery, TResponse>(
     ISqlRepository<TModel> sqlRepository,

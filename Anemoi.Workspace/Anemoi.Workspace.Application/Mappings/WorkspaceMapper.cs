@@ -195,6 +195,21 @@ public partial class WorkspaceMapper(IUserIdGetter userIdGetter, IWorkspaceIdGet
     public partial IQueryable<MemberMapRoleGroupResponse> ProjectToMemberMapRoleGroupResponse(IQueryable<MemberMapRoleGroup> query);
 
     // ErrorDetail Mappings
-    public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);
-    public partial ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse);
+    public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)
+    {
+        return new ErrorDetailResponse
+        {
+            Code = errorDetail.Code,
+            Messages = errorDetail.Messages
+        };
+    }
+
+    public ErrorDetail ToErrorDetail(ErrorDetailResponse errorDetailResponse)
+    {
+        return new ErrorDetail
+        {
+            Code = errorDetailResponse.Code,
+            Messages = errorDetailResponse.Messages
+        };
+    }
 }

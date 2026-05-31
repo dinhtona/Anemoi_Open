@@ -17,7 +17,6 @@ COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Do
 COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj", "Anemoi.Contract/Anemoi.Contract.Identity/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.MasterData/Anemoi.Contract.MasterData.csproj", "Anemoi.Contract/Anemoi.Contract.MasterData/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.Workspace/Anemoi.Contract.Workspace.csproj", "Anemoi.Contract/Anemoi.Contract.Workspace/"]
-COPY ["Anemoi.Grpc/Anemoi.Grpc.Identity/Anemoi.Grpc.Identity.csproj", "Anemoi.Grpc/Anemoi.Grpc.Identity/"]
 COPY ["Anemoi.Centralize/Anemoi.Centralize.Domain/Anemoi.Centralize.Domain.csproj", "Anemoi.Centralize/Anemoi.Centralize.Domain/"]
 RUN dotnet restore "Anemoi.Centralize/Anemoi.Centralize.Api/Anemoi.Centralize.Api.csproj"
 COPY . .

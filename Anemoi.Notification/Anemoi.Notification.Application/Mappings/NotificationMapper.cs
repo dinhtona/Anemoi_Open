@@ -36,5 +36,12 @@ public partial class NotificationMapper
         };
     }
 
-    public partial ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail);
+    public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)
+    {
+        return new ErrorDetailResponse
+        {
+            Code = errorDetail.Code,
+            Messages = errorDetail.Messages
+        };
+    }
 }

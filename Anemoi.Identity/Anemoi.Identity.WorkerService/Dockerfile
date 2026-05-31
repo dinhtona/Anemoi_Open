@@ -10,7 +10,6 @@ WORKDIR /src
 COPY ["Anemoi.Identity/Anemoi.Identity.WorkerService/Anemoi.Identity.WorkerService.csproj", "Anemoi.Identity/Anemoi.Identity.WorkerService/"]
 COPY ["Anemoi.Identity/Anemoi.Identity.Infrastructure/Anemoi.Identity.Infrastructure.csproj", "Anemoi.Identity/Anemoi.Identity.Infrastructure/"]
 COPY ["Anemoi.Identity/Anemoi.Identity.Application/Anemoi.Identity.Application.csproj", "Anemoi.Identity/Anemoi.Identity.Application/"]
-COPY ["Anemoi.Grpc/Anemoi.Grpc.Identity/Anemoi.Grpc.Identity.csproj", "Anemoi.Grpc/Anemoi.Grpc.Identity/"]
 COPY ["Anemoi.Identity/Anemoi.Identity.Domain/Anemoi.Identity.Domain.csproj", "Anemoi.Identity/Anemoi.Identity.Domain/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj", "Anemoi.Contract/Anemoi.Contract.Identity/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/Anemoi.Contract.CrossCuttingConcern.csproj", "Anemoi.Contract/Anemoi.Contract.CrossCuttingConcern/"]

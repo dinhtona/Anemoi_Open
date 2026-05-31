@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryOne;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUser;
 using Anemoi.Contract.Identity.Responses;
