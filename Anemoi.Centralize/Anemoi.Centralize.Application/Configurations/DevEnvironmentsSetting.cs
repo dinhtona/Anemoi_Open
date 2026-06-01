@@ -9,7 +9,8 @@ public sealed class DevEnvironmentsSetting
     public string MailContainerName { get; set; } = "smtp4dev_server";
     public string MailDisplayName { get; set; } = "Mail Test";
     public int MailSmtpPort { get; set; } = 25;
-    public string MailWebUiUrl { get; set; } = "http://localhost:5555";
+    public string MailWebUiUrl { get; set; } = "/mail/";
+    public string MailApiUrl { get; set; } = "http://localhost:5555/mail/api/messages";
     public string MailDescription { get; set; } = "SMTP server for receiving and debugging emails locally";
 
     // SFTP

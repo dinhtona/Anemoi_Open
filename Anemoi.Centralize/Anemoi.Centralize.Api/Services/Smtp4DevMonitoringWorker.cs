@@ -43,29 +43,22 @@ public sealed class Smtp4DevMonitoringWorker(
 
     private async Task PollMessagesAsync(CancellationToken cancellationToken)
     {
-        // Try multiple endpoints depending on execution context (in-docker service name vs localhost)
-        var endpoints = new[]
+        Smtp4DevMessagesResponse? response = null;
+        if (!string.IsNullOrWhiteSpace(settings.MailApiUrl))
         {
-            "http://smtp4dev/api/messages",
-            "http://smtp4dev_server/api/messages",
-            settings.MailWebUiUrl?.TrimEnd('/') + "/api/messages"
-        };
-
-        List<Smtp4DevMessageDto>? messages = null;
-        foreach (var url in endpoints)
-        {
-            if (string.IsNullOrEmpty(url)) continue;
             try
             {
-                messages = await _httpClient.GetFromJsonAsync<List<Smtp4DevMessageDto>>(url, cancellationToken);
-                if (messages != null) break;
+                response = await _httpClient.GetFromJsonAsync<Smtp4DevMessagesResponse>(
+                    settings.MailApiUrl,
+                    cancellationToken);
             }
             catch
             {
-                // Try next endpoint
+                // The developer SMTP service may be stopped independently of the API.
             }
         }
 
+        var messages = response?.Results;
         if (messages == null) return;
 
         if (!_initialized)
@@ -100,6 +93,11 @@ public sealed class Smtp4DevMonitoringWorker(
                 msg.To ?? "",
                 msg.Subject ?? "");
         }
+    }
+
+    private sealed class Smtp4DevMessagesResponse
+    {
+        public List<Smtp4DevMessageDto>? Results { get; set; }
     }
 
     private sealed class Smtp4DevMessageDto

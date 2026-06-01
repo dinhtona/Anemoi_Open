@@ -9,8 +9,8 @@ services:
     image: masstransit/rabbitmq
     container_name: rabbitmq
     ports:
-      - "5672:5672"      # RabbitMQ port
-      - "15672:15672"    # RabbitMQ management UI
+      - "${BIND_ADDRESS:-127.0.0.1}:5672:5672"      # RabbitMQ port
+      - "${BIND_ADDRESS:-127.0.0.1}:15672:15672"    # RabbitMQ management UI
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
@@ -31,7 +31,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${BIND_ADDRESS:-127.0.0.1}:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -47,7 +47,7 @@ services:
     image: redis:7-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "${BIND_ADDRESS:-127.0.0.1}:6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -72,7 +72,7 @@ services:
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
 
     ports:
-      - "1433:1433"
+      - "${BIND_ADDRESS:-127.0.0.1}:1433:1433"
 
     volumes:
       - mssql_data:/var/opt/mssql
@@ -89,7 +89,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\""
+          "timeout 5 bash -c '</dev/tcp/127.0.0.1/1433'"
         ]
       interval: 30s
       timeout: 10s
@@ -101,7 +101,7 @@ services:
     image: mongo:latest
     container_name: mongodb
     ports:
-      - "27017:27017"
+      - "${BIND_ADDRESS:-127.0.0.1}:27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
@@ -125,8 +125,11 @@ services:
       - RedisSetting__ConnectionString=redis:6379
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}
+      - PUBLIC_APP_ORIGIN=${PUBLIC_APP_ORIGIN:-}
+      - DevEnvironmentsSetting__MailWebUiUrl=/mail/
+      - DevEnvironmentsSetting__MailApiUrl=http://smtp4dev:80/mail/api/messages
     ports:
-      - "8080:8080"
+      - "${BIND_ADDRESS:-127.0.0.1}:8080:8080"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -137,6 +140,7 @@ services:
     networks:
       - anemoi_network
     volumes:
+      - centralize_keys:/root/.aspnet/DataProtection-Keys
       - /var/run/docker.sock:/var/run/docker.sock
       - ./local_env/env_data:/app/env_data
       - ./local_env/sftp_data:/app/sftp_data
@@ -156,6 +160,7 @@ services:
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}
+      - ExternalAuthSetting__GoogleClientId=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
       - Kestrel__Endpoints__Http2__Url=http://0.0.0.0:5021
       - Kestrel__Endpoints__Http1__Url=http://0.0.0.0:5031
     volumes:
@@ -280,7 +285,7 @@ services:
     container_name: sftp_server
     restart: unless-stopped
     ports:
-      - "2222:22"
+      - "${BIND_ADDRESS:-127.0.0.1}:2222:22"
     volumes:
       - ./local_env/sftp_data:/home/user1/upload
       - ./local_env/sftp_keys:/home/user1/.ssh/keys:ro
@@ -292,9 +297,10 @@ services:
     image: rnwood/smtp4dev:v3
     container_name: smtp4dev_server
     restart: unless-stopped
+    command: --basepath=/mail
     ports:
-      - "25:25"
-      - "5555:80"
+      - "${BIND_ADDRESS:-127.0.0.1}:25:25"
+      - "${BIND_ADDRESS:-127.0.0.1}:5555:80"
     networks:
       - anemoi_network
 
@@ -319,9 +325,9 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "3000:443"
+      - "${BIND_ADDRESS:-127.0.0.1}:80:80"
+      - "${BIND_ADDRESS:-127.0.0.1}:443:443"
+      - "${BIND_ADDRESS:-127.0.0.1}:3000:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
@@ -351,6 +357,7 @@ networks:
     driver: bridge
 
 volumes:
+  centralize_keys:
   identity_keys:
   masterdata_keys:
   workspace_keys:

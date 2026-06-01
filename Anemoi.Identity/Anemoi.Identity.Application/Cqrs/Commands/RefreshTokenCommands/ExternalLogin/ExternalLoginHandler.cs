@@ -11,6 +11,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.ExternalLogin;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
+using Anemoi.Identity.Application.Configurations;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Domain.Models;
 using MediatR;
@@ -23,7 +24,8 @@ public sealed class ExternalLoginHandler(
     ISqlRepository<User> userRepository,
     ISqlRepository<RefreshToken> refreshTokenRepository,
     IUnitOfWork unitOfWork,
-    ISender sender)
+    ISender sender,
+    ExternalAuthSetting externalAuthSetting)
     : ICommandHandler<ExternalLoginCommand, OneOf<AuthenticationSuccessResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<AuthenticationSuccessResponse, ErrorDetailResponse>> Handle(ExternalLoginCommand request,
@@ -49,6 +51,15 @@ public sealed class ExternalLoginHandler(
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
                 using var doc = JsonDocument.Parse(content);
                 var root = doc.RootElement;
+                if (string.IsNullOrWhiteSpace(externalAuthSetting.GoogleClientId) ||
+                    !root.TryGetProperty("aud", out var audienceProp) ||
+                    audienceProp.ValueKind != JsonValueKind.String ||
+                    !string.Equals(audienceProp.GetString(), externalAuthSetting.GoogleClientId,
+                        StringComparison.Ordinal))
+                {
+                    return CreateError("ExternalAuthFailed");
+                }
+
                 if (!root.TryGetProperty("email", out var emailProp))
                 {
                     return CreateError("ExternalAuthFailed");
