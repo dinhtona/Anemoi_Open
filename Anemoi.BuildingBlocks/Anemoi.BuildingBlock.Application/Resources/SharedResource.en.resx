@@ -191,4 +191,26 @@
   <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Downloaded file: {0} from path: {1}</value></data>
   <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>Mock API matched: {0} /{1} - returned {2}</value></data>
   <data name="EnvironmentMailReceived" xml:space="preserve"><value>New email received from {0} to {1} with subject: "{2}"</value></data>
+  <data name="PermissionGroupUsers" xml:space="preserve"><value>Users</value></data>
+  <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Role groups</value></data>
+  <data name="PermissionGroupSeedGenerator" xml:space="preserve"><value>Seed generator</value></data>
+  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Environments</value></data>
+  <data name="PermissionGroupOther" xml:space="preserve"><value>Other</value></data>
+  <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>View users and their assigned role groups.</value></data>
+  <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Create, update and manage user access.</value></data>
+  <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>View role groups and their assigned permissions.</value></data>
+  <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Create, update and remove role groups.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorRead" xml:space="preserve"><value>View seed servers, templates and functions.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorManage" xml:space="preserve"><value>Create and update seed servers, templates and functions.</value></data>
+  <data name="PermissionDescriptionSeedExecutionRun" xml:space="preserve"><value>Run automatic data generation tasks.</value></data>
+  <data name="PermissionDescriptionSeedExecutionManualWrite" xml:space="preserve"><value>Insert manually prepared rows into target databases.</value></data>
+  <data name="PermissionDescriptionSeedExecutionDeleteRow" xml:space="preserve"><value>Delete generated rows from target databases.</value></data>
+  <data name="PermissionDescriptionSeedExecutionLogClear" xml:space="preserve"><value>Clear generated-row history logs.</value></data>
+  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>View development environment services.</value></data>
+  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Start and stop development environment services.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Browse and download files from development SFTP storage.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Upload, create and delete items in development SFTP storage.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>View development mock API routes.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Create, update and delete development mock API routes.</value></data>
+  <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Unmapped permission: {0}. Add metadata to the permission catalog.</value></data>
 </root>

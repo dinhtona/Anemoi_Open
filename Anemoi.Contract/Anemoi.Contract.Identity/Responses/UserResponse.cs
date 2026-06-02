@@ -17,4 +17,5 @@ public sealed class UserResponse : ModelResponse
     public List<string> Roles { get; set; } = [];
     public List<string> DirectRoles { get; set; } = [];
     public List<string> RoleGroupIds { get; set; } = [];
+    public List<string> RoleGroupNames { get; set; } = [];
 }

@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Application.Resources;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Contract.Identity.Queries.IdentityPolicyQueries.GetIdentityPolicies;
 using Anemoi.Contract.Identity.Queries.RoleQueries.GetRoles;
@@ -8,13 +9,16 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Anemoi.Centralize.Api.Controllers.Identity;
 
 [Route("api/identity/[controller]/[action]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
-public class IdentityPolicyController(ISender sender) : ControllerBase
+public class IdentityPolicyController(
+    ISender sender,
+    IStringLocalizer<SharedResource> localizer) : ControllerBase
 {
     /// <summary>
     /// GetIdentityPolicyRoles
@@ -35,7 +39,18 @@ public class IdentityPolicyController(ISender sender) : ControllerBase
             PageIndex = 1,
             PageSize = int.MaxValue
         }, cancellationToken);
-        return Ok(res.Items.Where(role => role.Name != SystemRoles.Administrator));
+        var roles = res.Items
+            .Where(role => role.Name != SystemRoles.Administrator)
+            .Select(role =>
+            {
+                var permission = Permissions.Find(role.Name);
+                role.Group = localizer[permission?.GroupKey ?? "PermissionGroupOther"].Value;
+                role.Description = permission is null
+                    ? localizer["PermissionDescriptionUnmapped", role.Name].Value
+                    : localizer[permission.DescriptionKey].Value;
+                return role;
+            });
+        return Ok(roles);
     }
 
     /// <summary>

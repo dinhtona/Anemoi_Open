@@ -191,4 +191,26 @@
   <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Đã tải xuống tệp: {0} từ đường dẫn: {1}</value></data>
   <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>API Mock khớp yêu cầu: {0} /{1} - trả về {2}</value></data>
   <data name="EnvironmentMailReceived" xml:space="preserve"><value>Nhận email mới từ {0} đến {1} với tiêu đề: "{2}"</value></data>
+  <data name="PermissionGroupUsers" xml:space="preserve"><value>Người dùng</value></data>
+  <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Nhóm vai trò</value></data>
+  <data name="PermissionGroupSeedGenerator" xml:space="preserve"><value>Tạo dữ liệu mẫu</value></data>
+  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Môi trường</value></data>
+  <data name="PermissionGroupOther" xml:space="preserve"><value>Khác</value></data>
+  <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>Xem người dùng và các nhóm vai trò đã được gán.</value></data>
+  <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Tạo, cập nhật và quản lý quyền truy cập của người dùng.</value></data>
+  <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>Xem nhóm vai trò và các quyền đã được gán.</value></data>
+  <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Tạo, cập nhật và xóa nhóm vai trò.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorRead" xml:space="preserve"><value>Xem máy chủ, mẫu cấu hình và tác vụ tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorManage" xml:space="preserve"><value>Tạo và cập nhật máy chủ, mẫu cấu hình và tác vụ tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedExecutionRun" xml:space="preserve"><value>Chạy tác vụ tự động tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedExecutionManualWrite" xml:space="preserve"><value>Chèn thủ công các dòng dữ liệu đã chuẩn bị vào cơ sở dữ liệu đích.</value></data>
+  <data name="PermissionDescriptionSeedExecutionDeleteRow" xml:space="preserve"><value>Xóa các dòng dữ liệu đã tạo khỏi cơ sở dữ liệu đích.</value></data>
+  <data name="PermissionDescriptionSeedExecutionLogClear" xml:space="preserve"><value>Xóa lịch sử các dòng dữ liệu đã tạo.</value></data>
+  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>Xem các dịch vụ trong môi trường phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Khởi động và dừng các dịch vụ trong môi trường phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Duyệt và tải xuống tệp từ kho lưu trữ SFTP phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Tải lên, tạo và xóa nội dung trong kho lưu trữ SFTP phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>Xem các route API giả lập phục vụ phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Tạo, cập nhật và xóa các route API giả lập phục vụ phát triển.</value></data>
+  <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Quyền chưa được ánh xạ: {0}. Hãy bổ sung metadata vào danh mục quyền.</value></data>
 </root>

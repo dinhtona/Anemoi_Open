@@ -11,6 +11,7 @@ using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
 
@@ -43,8 +44,10 @@ public sealed class GetUserHandler(
             x => x.UserId == user.UserId &&
                 !x.RoleGroup.RoleGroupClaims.Any(claim =>
                     claim.Key == AuthorizationClaimTypes.WorkspaceId),
+            query => query.Include(x => x.RoleGroup),
             token: default);
         response.RoleGroupIds = roleGroups.Select(rg => rg.RoleGroupId.ToString()).ToList();
+        response.RoleGroupNames = roleGroups.Select(rg => rg.RoleGroup.Name).ToList();
 
         response.DirectRoles = (await userRepository.GetDirectRolesAsync(user)).ToList();
         response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
