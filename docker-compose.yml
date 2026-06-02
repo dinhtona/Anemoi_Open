@@ -60,41 +60,41 @@ services:
 
   # Microsoft SQL Server (Azure SQL Edge) for seed/data ingestion scenarios.
   # Azure SQL Edge is natively compiled for ARM64 (Apple Silicon), providing maximum stability.
-  mssql:
-    image: mcr.microsoft.com/azure-sql-edge:latest
-    container_name: mssql
-    hostname: mssql
+  # mssql:
+  #   image: mcr.microsoft.com/azure-sql-edge:latest
+  #   container_name: mssql
+  #   hostname: mssql
 
-    shm_size: "2gb"
+  #   shm_size: "2gb"
 
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+  #   environment:
+  #     ACCEPT_EULA: "Y"
+  #     MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
 
-    ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:1433:1433"
+  #   ports:
+  #     - "${BIND_ADDRESS:-127.0.0.1}:1433:1433"
 
-    volumes:
-      - mssql_data:/var/opt/mssql
+  #   volumes:
+  #     - mssql_data:/var/opt/mssql
 
-    security_opt:
-      - seccomp:unconfined
+  #   security_opt:
+  #     - seccomp:unconfined
 
-    networks:
-      - anemoi_network
+  #   networks:
+  #     - anemoi_network
 
-    restart: unless-stopped
+  #   restart: unless-stopped
 
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "timeout 5 bash -c '</dev/tcp/127.0.0.1/1433'"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 90s
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "timeout 5 bash -c '</dev/tcp/127.0.0.1/1433'"
+  #       ]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 10
+  #     start_period: 90s
 
   # MongoDB service for NoSQL data storage
   mongodb:
@@ -306,17 +306,17 @@ services:
 
   # Next.js frontend. Browser traffic should enter through Caddy so the
   # frontend and API share one HTTPS origin.
-  anemoi_web:
-    image: anemoi/web
-    build:
-      context: ./cody-web-app
-      dockerfile: Dockerfile.runtime
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://anemoi_centralize:8080
-    depends_on:
-      - anemoi_centralize
-    networks:
-      - anemoi_network
+  # anemoi_web:
+  #   image: anemoi/web
+  #   build:
+  #     context: ./cody-web-app
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - NEXT_PUBLIC_API_BASE_URL=http://anemoi_centralize:8080
+  #   depends_on:
+  #     - anemoi_centralize
+  #   networks:
+  #     - anemoi_network
 
   # Single HTTP(S) entrypoint for the frontend and API. Caddy creates a local
   # development CA certificate for https://localhost automatically.
@@ -333,7 +333,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - anemoi_web
+      # - anemoi_web
       - anemoi_centralize
     networks:
       - anemoi_network
@@ -362,7 +362,7 @@ volumes:
   masterdata_keys:
   workspace_keys:
   notification_keys:
-  mssql_data:
+  # mssql_data:
   postgres_data:
   mongodb_data:
   redis_data:

@@ -74,6 +74,19 @@ CQRS Pattern: Commands and queries are separated for scalable data management.
 EDA: Events are published by producers and consumed by subscribers within the microservices.
 
 Saga Orchestration: Manages complex transactions across multiple services to ensure data consistency.
+
+### Docker Compose on Windows x64
+
+Use Docker Desktop with Linux containers, copy `.env.example` to `.env`, fill in
+the required passwords, then run:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.windows-x64.yml up -d --build
+```
+
+The Windows x64 override replaces the ARM64-oriented Azure SQL Edge container
+with SQL Server 2022 for `linux/amd64`.
+
 ## Contributing
 
 Contributions are always welcome!
