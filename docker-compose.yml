@@ -285,11 +285,18 @@ services:
     container_name: sftp_server
     restart: unless-stopped
     ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:2222:22"
+      - "${BIND_ADDRESS:-127.0.0.1}:${SFTP_HOST_PORT:-2222}:22"
     volumes:
       - ./local_env/sftp_data:/home/user1/upload
       - ./local_env/sftp_keys:/home/user1/.ssh/keys:ro
-    command: user1:123456:1001
+      - sftp_host_keys:/etc/ssh
+    entrypoint:
+      - /bin/sh
+      - -c
+      - ssh-keygen -A && exec /entrypoint "$$@"
+      - --
+    command:
+      - user1:123456:1001
     networks:
       - anemoi_network
 
@@ -366,5 +373,6 @@ volumes:
   postgres_data:
   mongodb_data:
   redis_data:
+  sftp_host_keys:
   caddy_data:
   caddy_config:
