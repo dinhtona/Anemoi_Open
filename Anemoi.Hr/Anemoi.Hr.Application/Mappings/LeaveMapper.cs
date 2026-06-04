@@ -120,6 +120,8 @@ public partial class LeaveMapper
             TransactionTypeCode = transaction.TransactionTypeCode,
             Days = transaction.Days,
             BalanceAfterDays = transaction.BalanceAfterDays,
+            SourceType = transaction.SourceType,
+            SourceId = transaction.SourceId,
             Reason = transaction.Reason,
             CreatedAt = transaction.CreatedAt
         };

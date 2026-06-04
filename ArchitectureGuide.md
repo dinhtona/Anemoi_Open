@@ -22,7 +22,7 @@ The `Anemoi_Open` project is designed based on a **Microservices** architecture,
 ## 2. Core Stack & Libraries
 When developing within this project, you **MUST** use the following predefined libraries and frameworks. Do not substitute them without explicit permission:
 
-- **Web Framework**: `.NET 8` (ASP.NET Core 8.0).
+- **Web Framework**: `.NET 10` (ASP.NET Core 10.0).
 - **Architecture**: Clean Architecture + CQRS + Event-driven.
 - **Data Access/ORM**: `Microsoft.EntityFrameworkCore` & `Npgsql.EntityFrameworkCore.PostgreSQL`.
 - **Message Bus / Events**: `MassTransit` combined with `MassTransit.RabbitMQ` & `MassTransit.EntityFrameworkCore`.

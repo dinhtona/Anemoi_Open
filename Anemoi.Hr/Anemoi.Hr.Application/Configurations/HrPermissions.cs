@@ -15,6 +15,22 @@ public static class HrPermissions
     public const string LeaveRequestForceCancel = "hr.leave.request.force_cancel";
     public const string LeaveTransactionView = "hr.leave.transaction.view";
 
+    public static readonly IReadOnlyList<string> All =
+    [
+        LeavePolicyView,
+        LeavePolicyCreate,
+        LeavePolicyUpdate,
+        LeaveBalanceView,
+        LeaveBalanceAdjust,
+        LeaveRequestView,
+        LeaveRequestCreate,
+        LeaveRequestApprove,
+        LeaveRequestCancel,
+        LeaveRequestForceApprove,
+        LeaveRequestForceCancel,
+        LeaveTransactionView
+    ];
+
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
         new Dictionary<string, SensitivePermissionDefinition>
         {

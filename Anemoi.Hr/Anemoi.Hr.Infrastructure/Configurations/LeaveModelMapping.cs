@@ -103,6 +103,8 @@ public sealed class LeaveModelMapping :
         builder.Property(x => x.TransactionTypeCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.Days).HasPrecision(9, 2);
         builder.Property(x => x.BalanceAfterDays).HasPrecision(9, 2);
+        builder.Property(x => x.SourceType).HasMaxLength(64);
+        builder.Property(x => x.SourceId).HasMaxLength(128);
         builder.Property(x => x.Reason).HasMaxLength(1024);
         builder.HasIndex(x => new { x.EmployeeId, x.CreatedAt });
         builder.HasIndex(x => x.LeaveBalanceId);

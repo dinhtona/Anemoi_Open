@@ -10,6 +10,8 @@ public sealed class LeaveTransactionResponse
     public string TransactionTypeCode { get; set; }
     public decimal Days { get; set; }
     public decimal BalanceAfterDays { get; set; }
+    public string SourceType { get; set; }
+    public string SourceId { get; set; }
     public string Reason { get; set; }
     public DateTime CreatedAt { get; set; }
 }
