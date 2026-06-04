@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
@@ -13,24 +14,26 @@ namespace Anemoi.Hr.Api.Services;
 
 public sealed class MonthlyLeaveAccrualWorker(
     IServiceScopeFactory serviceScopeFactory,
+    HrSettings hrSettings,
     ILogger<MonthlyLeaveAccrualWorker> logger)
     : BackgroundService
 {
-    private static readonly TimeSpan RunInterval = TimeSpan.FromHours(12);
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
             await RunAccrualAsync(stoppingToken);
-            await Task.Delay(RunInterval, stoppingToken);
+            await Task.Delay(TimeSpan.FromHours(Math.Max(1, hrSettings.MonthlyAccrualCheckIntervalHours)),
+                stoppingToken);
         }
     }
 
     private async Task RunAccrualAsync(CancellationToken cancellationToken)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        if (today.Day != DateTime.DaysInMonth(today.Year, today.Month))
+        var businessNow = GetBusinessNow();
+        var today = DateOnly.FromDateTime(businessNow.DateTime);
+        if (businessNow.Hour != hrSettings.MonthlyAccrualRunHour ||
+            today.Day != DateTime.DaysInMonth(today.Year, today.Month))
         {
             return;
         }
@@ -129,6 +132,27 @@ public sealed class MonthlyLeaveAccrualWorker(
                     balance.RemainingDays,
                     "Accrual"), cancellationToken);
             }
+        }
+    }
+
+    private DateTimeOffset GetBusinessNow()
+    {
+        try
+        {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(hrSettings.BusinessTimeZone);
+            return TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
+        }
+        catch (TimeZoneNotFoundException exception)
+        {
+            logger.LogError(exception, "HR business timezone {BusinessTimeZone} was not found.",
+                hrSettings.BusinessTimeZone);
+            return DateTimeOffset.UtcNow;
+        }
+        catch (InvalidTimeZoneException exception)
+        {
+            logger.LogError(exception, "HR business timezone {BusinessTimeZone} is invalid.",
+                hrSettings.BusinessTimeZone);
+            return DateTimeOffset.UtcNow;
         }
     }
 }

@@ -5,7 +5,8 @@ namespace Anemoi.BuildingBlock.Application.Authorization;
 
 public static class Permissions
 {
-    public sealed record Definition(string Key, string GroupKey, string DescriptionKey);
+    public sealed record Definition(string Key, string GroupKey, string DescriptionKey, bool IsSensitive = false,
+        string RiskLevel = null);
 
     public const string UserRead = "UserQuery";
     public const string UserManage = "UserCommand";
@@ -26,6 +27,19 @@ public static class Permissions
     public const string EnvironmentMockRouteRead = "EnvironmentMockRouteRead";
     public const string EnvironmentMockRouteManage = "EnvironmentMockRouteManage";
 
+    public const string HrLeavePolicyView = "hr.leave.policy.view";
+    public const string HrLeavePolicyCreate = "hr.leave.policy.create";
+    public const string HrLeavePolicyUpdate = "hr.leave.policy.update";
+    public const string HrLeaveBalanceView = "hr.leave.balance.view";
+    public const string HrLeaveBalanceAdjust = "hr.leave.balance.adjust";
+    public const string HrLeaveRequestView = "hr.leave.request.view";
+    public const string HrLeaveRequestCreate = "hr.leave.request.create";
+    public const string HrLeaveRequestApprove = "hr.leave.request.approve";
+    public const string HrLeaveRequestCancel = "hr.leave.request.cancel";
+    public const string HrLeaveRequestForceApprove = "hr.leave.request.force_approve";
+    public const string HrLeaveRequestForceCancel = "hr.leave.request.force_cancel";
+    public const string HrLeaveTransactionView = "hr.leave.transaction.view";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -43,7 +57,21 @@ public static class Permissions
         new(EnvironmentSftpRead, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentSftpRead"),
         new(EnvironmentSftpManage, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentSftpManage"),
         new(EnvironmentMockRouteRead, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentMockRouteRead"),
-        new(EnvironmentMockRouteManage, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentMockRouteManage")
+        new(EnvironmentMockRouteManage, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentMockRouteManage"),
+        new(HrLeavePolicyView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyView"),
+        new(HrLeavePolicyCreate, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyCreate"),
+        new(HrLeavePolicyUpdate, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyUpdate"),
+        new(HrLeaveBalanceView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveBalanceView"),
+        new(HrLeaveBalanceAdjust, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveBalanceAdjust", true, "High"),
+        new(HrLeaveRequestView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveRequestView"),
+        new(HrLeaveRequestCreate, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveRequestCreate"),
+        new(HrLeaveRequestApprove, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveRequestApprove"),
+        new(HrLeaveRequestCancel, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveRequestCancel"),
+        new(HrLeaveRequestForceApprove, "PermissionGroupHrLeave",
+            "PermissionDescriptionHrLeaveRequestForceApprove", true, "High"),
+        new(HrLeaveRequestForceCancel, "PermissionGroupHrLeave",
+            "PermissionDescriptionHrLeaveRequestForceCancel", true, "High"),
+        new(HrLeaveTransactionView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTransactionView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();
