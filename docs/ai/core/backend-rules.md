@@ -4,8 +4,7 @@
 
 Use the established Anemoi stack:
 
-- .NET 8
-- ASP.NET Core 8
+- Use the same TargetFramework as the existing repository projects. Do not introduce a different .NET version unless explicitly approved.
 - EF Core
 - Npgsql.EntityFrameworkCore.PostgreSQL
 - MassTransit
