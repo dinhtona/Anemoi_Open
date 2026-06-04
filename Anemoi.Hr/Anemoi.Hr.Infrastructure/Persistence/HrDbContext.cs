@@ -1,5 +1,6 @@
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,11 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<EmployeePositionHistory> EmployeePositionHistories { get; set; }
     public DbSet<EmployeeGradeHistory> EmployeeGradeHistories { get; set; }
     public DbSet<EmployeeManagerHistory> EmployeeManagerHistories { get; set; }
+    public DbSet<LeavePolicy> LeavePolicies { get; set; }
+    public DbSet<LeaveBalance> LeaveBalances { get; set; }
+    public DbSet<LeaveRequest> LeaveRequests { get; set; }
+    public DbSet<LeaveTransaction> LeaveTransactions { get; set; }
+    public DbSet<LeaveAccrualRun> LeaveAccrualRuns { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
