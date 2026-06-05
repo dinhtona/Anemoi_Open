@@ -33,6 +33,10 @@ public static class HrPermissions
     public const string PositionChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionChange;
     public const string GradeChangeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrGradeChangeView;
     public const string GradeChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrGradeChange;
+    public const string ContractView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractView;
+    public const string ContractCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractCreate;
+    public const string ContractUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractUpdate;
+    public const string ContractTerminate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractTerminate;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -60,7 +64,11 @@ public static class HrPermissions
         PositionChangeView,
         PositionChange,
         GradeChangeView,
-        GradeChange
+        GradeChange,
+        ContractView,
+        ContractCreate,
+        ContractUpdate,
+        ContractTerminate
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -73,7 +81,11 @@ public static class HrPermissions
             [EmployeeTransferCreate] = new(EmployeeTransferCreate, "High"),
             [PromotionCreate] = new(PromotionCreate, "High"),
             [PositionChange] = new(PositionChange, "High"),
-            [GradeChange] = new(GradeChange, "High")
+            [GradeChange] = new(GradeChange, "High"),
+            [ContractView] = new(ContractView, "High"),
+            [ContractCreate] = new(ContractCreate, "High"),
+            [ContractUpdate] = new(ContractUpdate, "High"),
+            [ContractTerminate] = new(ContractTerminate, "High")
         };
 }
 

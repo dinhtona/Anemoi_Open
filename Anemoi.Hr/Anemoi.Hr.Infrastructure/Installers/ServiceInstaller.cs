@@ -16,6 +16,7 @@ public sealed class ServiceInstaller : IInstaller
     {
         services.AddScoped<LeaveMapper>();
         services.AddScoped<EmployeeMapper>();
+        services.AddScoped<EmployeeContractMapper>();
         services.AddScoped<ApproveLeaveRequestHandler>();
         services.AddScoped<CancelLeaveRequestHandler>();
         services.AddSingleton<Anemoi.Hr.Application.Abstractions.IEmployeeGradeLookup, Anemoi.Hr.Application.Services.EmployeeGradeLookup>();

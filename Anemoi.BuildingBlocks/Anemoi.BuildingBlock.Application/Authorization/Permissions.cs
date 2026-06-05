@@ -52,6 +52,10 @@ public static class Permissions
     public const string HrPositionChange = "hr.position.change";
     public const string HrGradeChangeView = "hr.grade.change.view";
     public const string HrGradeChange = "hr.grade.change";
+    public const string HrContractView = "hr.contract.view";
+    public const string HrContractCreate = "hr.contract.create";
+    public const string HrContractUpdate = "hr.contract.update";
+    public const string HrContractTerminate = "hr.contract.terminate";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -98,7 +102,11 @@ public static class Permissions
         new(HrPositionChangeView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionChangeView"),
         new(HrPositionChange, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionChange", true, "High"),
         new(HrGradeChangeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrGradeChangeView"),
-        new(HrGradeChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrGradeChange", true, "High")
+        new(HrGradeChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrGradeChange", true, "High"),
+        new(HrContractView, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractView", true, "High"),
+        new(HrContractCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractCreate", true, "High"),
+        new(HrContractUpdate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractUpdate", true, "High"),
+        new(HrContractTerminate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractTerminate", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

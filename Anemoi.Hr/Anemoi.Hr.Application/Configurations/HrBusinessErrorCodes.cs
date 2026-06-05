@@ -32,4 +32,11 @@ public static class HrBusinessErrorCodes
     public const string PromotionDateBeforeJoinDate = "HR_PROMOTION_DATE_BEFORE_JOIN_DATE";
     public const string PromotionEffectiveDateInFuture = "HR_PROMOTION_EFFECTIVE_DATE_IN_FUTURE";
     public const string PromotionConcurrencyConflict = "HR_PROMOTION_CONCURRENCY_CONFLICT";
+    public const string ContractOverlapping = "HR_CONTRACT_OVERLAPPING";
+    public const string ContractNotFound = "HR_CONTRACT_NOT_FOUND";
+    public const string ContractNumberDuplicated = "HR_CONTRACT_NUMBER_DUPLICATED";
+    public const string ContractAlreadyTerminated = "HR_CONTRACT_ALREADY_TERMINATED";
+    public const string ContractAlreadyExpired = "HR_CONTRACT_ALREADY_EXPIRED";
+    public const string ContractInvalidDateRange = "HR_CONTRACT_INVALID_DATE_RANGE";
+    public const string ContractConcurrencyConflict = "HR_CONTRACT_CONCURRENCY_CONFLICT";
 }
