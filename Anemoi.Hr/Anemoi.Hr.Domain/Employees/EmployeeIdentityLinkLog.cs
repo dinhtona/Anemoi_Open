@@ -12,6 +12,7 @@ public sealed class EmployeeIdentityLinkLog : ValueObject
     public string MatchStatus { get; set; }
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; }
+    public bool IsDryRun { get; set; }
 
     public Employee Employee { get; set; }
 

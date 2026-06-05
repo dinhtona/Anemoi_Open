@@ -64,10 +64,12 @@ public sealed class EmployeeOrganizationModelMapping :
         builder.Property(x => x.WorkEmail).HasMaxLength(256);
         builder.Property(x => x.MatchStatus).HasMaxLength(64).IsRequired();
         builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.Property(x => x.IsDryRun).IsRequired();
         builder.HasIndex(x => x.EmployeeId);
         builder.HasIndex(x => x.IdentityUserId);
         builder.HasIndex(x => x.MatchStatus);
         builder.HasIndex(x => x.CreatedAt);
+        builder.HasIndex(x => x.IsDryRun);
         builder.HasOne(x => x.Employee)
             .WithMany()
             .HasForeignKey(x => x.EmployeeId)

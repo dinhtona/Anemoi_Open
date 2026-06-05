@@ -40,6 +40,15 @@ public sealed class SubmitLeaveRequestHandler(
         if (balance.RemainingDays < request.RequestedDays)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceNotEnough);
 
+        var isOverlapping = await leaveRequestRepository.ExistByConditionAsync(
+            x => x.EmployeeId == request.EmployeeId
+                 && (x.StatusCode == "Pending" || x.StatusCode == "Approved")
+                 && x.StartDate <= request.EndDate
+                 && request.StartDate <= x.EndDate,
+            cancellationToken);
+        if (isOverlapping)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestOverlapping);
+
         var leaveRequest = mapper.ToLeaveRequest(request);
         balance.PendingDays += request.RequestedDays;
         balance.RemainingDays -= request.RequestedDays;

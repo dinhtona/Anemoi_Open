@@ -27,8 +27,9 @@ public sealed class GetMyEmployeeProfileHandler(ISqlRepository<Employee> reposit
 
         if (employee is null && !string.IsNullOrEmpty(request.Email))
         {
+            var searchEmail = request.Email.ToLower();
             employee = await repository.GetFirstByConditionAsync(
-                x => x.WorkEmail == request.Email,
+                x => x.WorkEmail != null && x.WorkEmail.ToLower() == searchEmail,
                 IncludeProfileRelations,
                 cancellationToken);
         }

@@ -15,7 +15,9 @@ public sealed class SubmitLeaveRequestValidator : AbstractValidator<SubmitLeaveR
         RuleFor(x => x.RequestedDays).GreaterThan(0);
         RuleFor(x => x.EndDate)
             .GreaterThanOrEqualTo(x => x.StartDate)
-            .WithMessage(HrBusinessErrorCodes.LeaveRequestInvalidDateRange);
+            .WithMessage(HrBusinessErrorCodes.LeaveRequestInvalidDateRange)
+            .Must((cmd, endDate) => cmd.StartDate.Year == endDate.Year)
+            .WithMessage(HrBusinessErrorCodes.LeaveRequestMultiYearNotSupported);
         RuleFor(x => x.Reason).MaximumLength(1024);
     }
 }

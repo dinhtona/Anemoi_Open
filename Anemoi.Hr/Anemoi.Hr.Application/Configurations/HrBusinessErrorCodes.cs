@@ -18,4 +18,6 @@ public static class HrBusinessErrorCodes
     public const string EmployeeNotFound = "HR_EMPLOYEE_NOT_FOUND";
     public const string DepartmentNotFound = "HR_DEPARTMENT_NOT_FOUND";
     public const string PositionNotFound = "HR_POSITION_NOT_FOUND";
+    public const string LeaveRequestOverlapping = "HR_LEAVE_REQUEST_OVERLAPPING";
+    public const string LeaveRequestMultiYearNotSupported = "HR_LEAVE_REQUEST_MULTI_YEAR_NOT_SUPPORTED";
 }

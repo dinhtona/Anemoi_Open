@@ -61,7 +61,8 @@ public sealed class LinkEmployeesToIdentityUsersHandler(
                 IdentityUserId = matchedIdentityUserId,
                 MatchStatus = status,
                 CreatedAt = now,
-                CreatedBy = createdBy
+                CreatedBy = createdBy,
+                IsDryRun = request.DryRun
             });
         }
 
