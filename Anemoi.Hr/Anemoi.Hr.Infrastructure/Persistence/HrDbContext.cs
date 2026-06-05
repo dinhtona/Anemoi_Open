@@ -9,6 +9,7 @@ namespace Anemoi.Hr.Infrastructure.Persistence;
 public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbContext(options)
 {
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<EmployeeIdentityLinkLog> EmployeeIdentityLinkLogs { get; set; }
     public DbSet<Department> Departments { get; set; }
     public DbSet<Position> Positions { get; set; }
     public DbSet<EmployeeDepartmentHistory> EmployeeDepartmentHistories { get; set; }

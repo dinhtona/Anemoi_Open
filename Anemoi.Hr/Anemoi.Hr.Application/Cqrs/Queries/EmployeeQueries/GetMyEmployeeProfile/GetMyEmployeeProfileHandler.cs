@@ -16,24 +16,30 @@ public sealed class GetMyEmployeeProfileHandler(ISqlRepository<Employee> reposit
     public async Task<OneOf<EmployeeResponse, ErrorDetailResponse>> Handle(GetMyEmployeeProfileQuery request,
         CancellationToken cancellationToken)
     {
-        // TEMPORARY LIMITATION: Currently, the Employee entity does not have an Identity/User mapping field (e.g., UserId).
-        // Once the mapping is added to the database model, we should resolve by request.UserId first.
-        // For now, we fallback to finding the employee by WorkEmail matching the authenticated user's email.
-        
-        if (string.IsNullOrEmpty(request.Email))
+        Employee employee = null;
+        if (Guid.TryParse(request.UserId, out var identityUserId))
         {
-            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+            employee = await repository.GetFirstByConditionAsync(
+                x => x.IdentityUserId == identityUserId,
+                IncludeProfileRelations,
+                cancellationToken);
         }
 
-        var employee = await repository.GetFirstByConditionAsync(
-            x => x.WorkEmail == request.Email,
-            q => q.Include(x => x.PrimaryDepartment)
-                  .Include(x => x.PrimaryPosition)
-                  .Include(x => x.DirectManager),
-            cancellationToken);
+        if (employee is null && !string.IsNullOrEmpty(request.Email))
+        {
+            employee = await repository.GetFirstByConditionAsync(
+                x => x.WorkEmail == request.Email,
+                IncludeProfileRelations,
+                cancellationToken);
+        }
 
         return employee is null
             ? HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound)
             : mapper.ToEmployeeResponse(employee);
     }
+
+    private static IQueryable<Employee> IncludeProfileRelations(IQueryable<Employee> query) =>
+        query.Include(x => x.PrimaryDepartment)
+            .Include(x => x.PrimaryPosition)
+            .Include(x => x.DirectManager);
 }

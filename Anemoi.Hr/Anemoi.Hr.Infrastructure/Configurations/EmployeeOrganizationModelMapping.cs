@@ -14,7 +14,8 @@ public sealed class EmployeeOrganizationModelMapping :
     IEntityTypeConfiguration<EmployeeDepartmentHistory>,
     IEntityTypeConfiguration<EmployeePositionHistory>,
     IEntityTypeConfiguration<EmployeeGradeHistory>,
-    IEntityTypeConfiguration<EmployeeManagerHistory>
+    IEntityTypeConfiguration<EmployeeManagerHistory>,
+    IEntityTypeConfiguration<EmployeeIdentityLinkLog>
 {
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
@@ -28,6 +29,7 @@ public sealed class EmployeeOrganizationModelMapping :
         builder.Property(x => x.DirectManagerEmployeeId)
             .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
         builder.HasKey(x => x.Id);
+        builder.HasIndex(x => x.IdentityUserId).IsUnique();
         builder.Property(x => x.EmployeeCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.FullName).HasMaxLength(256).IsRequired();
         builder.Property(x => x.WorkEmail).HasMaxLength(256);
@@ -49,6 +51,27 @@ public sealed class EmployeeOrganizationModelMapping :
             .WithMany(x => x.DirectReports)
             .HasForeignKey(x => x.DirectManagerEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeIdentityLinkLog> builder)
+    {
+        builder.ToTable("EmployeeIdentityLinkLogs");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeIdentityLinkLogId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.WorkEmail).HasMaxLength(256);
+        builder.Property(x => x.MatchStatus).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => x.EmployeeId);
+        builder.HasIndex(x => x.IdentityUserId);
+        builder.HasIndex(x => x.MatchStatus);
+        builder.HasIndex(x => x.CreatedAt);
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 
     public void Configure(EntityTypeBuilder<Department> builder)

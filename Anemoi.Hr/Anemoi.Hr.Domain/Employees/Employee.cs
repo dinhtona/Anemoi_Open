@@ -8,6 +8,7 @@ namespace Anemoi.Hr.Domain.Employees;
 public sealed class Employee : ValueObject
 {
     public EmployeeId Id { get; set; }
+    public Guid? IdentityUserId { get; set; }
     public string EmployeeCode { get; set; }
     public string FullName { get; set; }
     public string WorkEmail { get; set; }
