@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
@@ -19,14 +21,16 @@ public sealed class GetDashboardOverviewHandler(
     ISqlRepository<LeaveRequest> leaveRequestRepository,
     ISqlRepository<LeaveBalance> leaveBalanceRepository,
     ISqlRepository<Department> departmentRepository,
-    ISqlRepository<Position> positionRepository)
+    ISqlRepository<Position> positionRepository,
+    ISqlRepository<EmployeeContract> contractRepository,
+    HrSettings hrSettings)
     : IQueryHandler<GetDashboardOverviewQuery, DashboardOverviewResponse>
 {
     public async Task<DashboardOverviewResponse> Handle(GetDashboardOverviewQuery request,
         CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
-        var today = DateOnly.FromDateTime(now);
+        var today = GetBusinessToday();
 
         // 1. Summary Metrics
         var totalActiveEmployees = (int)await employeeRepository.CountByConditionAsync(
@@ -149,7 +153,17 @@ public sealed class GetDashboardOverviewHandler(
         )).ToList();
 
         // 5. Alerts Section
-        var contractExpirations = Array.Empty<ContractExpirationDto>();
+        var thresholdDate = today.AddDays(hrSettings.ContractExpirationAlertDays);
+        var expiringContracts = await contractRepository.GetManyByConditionAsync(
+            x => x.StatusCode == "Active" && x.EndDate != null && x.EndDate >= today && x.EndDate <= thresholdDate,
+            q => q.Include(x => x.Employee),
+            cancellationToken);
+
+        var contractExpirations = expiringContracts.Select(c => new ContractExpirationDto(
+            c.EmployeeId.Value,
+            c.Employee?.FullName ?? "",
+            $"Contract {c.ContractNumber} expires on {c.EndDate:yyyy-MM-dd}"
+        )).ToList();
 
         return new DashboardOverviewResponse(
             new DashboardSummarySection(
@@ -163,5 +177,19 @@ public sealed class GetDashboardOverviewHandler(
             new DashboardLeaveSection(whosOutToday, whosOutThisWeek),
             new DashboardAlertsSection(contractExpirations, nearExhaustionEmployees)
         );
+    }
+
+    private DateOnly GetBusinessToday()
+    {
+        try
+        {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(hrSettings.BusinessTimeZone);
+            var localTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
+            return DateOnly.FromDateTime(localTime.DateTime);
+        }
+        catch
+        {
+            return DateOnly.FromDateTime(DateTime.UtcNow);
+        }
     }
 }

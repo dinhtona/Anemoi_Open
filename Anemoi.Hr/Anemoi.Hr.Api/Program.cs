@@ -75,6 +75,7 @@ builder.Host.ConfigureServices((context, services) =>
     });
     services.AddHostedService<MonthlyLeaveAccrualWorker>();
     services.AddHostedService<DepartmentTransferWorker>();
+    services.AddHostedService<ContractExpirationWorker>();
 });
 
 var app = builder.Build();
