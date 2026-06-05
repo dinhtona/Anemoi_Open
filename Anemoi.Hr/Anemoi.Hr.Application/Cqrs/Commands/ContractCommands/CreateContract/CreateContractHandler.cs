@@ -64,7 +64,7 @@ public sealed class CreateContractHandler(
             c.StartDate <= newEndDateVal &&
             request.StartDate <= (c.EndDate ?? DateOnly.MaxValue));
 
-        if (hasOverlap)
+        if (!request.IsDraft && hasOverlap)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractOverlapping);
 
         // 6. Close the previous contract if it was active
@@ -83,13 +83,8 @@ public sealed class CreateContractHandler(
             prevContract.UpdatedBy = request.CreatedBy ?? "system";
         }
 
-        // 7. Create new contract (StatusCode starts as "Active" if StartDate <= today, otherwise can still start as "Active" representing a signed contract)
-        var statusCode = "Active";
-        if (request.StartDate > today)
-        {
-            // Even future contracts start as "Active" status in the simplified MVP lifecycle (representing signed/active pipeline contracts)
-            statusCode = "Active";
-        }
+        // 7. Create new contract
+        var statusCode = request.IsDraft ? "Draft" : "Active";
 
         var newContract = new EmployeeContract
         {

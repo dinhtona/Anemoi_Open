@@ -15,4 +15,5 @@ public sealed record UpdateContractCommand(
     DateOnly SignedDate,
     string Notes,
     string AttachmentFileId = null,
+    bool Activate = false,
     [property: JsonIgnore] string UpdatedBy = null) : ICommandResult<EmployeeContractDetailResponse>;

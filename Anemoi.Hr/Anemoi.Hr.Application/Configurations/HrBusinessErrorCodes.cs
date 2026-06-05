@@ -39,4 +39,6 @@ public static class HrBusinessErrorCodes
     public const string ContractAlreadyExpired = "HR_CONTRACT_ALREADY_EXPIRED";
     public const string ContractInvalidDateRange = "HR_CONTRACT_INVALID_DATE_RANGE";
     public const string ContractConcurrencyConflict = "HR_CONTRACT_CONCURRENCY_CONFLICT";
+    public const string ContractNotDraft = "HR_CONTRACT_NOT_DRAFT";
 }
+

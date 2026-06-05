@@ -6,6 +6,7 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Contracts;
+using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using System;
@@ -18,7 +19,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.ContractCommands.UpdateContract;
 public sealed class UpdateContractHandler(
     ISqlRepository<EmployeeContract> employeeContractRepository,
     IUnitOfWork unitOfWork,
-    EmployeeContractMapper mapper)
+    EmployeeContractMapper mapper,
+    HrSettings hrSettings)
     : ICommandHandler<UpdateContractCommand, OneOf<EmployeeContractDetailResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<EmployeeContractDetailResponse, ErrorDetailResponse>> Handle(
@@ -30,12 +32,9 @@ public sealed class UpdateContractHandler(
         if (contract is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNotFound);
 
-        // 2. Reject modifications on Terminated or Expired contracts
-        if (contract.StatusCode == "Terminated")
-            return HrErrorResponses.Create(HrBusinessErrorCodes.ContractAlreadyTerminated);
-
-        if (contract.StatusCode == "Expired")
-            return HrErrorResponses.Create(HrBusinessErrorCodes.ContractAlreadyExpired);
+        // 2. Reject modifications unless contract is Draft
+        if (contract.StatusCode != "Draft")
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNotDraft);
 
         // 3. Date range validation
         if (request.EndDate.HasValue && request.EndDate.Value < request.StartDate)
@@ -46,18 +45,51 @@ public sealed class UpdateContractHandler(
         if (isNumberDuplicated)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNumberDuplicated);
 
-        // 5. Overlap check excluding this contract
-        var existingContracts = await employeeContractRepository.GetManyByConditionAsync(x => x.EmployeeId == contract.EmployeeId && x.Id != request.Id, null, cancellationToken);
-        var newEndDateVal = request.EndDate ?? DateOnly.MaxValue;
-        var hasOverlap = existingContracts.Any(c =>
-            c.StatusCode != "Draft" &&
-            c.StartDate <= newEndDateVal &&
-            request.StartDate <= (c.EndDate ?? DateOnly.MaxValue));
+        // 5. Overlap check excluding this contract and the previous contract (only when activating)
+        if (request.Activate)
+        {
+            var existingContracts = await employeeContractRepository.GetManyByConditionAsync(x => x.EmployeeId == contract.EmployeeId && x.Id != request.Id, null, cancellationToken);
+            var newEndDateVal = request.EndDate ?? DateOnly.MaxValue;
+            var hasOverlap = existingContracts.Any(c =>
+                c.StatusCode != "Draft" &&
+                (contract.PreviousContractId == null || c.Id.Value != contract.PreviousContractId.Value) &&
+                c.StartDate <= newEndDateVal &&
+                request.StartDate <= (c.EndDate ?? DateOnly.MaxValue));
 
-        if (hasOverlap)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.ContractOverlapping);
+            if (hasOverlap)
+                return HrErrorResponses.Create(HrBusinessErrorCodes.ContractOverlapping);
+        }
 
-        // 6. Update fields
+        // 6. Renewal previous-contract handling
+        if (contract.PreviousContractId.HasValue && request.StartDate != contract.StartDate)
+        {
+            var prevId = new EmployeeContractId(contract.PreviousContractId.Value);
+            var prevContract = await employeeContractRepository.GetFirstByConditionAsync(x => x.Id == prevId, null, cancellationToken);
+            if (prevContract is not null)
+            {
+                var targetEndDate = request.StartDate.AddDays(-1);
+                if (targetEndDate < prevContract.StartDate)
+                    return HrErrorResponses.Create(HrBusinessErrorCodes.ContractInvalidDateRange);
+
+                prevContract.EndDate = targetEndDate;
+                var today = GetBusinessToday();
+                if (targetEndDate < today)
+                {
+                    prevContract.StatusCode = "Expired";
+                }
+                else
+                {
+                    if (prevContract.StatusCode == "Expired")
+                    {
+                        prevContract.StatusCode = "Active";
+                    }
+                }
+                prevContract.UpdatedAt = DateTime.UtcNow;
+                prevContract.UpdatedBy = request.UpdatedBy ?? "system";
+            }
+        }
+
+        // 7. Update fields
         contract.ContractNumber = request.ContractNumber;
         contract.ContractTypeCode = request.ContractTypeCode;
         contract.StartDate = request.StartDate;
@@ -68,6 +100,11 @@ public sealed class UpdateContractHandler(
         contract.UpdatedAt = DateTime.UtcNow;
         contract.UpdatedBy = request.UpdatedBy ?? "system";
 
+        if (request.Activate)
+        {
+            contract.StatusCode = "Active";
+        }
+
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
         {
@@ -77,5 +114,19 @@ public sealed class UpdateContractHandler(
         }
 
         return mapper.ToDetailResponse(contract);
+    }
+
+    private DateOnly GetBusinessToday()
+    {
+        try
+        {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(hrSettings.BusinessTimeZone);
+            var localTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
+            return DateOnly.FromDateTime(localTime.DateTime);
+        }
+        catch
+        {
+            return DateOnly.FromDateTime(DateTime.UtcNow);
+        }
     }
 }

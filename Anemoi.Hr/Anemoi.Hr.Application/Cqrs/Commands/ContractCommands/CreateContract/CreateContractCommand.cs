@@ -16,4 +16,5 @@ public sealed record CreateContractCommand(
     string Notes,
     string AttachmentFileId = null,
     Guid? PreviousContractId = null,
+    bool IsDraft = false,
     [property: JsonIgnore] string CreatedBy = null) : ICommandResult<EmployeeContractDetailResponse>;
