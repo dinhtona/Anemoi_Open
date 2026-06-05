@@ -37,6 +37,7 @@ public sealed class EmployeeOrganizationModelMapping :
         builder.Property(x => x.PhoneNumber).HasMaxLength(32);
         builder.Property(x => x.EmploymentStatusCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.EmploymentTypeCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.GradeCode).HasMaxLength(64);
         builder.HasIndex(x => x.EmployeeCode).IsUnique();
         builder.HasIndex(x => x.WorkEmail).IsUnique();
         builder.HasOne(x => x.PrimaryDepartment)
@@ -162,9 +163,12 @@ public sealed class EmployeeOrganizationModelMapping :
             .HasConversion(x => x.Value, id => new EmployeeId(id));
         builder.Property(x => x.PositionId)
             .HasConversion(x => x.Value, id => new PositionId(id));
+        builder.Property(x => x.OldPositionId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new PositionId(id.Value));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.ReasonCode).HasMaxLength(64);
-        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom });
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
         builder.HasOne(x => x.Employee)
             .WithMany(x => x.PositionHistories)
             .HasForeignKey(x => x.EmployeeId)
@@ -173,6 +177,13 @@ public sealed class EmployeeOrganizationModelMapping :
             .WithMany()
             .HasForeignKey(x => x.PositionId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.OldPosition)
+            .WithMany()
+            .HasForeignKey(x => x.OldPositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<EmployeeGradeHistory> builder)
@@ -184,12 +195,17 @@ public sealed class EmployeeOrganizationModelMapping :
             .HasConversion(x => x.Value, id => new EmployeeId(id));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.GradeCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.OldGradeCode).HasMaxLength(64);
         builder.Property(x => x.ReasonCode).HasMaxLength(64);
-        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom });
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
         builder.HasOne(x => x.Employee)
             .WithMany(x => x.GradeHistories)
             .HasForeignKey(x => x.EmployeeId)
             .OnDelete(DeleteBehavior.Cascade);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<EmployeeManagerHistory> builder)
