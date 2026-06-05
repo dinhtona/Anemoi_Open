@@ -44,6 +44,8 @@ public static class Permissions
     public const string HrDepartmentView = "hr.department.view";
     public const string HrPositionView = "hr.position.view";
     public const string HrDashboardView = "hr.dashboard.view";
+    public const string HrEmployeeTransferView = "hr.employee.transfer.view";
+    public const string HrEmployeeTransferCreate = "hr.employee.transfer.create";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -82,7 +84,9 @@ public static class Permissions
             true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),
-        new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView")
+        new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView"),
+        new(HrEmployeeTransferView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferView"),
+        new(HrEmployeeTransferCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferCreate", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

@@ -25,6 +25,8 @@ public static class HrPermissions
     public const string DepartmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrDepartmentView;
     public const string PositionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionView;
     public const string DashboardView = "hr.dashboard.view";
+    public const string EmployeeTransferView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferView;
+    public const string EmployeeTransferCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferCreate;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -44,7 +46,9 @@ public static class HrPermissions
         EmployeeIdentityLink,
         DepartmentView,
         PositionView,
-        DashboardView
+        DashboardView,
+        EmployeeTransferView,
+        EmployeeTransferCreate
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -53,7 +57,8 @@ public static class HrPermissions
             [LeaveBalanceAdjust] = new(LeaveBalanceAdjust, "High"),
             [LeaveRequestForceApprove] = new(LeaveRequestForceApprove, "High"),
             [LeaveRequestForceCancel] = new(LeaveRequestForceCancel, "High"),
-            [EmployeeIdentityLink] = new(EmployeeIdentityLink, "High")
+            [EmployeeIdentityLink] = new(EmployeeIdentityLink, "High"),
+            [EmployeeTransferCreate] = new(EmployeeTransferCreate, "High")
         };
 }
 

@@ -3,7 +3,9 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.LinkEmployeesToIdentityUsers;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.TransferEmployee;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployee;
+using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeDepartmentHistory;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployees;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetMyEmployeeProfile;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.SearchEmployees;
@@ -67,5 +69,27 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
     {
         var res = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.EmployeeTransferCreate)]
+    [ProducesResponseType(typeof(EmployeeDepartmentHistoryIdResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> TransferEmployee(
+        [FromBody] TransferEmployeeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpGet("{employeeId}")]
+    [HasPermission(HrPermissions.EmployeeTransferView)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EmployeeDepartmentHistoryResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeeDepartmentHistory(
+        [FromRoute] EmployeeId employeeId,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetEmployeeDepartmentHistoryQuery(employeeId), cancellationToken);
+        return Ok(res);
     }
 }

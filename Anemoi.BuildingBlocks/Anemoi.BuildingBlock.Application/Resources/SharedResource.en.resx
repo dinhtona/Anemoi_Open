@@ -234,4 +234,6 @@
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>View HR position information.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>View HR dashboard.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>View employee department transfer history.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Execute department transfers for employees.</value></data>
 </root>

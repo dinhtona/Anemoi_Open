@@ -74,6 +74,7 @@ builder.Host.ConfigureServices((context, services) =>
         };
     });
     services.AddHostedService<MonthlyLeaveAccrualWorker>();
+    services.AddHostedService<DepartmentTransferWorker>();
 });
 
 var app = builder.Build();

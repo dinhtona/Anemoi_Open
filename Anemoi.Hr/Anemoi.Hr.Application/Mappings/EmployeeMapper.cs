@@ -67,4 +67,25 @@ public partial class EmployeeMapper
             UpdatedAt = position.UpdatedAt
         };
     }
+
+    public EmployeeDepartmentHistoryResponse ToEmployeeDepartmentHistoryResponse(EmployeeDepartmentHistory history)
+    {
+        if (history is null) return null;
+        return new EmployeeDepartmentHistoryResponse
+        {
+            Id = history.Id.Value.ToString(),
+            EmployeeId = history.EmployeeId.Value.ToString(),
+            DepartmentId = history.DepartmentId.Value.ToString(),
+            DepartmentCode = history.Department?.Code,
+            DepartmentName = history.Department?.Name,
+            OldDepartmentId = history.OldDepartmentId?.Value.ToString(),
+            OldDepartmentCode = history.OldDepartment?.Code,
+            OldDepartmentName = history.OldDepartment?.Name,
+            EffectiveFrom = history.EffectiveFrom,
+            EffectiveTo = history.EffectiveTo,
+            ReasonCode = history.ReasonCode,
+            CreatedBy = history.CreatedBy,
+            CreatedAt = history.CreatedAt
+        };
+    }
 }

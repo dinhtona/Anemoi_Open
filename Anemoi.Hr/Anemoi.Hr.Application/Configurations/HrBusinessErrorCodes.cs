@@ -20,4 +20,7 @@ public static class HrBusinessErrorCodes
     public const string PositionNotFound = "HR_POSITION_NOT_FOUND";
     public const string LeaveRequestOverlapping = "HR_LEAVE_REQUEST_OVERLAPPING";
     public const string LeaveRequestMultiYearNotSupported = "HR_LEAVE_REQUEST_MULTI_YEAR_NOT_SUPPORTED";
+    public const string DepartmentTransferOverlapping = "HR_DEPARTMENT_TRANSFER_OVERLAPPING";
+    public const string DepartmentTransferSameDepartment = "HR_DEPARTMENT_TRANSFER_SAME_DEPARTMENT";
+    public const string DepartmentTransferDateBeforeJoinDate = "HR_DEPARTMENT_TRANSFER_DATE_BEFORE_JOIN_DATE";
 }

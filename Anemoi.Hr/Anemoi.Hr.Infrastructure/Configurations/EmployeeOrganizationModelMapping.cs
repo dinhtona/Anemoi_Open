@@ -51,6 +51,9 @@ public sealed class EmployeeOrganizationModelMapping :
             .WithMany(x => x.DirectReports)
             .HasForeignKey(x => x.DirectManagerEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<EmployeeIdentityLinkLog> builder)
@@ -127,9 +130,12 @@ public sealed class EmployeeOrganizationModelMapping :
             .HasConversion(x => x.Value, id => new EmployeeId(id));
         builder.Property(x => x.DepartmentId)
             .HasConversion(x => x.Value, id => new DepartmentId(id));
+        builder.Property(x => x.OldDepartmentId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new DepartmentId(id.Value));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.ReasonCode).HasMaxLength(64);
-        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom });
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
         builder.HasOne(x => x.Employee)
             .WithMany(x => x.DepartmentHistories)
             .HasForeignKey(x => x.EmployeeId)
@@ -138,6 +144,13 @@ public sealed class EmployeeOrganizationModelMapping :
             .WithMany()
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.OldDepartment)
+            .WithMany()
+            .HasForeignKey(x => x.OldDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<EmployeePositionHistory> builder)

@@ -234,4 +234,6 @@
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>Xem lịch sử chuyển phòng ban của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Thực hiện chuyển phòng ban cho nhân viên.</value></data>
 </root>
