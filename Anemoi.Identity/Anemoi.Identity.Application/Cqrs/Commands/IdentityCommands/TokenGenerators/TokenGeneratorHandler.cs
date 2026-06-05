@@ -41,6 +41,10 @@ public sealed class TokenGeneratorHandler(
         claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName ?? string.Empty));
         claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName ?? string.Empty));
         claimsIdentity.AddClaim(new Claim("id", user.UserId.ToString()));
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+        }
         var userRoles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
         claimsIdentity.AddClaims(userRoles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 

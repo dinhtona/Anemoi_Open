@@ -104,6 +104,10 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
 
         var roleGroupClaims = rolesResult.Items.SelectMany(a => a.RoleGroupClaims);
         claimsIdentity.AddClaim(new Claim("id", user.UserId.ToString()));
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+        }
         claimsIdentity.AddClaims(roleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
         claimsIdentity.AddClaims(RoleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
         claimsIdentity.AddClaims(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
