@@ -40,6 +40,7 @@ public static class Permissions
     public const string HrLeaveRequestForceCancel = "hr.leave.request.force_cancel";
     public const string HrLeaveTransactionView = "hr.leave.transaction.view";
     public const string HrEmployeeView = "hr.employee.view";
+    public const string HrEmployeeIdentityLink = "hr.employee.identity_link";
     public const string HrDepartmentView = "hr.department.view";
     public const string HrPositionView = "hr.position.view";
 
@@ -76,6 +77,8 @@ public static class Permissions
             "PermissionDescriptionHrLeaveRequestForceCancel", true, "High"),
         new(HrLeaveTransactionView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTransactionView"),
         new(HrEmployeeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeView"),
+        new(HrEmployeeIdentityLink, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeIdentityLink",
+            true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView")
     ];

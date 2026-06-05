@@ -228,6 +228,7 @@
   <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>Xem giao dịch nghỉ phép.</value></data>
   <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>Nhân viên</value></data>
   <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>Xem thông tin nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Liên kết nhân viên với người dùng định danh.</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>

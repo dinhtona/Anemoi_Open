@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.LinkEmployeesToIdentityUsers;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployee;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployees;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetMyEmployeeProfile;
@@ -54,6 +55,17 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         var userId = HttpContext.GetUserId();
         var email = HttpContext.GetClaimValue("email");
         var res = await sender.Send(new GetMyEmployeeProfileQuery(userId, email), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.EmployeeIdentityLink)]
+    [ProducesResponseType(typeof(EmployeeIdentityLinkResultResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> LinkEmployeesToIdentityUsers(
+        [FromBody] LinkEmployeesToIdentityUsersCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

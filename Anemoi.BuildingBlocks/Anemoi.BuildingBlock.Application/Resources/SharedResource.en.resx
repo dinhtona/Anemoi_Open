@@ -228,6 +228,7 @@
   <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>View HR leave transactions.</value></data>
   <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>HR Employee</value></data>
   <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>View HR employee profiles.</value></data>
+  <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Link HR employees to identity users.</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>HR Department</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>View HR department information.</value></data>
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>

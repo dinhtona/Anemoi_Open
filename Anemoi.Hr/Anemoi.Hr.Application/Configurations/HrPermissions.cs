@@ -20,6 +20,8 @@ public static class HrPermissions
     public const string LeaveTransactionView =
         Anemoi.BuildingBlock.Application.Authorization.Permissions.HrLeaveTransactionView;
     public const string EmployeeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeView;
+    public const string EmployeeIdentityLink =
+        Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeIdentityLink;
     public const string DepartmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrDepartmentView;
     public const string PositionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionView;
 
@@ -38,6 +40,7 @@ public static class HrPermissions
         LeaveRequestForceCancel,
         LeaveTransactionView,
         EmployeeView,
+        EmployeeIdentityLink,
         DepartmentView,
         PositionView
     ];
@@ -47,7 +50,8 @@ public static class HrPermissions
         {
             [LeaveBalanceAdjust] = new(LeaveBalanceAdjust, "High"),
             [LeaveRequestForceApprove] = new(LeaveRequestForceApprove, "High"),
-            [LeaveRequestForceCancel] = new(LeaveRequestForceCancel, "High")
+            [LeaveRequestForceCancel] = new(LeaveRequestForceCancel, "High"),
+            [EmployeeIdentityLink] = new(EmployeeIdentityLink, "High")
         };
 }
 
