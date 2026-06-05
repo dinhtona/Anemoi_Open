@@ -15,6 +15,7 @@ public sealed class ServiceInstaller : IInstaller
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<LeaveMapper>();
+        services.AddScoped<EmployeeMapper>();
         services.AddScoped<ApproveLeaveRequestHandler>();
         services.AddScoped<CancelLeaveRequestHandler>();
         services.AddEfRepositoriesAsScope<HrDbContext>(typeof(IHrDomainAssemblyMarker).Assembly);

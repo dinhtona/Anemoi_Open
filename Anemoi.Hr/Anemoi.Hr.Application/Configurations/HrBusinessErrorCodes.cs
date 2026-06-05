@@ -14,4 +14,7 @@ public static class HrBusinessErrorCodes
     public const string LeaveRequestInvalidDateRange = "HR_LEAVE_REQUEST_INVALID_DATE_RANGE";
     public const string LeaveAdjustmentReasonRequired = "HR_LEAVE_ADJUSTMENT_REASON_REQUIRED";
     public const string PermissionSensitiveConfirmationRequired = "HR_PERMISSION_SENSITIVE_CONFIRMATION_REQUIRED";
+    public const string EmployeeNotFound = "HR_EMPLOYEE_NOT_FOUND";
+    public const string DepartmentNotFound = "HR_DEPARTMENT_NOT_FOUND";
+    public const string PositionNotFound = "HR_POSITION_NOT_FOUND";
 }

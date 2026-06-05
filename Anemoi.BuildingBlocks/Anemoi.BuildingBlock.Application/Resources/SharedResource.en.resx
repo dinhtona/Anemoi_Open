@@ -213,4 +213,23 @@
   <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>View development mock API routes.</value></data>
   <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Create, update and delete development mock API routes.</value></data>
   <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Unmapped permission: {0}. Add metadata to the permission catalog.</value></data>
+  <data name="PermissionGroupHrLeave" xml:space="preserve"><value>HR Leave</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyView" xml:space="preserve"><value>View HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyCreate" xml:space="preserve"><value>Create HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyUpdate" xml:space="preserve"><value>Update HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceView" xml:space="preserve"><value>View HR leave balances.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceAdjust" xml:space="preserve"><value>Adjust HR leave balances.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestView" xml:space="preserve"><value>View HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCreate" xml:space="preserve"><value>Create HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestApprove" xml:space="preserve"><value>Approve HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCancel" xml:space="preserve"><value>Cancel HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Force approve HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Force cancel HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>View HR leave transactions.</value></data>
+  <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>HR Employee</value></data>
+  <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>View HR employee profiles.</value></data>
+  <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>HR Department</value></data>
+  <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>View HR department information.</value></data>
+  <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>
+  <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>View HR position information.</value></data>
 </root>

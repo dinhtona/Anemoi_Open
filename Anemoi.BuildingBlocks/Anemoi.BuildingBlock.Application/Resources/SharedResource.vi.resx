@@ -213,4 +213,23 @@
   <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>Xem các route API giả lập phục vụ phát triển.</value></data>
   <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Tạo, cập nhật và xóa các route API giả lập phục vụ phát triển.</value></data>
   <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Quyền chưa được ánh xạ: {0}. Hãy bổ sung metadata vào danh mục quyền.</value></data>
+  <data name="PermissionGroupHrLeave" xml:space="preserve"><value>Nghỉ phép</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyView" xml:space="preserve"><value>Xem chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyCreate" xml:space="preserve"><value>Tạo chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyUpdate" xml:space="preserve"><value>Cập nhật chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceView" xml:space="preserve"><value>Xem số dư nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceAdjust" xml:space="preserve"><value>Điều chỉnh số dư nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestView" xml:space="preserve"><value>Xem yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCreate" xml:space="preserve"><value>Tạo yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestApprove" xml:space="preserve"><value>Phê duyệt yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCancel" xml:space="preserve"><value>Hủy yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Bắt buộc phê duyệt yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Bắt buộc hủy yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>Xem giao dịch nghỉ phép.</value></data>
+  <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>Nhân viên</value></data>
+  <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>Xem thông tin nhân viên.</value></data>
+  <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
+  <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
+  <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
+  <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
 </root>

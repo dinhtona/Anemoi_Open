@@ -39,6 +39,9 @@ public static class Permissions
     public const string HrLeaveRequestForceApprove = "hr.leave.request.force_approve";
     public const string HrLeaveRequestForceCancel = "hr.leave.request.force_cancel";
     public const string HrLeaveTransactionView = "hr.leave.transaction.view";
+    public const string HrEmployeeView = "hr.employee.view";
+    public const string HrDepartmentView = "hr.department.view";
+    public const string HrPositionView = "hr.position.view";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -71,7 +74,10 @@ public static class Permissions
             "PermissionDescriptionHrLeaveRequestForceApprove", true, "High"),
         new(HrLeaveRequestForceCancel, "PermissionGroupHrLeave",
             "PermissionDescriptionHrLeaveRequestForceCancel", true, "High"),
-        new(HrLeaveTransactionView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTransactionView")
+        new(HrLeaveTransactionView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTransactionView"),
+        new(HrEmployeeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeView"),
+        new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
+        new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

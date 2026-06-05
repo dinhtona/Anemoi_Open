@@ -19,6 +19,9 @@ public static class HrPermissions
         Anemoi.BuildingBlock.Application.Authorization.Permissions.HrLeaveRequestForceCancel;
     public const string LeaveTransactionView =
         Anemoi.BuildingBlock.Application.Authorization.Permissions.HrLeaveTransactionView;
+    public const string EmployeeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeView;
+    public const string DepartmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrDepartmentView;
+    public const string PositionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionView;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -33,7 +36,10 @@ public static class HrPermissions
         LeaveRequestCancel,
         LeaveRequestForceApprove,
         LeaveRequestForceCancel,
-        LeaveTransactionView
+        LeaveTransactionView,
+        EmployeeView,
+        DepartmentView,
+        PositionView
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
