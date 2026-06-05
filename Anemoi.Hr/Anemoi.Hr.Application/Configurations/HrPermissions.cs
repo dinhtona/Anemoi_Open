@@ -27,6 +27,12 @@ public static class HrPermissions
     public const string DashboardView = "hr.dashboard.view";
     public const string EmployeeTransferView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferView;
     public const string EmployeeTransferCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferCreate;
+    public const string PromotionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPromotionView;
+    public const string PromotionCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPromotionCreate;
+    public const string PositionChangeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionChangeView;
+    public const string PositionChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionChange;
+    public const string GradeChangeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrGradeChangeView;
+    public const string GradeChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrGradeChange;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -48,7 +54,13 @@ public static class HrPermissions
         PositionView,
         DashboardView,
         EmployeeTransferView,
-        EmployeeTransferCreate
+        EmployeeTransferCreate,
+        PromotionView,
+        PromotionCreate,
+        PositionChangeView,
+        PositionChange,
+        GradeChangeView,
+        GradeChange
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -58,7 +70,10 @@ public static class HrPermissions
             [LeaveRequestForceApprove] = new(LeaveRequestForceApprove, "High"),
             [LeaveRequestForceCancel] = new(LeaveRequestForceCancel, "High"),
             [EmployeeIdentityLink] = new(EmployeeIdentityLink, "High"),
-            [EmployeeTransferCreate] = new(EmployeeTransferCreate, "High")
+            [EmployeeTransferCreate] = new(EmployeeTransferCreate, "High"),
+            [PromotionCreate] = new(PromotionCreate, "High"),
+            [PositionChange] = new(PositionChange, "High"),
+            [GradeChange] = new(GradeChange, "High")
         };
 }
 

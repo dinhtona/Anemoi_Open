@@ -46,6 +46,12 @@ public static class Permissions
     public const string HrDashboardView = "hr.dashboard.view";
     public const string HrEmployeeTransferView = "hr.employee.transfer.view";
     public const string HrEmployeeTransferCreate = "hr.employee.transfer.create";
+    public const string HrPromotionView = "hr.promotion.view";
+    public const string HrPromotionCreate = "hr.promotion.create";
+    public const string HrPositionChangeView = "hr.position.change.view";
+    public const string HrPositionChange = "hr.position.change";
+    public const string HrGradeChangeView = "hr.grade.change.view";
+    public const string HrGradeChange = "hr.grade.change";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -86,7 +92,13 @@ public static class Permissions
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),
         new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView"),
         new(HrEmployeeTransferView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferView"),
-        new(HrEmployeeTransferCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferCreate", true, "High")
+        new(HrEmployeeTransferCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferCreate", true, "High"),
+        new(HrPromotionView, "PermissionGroupHrEmployee", "PermissionDescriptionHrPromotionView"),
+        new(HrPromotionCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrPromotionCreate", true, "High"),
+        new(HrPositionChangeView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionChangeView"),
+        new(HrPositionChange, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionChange", true, "High"),
+        new(HrGradeChangeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrGradeChangeView"),
+        new(HrGradeChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrGradeChange", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

@@ -23,4 +23,13 @@ public static class HrBusinessErrorCodes
     public const string DepartmentTransferOverlapping = "HR_DEPARTMENT_TRANSFER_OVERLAPPING";
     public const string DepartmentTransferSameDepartment = "HR_DEPARTMENT_TRANSFER_SAME_DEPARTMENT";
     public const string DepartmentTransferDateBeforeJoinDate = "HR_DEPARTMENT_TRANSFER_DATE_BEFORE_JOIN_DATE";
+    public const string PromotionNoChange = "HR_PROMOTION_NO_CHANGE";
+    public const string PositionChangeSamePosition = "HR_POSITION_CHANGE_SAME_POSITION";
+    public const string GradeChangeSameGrade = "HR_GRADE_CHANGE_SAME_GRADE";
+    public const string PositionChangeOverlapping = "HR_POSITION_CHANGE_OVERLAPPING";
+    public const string GradeChangeOverlapping = "HR_GRADE_CHANGE_OVERLAPPING";
+    public const string GradeNotFound = "HR_GRADE_NOT_FOUND";
+    public const string PromotionDateBeforeJoinDate = "HR_PROMOTION_DATE_BEFORE_JOIN_DATE";
+    public const string PromotionEffectiveDateInFuture = "HR_PROMOTION_EFFECTIVE_DATE_IN_FUTURE";
+    public const string PromotionConcurrencyConflict = "HR_PROMOTION_CONCURRENCY_CONFLICT";
 }

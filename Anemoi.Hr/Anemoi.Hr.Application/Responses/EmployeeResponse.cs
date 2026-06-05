@@ -14,6 +14,7 @@ public sealed class EmployeeResponse
     public DateOnly JoinDate { get; set; }
     public string EmploymentStatusCode { get; set; }
     public string EmploymentTypeCode { get; set; }
+    public string GradeCode { get; set; }
     public string PrimaryDepartmentId { get; set; }
     public string PrimaryPositionId { get; set; }
     public string DirectManagerEmployeeId { get; set; }

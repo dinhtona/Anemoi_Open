@@ -236,4 +236,10 @@
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>View HR dashboard.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>View employee department transfer history.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Execute department transfers for employees.</value></data>
+  <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>View employee promotion history.</value></data>
+  <data name="PermissionDescriptionHrPromotionCreate" xml:space="preserve"><value>Execute employee promotions.</value></data>
+  <data name="PermissionDescriptionHrPositionChangeView" xml:space="preserve"><value>View employee position change history.</value></data>
+  <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Execute employee position changes.</value></data>
+  <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>View employee grade change history.</value></data>
+  <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Execute employee grade changes.</value></data>
 </root>

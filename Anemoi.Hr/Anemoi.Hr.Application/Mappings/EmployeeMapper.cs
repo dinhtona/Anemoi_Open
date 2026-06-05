@@ -24,6 +24,7 @@ public partial class EmployeeMapper
             JoinDate = employee.JoinDate,
             EmploymentStatusCode = employee.EmploymentStatusCode,
             EmploymentTypeCode = employee.EmploymentTypeCode,
+            GradeCode = employee.GradeCode,
             PrimaryDepartmentId = employee.PrimaryDepartmentId?.Value.ToString(),
             PrimaryPositionId = employee.PrimaryPositionId?.Value.ToString(),
             DirectManagerEmployeeId = employee.DirectManagerEmployeeId?.Value.ToString(),
@@ -81,6 +82,44 @@ public partial class EmployeeMapper
             OldDepartmentId = history.OldDepartmentId?.Value.ToString(),
             OldDepartmentCode = history.OldDepartment?.Code,
             OldDepartmentName = history.OldDepartment?.Name,
+            EffectiveFrom = history.EffectiveFrom,
+            EffectiveTo = history.EffectiveTo,
+            ReasonCode = history.ReasonCode,
+            CreatedBy = history.CreatedBy,
+            CreatedAt = history.CreatedAt
+        };
+    }
+
+    public EmployeePositionHistoryResponse ToEmployeePositionHistoryResponse(EmployeePositionHistory history)
+    {
+        if (history is null) return null;
+        return new EmployeePositionHistoryResponse
+        {
+            Id = history.Id.Value.ToString(),
+            EmployeeId = history.EmployeeId.Value.ToString(),
+            PositionId = history.PositionId.Value.ToString(),
+            PositionCode = history.Position?.Code,
+            PositionName = history.Position?.Name,
+            OldPositionId = history.OldPositionId?.Value.ToString(),
+            OldPositionCode = history.OldPosition?.Code,
+            OldPositionName = history.OldPosition?.Name,
+            EffectiveFrom = history.EffectiveFrom,
+            EffectiveTo = history.EffectiveTo,
+            ReasonCode = history.ReasonCode,
+            CreatedBy = history.CreatedBy,
+            CreatedAt = history.CreatedAt
+        };
+    }
+
+    public EmployeeGradeHistoryResponse ToEmployeeGradeHistoryResponse(EmployeeGradeHistory history)
+    {
+        if (history is null) return null;
+        return new EmployeeGradeHistoryResponse
+        {
+            Id = history.Id.Value.ToString(),
+            EmployeeId = history.EmployeeId.Value.ToString(),
+            GradeCode = history.GradeCode,
+            OldGradeCode = history.OldGradeCode,
             EffectiveFrom = history.EffectiveFrom,
             EffectiveTo = history.EffectiveTo,
             ReasonCode = history.ReasonCode,

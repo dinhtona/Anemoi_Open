@@ -236,4 +236,10 @@
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>Xem lịch sử chuyển phòng ban của nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Thực hiện chuyển phòng ban cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>Xem lịch sử thăng chức của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPromotionCreate" xml:space="preserve"><value>Thực hiện thăng chức cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPositionChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi chức vụ của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Thực hiện thay đổi chức vụ cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi cấp bậc của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Thực hiện thay đổi cấp bậc cho nhân viên.</value></data>
 </root>

@@ -3,9 +3,13 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.LinkEmployeesToIdentityUsers;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.PromoteEmployee;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.TransferEmployee;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployee;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeDepartmentHistory;
+using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeGradeHistory;
+using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePositionHistory;
+using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePromotionTimeline;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployees;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetMyEmployeeProfile;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.SearchEmployees;
@@ -82,6 +86,17 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
+    [HttpPost]
+    [HasPermission(HrPermissions.PromotionCreate)]
+    [ProducesResponseType(typeof(PromoteEmployeeResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PromoteEmployee(
+        [FromBody] PromoteEmployeeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
     [HttpGet("{employeeId}")]
     [HasPermission(HrPermissions.EmployeeTransferView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<EmployeeDepartmentHistoryResponse>), StatusCodes.Status200OK)]
@@ -90,6 +105,39 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeeDepartmentHistoryQuery(employeeId), cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpGet("{employeeId}")]
+    [HasPermission(HrPermissions.PositionChangeView)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EmployeePositionHistoryResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeePositionHistory(
+        [FromRoute] EmployeeId employeeId,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetEmployeePositionHistoryQuery(employeeId), cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpGet("{employeeId}")]
+    [HasPermission(HrPermissions.GradeChangeView)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EmployeeGradeHistoryResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeeGradeHistory(
+        [FromRoute] EmployeeId employeeId,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetEmployeeGradeHistoryQuery(employeeId), cancellationToken);
+        return Ok(res);
+    }
+
+    [HttpGet("{employeeId}")]
+    [HasPermission(HrPermissions.PromotionView)]
+    [ProducesResponseType(typeof(IReadOnlyCollection<EmployeePromotionTimelineResponse>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeePromotionTimeline(
+        [FromRoute] EmployeeId employeeId,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetEmployeePromotionTimelineQuery(employeeId), cancellationToken);
         return Ok(res);
     }
 }
