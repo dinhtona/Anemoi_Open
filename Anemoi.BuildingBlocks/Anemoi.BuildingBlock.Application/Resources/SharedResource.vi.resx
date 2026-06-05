@@ -233,4 +233,5 @@
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
+  <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
 </root>

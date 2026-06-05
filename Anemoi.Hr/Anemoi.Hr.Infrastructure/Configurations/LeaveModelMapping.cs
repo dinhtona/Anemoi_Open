@@ -75,6 +75,7 @@ public sealed class LeaveModelMapping :
         builder.Property(x => x.Reason).HasMaxLength(1024);
         builder.HasIndex(x => new { x.EmployeeId, x.StatusCode });
         builder.HasIndex(x => new { x.StartDate, x.EndDate });
+        builder.HasIndex(x => new { x.StatusCode, x.StartDate, x.EndDate });
         builder.HasOne(x => x.Employee)
             .WithMany()
             .HasForeignKey(x => x.EmployeeId)

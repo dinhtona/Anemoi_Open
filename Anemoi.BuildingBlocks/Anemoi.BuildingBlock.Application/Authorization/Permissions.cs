@@ -43,6 +43,7 @@ public static class Permissions
     public const string HrEmployeeIdentityLink = "hr.employee.identity_link";
     public const string HrDepartmentView = "hr.department.view";
     public const string HrPositionView = "hr.position.view";
+    public const string HrDashboardView = "hr.dashboard.view";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -80,7 +81,8 @@ public static class Permissions
         new(HrEmployeeIdentityLink, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeIdentityLink",
             true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
-        new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView")
+        new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),
+        new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

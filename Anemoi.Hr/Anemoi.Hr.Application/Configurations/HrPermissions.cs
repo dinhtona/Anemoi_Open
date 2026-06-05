@@ -24,6 +24,7 @@ public static class HrPermissions
         Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeIdentityLink;
     public const string DepartmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrDepartmentView;
     public const string PositionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionView;
+    public const string DashboardView = "hr.dashboard.view";
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -42,7 +43,8 @@ public static class HrPermissions
         EmployeeView,
         EmployeeIdentityLink,
         DepartmentView,
-        PositionView
+        PositionView,
+        DashboardView
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
