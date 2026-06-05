@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Domain.StronglyTypedHelper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +9,10 @@ public sealed class ControllerInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new StronglyTypedIdJsonConverterFactory());
+            });
     }
 }
