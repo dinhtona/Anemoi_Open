@@ -2,6 +2,9 @@
 	@mail path /mail /mail/*
 	reverse_proxy @mail smtp4dev:80
 
+	@hr path /api/hr /api/hr/*
+	reverse_proxy @hr anemoi_hr:8080
+
 	@backend path /api /api/* /hubs /hubs/*
 	reverse_proxy @backend anemoi_centralize:8080
 	reverse_proxy anemoi_web:3000

@@ -1,10 +1,18 @@
+using System.Reflection;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.Hr.Api.Services;
 using Anemoi.Hr.Infrastructure;
+using Anemoi.BuildingBlock.Application.Configurations;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +23,57 @@ builder.Host.UseDefaultServiceProvider((context, provider) =>
             context.HostingEnvironment.IsDevelopment();
 });
 
-builder.Services.InstallServicesInAssembly<IHrInfrastructureAssemblyMarker>(builder.Configuration);
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
-builder.Services.AddHostedService<MonthlyLeaveAccrualWorker>();
+builder.Configuration
+    .AddUserSecrets(Assembly.GetExecutingAssembly())
+    .AddEnvironmentVariables()
+    .AddJsonFile("serilogConfiguration.json");
+
+builder.Host.UseSerilog((host, configuration) => configuration.Enrich
+    .FromLogContext()
+    .ReadFrom.Configuration(host.Configuration)
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .MinimumLevel.Override("System", LogEventLevel.Information));
+
+builder.Host.ConfigureServices((context, services) =>
+{
+    services.InstallServicesInAssembly<IHrInfrastructureAssemblyMarker>(context.Configuration);
+    services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = context.Configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>();
+        var publicKeyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jwtSettings.PublicKeyPath);
+        var publicSigningCredential = JwtSecurity.GetPublicSigningCredential(publicKeyPath);
+
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = publicSigningCredential,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+            ValidateLifetime = true,
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ClockSkew = TimeSpan.Zero
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = messageReceivedContext =>
+            {
+                if (messageReceivedContext.Request.Cookies.ContainsKey("access_token"))
+                {
+                    messageReceivedContext.Token = messageReceivedContext.Request.Cookies["access_token"];
+                }
+                return Task.CompletedTask;
+            }
+        };
+    });
+    services.AddHostedService<MonthlyLeaveAccrualWorker>();
+});
 
 var app = builder.Build();
 
@@ -34,5 +89,7 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+await Anemoi.BuildingBlock.Infrastructure.RunSqlMigration.MigrationDatabase.MigrationDatabaseAsync<Anemoi.Hr.Infrastructure.Persistence.HrDbContext>(app);
 
 await app.RunAsync();

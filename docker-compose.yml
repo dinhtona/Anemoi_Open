@@ -217,6 +217,33 @@ services:
     networks:
       - anemoi_network
 
+  # HR service
+  anemoi_hr:
+    image: anemoi/hr
+    build:
+      context: .
+      dockerfile: Anemoi.Hr/Anemoi.Hr.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Hr
+      - MassTransitSetting__Host=rabbitmq
+      - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
+      - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
+      - JwtSetting__Issuer=${JWT_ISSUER}
+      - JwtSetting__Audience=${JWT_AUDIENCE}
+      - HrSettings__BusinessTimeZone=Asia/Ho_Chi_Minh
+      - HrSettings__MonthlyAccrualCheckIntervalHours=12
+      - HrSettings__MonthlyAccrualRunHour=0
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${HR_API_HOST_PORT:-8082}:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+
   # Orchestrator service (for Saga orchestration)
   # anemoi_orchestrator:
   #   image: anemoi/orchestrator
