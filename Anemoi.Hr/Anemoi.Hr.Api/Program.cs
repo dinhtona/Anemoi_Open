@@ -2,6 +2,7 @@ using System.Reflection;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.Hr.Api.Services;
 using Anemoi.Hr.Infrastructure;
+using Anemoi.Hr.Infrastructure.SeedData;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -91,5 +92,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 await Anemoi.BuildingBlock.Infrastructure.RunSqlMigration.MigrationDatabase.MigrationDatabaseAsync<Anemoi.Hr.Infrastructure.Persistence.HrDbContext>(app);
+
+if (app.Environment.IsDevelopment())
+{
+    using var serviceScope = app.Services.CreateScope();
+    await HrDevSeedData.SeedAsync(serviceScope);
+}
 
 await app.RunAsync();

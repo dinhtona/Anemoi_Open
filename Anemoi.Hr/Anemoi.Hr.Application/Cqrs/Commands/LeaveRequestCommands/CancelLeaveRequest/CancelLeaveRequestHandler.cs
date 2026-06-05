@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
@@ -28,6 +29,10 @@ public sealed class CancelLeaveRequestHandler(
         if (leaveRequest is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestNotFound);
         if (leaveRequest.StatusCode == "Cancelled")
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyCancelled);
+        if (leaveRequest.StatusCode == "Rejected")
+            return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyRejected);
+        if (leaveRequest.StatusCode is not ("Pending" or "Approved"))
+            return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestInvalidStatus);
 
         var balance = await leaveBalanceRepository.GetFirstByConditionAsync(
             x => x.EmployeeId == leaveRequest.EmployeeId &&
@@ -56,7 +61,12 @@ public sealed class CancelLeaveRequestHandler(
             request.Reason), cancellationToken);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1) return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+        if (saveResult.IsT1)
+        {
+            return saveResult.AsT1 is DbUpdateConcurrencyException
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
+                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+        }
 
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),

@@ -63,6 +63,37 @@ public static class SeedData
         }
     }
 
+    public static async Task RegisterDevTestUsersAsync(IServiceScope serviceScope)
+    {
+        var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
+        var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+        var seedUsers = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>()?.DevTestUsers ?? [];
+
+        foreach (var user in seedUsers)
+        {
+            var email = user.UserName?.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(email)) continue;
+            if (await userDbRepository.ExistByConditionAsync(x => x.Email == email && x.IsActivated))
+                continue;
+
+            var result = await mediator.Send(new CreateUserCommand
+            {
+                Email = email,
+                Password = user.Password,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                IsActivated = true
+            });
+            if (result.IsT1)
+            {
+                logger.Warning("[SeedData] Failed to create dev test user {@Email}: {@Error}",
+                    email, result.AsT1);
+            }
+        }
+    }
+
     public static async Task RemoveReservedApplicationPolicyClaimsAsync(IServiceScope serviceScope)
     {
         var userClaimRepository = serviceScope.ServiceProvider.GetRequiredService<IUserClaimRepository>();

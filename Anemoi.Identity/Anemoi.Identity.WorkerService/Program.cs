@@ -44,6 +44,11 @@ await SeedData.SeedApplicationPoliciesAsync(serviceScope);
 
 await SeedData.RegisterAdministratorAsync(serviceScope);
 
+if (app.Environment.IsDevelopment())
+{
+    await SeedData.RegisterDevTestUsersAsync(serviceScope);
+}
+
 await SeedData.NormalizeAuthorizationAssignmentsAsync(serviceScope);
 
 await SeedData.RemoveReservedApplicationPolicyClaimsAsync(serviceScope);

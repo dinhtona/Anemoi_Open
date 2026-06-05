@@ -52,6 +52,9 @@ public sealed class LeaveModelMapping :
             .WithMany(x => x.LeaveBalances)
             .HasForeignKey(x => x.LeavePolicyId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<LeaveRequest> builder)

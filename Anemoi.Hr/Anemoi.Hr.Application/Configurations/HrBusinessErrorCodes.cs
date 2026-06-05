@@ -6,6 +6,7 @@ public static class HrBusinessErrorCodes
     public const string LeavePolicyCodeAlreadyExists = "HR_LEAVE_POLICY_CODE_ALREADY_EXISTS";
     public const string LeaveBalanceNotFound = "HR_LEAVE_BALANCE_NOT_FOUND";
     public const string LeaveBalanceNotEnough = "HR_LEAVE_BALANCE_NOT_ENOUGH";
+    public const string LeaveBalanceConcurrencyConflict = "HR_LEAVE_BALANCE_CONCURRENCY_CONFLICT";
     public const string LeaveRequestNotFound = "HR_LEAVE_REQUEST_NOT_FOUND";
     public const string LeaveRequestAlreadyApproved = "HR_LEAVE_REQUEST_ALREADY_APPROVED";
     public const string LeaveRequestAlreadyRejected = "HR_LEAVE_REQUEST_ALREADY_REJECTED";
