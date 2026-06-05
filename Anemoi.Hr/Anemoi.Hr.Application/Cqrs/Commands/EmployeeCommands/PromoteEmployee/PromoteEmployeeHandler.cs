@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
@@ -17,6 +18,8 @@ public sealed class PromoteEmployeeHandler(
     ISqlRepository<Position> positionRepository,
     ISqlRepository<EmployeePositionHistory> employeePositionHistoryRepository,
     ISqlRepository<EmployeeGradeHistory> employeeGradeHistoryRepository,
+    IEmployeeGradeLookup employeeGradeLookup,
+    HrSettings hrSettings,
     IUnitOfWork unitOfWork)
     : ICommandHandler<PromoteEmployeeCommand, OneOf<PromoteEmployeeResponse, ErrorDetailResponse>>
 {
@@ -24,7 +27,7 @@ public sealed class PromoteEmployeeHandler(
         PromoteEmployeeCommand request,
         CancellationToken cancellationToken)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = GetBusinessToday();
 
         if (request.EffectiveDate > today)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PromotionEffectiveDateInFuture);
@@ -70,6 +73,9 @@ public sealed class PromoteEmployeeHandler(
         if (changesGrade)
         {
             var newGradeCode = request.NewGradeCode.Trim();
+            if (!employeeGradeLookup.IsValidGrade(newGradeCode))
+                return HrErrorResponses.Create(HrBusinessErrorCodes.GradeNotFound);
+
             if (string.Equals(employee.GradeCode, newGradeCode, StringComparison.OrdinalIgnoreCase))
                 return HrErrorResponses.Create(HrBusinessErrorCodes.GradeChangeSameGrade);
 
@@ -110,12 +116,13 @@ public sealed class PromoteEmployeeHandler(
             null,
             cancellationToken);
 
-        var latestHistory = histories.OrderByDescending(x => x.EffectiveFrom).FirstOrDefault();
-        if (latestHistory is not null)
-        {
-            if (request.EffectiveDate <= latestHistory.EffectiveFrom)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.PositionChangeOverlapping);
+        var hasOverlap = histories.Any(h => h.EffectiveFrom >= request.EffectiveDate || (h.EffectiveTo != null && h.EffectiveTo >= request.EffectiveDate));
+        if (hasOverlap)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PositionChangeOverlapping);
 
+        var latestHistory = histories.OrderByDescending(x => x.EffectiveFrom).FirstOrDefault();
+        if (latestHistory is not null && latestHistory.EffectiveTo == null)
+        {
             latestHistory.EffectiveTo = request.EffectiveDate.AddDays(-1);
         }
 
@@ -147,12 +154,13 @@ public sealed class PromoteEmployeeHandler(
             null,
             cancellationToken);
 
-        var latestHistory = histories.OrderByDescending(x => x.EffectiveFrom).FirstOrDefault();
-        if (latestHistory is not null)
-        {
-            if (request.EffectiveDate <= latestHistory.EffectiveFrom)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.GradeChangeOverlapping);
+        var hasOverlap = histories.Any(h => h.EffectiveFrom >= request.EffectiveDate || (h.EffectiveTo != null && h.EffectiveTo >= request.EffectiveDate));
+        if (hasOverlap)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.GradeChangeOverlapping);
 
+        var latestHistory = histories.OrderByDescending(x => x.EffectiveFrom).FirstOrDefault();
+        if (latestHistory is not null && latestHistory.EffectiveTo == null)
+        {
             latestHistory.EffectiveTo = request.EffectiveDate.AddDays(-1);
         }
 
@@ -172,5 +180,19 @@ public sealed class PromoteEmployeeHandler(
 
         await employeeGradeHistoryRepository.CreateOneAsync(newHistory, cancellationToken);
         return newHistory;
+    }
+
+    private DateOnly GetBusinessToday()
+    {
+        try
+        {
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(hrSettings.BusinessTimeZone);
+            var localTime = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, timeZone);
+            return DateOnly.FromDateTime(localTime.DateTime);
+        }
+        catch
+        {
+            return DateOnly.FromDateTime(DateTime.UtcNow);
+        }
     }
 }

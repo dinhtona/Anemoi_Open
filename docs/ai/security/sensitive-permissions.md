@@ -54,3 +54,7 @@ identity.user.deactivate
 ```
 
 Do not allow sensitive permission assignment from a normal role-edit screen without explicit warning and confirmation.
+
+> [!NOTE]
+> - `hr.promotion.create` is the aggregate permission for combined promotion action.
+> - `hr.position.change` and `hr.grade.change` are reserved for future standalone actions.

@@ -18,6 +18,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<EmployeeMapper>();
         services.AddScoped<ApproveLeaveRequestHandler>();
         services.AddScoped<CancelLeaveRequestHandler>();
+        services.AddSingleton<Anemoi.Hr.Application.Abstractions.IEmployeeGradeLookup, Anemoi.Hr.Application.Services.EmployeeGradeLookup>();
         services.AddEfRepositoriesAsScope<HrDbContext>(typeof(IHrDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<HrDbContext>();
     }
