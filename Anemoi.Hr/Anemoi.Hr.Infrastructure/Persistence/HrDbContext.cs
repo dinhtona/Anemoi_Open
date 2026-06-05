@@ -1,3 +1,4 @@
+using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
@@ -21,6 +22,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<LeaveRequest> LeaveRequests { get; set; }
     public DbSet<LeaveTransaction> LeaveTransactions { get; set; }
     public DbSet<LeaveAccrualRun> LeaveAccrualRuns { get; set; }
+    public DbSet<EmployeeContract> EmployeeContracts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
