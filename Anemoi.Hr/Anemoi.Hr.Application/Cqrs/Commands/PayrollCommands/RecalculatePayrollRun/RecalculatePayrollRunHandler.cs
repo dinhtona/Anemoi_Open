@@ -16,55 +16,57 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
+namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 
-public sealed class CalculatePayrollRunHandler(
+public sealed class RecalculatePayrollRunHandler(
     ISqlRepository<PayrollPeriod> payrollPeriodRepository,
     ISqlRepository<PayrollRun> payrollRunRepository,
+    ISqlRepository<PayrollItem> payrollItemRepository,
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<EmployeeSalary> employeeSalaryRepository,
     ISqlRepository<EmployeeAllowance> employeeAllowanceRepository,
     IUnitOfWork unitOfWork,
     PayrollMapper mapper)
-    : ICommandHandler<CalculatePayrollRunCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
+    : ICommandHandler<RecalculatePayrollRunCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<PayrollRunDetailResponse, ErrorDetailResponse>> Handle(
-        CalculatePayrollRunCommand request,
+        RecalculatePayrollRunCommand request,
         CancellationToken cancellationToken)
     {
-        // 1. Fetch Payroll Period
+        // 1. Fetch existing PayrollRun (including items)
+        var payrollRun = await payrollRunRepository.GetFirstByConditionAsync(
+            x => x.Id == request.PayrollRunId,
+            q => q.Include(r => r.PayrollItems),
+            cancellationToken);
+
+        if (payrollRun is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunNotFound);
+
+        // 2. Fetch Payroll Period
         var period = await payrollPeriodRepository.GetFirstByConditionAsync(
-            x => x.Id == request.PayrollPeriodId,
+            x => x.Id == payrollRun.PayrollPeriodId,
             null,
             cancellationToken);
 
         if (period is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodNotFound);
 
-        // 2. Reject if payroll period is locked
-        if (period.StatusCode == "Locked")
+        // 3. Reject if payroll period is locked (only Draft allowed)
+        if (period.StatusCode != "Draft")
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
-
-        // 3. Reject if payroll run already exists
-        var runExists = await payrollRunRepository.ExistByConditionAsync(
-            x => x.PayrollPeriodId == request.PayrollPeriodId && x.EmployeeId == request.EmployeeId,
-            cancellationToken);
-
-        if (runExists)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunAlreadyExists);
 
         // 4. Fetch Employee
         var employee = await employeeRepository.GetFirstByConditionAsync(
-            x => x.Id == request.EmployeeId,
+            x => x.Id == payrollRun.EmployeeId,
             null,
             cancellationToken);
 
         if (employee is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
-        // 5. Read active employee salary snapshot
+        // 5. Read active employee salary snapshot on period.EndDate
         var activeSalary = await employeeSalaryRepository.GetQueryable()
-            .Where(x => x.EmployeeId == request.EmployeeId &&
+            .Where(x => x.EmployeeId == payrollRun.EmployeeId &&
                         x.EffectiveFrom <= period.EndDate &&
                         (x.EffectiveTo == null || x.EffectiveTo >= period.EndDate))
             .FirstOrDefaultAsync(cancellationToken);
@@ -76,7 +78,14 @@ public sealed class CalculatePayrollRunHandler(
         if (request.PaidWorkingDays + request.UnpaidLeaveDays > period.StandardWorkingDays)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollInvalidWorkingDays);
 
-        // 7. Calculate details
+        // 7. Remove existing PayrollItems
+        foreach (var item in payrollRun.PayrollItems.ToList())
+        {
+            await payrollItemRepository.RemoveOneAsync(item, cancellationToken);
+        }
+        payrollRun.PayrollItems.Clear();
+
+        // 8. Recalculate details
         var baseSalary = activeSalary.BaseSalary;
         var currencyCode = activeSalary.Currency;
         var payScheduleType = activeSalary.SalaryType.ToString();
@@ -96,7 +105,7 @@ public sealed class CalculatePayrollRunHandler(
         // Fetch active allowances
         var activeAllowances = await employeeAllowanceRepository.GetQueryable()
             .Include(x => x.AllowanceType)
-            .Where(x => x.EmployeeId == request.EmployeeId &&
+            .Where(x => x.EmployeeId == payrollRun.EmployeeId &&
                         x.EffectiveFrom <= period.EndDate &&
                         (x.EffectiveTo == null || x.EffectiveTo >= period.EndDate))
             .ToListAsync(cancellationToken);
@@ -106,31 +115,23 @@ public sealed class CalculatePayrollRunHandler(
         var totalDeductionAmount = 0m;
         var netAmount = Math.Round(grossAmount - totalDeductionAmount, 2, MidpointRounding.AwayFromZero);
 
-        // 8. Create PayrollRun
-        var payrollRun = new PayrollRun
-        {
-            Id = new PayrollRunId(IdGenerator.NextGuid()),
-            PayrollPeriodId = request.PayrollPeriodId,
-            EmployeeId = request.EmployeeId,
-            EmployeeCode = employee.EmployeeCode,
-            EmployeeName = employee.FullName,
-            BaseSalary = baseSalary,
-            CurrencyCode = currencyCode,
-            PayScheduleType = payScheduleType,
-            StandardWorkingDays = period.StandardWorkingDays,
-            PaidWorkingDays = request.PaidWorkingDays,
-            UnpaidLeaveDays = request.UnpaidLeaveDays,
-            DailyRate = dailyRate,
-            BasePayAmount = basePayAmount,
-            TotalAllowanceAmount = totalAllowanceAmount,
-            GrossAmount = grossAmount,
-            TotalDeductionAmount = totalDeductionAmount,
-            NetAmount = netAmount,
-            CalculatedAt = DateTime.UtcNow,
-            CalculatedBy = request.CalculatedBy ?? "system"
-        };
+        // 9. Update existing PayrollRun details in-place
+        payrollRun.BaseSalary = baseSalary;
+        payrollRun.CurrencyCode = currencyCode;
+        payrollRun.PayScheduleType = payScheduleType;
+        payrollRun.StandardWorkingDays = period.StandardWorkingDays;
+        payrollRun.PaidWorkingDays = request.PaidWorkingDays;
+        payrollRun.UnpaidLeaveDays = request.UnpaidLeaveDays;
+        payrollRun.DailyRate = dailyRate;
+        payrollRun.BasePayAmount = basePayAmount;
+        payrollRun.TotalAllowanceAmount = totalAllowanceAmount;
+        payrollRun.GrossAmount = grossAmount;
+        payrollRun.TotalDeductionAmount = totalDeductionAmount;
+        payrollRun.NetAmount = netAmount;
+        payrollRun.CalculatedAt = DateTime.UtcNow;
+        payrollRun.CalculatedBy = request.CalculatedBy ?? "system";
 
-        // 9. Add PayrollItems
+        // 10. Recreate PayrollItems
         // Base Pay Item
         var basePayItem = new PayrollItem
         {
@@ -163,7 +164,6 @@ public sealed class CalculatePayrollRunHandler(
             }
         }
 
-        await payrollRunRepository.CreateOneAsync(payrollRun, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)

@@ -5,6 +5,7 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CreatePayrollPeriod;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.LockPayrollPeriod;
+using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollQueries.GetPayrollPeriods;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollQueries.GetPayrollRunDetail;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollQueries.GetPayrollRuns;
@@ -89,6 +90,17 @@ public sealed class PayrollController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetPayrollRunDetailQuery(id), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.PayrollCalculate)]
+    [ProducesResponseType(typeof(PayrollRunDetailResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RecalculatePayrollRun(
+        [FromBody] RecalculatePayrollRunCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { CalculatedBy = HttpContext.GetUserId() }, cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

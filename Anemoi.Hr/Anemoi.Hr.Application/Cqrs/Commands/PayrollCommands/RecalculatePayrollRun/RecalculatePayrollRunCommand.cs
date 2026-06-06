@@ -3,11 +3,10 @@ using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 using System.Text.Json.Serialization;
 
-namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
+namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 
-public sealed record CalculatePayrollRunCommand(
-    PayrollPeriodId PayrollPeriodId,
-    EmployeeId EmployeeId,
+public sealed record RecalculatePayrollRunCommand(
+    PayrollRunId PayrollRunId,
     decimal PaidWorkingDays,
     decimal UnpaidLeaveDays,
     bool SensitivePermissionConfirmed,

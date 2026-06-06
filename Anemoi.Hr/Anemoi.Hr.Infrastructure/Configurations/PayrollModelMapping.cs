@@ -62,7 +62,7 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.StandardWorkingDays).HasPrecision(9, 2).IsRequired();
         builder.Property(x => x.PaidWorkingDays).HasPrecision(9, 2).IsRequired();
         builder.Property(x => x.UnpaidLeaveDays).HasPrecision(9, 2).IsRequired();
-        builder.Property(x => x.DailyRate).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.DailyRate).HasPrecision(18, 4).IsRequired();
         builder.Property(x => x.BasePayAmount).HasPrecision(18, 2).IsRequired();
         builder.Property(x => x.TotalDeductionAmount).HasPrecision(18, 2).IsRequired();
         builder.Property(x => x.NetAmount).HasPrecision(18, 2).IsRequired();

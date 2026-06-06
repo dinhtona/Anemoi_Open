@@ -2,17 +2,14 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
-namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
+namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 
-public sealed class CalculatePayrollRunValidator : AbstractValidator<CalculatePayrollRunCommand>
+public sealed class RecalculatePayrollRunValidator : AbstractValidator<RecalculatePayrollRunCommand>
 {
-    public CalculatePayrollRunValidator()
+    public RecalculatePayrollRunValidator()
     {
-        RuleFor(x => x.PayrollPeriodId)
-            .RequiredId("VAL_PAYROLL_PERIOD_ID_REQUIRED");
-
-        RuleFor(x => x.EmployeeId)
-            .RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
+        RuleFor(x => x.PayrollRunId)
+            .RequiredId("VAL_PAYROLL_RUN_ID_REQUIRED");
 
         RuleFor(x => x.PaidWorkingDays)
             .GreaterThanOrEqualTo(0).WithMessage("VAL_PAID_WORKING_DAYS_MUST_BE_POS");
