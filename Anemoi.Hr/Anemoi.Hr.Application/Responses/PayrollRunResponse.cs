@@ -28,7 +28,25 @@ public sealed class PayrollRunResponse
     public decimal TotalDeductionAmount { get; set; }
     public decimal NetAmount { get; set; }
 
-    // Audit
+    // Status & Audit
+    public string Status { get; set; }
     public DateTime CalculatedAt { get; set; }
     public string CalculatedBy { get; set; }
+
+    public string SubmittedBy { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+
+    public string ApprovedBy { get; set; }
+    public DateTime? ApprovedAt { get; set; }
+
+    public string RejectedBy { get; set; }
+    public DateTime? RejectedAt { get; set; }
+    public string RejectionReason { get; set; }
+
+    public string FinalizedBy { get; set; }
+    public DateTime? FinalizedAt { get; set; }
+
+    public string CancelledBy { get; set; }
+    public DateTime? CancelledAt { get; set; }
+    public string CancellationReason { get; set; }
 }

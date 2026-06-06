@@ -56,7 +56,20 @@ public sealed class PayrollMapper
             TotalDeductionAmount = run.TotalDeductionAmount,
             NetAmount = run.NetAmount,
             CalculatedAt = run.CalculatedAt,
-            CalculatedBy = run.CalculatedBy
+            CalculatedBy = run.CalculatedBy,
+            Status = run.Status.ToString(),
+            SubmittedBy = run.SubmittedBy,
+            SubmittedAt = run.SubmittedAt,
+            ApprovedBy = run.ApprovedBy,
+            ApprovedAt = run.ApprovedAt,
+            RejectedBy = run.RejectedBy,
+            RejectedAt = run.RejectedAt,
+            RejectionReason = run.RejectionReason,
+            FinalizedBy = run.FinalizedBy,
+            FinalizedAt = run.FinalizedAt,
+            CancelledBy = run.CancelledBy,
+            CancelledAt = run.CancelledAt,
+            CancellationReason = run.CancellationReason
         };
     }
 
@@ -118,6 +131,19 @@ public sealed class PayrollMapper
             NetAmount = run.NetAmount,
             CalculatedAt = run.CalculatedAt,
             CalculatedBy = run.CalculatedBy,
+            Status = run.Status.ToString(),
+            SubmittedBy = run.SubmittedBy,
+            SubmittedAt = run.SubmittedAt,
+            ApprovedBy = run.ApprovedBy,
+            ApprovedAt = run.ApprovedAt,
+            RejectedBy = run.RejectedBy,
+            RejectedAt = run.RejectedAt,
+            RejectionReason = run.RejectionReason,
+            FinalizedBy = run.FinalizedBy,
+            FinalizedAt = run.FinalizedAt,
+            CancelledBy = run.CancelledBy,
+            CancelledAt = run.CancelledAt,
+            CancellationReason = run.CancellationReason,
             PayrollItems = ToResponses(run.PayrollItems)
         };
     }

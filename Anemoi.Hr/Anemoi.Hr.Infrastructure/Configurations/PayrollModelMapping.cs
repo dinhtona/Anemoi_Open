@@ -61,6 +61,24 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.PayScheduleType).HasMaxLength(64).IsRequired();
         builder.Property(x => x.CalculatedBy).HasMaxLength(128).IsRequired();
 
+        builder.Property(x => x.Status)
+            .HasConversion(s => s.ToString(), v => (PayrollRunStatus)Enum.Parse(typeof(PayrollRunStatus), v))
+            .HasMaxLength(64)
+            .IsRequired();
+
+        builder.Property(x => x.SubmittedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.SubmittedAt).IsRequired(false);
+        builder.Property(x => x.ApprovedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.ApprovedAt).IsRequired(false);
+        builder.Property(x => x.RejectedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.RejectedAt).IsRequired(false);
+        builder.Property(x => x.RejectionReason).IsRequired(false);
+        builder.Property(x => x.FinalizedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.FinalizedAt).IsRequired(false);
+        builder.Property(x => x.CancelledBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.CancelledAt).IsRequired(false);
+        builder.Property(x => x.CancellationReason).IsRequired(false);
+
         builder.Property(x => x.BaseSalary).HasPrecision(18, 2);
         builder.Property(x => x.TotalAllowanceAmount).HasPrecision(18, 2);
         builder.Property(x => x.GrossAmount).HasPrecision(18, 2);

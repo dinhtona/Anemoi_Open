@@ -45,6 +45,9 @@ public sealed class RecalculatePayrollRunHandler(
         if (payrollRun is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunNotFound);
 
+        if (payrollRun.Status != PayrollRunStatus.Calculated && payrollRun.Status != PayrollRunStatus.Rejected)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunLocked);
+
         // 2. Fetch Payroll Period
         var period = await payrollPeriodRepository.GetFirstByConditionAsync(
             x => x.Id == payrollRun.PayrollPeriodId,
@@ -160,8 +163,7 @@ public sealed class RecalculatePayrollRunHandler(
         payrollRun.GrossAmount = grossAmount;
         payrollRun.TotalDeductionAmount = totalDeductionAmount;
         payrollRun.NetAmount = netAmount;
-        payrollRun.CalculatedAt = DateTime.UtcNow;
-        payrollRun.CalculatedBy = request.CalculatedBy ?? "system";
+        payrollRun.MarkRecalculated(request.CalculatedBy ?? "system", DateTime.UtcNow);
 
         // 10. Recreate PayrollItems
         // Base Pay Item

@@ -48,6 +48,9 @@ public static class HrBusinessErrorCodes
     public const string PayrollRunNotFound = "HR_PAYROLL_RUN_NOT_FOUND";
     public const string EmployeeSalaryNotFound = "HR_EMPLOYEE_SALARY_NOT_FOUND";
     public const string PayrollInvalidWorkingDays = "HR_PAYROLL_INVALID_WORKING_DAYS";
+    public const string PayrollRunInvalidStatus = "HR_PAYROLL_RUN_INVALID_STATUS";
+    public const string PayrollRunRejectionReasonRequired = "HR_PAYROLL_RUN_REJECTION_REASON_REQUIRED";
+    public const string PayrollRunLocked = "HR_PAYROLL_RUN_LOCKED";
 
     public const string AttendancePeriodNotFound = "HR_ATTENDANCE_PERIOD_NOT_FOUND";
     public const string AttendanceRecordNotFound = "HR_ATTENDANCE_RECORD_NOT_FOUND";
