@@ -1,3 +1,4 @@
+using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
@@ -23,6 +24,13 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<LeaveTransaction> LeaveTransactions { get; set; }
     public DbSet<LeaveAccrualRun> LeaveAccrualRuns { get; set; }
     public DbSet<EmployeeContract> EmployeeContracts { get; set; }
+    public DbSet<SalaryGrade> SalaryGrades { get; set; }
+    public DbSet<SalaryRange> SalaryRanges { get; set; }
+    public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+    public DbSet<AllowanceType> AllowanceTypes { get; set; }
+    public DbSet<PositionAllowance> PositionAllowances { get; set; }
+    public DbSet<EmployeeAllowance> EmployeeAllowances { get; set; }
+    public DbSet<SalaryValidationBypassLog> SalaryValidationBypassLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -57,6 +57,16 @@ public static class Permissions
     public const string HrContractUpdate = "hr.contract.update";
     public const string HrContractTerminate = "hr.contract.terminate";
 
+    public const string HrSalaryView = "hr.salary.view";
+    public const string HrSalaryChange = "hr.salary.change";
+    public const string HrSalaryGradeView = "hr.salary.grade.view";
+    public const string HrSalaryGradeManage = "hr.salary.grade.manage";
+    public const string HrAllowanceTypeView = "hr.allowance.type.view";
+    public const string HrAllowanceTypeManage = "hr.allowance.type.manage";
+    public const string HrEmployeeAllowanceView = "hr.employee.allowance.view";
+    public const string HrEmployeeAllowanceChange = "hr.employee.allowance.change";
+    public const string HrCompensationDashboardView = "hr.compensation.dashboard.view";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -106,7 +116,16 @@ public static class Permissions
         new(HrContractView, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractView", true, "High"),
         new(HrContractCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractCreate", true, "High"),
         new(HrContractUpdate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractUpdate", true, "High"),
-        new(HrContractTerminate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractTerminate", true, "High")
+        new(HrContractTerminate, "PermissionGroupHrEmployee", "PermissionDescriptionHrContractTerminate", true, "High"),
+        new(HrSalaryView, "PermissionGroupHrEmployee", "PermissionDescriptionHrSalaryView", true, "High"),
+        new(HrSalaryChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrSalaryChange", true, "High"),
+        new(HrSalaryGradeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrSalaryGradeView"),
+        new(HrSalaryGradeManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrSalaryGradeManage", true, "High"),
+        new(HrAllowanceTypeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrAllowanceTypeView"),
+        new(HrAllowanceTypeManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrAllowanceTypeManage", true, "High"),
+        new(HrEmployeeAllowanceView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAllowanceView"),
+        new(HrEmployeeAllowanceChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAllowanceChange", true, "High"),
+        new(HrCompensationDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrCompensationDashboardView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

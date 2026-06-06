@@ -38,6 +38,16 @@ public static class HrPermissions
     public const string ContractUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractUpdate;
     public const string ContractTerminate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrContractTerminate;
 
+    public const string SalaryView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSalaryView;
+    public const string SalaryChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSalaryChange;
+    public const string SalaryGradeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSalaryGradeView;
+    public const string SalaryGradeManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSalaryGradeManage;
+    public const string AllowanceTypeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAllowanceTypeView;
+    public const string AllowanceTypeManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAllowanceTypeManage;
+    public const string EmployeeAllowanceView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeAllowanceView;
+    public const string EmployeeAllowanceChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeAllowanceChange;
+    public const string CompensationDashboardView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCompensationDashboardView;
+
     public static readonly IReadOnlyList<string> All =
     [
         LeavePolicyView,
@@ -68,7 +78,16 @@ public static class HrPermissions
         ContractView,
         ContractCreate,
         ContractUpdate,
-        ContractTerminate
+        ContractTerminate,
+        SalaryView,
+        SalaryChange,
+        SalaryGradeView,
+        SalaryGradeManage,
+        AllowanceTypeView,
+        AllowanceTypeManage,
+        EmployeeAllowanceView,
+        EmployeeAllowanceChange,
+        CompensationDashboardView
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -85,7 +104,12 @@ public static class HrPermissions
             [ContractView] = new(ContractView, "High"),
             [ContractCreate] = new(ContractCreate, "High"),
             [ContractUpdate] = new(ContractUpdate, "High"),
-            [ContractTerminate] = new(ContractTerminate, "High")
+            [ContractTerminate] = new(ContractTerminate, "High"),
+            [SalaryView] = new(SalaryView, "High"),
+            [SalaryChange] = new(SalaryChange, "High"),
+            [SalaryGradeManage] = new(SalaryGradeManage, "High"),
+            [AllowanceTypeManage] = new(AllowanceTypeManage, "High"),
+            [EmployeeAllowanceChange] = new(EmployeeAllowanceChange, "High")
         };
 }
 

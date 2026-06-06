@@ -73,7 +73,7 @@ public sealed class PromoteEmployeeHandler(
         if (changesGrade)
         {
             var newGradeCode = request.NewGradeCode.Trim();
-            if (!employeeGradeLookup.IsValidGrade(newGradeCode))
+            if (!await employeeGradeLookup.IsValidGradeAsync(newGradeCode, cancellationToken))
                 return HrErrorResponses.Create(HrBusinessErrorCodes.GradeNotFound);
 
             if (string.Equals(employee.GradeCode, newGradeCode, StringComparison.OrdinalIgnoreCase))
