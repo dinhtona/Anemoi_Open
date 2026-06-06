@@ -1,3 +1,4 @@
+using Anemoi.Hr.Domain.Attendance;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
@@ -35,6 +36,8 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<PayrollPeriod> PayrollPeriods { get; set; }
     public DbSet<PayrollRun> PayrollRuns { get; set; }
     public DbSet<PayrollItem> PayrollItems { get; set; }
+    public DbSet<AttendancePeriod> AttendancePeriods { get; set; }
+    public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
