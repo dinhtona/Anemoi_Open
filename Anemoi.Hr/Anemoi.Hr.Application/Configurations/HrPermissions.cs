@@ -48,6 +48,11 @@ public static class HrPermissions
     public const string EmployeeAllowanceChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeAllowanceChange;
     public const string CompensationDashboardView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCompensationDashboardView;
 
+    public const string PayrollView = "hr.payroll.view";
+    public const string PayrollCalculate = "hr.payroll.calculate";
+    public const string PayrollApprove = "hr.payroll.approve";
+    public const string PayrollLock = "hr.payroll.lock";
+
     public static readonly IReadOnlyList<string> All =
     [
         LeavePolicyView,
@@ -87,7 +92,11 @@ public static class HrPermissions
         AllowanceTypeManage,
         EmployeeAllowanceView,
         EmployeeAllowanceChange,
-        CompensationDashboardView
+        CompensationDashboardView,
+        PayrollView,
+        PayrollCalculate,
+        PayrollApprove,
+        PayrollLock
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -109,7 +118,10 @@ public static class HrPermissions
             [SalaryChange] = new(SalaryChange, "High"),
             [SalaryGradeManage] = new(SalaryGradeManage, "High"),
             [AllowanceTypeManage] = new(AllowanceTypeManage, "High"),
-            [EmployeeAllowanceChange] = new(EmployeeAllowanceChange, "High")
+            [EmployeeAllowanceChange] = new(EmployeeAllowanceChange, "High"),
+            [PayrollCalculate] = new(PayrollCalculate, "High"),
+            [PayrollApprove] = new(PayrollApprove, "High"),
+            [PayrollLock] = new(PayrollLock, "Critical")
         };
 }
 

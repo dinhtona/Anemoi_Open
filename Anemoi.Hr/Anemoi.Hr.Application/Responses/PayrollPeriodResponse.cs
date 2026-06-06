@@ -1,13 +1,10 @@
-using Anemoi.BuildingBlock.Domain;
-using Anemoi.Hr.ModelIds.ModelIds;
 using System;
-using System.Collections.Generic;
 
-namespace Anemoi.Hr.Domain.Payroll;
+namespace Anemoi.Hr.Application.Responses;
 
-public sealed class PayrollPeriod : ValueObject
+public sealed class PayrollPeriodResponse
 {
-    public PayrollPeriodId Id { get; set; }
+    public string Id { get; set; }
     public string PeriodCode { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
@@ -18,9 +15,4 @@ public sealed class PayrollPeriod : ValueObject
     public string CreatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string UpdatedBy { get; set; }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Id;
-    }
 }

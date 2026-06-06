@@ -10,6 +10,7 @@ public sealed class PayrollItem : ValueObject
     public PayrollRunId PayrollRunId { get; set; }
     public string ItemCode { get; set; }
     public string ItemName { get; set; }
+    public string ItemTypeCode { get; set; }
     public decimal Amount { get; set; }
     public string CurrencyCode { get; set; }
 
@@ -20,4 +21,11 @@ public sealed class PayrollItem : ValueObject
     {
         yield return Id;
     }
+}
+
+public static class PayrollItemType
+{
+    public const string BasePay = "BasePay";
+    public const string Allowance = "Allowance";
+    public const string Deduction = "Deduction";
 }

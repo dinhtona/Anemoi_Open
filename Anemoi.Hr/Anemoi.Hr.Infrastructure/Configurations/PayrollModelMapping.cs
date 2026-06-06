@@ -22,6 +22,8 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.StatusCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.CreatedBy).HasMaxLength(128).IsRequired();
         builder.Property(x => x.UpdatedBy).HasMaxLength(128).IsRequired();
+        
+        builder.Property(x => x.StandardWorkingDays).HasPrecision(9, 2).IsRequired();
 
         // Unique Index
         builder.HasIndex(x => x.PeriodCode).IsUnique();
@@ -56,6 +58,14 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.BaseSalary).HasPrecision(18, 2);
         builder.Property(x => x.TotalAllowanceAmount).HasPrecision(18, 2);
         builder.Property(x => x.GrossAmount).HasPrecision(18, 2);
+        
+        builder.Property(x => x.StandardWorkingDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.PaidWorkingDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.UnpaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.DailyRate).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.BasePayAmount).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.TotalDeductionAmount).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.NetAmount).HasPrecision(18, 2).IsRequired();
 
         // Unique Index: PayrollPeriodId + EmployeeId
         builder.HasIndex(x => new { x.PayrollPeriodId, x.EmployeeId }).IsUnique();
@@ -90,6 +100,7 @@ public sealed class PayrollModelMapping :
 
         builder.Property(x => x.ItemCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.ItemName).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.ItemTypeCode).HasMaxLength(64).IsRequired();
         builder.Property(x => x.CurrencyCode).HasMaxLength(16).IsRequired();
 
         builder.Property(x => x.Amount).HasPrecision(18, 2);

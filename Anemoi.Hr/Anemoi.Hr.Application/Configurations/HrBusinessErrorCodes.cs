@@ -40,5 +40,13 @@ public static class HrBusinessErrorCodes
     public const string ContractInvalidDateRange = "HR_CONTRACT_INVALID_DATE_RANGE";
     public const string ContractConcurrencyConflict = "HR_CONTRACT_CONCURRENCY_CONFLICT";
     public const string ContractNotDraft = "HR_CONTRACT_NOT_DRAFT";
+    
+    public const string PayrollPeriodNotFound = "HR_PAYROLL_PERIOD_NOT_FOUND";
+    public const string PayrollPeriodCodeAlreadyExists = "HR_PAYROLL_PERIOD_CODE_ALREADY_EXISTS";
+    public const string PayrollPeriodLocked = "HR_PAYROLL_PERIOD_LOCKED";
+    public const string PayrollRunAlreadyExists = "HR_PAYROLL_RUN_ALREADY_EXISTS";
+    public const string PayrollRunNotFound = "HR_PAYROLL_RUN_NOT_FOUND";
+    public const string EmployeeSalaryNotFound = "HR_EMPLOYEE_SALARY_NOT_FOUND";
+    public const string PayrollInvalidWorkingDays = "HR_PAYROLL_INVALID_WORKING_DAYS";
 }
 

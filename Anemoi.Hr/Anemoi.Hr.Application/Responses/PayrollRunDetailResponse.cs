@@ -1,16 +1,13 @@
-using Anemoi.BuildingBlock.Domain;
-using Anemoi.Hr.Domain.Employees;
-using Anemoi.Hr.ModelIds.ModelIds;
 using System;
 using System.Collections.Generic;
 
-namespace Anemoi.Hr.Domain.Payroll;
+namespace Anemoi.Hr.Application.Responses;
 
-public sealed class PayrollRun : ValueObject
+public sealed class PayrollRunDetailResponse
 {
-    public PayrollRunId Id { get; set; }
-    public PayrollPeriodId PayrollPeriodId { get; set; }
-    public EmployeeId EmployeeId { get; set; }
+    public string Id { get; set; }
+    public string PayrollPeriodId { get; set; }
+    public string EmployeeId { get; set; }
 
     // Employee snapshot
     public string EmployeeCode { get; set; }
@@ -21,7 +18,7 @@ public sealed class PayrollRun : ValueObject
     public string CurrencyCode { get; set; }
     public string PayScheduleType { get; set; }
 
-    // Working days and calculation details
+    // Working days and details
     public decimal StandardWorkingDays { get; set; }
     public decimal PaidWorkingDays { get; set; }
     public decimal UnpaidLeaveDays { get; set; }
@@ -36,13 +33,6 @@ public sealed class PayrollRun : ValueObject
     public DateTime CalculatedAt { get; set; }
     public string CalculatedBy { get; set; }
 
-    // Navigation
-    public PayrollPeriod PayrollPeriod { get; set; }
-    public Employee Employee { get; set; }
-    public List<PayrollItem> PayrollItems { get; set; } = [];
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Id;
-    }
+    // Detail Items
+    public List<PayrollItemResponse> PayrollItems { get; set; } = [];
 }
