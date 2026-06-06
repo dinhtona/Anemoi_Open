@@ -25,6 +25,12 @@ public sealed class PayrollModelMapping :
         
         builder.Property(x => x.StandardWorkingDays).HasPrecision(9, 2).IsRequired();
 
+        builder.Property(x => x.AttendancePeriodId)
+            .HasConversion(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? new AttendancePeriodId(value.Value) : null)
+            .IsRequired(false);
+
         // Unique Index
         builder.HasIndex(x => x.PeriodCode).IsUnique();
 
@@ -104,6 +110,19 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.CurrencyCode).HasMaxLength(16).IsRequired();
 
         builder.Property(x => x.Amount).HasPrecision(18, 2);
+
+        builder.Property(x => x.AttendanceSummaryId)
+            .HasConversion(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? new AttendanceSummaryId(value.Value) : null)
+            .IsRequired(false);
+
+        builder.Property(x => x.PaidWorkingDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.PaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.UnpaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.BaseSalarySnapshot).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.DailyRateSnapshot).HasPrecision(18, 4).IsRequired();
+        builder.Property(x => x.BasePayAmount).HasPrecision(18, 2).IsRequired();
 
         // Index on PayrollRunId
         builder.HasIndex(x => x.PayrollRunId);

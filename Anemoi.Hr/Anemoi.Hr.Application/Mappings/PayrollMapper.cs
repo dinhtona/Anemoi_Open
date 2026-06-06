@@ -19,6 +19,7 @@ public sealed class PayrollMapper
             EndDate = period.EndDate,
             StatusCode = period.StatusCode,
             StandardWorkingDays = period.StandardWorkingDays,
+            AttendancePeriodId = period.AttendancePeriodId?.Value.ToString(),
             CreatedAt = period.CreatedAt,
             CreatedBy = period.CreatedBy,
             UpdatedAt = period.UpdatedAt,
@@ -76,7 +77,14 @@ public sealed class PayrollMapper
             ItemName = item.ItemName,
             ItemTypeCode = item.ItemTypeCode,
             Amount = item.Amount,
-            CurrencyCode = item.CurrencyCode
+            CurrencyCode = item.CurrencyCode,
+            AttendanceSummaryId = item.AttendanceSummaryId?.Value.ToString(),
+            PaidWorkingDays = item.PaidWorkingDays,
+            PaidLeaveDays = item.PaidLeaveDays,
+            UnpaidLeaveDays = item.UnpaidLeaveDays,
+            BaseSalarySnapshot = item.BaseSalarySnapshot,
+            DailyRateSnapshot = item.DailyRateSnapshot,
+            BasePayAmount = item.BasePayAmount
         };
     }
 

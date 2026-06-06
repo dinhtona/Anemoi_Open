@@ -7,7 +7,5 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayroll
 
 public sealed record RecalculatePayrollRunCommand(
     PayrollRunId PayrollRunId,
-    decimal PaidWorkingDays,
-    decimal UnpaidLeaveDays,
     bool SensitivePermissionConfirmed,
     [property: JsonIgnore] string CalculatedBy = null) : ICommandResult<PayrollRunDetailResponse>;

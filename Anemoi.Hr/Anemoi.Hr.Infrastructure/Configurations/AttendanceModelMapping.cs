@@ -9,7 +9,8 @@ namespace Anemoi.Hr.Infrastructure.Configurations;
 
 public sealed class AttendanceModelMapping :
     IEntityTypeConfiguration<AttendancePeriod>,
-    IEntityTypeConfiguration<AttendanceRecord>
+    IEntityTypeConfiguration<AttendanceRecord>,
+    IEntityTypeConfiguration<AttendanceSummary>
 {
     public void Configure(EntityTypeBuilder<AttendancePeriod> builder)
     {
@@ -67,6 +68,53 @@ public sealed class AttendanceModelMapping :
         builder.HasIndex(x => x.AttendancePeriodId);
         builder.HasIndex(x => x.EmployeeId);
         builder.HasIndex(x => x.WorkDate);
+
+        // Relationships
+        builder.HasOne(x => x.AttendancePeriod)
+            .WithMany()
+            .HasForeignKey(x => x.AttendancePeriodId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+         // PostgreSQL xmin concurrency
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<AttendanceSummary> builder)
+    {
+        builder.ToTable("AttendanceSummaries");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new AttendanceSummaryId(id));
+
+        builder.Property(x => x.AttendancePeriodId)
+            .HasConversion(x => x.Value, id => new AttendancePeriodId(id))
+            .IsRequired();
+
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .IsRequired();
+
+        builder.Property(x => x.WorkedDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.WorkedHours).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.LeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.AbsentDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.HolidayDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.PaidWorkingDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.PaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.UnpaidLeaveDays).HasPrecision(9, 2).IsRequired();
+
+        builder.Property(x => x.CreatedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.UpdatedBy).HasMaxLength(128).IsRequired();
+
+        // Unique Index
+        builder.HasIndex(x => new { x.AttendancePeriodId, x.EmployeeId }).IsUnique();
 
         // Relationships
         builder.HasOne(x => x.AttendancePeriod)

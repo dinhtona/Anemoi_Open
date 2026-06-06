@@ -10,6 +10,7 @@ public sealed class PayrollPeriodResponse
     public DateOnly EndDate { get; set; }
     public string StatusCode { get; set; }
     public decimal StandardWorkingDays { get; set; }
+    public string AttendancePeriodId { get; set; }
     
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; }

@@ -15,6 +15,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Anemoi.Hr.Domain.Attendance;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 
@@ -25,6 +26,8 @@ public sealed class RecalculatePayrollRunHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<EmployeeSalary> employeeSalaryRepository,
     ISqlRepository<EmployeeAllowance> employeeAllowanceRepository,
+    ISqlRepository<AttendancePeriod> attendancePeriodRepository,
+    ISqlRepository<AttendanceSummary> attendanceSummaryRepository,
     IUnitOfWork unitOfWork,
     PayrollMapper mapper)
     : ICommandHandler<RecalculatePayrollRunCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
@@ -55,6 +58,26 @@ public sealed class RecalculatePayrollRunHandler(
         if (period.StatusCode != "Draft")
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
 
+        // Validate Standard Working Days
+        if (period.StandardWorkingDays <= 0)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollStandardWorkingDaysInvalid);
+
+        // Validate AttendancePeriod link
+        if (period.AttendancePeriodId == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollAttendancePeriodNotLinked);
+
+        // 3b. Verify AttendancePeriod is locked
+        var attendancePeriod = await attendancePeriodRepository.GetFirstByConditionAsync(
+            x => x.Id == period.AttendancePeriodId,
+            null,
+            cancellationToken);
+
+        if (attendancePeriod is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
+
+        if (attendancePeriod.StatusCode != "Locked")
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
+
         // 4. Fetch Employee
         var employee = await employeeRepository.GetFirstByConditionAsync(
             x => x.Id == payrollRun.EmployeeId,
@@ -74,11 +97,16 @@ public sealed class RecalculatePayrollRunHandler(
         if (activeSalary is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeSalaryNotFound);
 
-        // 6. Validate working days count
-        if (request.PaidWorkingDays + request.UnpaidLeaveDays > period.StandardWorkingDays)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollInvalidWorkingDays);
+        // 7. Retrieve AttendanceSummary
+        var summary = await attendanceSummaryRepository.GetFirstByConditionAsync(
+            x => x.AttendancePeriodId == period.AttendancePeriodId && x.EmployeeId == payrollRun.EmployeeId,
+            null,
+            cancellationToken);
 
-        // 7. Remove existing PayrollItems
+        if (summary is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AttendanceSummaryNotFound);
+
+        // Remove existing PayrollItems
         foreach (var item in payrollRun.PayrollItems.ToList())
         {
             await payrollItemRepository.RemoveOneAsync(item, cancellationToken);
@@ -91,16 +119,20 @@ public sealed class RecalculatePayrollRunHandler(
         var payScheduleType = activeSalary.SalaryType.ToString();
 
         decimal dailyRate;
+        decimal baseSalarySnapshot;
+
         if (activeSalary.SalaryType == SalaryType.Monthly)
         {
-            dailyRate = Math.Round(baseSalary / period.StandardWorkingDays, 4, MidpointRounding.AwayFromZero);
+            baseSalarySnapshot = baseSalary; // MonthlyContractSalary
+            dailyRate = Math.Round(baseSalarySnapshot / period.StandardWorkingDays, 4, MidpointRounding.AwayFromZero);
         }
         else // Daily
         {
+            baseSalarySnapshot = baseSalary; // DailySalaryRate
             dailyRate = Math.Round(baseSalary, 4, MidpointRounding.AwayFromZero);
         }
 
-        var basePayAmount = Math.Round(dailyRate * request.PaidWorkingDays, 2, MidpointRounding.AwayFromZero);
+        var basePayAmount = Math.Round(dailyRate * (summary.PaidWorkingDays + summary.PaidLeaveDays), 2, MidpointRounding.AwayFromZero);
 
         // Fetch active allowances
         var activeAllowances = await employeeAllowanceRepository.GetQueryable()
@@ -120,8 +152,8 @@ public sealed class RecalculatePayrollRunHandler(
         payrollRun.CurrencyCode = currencyCode;
         payrollRun.PayScheduleType = payScheduleType;
         payrollRun.StandardWorkingDays = period.StandardWorkingDays;
-        payrollRun.PaidWorkingDays = request.PaidWorkingDays;
-        payrollRun.UnpaidLeaveDays = request.UnpaidLeaveDays;
+        payrollRun.PaidWorkingDays = summary.PaidWorkingDays;
+        payrollRun.UnpaidLeaveDays = summary.UnpaidLeaveDays;
         payrollRun.DailyRate = dailyRate;
         payrollRun.BasePayAmount = basePayAmount;
         payrollRun.TotalAllowanceAmount = totalAllowanceAmount;
@@ -141,7 +173,14 @@ public sealed class RecalculatePayrollRunHandler(
             ItemName = "Base Salary",
             ItemTypeCode = PayrollItemType.BasePay,
             Amount = basePayAmount,
-            CurrencyCode = currencyCode
+            CurrencyCode = currencyCode,
+            AttendanceSummaryId = summary.Id,
+            PaidWorkingDays = summary.PaidWorkingDays,
+            PaidLeaveDays = summary.PaidLeaveDays,
+            UnpaidLeaveDays = summary.UnpaidLeaveDays,
+            BaseSalarySnapshot = baseSalarySnapshot,
+            DailyRateSnapshot = dailyRate,
+            BasePayAmount = basePayAmount
         };
         payrollRun.PayrollItems.Add(basePayItem);
 
@@ -158,7 +197,13 @@ public sealed class RecalculatePayrollRunHandler(
                     ItemName = allowance.AllowanceType?.Name ?? "Allowance",
                     ItemTypeCode = PayrollItemType.Allowance,
                     Amount = allowance.Amount,
-                    CurrencyCode = allowance.Currency
+                    CurrencyCode = allowance.Currency,
+                    PaidWorkingDays = 0,
+                    PaidLeaveDays = 0,
+                    UnpaidLeaveDays = 0,
+                    BaseSalarySnapshot = allowance.Amount,
+                    DailyRateSnapshot = allowance.Amount,
+                    BasePayAmount = 0
                 };
                 payrollRun.PayrollItems.Add(allowanceItem);
             }

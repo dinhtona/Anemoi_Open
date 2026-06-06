@@ -11,12 +11,6 @@ public sealed class RecalculatePayrollRunValidator : AbstractValidator<Recalcula
         RuleFor(x => x.PayrollRunId)
             .RequiredId("VAL_PAYROLL_RUN_ID_REQUIRED");
 
-        RuleFor(x => x.PaidWorkingDays)
-            .GreaterThanOrEqualTo(0).WithMessage("VAL_PAID_WORKING_DAYS_MUST_BE_POS");
-
-        RuleFor(x => x.UnpaidLeaveDays)
-            .GreaterThanOrEqualTo(0).WithMessage("VAL_UNPAID_LEAVE_DAYS_MUST_BE_POS");
-
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)
             .WithMessage(HrBusinessErrorCodes.PermissionSensitiveConfirmationRequired);

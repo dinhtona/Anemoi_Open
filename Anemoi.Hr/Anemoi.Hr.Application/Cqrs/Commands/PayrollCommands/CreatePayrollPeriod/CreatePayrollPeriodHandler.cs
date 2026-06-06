@@ -41,6 +41,7 @@ public sealed class CreatePayrollPeriodHandler(
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             StandardWorkingDays = request.StandardWorkingDays,
+            AttendancePeriodId = request.AttendancePeriodId.HasValue ? new AttendancePeriodId(request.AttendancePeriodId.Value) : null,
             StatusCode = "Draft",
             CreatedAt = DateTime.UtcNow,
             CreatedBy = request.CreatedBy ?? "system",

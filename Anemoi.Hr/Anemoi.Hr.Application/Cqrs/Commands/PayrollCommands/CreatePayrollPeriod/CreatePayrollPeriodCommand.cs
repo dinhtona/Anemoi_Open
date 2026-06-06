@@ -10,4 +10,5 @@ public sealed record CreatePayrollPeriodCommand(
     DateOnly StartDate,
     DateOnly EndDate,
     decimal StandardWorkingDays,
+    Guid? AttendancePeriodId = null,
     [property: JsonIgnore] string CreatedBy = null) : ICommandResult<PayrollPeriodResponse>;
