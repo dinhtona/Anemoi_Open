@@ -64,5 +64,8 @@ public static class HrBusinessErrorCodes
     public const string PayrollAttendancePeriodNotLinked = "HR_PAYROLL_ATTENDANCE_PERIOD_NOT_LINKED";
     public const string AttendanceSummaryNotFound = "HR_ATTENDANCE_SUMMARY_NOT_FOUND";
     public const string AttendancePeriodNotLocked = "HR_ATTENDANCE_PERIOD_NOT_LOCKED";
+
+    public const string PayrollRunNotFinalized = "HR_PAYROLL_RUN_NOT_FINALIZED";
+    public const string PayslipInvalidStatus = "HR_PAYSLIP_INVALID_STATUS";
 }
 

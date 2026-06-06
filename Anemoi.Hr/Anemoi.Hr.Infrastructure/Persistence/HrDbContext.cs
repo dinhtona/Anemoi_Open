@@ -39,6 +39,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<AttendancePeriod> AttendancePeriods { get; set; }
     public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     public DbSet<AttendanceSummary> AttendanceSummaries { get; set; }
+    public DbSet<Payslip> Payslips { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

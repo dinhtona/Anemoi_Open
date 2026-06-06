@@ -157,3 +157,65 @@ public sealed class PayrollModelMapping :
             .IsRowVersion();
     }
 }
+
+public sealed class PayslipModelMapping : IEntityTypeConfiguration<Payslip>
+{
+    public void Configure(EntityTypeBuilder<Payslip> builder)
+    {
+        builder.ToTable("Payslips");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new PayslipId(id));
+
+        builder.Property(x => x.PayrollRunId)
+            .HasConversion(x => x.Value, id => new PayrollRunId(id))
+            .IsRequired();
+
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .IsRequired();
+
+        builder.Property(x => x.PeriodCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.EmployeeCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.EmployeeName).HasMaxLength(256).IsRequired();
+
+        builder.Property(x => x.Status)
+            .HasConversion(s => s.ToString(), v => (PayslipStatus)Enum.Parse(typeof(PayslipStatus), v))
+            .HasMaxLength(64)
+            .IsRequired();
+
+        builder.Property(x => x.BaseSalarySnapshot).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.DailyRateSnapshot).HasPrecision(18, 4).IsRequired();
+        builder.Property(x => x.PaidWorkingDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.PaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.UnpaidLeaveDays).HasPrecision(9, 2).IsRequired();
+        builder.Property(x => x.BasePayAmount).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.AllowanceTotal).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.DeductionTotal).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.GrossPay).HasPrecision(18, 2).IsRequired();
+        builder.Property(x => x.NetPay).HasPrecision(18, 2).IsRequired();
+
+        builder.Property(x => x.GeneratedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.PublishedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.CancelledBy).HasMaxLength(128).IsRequired(false);
+
+        // Unique Index: PayrollRunId + EmployeeId
+        builder.HasIndex(x => new { x.PayrollRunId, x.EmployeeId }).IsUnique();
+
+        // Relationships
+        builder.HasOne(x => x.PayrollRun)
+            .WithMany()
+            .HasForeignKey(x => x.PayrollRunId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // PostgreSQL xmin concurrency
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+}
