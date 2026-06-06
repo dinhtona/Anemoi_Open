@@ -3,6 +3,7 @@ using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
+using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,9 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<PositionAllowance> PositionAllowances { get; set; }
     public DbSet<EmployeeAllowance> EmployeeAllowances { get; set; }
     public DbSet<SalaryValidationBypassLog> SalaryValidationBypassLogs { get; set; }
+    public DbSet<PayrollPeriod> PayrollPeriods { get; set; }
+    public DbSet<PayrollRun> PayrollRuns { get; set; }
+    public DbSet<PayrollItem> PayrollItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
