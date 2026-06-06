@@ -67,6 +67,11 @@ public static class Permissions
     public const string HrEmployeeAllowanceChange = "hr.employee.allowance.change";
     public const string HrCompensationDashboardView = "hr.compensation.dashboard.view";
 
+    public const string HrAttendanceView = "hr.attendance.view";
+    public const string HrAttendanceCreate = "hr.attendance.create";
+    public const string HrAttendanceUpdate = "hr.attendance.update";
+    public const string HrAttendanceLock = "hr.attendance.lock";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -125,7 +130,11 @@ public static class Permissions
         new(HrAllowanceTypeManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrAllowanceTypeManage", true, "High"),
         new(HrEmployeeAllowanceView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAllowanceView"),
         new(HrEmployeeAllowanceChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAllowanceChange", true, "High"),
-        new(HrCompensationDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrCompensationDashboardView")
+        new(HrCompensationDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrCompensationDashboardView"),
+        new(HrAttendanceView, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceView"),
+        new(HrAttendanceCreate, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceCreate"),
+        new(HrAttendanceUpdate, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceUpdate"),
+        new(HrAttendanceLock, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceLock", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

@@ -19,6 +19,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<EmployeeContractMapper>();
         services.AddScoped<CompensationMapper>();
         services.AddScoped<PayrollMapper>();
+        services.AddScoped<AttendanceMapper>();
         services.AddScoped<ApproveLeaveRequestHandler>();
         services.AddScoped<CancelLeaveRequestHandler>();
         services.AddScoped<Anemoi.Hr.Application.Abstractions.IEmployeeGradeLookup, Anemoi.Hr.Application.Services.EmployeeGradeLookup>();

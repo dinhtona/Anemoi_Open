@@ -242,4 +242,9 @@
   <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Thực hiện thay đổi chức vụ cho nhân viên.</value></data>
   <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi cấp bậc của nhân viên.</value></data>
   <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Thực hiện thay đổi cấp bậc cho nhân viên.</value></data>
+  <data name="PermissionGroupHrAttendance" xml:space="preserve"><value>Chấm công</value></data>
+  <data name="PermissionDescriptionHrAttendanceView" xml:space="preserve"><value>Xem dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Tạo dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceUpdate" xml:space="preserve"><value>Cập nhật dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceLock" xml:space="preserve"><value>Khóa chu kỳ chấm công.</value></data>
 </root>

@@ -48,5 +48,13 @@ public static class HrBusinessErrorCodes
     public const string PayrollRunNotFound = "HR_PAYROLL_RUN_NOT_FOUND";
     public const string EmployeeSalaryNotFound = "HR_EMPLOYEE_SALARY_NOT_FOUND";
     public const string PayrollInvalidWorkingDays = "HR_PAYROLL_INVALID_WORKING_DAYS";
+
+    public const string AttendancePeriodNotFound = "HR_ATTENDANCE_PERIOD_NOT_FOUND";
+    public const string AttendanceRecordNotFound = "HR_ATTENDANCE_RECORD_NOT_FOUND";
+    public const string AttendancePeriodDuplicated = "HR_ATTENDANCE_PERIOD_DUPLICATED";
+    public const string AttendancePeriodLocked = "HR_ATTENDANCE_PERIOD_LOCKED";
+    public const string AttendanceRecordAlreadyExists = "HR_ATTENDANCE_RECORD_ALREADY_EXISTS";
+    public const string AttendanceInvalidTimeRange = "HR_ATTENDANCE_INVALID_TIME_RANGE";
+    public const string AttendanceConcurrencyConflict = "HR_ATTENDANCE_CONCURRENCY_CONFLICT";
 }
 

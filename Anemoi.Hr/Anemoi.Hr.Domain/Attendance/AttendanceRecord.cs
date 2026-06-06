@@ -17,7 +17,7 @@ public sealed class AttendanceRecord : ValueObject
     public decimal WorkedHours { get; set; }
     public decimal WorkedDays { get; set; }
     public string Status { get; set; }
-    public LeaveRequestId? LeaveRequestId { get; set; }
+    public LeaveRequestId LeaveRequestId { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public string CreatedBy { get; set; }

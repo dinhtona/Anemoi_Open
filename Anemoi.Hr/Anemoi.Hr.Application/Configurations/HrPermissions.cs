@@ -53,6 +53,11 @@ public static class HrPermissions
     public const string PayrollApprove = "hr.payroll.approve";
     public const string PayrollLock = "hr.payroll.lock";
 
+    public const string AttendanceView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceView;
+    public const string AttendanceCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceCreate;
+    public const string AttendanceUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceUpdate;
+    public const string AttendanceLock = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceLock;
+
     public static readonly IReadOnlyList<string> All =
     [
         LeavePolicyView,
@@ -96,7 +101,11 @@ public static class HrPermissions
         PayrollView,
         PayrollCalculate,
         PayrollApprove,
-        PayrollLock
+        PayrollLock,
+        AttendanceView,
+        AttendanceCreate,
+        AttendanceUpdate,
+        AttendanceLock
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -121,7 +130,8 @@ public static class HrPermissions
             [EmployeeAllowanceChange] = new(EmployeeAllowanceChange, "High"),
             [PayrollCalculate] = new(PayrollCalculate, "High"),
             [PayrollApprove] = new(PayrollApprove, "High"),
-            [PayrollLock] = new(PayrollLock, "Critical")
+            [PayrollLock] = new(PayrollLock, "Critical"),
+            [AttendanceLock] = new(AttendanceLock, "High")
         };
 }
 
