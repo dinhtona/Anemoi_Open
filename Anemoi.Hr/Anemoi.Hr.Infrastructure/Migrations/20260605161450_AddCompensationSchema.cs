@@ -208,12 +208,28 @@ namespace Anemoi.Hr.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeAllowances_EmployeeId_AllowanceTypeId_Currency",
                 table: "EmployeeAllowances",
-                columns: new[] { "EmployeeId", "AllowanceTypeId", "Currency" });
+                columns: new[] { "EmployeeId", "AllowanceTypeId", "Currency" },
+                unique: true,
+                filter: "\"EffectiveTo\" IS NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeSalaries_EmployeeId_EffectiveFrom_EffectiveTo",
+                name: "IX_EmployeeAllowances_EmployeeId_AllowanceTypeId_Currency_EffectiveFrom",
+                table: "EmployeeAllowances",
+                columns: new[] { "EmployeeId", "AllowanceTypeId", "Currency", "EffectiveFrom" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeSalaries_EmployeeId",
                 table: "EmployeeSalaries",
-                columns: new[] { "EmployeeId", "EffectiveFrom", "EffectiveTo" });
+                column: "EmployeeId",
+                unique: true,
+                filter: "\"EffectiveTo\" IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeSalaries_EmployeeId_EffectiveFrom",
+                table: "EmployeeSalaries",
+                columns: new[] { "EmployeeId", "EffectiveFrom" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeSalaries_SalaryGradeId",

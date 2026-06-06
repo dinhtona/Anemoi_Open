@@ -66,7 +66,12 @@ public sealed class EmployeeSalaryModelMapping : IEntityTypeConfiguration<Employ
             .HasForeignKey(x => x.SalaryGradeId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom, x.EffectiveTo });
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom })
+            .IsUnique();
+
+        builder.HasIndex(x => x.EmployeeId)
+            .IsUnique()
+            .HasFilter("\"EffectiveTo\" IS NULL");
 
         builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
     }
@@ -139,7 +144,12 @@ public sealed class EmployeeAllowanceModelMapping : IEntityTypeConfiguration<Emp
             .HasForeignKey(x => x.AllowanceTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(x => new { x.EmployeeId, x.AllowanceTypeId, x.Currency });
+        builder.HasIndex(x => new { x.EmployeeId, x.AllowanceTypeId, x.Currency, x.EffectiveFrom })
+            .IsUnique();
+
+        builder.HasIndex(x => new { x.EmployeeId, x.AllowanceTypeId, x.Currency })
+            .IsUnique()
+            .HasFilter("\"EffectiveTo\" IS NULL");
 
         builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
     }

@@ -36,7 +36,12 @@ public sealed class GetCompensationSnapshotHandler(
                         (x.EffectiveTo == null || x.EffectiveTo >= refDate))
             .ToListAsync(cancellationToken);
 
-        decimal totalMonthlyCost = 0;
+        var totalsByCurrency = activeAllowances
+            .GroupBy(x => x.Currency, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Sum(a => a.Amount),
+                StringComparer.OrdinalIgnoreCase);
 
         if (activeSalary is not null)
         {
@@ -44,25 +49,42 @@ public sealed class GetCompensationSnapshotHandler(
                 ? activeSalary.BaseSalary
                 : activeSalary.BaseSalary * 21.75m;
 
-            totalMonthlyCost += salaryCost;
-
-            // Sum allowances that match the salary currency
-            var matchingAllowances = activeAllowances
-                .Where(x => string.Equals(x.Currency, activeSalary.Currency, StringComparison.OrdinalIgnoreCase));
-
-            totalMonthlyCost += matchingAllowances.Sum(x => x.Amount);
-        }
-        else if (activeAllowances.Any())
-        {
-            // Sum all allowances since there's no salary (assuming they are in the same currency or just raw sum)
-            totalMonthlyCost += activeAllowances.Sum(x => x.Amount);
+            if (totalsByCurrency.TryGetValue(activeSalary.Currency, out var existingTotal))
+                totalsByCurrency[activeSalary.Currency] = existingTotal + salaryCost;
+            else
+                totalsByCurrency[activeSalary.Currency] = salaryCost;
         }
 
         return new CompensationSnapshotResponse
         {
             ActiveSalary = mapper.ToEmployeeSalaryResponse(activeSalary),
             ActiveAllowances = activeAllowances.Select(mapper.ToEmployeeAllowanceResponse).ToList(),
-            TotalMonthlyCost = totalMonthlyCost
+            BaseSalary = activeSalary is null
+                ? null
+                : new SalaryAmountResponse
+                {
+                    Amount = activeSalary.SalaryType == SalaryType.Monthly
+                        ? activeSalary.BaseSalary
+                        : activeSalary.BaseSalary * 21.75m,
+                    Currency = activeSalary.Currency
+                },
+            Allowances = activeAllowances
+                .GroupBy(x => x.Currency, StringComparer.OrdinalIgnoreCase)
+                .Select(x => new CurrencyTotalResponse
+                {
+                    Currency = x.Key,
+                    TotalAmount = x.Sum(a => a.Amount)
+                })
+                .OrderBy(x => x.Currency)
+                .ToList(),
+            TotalsByCurrency = totalsByCurrency
+                .Select(x => new CurrencyTotalResponse
+                {
+                    Currency = x.Key,
+                    TotalAmount = x.Value
+                })
+                .OrderBy(x => x.Currency)
+                .ToList()
         };
     }
 }

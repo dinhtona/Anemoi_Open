@@ -102,7 +102,8 @@ public sealed class AssignEmployeeAllowanceHandler(
         
         if (saveResult.IsT1)
         {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
+            return saveResult.AsT1 is DbUpdateConcurrencyException ||
+                   CompensationPersistenceErrors.IsUniqueConstraintViolation(saveResult.AsT1)
                 ? HrErrorResponses.Create("HR_ALLOWANCE_CONCURRENCY_CONFLICT")
                 : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
         }

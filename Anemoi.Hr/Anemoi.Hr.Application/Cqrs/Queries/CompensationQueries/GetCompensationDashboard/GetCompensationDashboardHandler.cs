@@ -36,6 +36,7 @@ public sealed class GetCompensationDashboardHandler(
             .ToListAsync(cancellationToken);
 
         var activeAllowances = await allowanceRepository.GetQueryable()
+            .Include(x => x.AllowanceType)
             .Where(x => x.EffectiveFrom <= today && (x.EffectiveTo == null || x.EffectiveTo >= today))
             .ToListAsync(cancellationToken);
 
@@ -44,9 +45,8 @@ public sealed class GetCompensationDashboardHandler(
             .Take(10)
             .ToListAsync(cancellationToken);
 
-        // Compute payroll projection
-        decimal totalMonthlyPayroll = 0;
         var costByGrade = new Dictionary<string, decimal>();
+        var projectionByCurrency = new Dictionary<string, PayrollProjectionByCurrencyResponse>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var salary in activeSalaries)
         {
@@ -54,7 +54,16 @@ public sealed class GetCompensationDashboardHandler(
                 ? salary.BaseSalary
                 : salary.BaseSalary * 21.75m;
 
-            totalMonthlyPayroll += monthlySalaryCost;
+            if (!projectionByCurrency.TryGetValue(salary.Currency, out var projection))
+            {
+                projection = new PayrollProjectionByCurrencyResponse { Currency = salary.Currency };
+                projectionByCurrency[salary.Currency] = projection;
+            }
+
+            if (salary.SalaryType == SalaryType.Monthly)
+                projection.MonthlySalaryTotal += monthlySalaryCost;
+            else
+                projection.DailySalaryTotal += monthlySalaryCost;
 
             var gradeCode = salary.GradeCodeSnapshot ?? "Unknown";
             if (!costByGrade.TryGetValue(gradeCode, out var currentCost))
@@ -64,8 +73,37 @@ public sealed class GetCompensationDashboardHandler(
             costByGrade[gradeCode] += monthlySalaryCost;
         }
 
-        // Add allowances to total projection
-        totalMonthlyPayroll += activeAllowances.Sum(x => x.Amount);
+        foreach (var allowance in activeAllowances)
+        {
+            if (!projectionByCurrency.TryGetValue(allowance.Currency, out var projection))
+            {
+                projection = new PayrollProjectionByCurrencyResponse { Currency = allowance.Currency };
+                projectionByCurrency[allowance.Currency] = projection;
+            }
+
+            projection.AllowanceTotal += allowance.Amount;
+        }
+
+        foreach (var projection in projectionByCurrency.Values)
+        {
+            projection.Total = projection.MonthlySalaryTotal + projection.DailySalaryTotal + projection.AllowanceTotal;
+        }
+
+        var allowanceCostByType = activeAllowances
+            .GroupBy(x => new
+            {
+                AllowanceTypeCode = x.AllowanceType?.Code ?? x.AllowanceTypeId.Value.ToString(),
+                x.Currency
+            })
+            .Select(x => new AllowanceCostByTypeResponse
+            {
+                AllowanceTypeCode = x.Key.AllowanceTypeCode,
+                Currency = x.Key.Currency,
+                Total = x.Sum(a => a.Amount)
+            })
+            .OrderBy(x => x.AllowanceTypeCode)
+            .ThenBy(x => x.Currency)
+            .ToList();
 
         // Find employees without salaries
         var employeesWithSalaryIds = activeSalaries.Select(s => s.EmployeeId).ToHashSet();
@@ -76,8 +114,9 @@ public sealed class GetCompensationDashboardHandler(
 
         return new CompensationDashboardResponse
         {
-            TotalMonthlyPayrollProjection = totalMonthlyPayroll,
+            PayrollProjectionByCurrency = projectionByCurrency.Values.OrderBy(x => x.Currency).ToList(),
             CostByGrade = costByGrade,
+            AllowanceCostByType = allowanceCostByType,
             MissingSalaryEmployeeIds = missingSalaryEmployeeIds,
             RecentBypasses = recentBypasses.Select(mapper.ToSalaryValidationBypassLogResponse).ToList()
         };

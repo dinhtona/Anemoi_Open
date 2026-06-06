@@ -116,7 +116,12 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("AllowanceTypeId");
 
-                    b.HasIndex("EmployeeId", "AllowanceTypeId", "Currency");
+                    b.HasIndex("EmployeeId", "AllowanceTypeId", "Currency")
+                        .IsUnique()
+                        .HasFilter("\"EffectiveTo\" IS NULL");
+
+                    b.HasIndex("EmployeeId", "AllowanceTypeId", "Currency", "EffectiveFrom")
+                        .IsUnique();
 
                     b.ToTable("EmployeeAllowances", (string)null);
                 });
@@ -174,7 +179,12 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("SalaryGradeId");
 
-                    b.HasIndex("EmployeeId", "EffectiveFrom", "EffectiveTo");
+                    b.HasIndex("EmployeeId")
+                        .IsUnique()
+                        .HasFilter("\"EffectiveTo\" IS NULL");
+
+                    b.HasIndex("EmployeeId", "EffectiveFrom")
+                        .IsUnique();
 
                     b.ToTable("EmployeeSalaries", (string)null);
                 });
