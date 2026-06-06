@@ -35,6 +35,7 @@ public sealed class GetAttendanceRecordsHandler(
         }
 
         var records = await query
+            .Include(x => x.Employee)
             .OrderBy(x => x.WorkDate)
             .ToListAsync(cancellationToken);
 

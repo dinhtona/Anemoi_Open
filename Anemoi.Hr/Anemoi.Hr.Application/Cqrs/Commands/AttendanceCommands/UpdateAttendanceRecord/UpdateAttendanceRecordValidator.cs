@@ -21,14 +21,15 @@ public sealed class UpdateAttendanceRecordValidator : AbstractValidator<UpdateAt
             .NotEmpty().WithMessage("VAL_WORK_DATE_REQUIRED");
 
         RuleFor(x => x.WorkedHours)
-            .GreaterThanOrEqualTo(0).WithMessage("VAL_WORKED_HOURS_MUST_BE_POS");
+            .InclusiveBetween(0, 24).WithMessage("VAL_WORKED_HOURS_OUT_OF_RANGE");
 
         RuleFor(x => x.WorkedDays)
-            .GreaterThanOrEqualTo(0).WithMessage("VAL_WORKED_DAYS_MUST_BE_POS");
+            .InclusiveBetween(0, 1).WithMessage("VAL_WORKED_DAYS_OUT_OF_RANGE");
 
         RuleFor(x => x.StatusCode)
             .NotEmpty().WithMessage("VAL_STATUS_REQUIRED")
-            .MaximumLength(64).WithMessage("VAL_STATUS_TOO_LONG");
+            .Must(AttendanceStatusCodes.All.Contains)
+            .WithMessage("VAL_ATTENDANCE_STATUS_UNSUPPORTED");
 
         RuleFor(x => x)
             .Must(x => !x.CheckInTime.HasValue || !x.CheckOutTime.HasValue || x.CheckOutTime.Value > x.CheckInTime.Value)

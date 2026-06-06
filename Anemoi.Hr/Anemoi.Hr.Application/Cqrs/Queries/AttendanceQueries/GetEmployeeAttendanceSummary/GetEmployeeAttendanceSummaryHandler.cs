@@ -47,15 +47,27 @@ public sealed class GetEmployeeAttendanceSummaryHandler(
 
         var workedDays = records.Sum(x => x.WorkedDays);
         var workedHours = records.Sum(x => x.WorkedHours);
-        var leaveDays = (decimal)records.Count(x => x.Status == "Leave");
-        var absentDays = (decimal)records.Count(x => x.Status == "Absent");
+        var leaveDays = records
+            .Where(x => x.Status == AttendanceStatusCodes.Leave)
+            .Sum(x => x.WorkedDays);
+        var absentDays = records
+            .Where(x => x.Status == AttendanceStatusCodes.Absent)
+            .Sum(x => x.WorkedDays);
+        var holidayDays = records
+            .Where(x => x.Status == AttendanceStatusCodes.Holiday)
+            .Sum(x => x.WorkedDays);
 
         return new AttendanceSummaryResponse
         {
             WorkedDays = workedDays,
             WorkedHours = workedHours,
             LeaveDays = leaveDays,
-            AbsentDays = absentDays
+            AbsentDays = absentDays,
+            HolidayDays = holidayDays,
+            // Temporary until attendance can classify paid and unpaid leave.
+            PaidWorkingDays = workedDays,
+            PaidLeaveDays = 0,
+            UnpaidLeaveDays = 0
         };
     }
 }

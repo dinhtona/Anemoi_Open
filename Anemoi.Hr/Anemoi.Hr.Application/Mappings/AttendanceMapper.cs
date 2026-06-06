@@ -40,6 +40,8 @@ public partial class AttendanceMapper
             Id = record.Id.Value.ToString(),
             AttendancePeriodId = record.AttendancePeriodId.Value.ToString(),
             EmployeeId = record.EmployeeId.Value.ToString(),
+            EmployeeCode = record.Employee?.EmployeeCode,
+            EmployeeName = record.Employee?.FullName,
             WorkDate = record.WorkDate,
             CheckInTime = record.CheckInTime,
             CheckOutTime = record.CheckOutTime,
