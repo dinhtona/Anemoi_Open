@@ -40,6 +40,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     public DbSet<AttendanceSummary> AttendanceSummaries { get; set; }
     public DbSet<Payslip> Payslips { get; set; }
+    public DbSet<ReportExportAuditLog> ReportExportAuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

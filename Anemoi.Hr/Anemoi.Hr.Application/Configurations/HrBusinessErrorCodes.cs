@@ -67,5 +67,8 @@ public static class HrBusinessErrorCodes
 
     public const string PayrollRunNotFinalized = "HR_PAYROLL_RUN_NOT_FINALIZED";
     public const string PayslipInvalidStatus = "HR_PAYSLIP_INVALID_STATUS";
+    public const string ReportExportFileGenerationFailed = "HR_REPORT_EXPORT_FILE_GENERATION_FAILED";
+    public const string ReportExportPermissionDenied = "HR_REPORT_EXPORT_PERMISSION_DENIED";
+    public const string ReportExportAuditLogSaveFailed = "HR_REPORT_EXPORT_AUDIT_LOG_SAVE_FAILED";
 }
 

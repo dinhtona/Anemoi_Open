@@ -47,7 +47,6 @@ public static class HrPermissions
     public const string EmployeeAllowanceView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeAllowanceView;
     public const string EmployeeAllowanceChange = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeAllowanceChange;
     public const string CompensationDashboardView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCompensationDashboardView;
-
     public const string PayrollView = "hr.payroll.view";
     public const string PayrollCalculate = "hr.payroll.calculate";
     public const string PayrollApprove = "hr.payroll.approve";
@@ -57,6 +56,7 @@ public static class HrPermissions
     public const string AttendanceCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceCreate;
     public const string AttendanceUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceUpdate;
     public const string AttendanceLock = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceLock;
+    public const string PayrollExport = "hr.payroll.export";
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -102,6 +102,7 @@ public static class HrPermissions
         PayrollCalculate,
         PayrollApprove,
         PayrollLock,
+        PayrollExport,
         AttendanceView,
         AttendanceCreate,
         AttendanceUpdate,
@@ -131,6 +132,7 @@ public static class HrPermissions
             [PayrollCalculate] = new(PayrollCalculate, "High"),
             [PayrollApprove] = new(PayrollApprove, "High"),
             [PayrollLock] = new(PayrollLock, "Critical"),
+            [PayrollExport] = new(PayrollExport, "High"),
             [AttendanceLock] = new(AttendanceLock, "High")
         };
 }
