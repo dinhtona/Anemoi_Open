@@ -6,6 +6,7 @@ using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Positions;
+using Anemoi.Hr.Domain.Reporting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Infrastructure.Persistence;
