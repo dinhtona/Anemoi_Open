@@ -36,6 +36,7 @@ public sealed class ExportPayslipSummaryCsvHandler(
             .BuildPayslipSummary(
                 payrollRunRepository.GetQueryable().AsNoTracking(),
                 filter)
+            .Take(ReportExportLimits.MaxRows + 1)
             .ToListAsync(cancellationToken);
         var reportItems = rows.Select(mapper.ToReportItem).ToList();
 

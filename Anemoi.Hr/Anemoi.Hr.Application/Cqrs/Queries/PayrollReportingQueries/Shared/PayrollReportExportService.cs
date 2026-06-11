@@ -23,8 +23,12 @@ public sealed class PayrollReportExportService(
         CancellationToken cancellationToken)
         where T : class
     {
-        if (string.IsNullOrWhiteSpace(currentUser.UserId))
+        var exportedBy = currentUser.UserId;
+        if (string.IsNullOrWhiteSpace(exportedBy))
             throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportPermissionDenied);
+
+        if (records.Count > ReportExportLimits.MaxRows)
+            throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportLimitExceeded);
 
         var fileName = $"{reportType.Replace('.', '-')}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
         var result = reportExporter.ExportCsv(records, fileName);
@@ -34,7 +38,7 @@ public sealed class PayrollReportExportService(
         var auditLog = ReportExportAuditLog.Export(
             ModuleCodes.Payroll,
             reportType,
-            currentUser.UserId,
+            exportedBy,
             "csv",
             records.Count,
             filtersJson,

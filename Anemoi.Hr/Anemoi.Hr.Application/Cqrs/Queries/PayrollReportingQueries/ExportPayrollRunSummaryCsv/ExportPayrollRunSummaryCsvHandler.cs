@@ -33,6 +33,7 @@ public sealed class ExportPayrollRunSummaryCsvHandler(
 
         var rows = await repository.GetQueryable().AsNoTracking()
             .BuildPayrollRunSummary(filter)
+            .Take(ReportExportLimits.MaxRows + 1)
             .ToListAsync(cancellationToken);
         var reportItems = rows.Select(mapper.ToReportItem).ToList();
 

@@ -1,9 +1,19 @@
 using System.Text;
+using Anemoi.BuildingBlock.Application.Pipelines;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.ExportPayslipSummaryCsv;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollRunSummaryReport;
+using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Infrastructure.Reporting;
+using Anemoi.Hr.Infrastructure.Services;
+using Anemoi.Hr.Infrastructure.Installers;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Anemoi.BuildingBlock.Test;
@@ -70,5 +80,111 @@ public sealed class HrPayrollReportingTests
         Assert.Contains("123.45", csv);
     }
 
+    [Fact]
+    public void CurrentUser_ReturnsEmpty_WhenHttpContextIsUnavailable()
+    {
+        var currentUser = new CurrentUser(new HttpContextAccessor());
+
+        Assert.Equal(string.Empty, currentUser.UserId);
+    }
+
+    [Fact]
+    public void CurrentUser_ReturnsEmpty_WhenUserIdClaimIsUnavailable()
+    {
+        var accessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
+        var currentUser = new CurrentUser(accessor);
+
+        Assert.Equal(string.Empty, currentUser.UserId);
+    }
+
+    [Fact]
+    public async Task ExportService_FailsSafely_WhenCurrentUserCannotBeResolved()
+    {
+        var service = new PayrollReportExportService(
+            null!,
+            new StubCurrentUser(string.Empty),
+            null!,
+            null!);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.ExportAsync(
+            Array.Empty<CsvRow>(),
+            ReportTypes.PayrollRunSummary,
+            new { },
+            CancellationToken.None));
+
+        Assert.Equal(HrBusinessErrorCodes.ReportExportPermissionDenied, exception.Message);
+    }
+
+    [Fact]
+    public async Task ExportService_RejectsExportsAboveMvpRowLimit()
+    {
+        var service = new PayrollReportExportService(
+            null!,
+            new StubCurrentUser("authenticated-user-id"),
+            null!,
+            null!);
+        var records = Enumerable.Repeat(
+            new CsvRow("Employee", "Description", 1m),
+            ReportExportLimits.MaxRows + 1).ToArray();
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => service.ExportAsync(
+            records,
+            ReportTypes.PayrollRunSummary,
+            new { },
+            CancellationToken.None));
+
+        Assert.Equal(HrBusinessErrorCodes.ReportExportLimitExceeded, exception.Message);
+    }
+
+    [Fact]
+    public void PipelineInstaller_RegistersSingleValidationBehavior()
+    {
+        var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder().Build();
+
+        new PipelineInstaller().InstallerServices(services, configuration);
+
+        Assert.Single(services, x =>
+            x.ServiceType.IsGenericTypeDefinition &&
+            x.ServiceType == typeof(IPipelineBehavior<,>) &&
+            x.ImplementationType == typeof(ValidationBehavior<,>));
+    }
+
+    [Fact]
+    public async Task ValidationBehavior_InvokesEachRegisteredValidatorOnce()
+    {
+        var validator = new CountingValidator();
+        var behavior = new ValidationBehavior<ValidationRequest, string>([validator]);
+        var nextCalls = 0;
+
+        var response = await behavior.Handle(
+            new ValidationRequest(),
+            () =>
+            {
+                nextCalls++;
+                return Task.FromResult("validated");
+            },
+            CancellationToken.None);
+
+        Assert.Equal("validated", response);
+        Assert.Equal(1, validator.InvocationCount);
+        Assert.Equal(1, nextCalls);
+    }
+
     private sealed record CsvRow(string EmployeeName, string Description, decimal Amount);
+    private sealed record ValidationRequest : IRequest<string>;
+    private sealed record StubCurrentUser(string UserId) : ICurrentUser;
+
+    private sealed class CountingValidator : AbstractValidator<ValidationRequest>
+    {
+        public int InvocationCount { get; private set; }
+
+        public override Task<FluentValidation.Results.ValidationResult> ValidateAsync(
+            ValidationContext<ValidationRequest> context,
+            CancellationToken cancellation = default)
+        {
+            InvocationCount++;
+            return base.ValidateAsync(context, cancellation);
+        }
+    }
 }
