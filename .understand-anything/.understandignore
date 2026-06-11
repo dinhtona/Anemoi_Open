@@ -1,0 +1,15 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Built-in defaults: node_modules/, .git/, dist/, build/, obj/, *.lock, etc.
+
+# Suggested exclusions for .NET projects
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+packages/
+.nuget/
+.DS_Store
+*.log
+coverage/
