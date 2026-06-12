@@ -79,6 +79,8 @@ public static class Permissions
     public const string HrShiftManage = "hr.shift.manage";
     public const string HrShiftAssign = "hr.shift.assign";
     public const string HrShiftCancel = "hr.shift.cancel";
+    public const string HrCalendarView = "hr.calendar.view";
+    public const string HrCalendarManage = "hr.calendar.manage";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -150,7 +152,9 @@ public static class Permissions
         new(HrShiftView, "PermissionGroupHrShift", "PermissionDescriptionHrShiftView"),
         new(HrShiftManage, "PermissionGroupHrShift", "PermissionDescriptionHrShiftManage"),
         new(HrShiftAssign, "PermissionGroupHrShift", "PermissionDescriptionHrShiftAssign"),
-        new(HrShiftCancel, "PermissionGroupHrShift", "PermissionDescriptionHrShiftCancel")
+        new(HrShiftCancel, "PermissionGroupHrShift", "PermissionDescriptionHrShiftCancel"),
+        new(HrCalendarView, "PermissionGroupHrCalendar", "PermissionDescriptionHrCalendarView"),
+        new(HrCalendarManage, "PermissionGroupHrCalendar", "PermissionDescriptionHrCalendarManage")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

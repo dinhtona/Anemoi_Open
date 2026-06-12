@@ -1,4 +1,5 @@
 using Anemoi.Hr.Domain.Attendance;
+using Anemoi.Hr.Domain.CalendarManagement;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
@@ -47,6 +48,10 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<OvertimeRequest> OvertimeRequests { get; set; }
     public DbSet<ShiftTemplate> ShiftTemplates { get; set; }
     public DbSet<EmployeeShiftAssignment> EmployeeShiftAssignments { get; set; }
+    public DbSet<PublicHoliday> PublicHolidays { get; set; }
+    public DbSet<CompanyHoliday> CompanyHolidays { get; set; }
+    public DbSet<WorkingCalendarRule> WorkingCalendarRules { get; set; }
+    public DbSet<CalendarException> CalendarExceptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

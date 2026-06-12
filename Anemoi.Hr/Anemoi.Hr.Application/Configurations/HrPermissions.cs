@@ -65,6 +65,8 @@ public static class HrPermissions
     public const string OvertimeCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeRequest;
     public const string OvertimeApprove = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeApprove;
     public const string OvertimeManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeManage;
+    public const string CalendarView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCalendarView;
+    public const string CalendarManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCalendarManage;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -123,6 +125,8 @@ public static class HrPermissions
         ,OvertimeCreate
         ,OvertimeApprove
         ,OvertimeManage
+        ,CalendarView
+        ,CalendarManage
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =

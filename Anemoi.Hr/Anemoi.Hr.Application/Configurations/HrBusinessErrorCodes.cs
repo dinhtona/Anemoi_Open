@@ -104,6 +104,36 @@ public static class HrBusinessErrorCodes
     public const string ShiftTemplateCodeRequired = "HR_SHIFT_TEMPLATE_CODE_REQUIRED";
     public const string ShiftTemplateNameRequired = "HR_SHIFT_TEMPLATE_NAME_REQUIRED";
     public const string ShiftAssignmentConcurrencyConflict = "HR_SHIFT_ASSIGNMENT_CONCURRENCY_CONFLICT";
+    // Calendar Management error codes
+    public const string PublicHolidayNotFound = "HR_PUBLIC_HOLIDAY_NOT_FOUND";
+    public const string PublicHolidayDuplicate = "HR_PUBLIC_HOLIDAY_DUPLICATE";
+    public const string PublicHolidayDateRequired = "HR_PUBLIC_HOLIDAY_DATE_REQUIRED";
+    public const string PublicHolidayNameRequired = "HR_PUBLIC_HOLIDAY_NAME_REQUIRED";
+    public const string PublicHolidayCountryCodeRequired = "HR_PUBLIC_HOLIDAY_COUNTRY_CODE_REQUIRED";
+    public const string PublicHolidayConcurrencyConflict = "HR_PUBLIC_HOLIDAY_CONCURRENCY_CONFLICT";
+
+    public const string CompanyHolidayNotFound = "HR_COMPANY_HOLIDAY_NOT_FOUND";
+    public const string CompanyHolidayDuplicate = "HR_COMPANY_HOLIDAY_DUPLICATE";
+    public const string CompanyHolidayDateRequired = "HR_COMPANY_HOLIDAY_DATE_REQUIRED";
+    public const string CompanyHolidayNameRequired = "HR_COMPANY_HOLIDAY_NAME_REQUIRED";
+    public const string CompanyHolidayConcurrencyConflict = "HR_COMPANY_HOLIDAY_CONCURRENCY_CONFLICT";
+
+    public const string WorkingCalendarRuleNotFound = "HR_WORKING_CALENDAR_RULE_NOT_FOUND";
+    public const string WorkingCalendarRuleNameRequired = "HR_WORKING_CALENDAR_RULE_NAME_REQUIRED";
+    public const string WorkingCalendarRuleEffectiveFromRequired = "HR_WORKING_CALENDAR_RULE_EFFECTIVE_FROM_REQUIRED";
+    public const string WorkingCalendarRuleWorkingDaysRequired = "HR_WORKING_CALENDAR_RULE_WORKING_DAYS_REQUIRED";
+    public const string WorkingCalendarRuleAlreadyActive = "HR_WORKING_CALENDAR_RULE_ALREADY_ACTIVE";
+    public const string WorkingCalendarRuleAlreadyInactive = "HR_WORKING_CALENDAR_RULE_ALREADY_INACTIVE";
+    public const string WorkingCalendarRuleConcurrencyConflict = "HR_WORKING_CALENDAR_RULE_CONCURRENCY_CONFLICT";
+    public const string WorkingCalendarRuleOverlap = "HR_WORKING_CALENDAR_RULE_OVERLAP";
+
+    public const string CalendarExceptionNotFound = "HR_CALENDAR_EXCEPTION_NOT_FOUND";
+    public const string CalendarExceptionDuplicate = "HR_CALENDAR_EXCEPTION_DUPLICATE";
+    public const string CalendarExceptionDateRequired = "HR_CALENDAR_EXCEPTION_DATE_REQUIRED";
+    public const string CalendarExceptionReasonRequired = "HR_CALENDAR_EXCEPTION_REASON_REQUIRED";
+    public const string CalendarExceptionTypeRequired = "HR_CALENDAR_EXCEPTION_TYPE_REQUIRED";
+    public const string CalendarExceptionConcurrencyConflict = "HR_CALENDAR_EXCEPTION_CONCURRENCY_CONFLICT";
+
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 }

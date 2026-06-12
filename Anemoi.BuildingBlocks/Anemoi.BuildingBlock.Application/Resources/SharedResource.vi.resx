@@ -257,4 +257,7 @@
   <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Tạo, cập nhật, kích hoạt và vô hiệu hóa mẫu ca.</value></data>
   <data name="PermissionDescriptionHrShiftAssign" xml:space="preserve"><value>Phân ca cho nhân viên.</value></data>
   <data name="PermissionDescriptionHrShiftCancel" xml:space="preserve"><value>Hủy phân ca cho nhân viên.</value></data>
+  <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>Lịch</value></data>
+  <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>Xem lịch và ngày lễ</value></data>
+  <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Quản lý lịch, ngày lễ và ngoại lệ</value></data>
 </root>
