@@ -10,6 +10,7 @@ using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Reporting;
+using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Infrastructure.Persistence;
@@ -52,6 +53,10 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<CompanyHoliday> CompanyHolidays { get; set; }
     public DbSet<WorkingCalendarRule> WorkingCalendarRules { get; set; }
     public DbSet<CalendarException> CalendarExceptions { get; set; }
+    public DbSet<TaxRuleSet> TaxRuleSets { get; set; }
+    public DbSet<TaxBracket> TaxBrackets { get; set; }
+    public DbSet<TaxDeductionRule> TaxDeductionRules { get; set; }
+    public DbSet<TaxCalculationSnapshot> TaxCalculationSnapshots { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

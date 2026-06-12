@@ -67,6 +67,9 @@ public static class HrPermissions
     public const string OvertimeManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeManage;
     public const string CalendarView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCalendarView;
     public const string CalendarManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrCalendarManage;
+    public const string TaxView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrTaxView;
+    public const string TaxManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrTaxManage;
+    public const string TaxCalculate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrTaxCalculate;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -116,17 +119,20 @@ public static class HrPermissions
         AttendanceView,
         AttendanceCreate,
         AttendanceUpdate,
-        AttendanceLock
-        ,ShiftView
-        ,ShiftManage
-        ,ShiftAssign
-        ,ShiftCancel
-        ,OvertimeView
-        ,OvertimeCreate
-        ,OvertimeApprove
-        ,OvertimeManage
-        ,CalendarView
-        ,CalendarManage
+        AttendanceLock,
+        ShiftView,
+        ShiftManage,
+        ShiftAssign,
+        ShiftCancel,
+        OvertimeView,
+        OvertimeCreate,
+        OvertimeApprove,
+        OvertimeManage,
+        CalendarView,
+        CalendarManage,
+        TaxView,
+        TaxManage,
+        TaxCalculate
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -153,7 +159,8 @@ public static class HrPermissions
             [PayrollApprove] = new(PayrollApprove, "High"),
             [PayrollLock] = new(PayrollLock, "Critical"),
             [PayrollExport] = new(PayrollExport, "High"),
-            [AttendanceLock] = new(AttendanceLock, "High")
+            [AttendanceLock] = new(AttendanceLock, "High"),
+            [TaxManage] = new(TaxManage, "High")
         };
 }
 
