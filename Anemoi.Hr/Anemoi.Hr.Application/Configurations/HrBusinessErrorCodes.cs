@@ -70,6 +70,7 @@ public static class HrBusinessErrorCodes
     public const string ReportExportFileGenerationFailed = "HR_REPORT_EXPORT_FILE_GENERATION_FAILED";
     public const string ReportExportPermissionDenied = "HR_REPORT_EXPORT_PERMISSION_DENIED";
     public const string ReportExportAuditLogSaveFailed = "HR_REPORT_EXPORT_AUDIT_LOG_SAVE_FAILED";
+    public const string ReportExportLimitExceeded = "HR_REPORT_EXPORT_LIMIT_EXCEEDED";
     public const string ReportPageInvalid = "HR_REPORT_PAGE_INVALID";
     public const string ReportPageSizeInvalid = "HR_REPORT_PAGE_SIZE_INVALID";
     public const string ReportDateRangeInvalid = "HR_REPORT_DATE_RANGE_INVALID";
