@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -16,7 +17,7 @@ public static class EfExtensions
 {
     public static void AddEfRepositoriesAsScope<TDbContext>(this IServiceCollection services, Assembly modelAssembly)
         where TDbContext : DbContext => modelAssembly.ExportedTypes
-        .Where(x => typeof(ValueObject).IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false })
+        .Where(x => IsPersistedDomainType(x) && x is { IsInterface: false, IsAbstract: false })
         .ForEach(x =>
         {
             var assemblyName = new AssemblyName
@@ -42,6 +43,20 @@ public static class EfExtensions
             var implementationType = typeof(ISqlRepository<>).MakeGenericType(x);
             services.TryAddScoped(implementationType, repositoryType);
         });
+
+    private static bool IsPersistedDomainType(Type type)
+    {
+        if (typeof(ValueObject).IsAssignableFrom(type))
+            return true;
+
+        for (var current = type.BaseType; current is not null; current = current.BaseType)
+        {
+            if (current.IsGenericType && current.GetGenericTypeDefinition() == typeof(Entity<>))
+                return true;
+        }
+
+        return false;
+    }
 
     public static void AddEfUnitOfWorkAsScope<TDbContext>(this IServiceCollection services) where TDbContext : DbContext
     {

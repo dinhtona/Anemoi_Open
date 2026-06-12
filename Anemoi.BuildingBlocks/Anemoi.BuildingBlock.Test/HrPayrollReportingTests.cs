@@ -1,4 +1,5 @@
 using System.Text;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Pipelines;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
@@ -9,6 +10,7 @@ using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Infrastructure.Reporting;
 using Anemoi.Hr.Infrastructure.Services;
 using Anemoi.Hr.Infrastructure.Installers;
+using Anemoi.Hr.Domain.Reporting;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -148,6 +150,18 @@ public sealed class HrPayrollReportingTests
             x.ServiceType.IsGenericTypeDefinition &&
             x.ServiceType == typeof(IPipelineBehavior<,>) &&
             x.ImplementationType == typeof(ValidationBehavior<,>));
+    }
+
+    [Fact]
+    public void ServiceInstaller_RegistersReportExportAuditLogRepository()
+    {
+        var services = new ServiceCollection();
+        var configuration = new ConfigurationBuilder().Build();
+
+        new ServiceInstaller().InstallerServices(services, configuration);
+
+        Assert.Contains(services, x =>
+            x.ServiceType == typeof(ISqlRepository<ReportExportAuditLog>));
     }
 
     [Fact]
