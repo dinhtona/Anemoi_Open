@@ -68,6 +68,10 @@ public static class Permissions
     public const string HrCompensationDashboardView = "hr.compensation.dashboard.view";
 
     public const string HrAttendanceView = "hr.attendance.view";
+    public const string HrOvertimeView = "hr.overtime.view";
+    public const string HrOvertimeRequest = "hr.overtime.request";
+    public const string HrOvertimeApprove = "hr.overtime.approve";
+    public const string HrOvertimeManage = "hr.overtime.manage";
     public const string HrAttendanceCreate = "hr.attendance.create";
     public const string HrAttendanceUpdate = "hr.attendance.update";
     public const string HrAttendanceLock = "hr.attendance.lock";
@@ -134,7 +138,11 @@ public static class Permissions
         new(HrAttendanceView, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceView"),
         new(HrAttendanceCreate, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceCreate"),
         new(HrAttendanceUpdate, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceUpdate"),
-        new(HrAttendanceLock, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceLock", true, "High")
+        new(HrAttendanceLock, "PermissionGroupHrAttendance", "PermissionDescriptionHrAttendanceLock", true, "High"),
+        new(HrOvertimeView, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeView"),
+        new(HrOvertimeRequest, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeRequest"),
+        new(HrOvertimeApprove, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeApprove"),
+        new(HrOvertimeManage, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeManage", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

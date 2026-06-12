@@ -57,6 +57,10 @@ public static class HrPermissions
     public const string AttendanceUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceUpdate;
     public const string AttendanceLock = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceLock;
     public const string PayrollExport = "hr.payroll.export";
+    public const string OvertimeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeView;
+    public const string OvertimeCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeRequest;
+    public const string OvertimeApprove = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeApprove;
+    public const string OvertimeManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeManage;
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -107,6 +111,10 @@ public static class HrPermissions
         AttendanceCreate,
         AttendanceUpdate,
         AttendanceLock
+        ,OvertimeView
+        ,OvertimeCreate
+        ,OvertimeApprove
+        ,OvertimeManage
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =

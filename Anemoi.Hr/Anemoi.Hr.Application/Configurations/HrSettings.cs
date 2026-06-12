@@ -6,4 +6,6 @@ public sealed class HrSettings
     public int MonthlyAccrualCheckIntervalHours { get; set; } = 12;
     public int MonthlyAccrualRunHour { get; set; } = 0;
     public int ContractExpirationAlertDays { get; set; } = 30;
+    public int OvertimeMaxHoursPerRequest { get; set; } = 12;
+    public int OvertimeHistoricalDaysLimit { get; set; } = 365;
 }

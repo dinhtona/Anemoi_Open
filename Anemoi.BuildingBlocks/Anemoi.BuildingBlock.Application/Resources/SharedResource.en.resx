@@ -247,4 +247,9 @@
   <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Create attendance records.</value></data>
   <data name="PermissionDescriptionHrAttendanceUpdate" xml:space="preserve"><value>Update attendance records.</value></data>
   <data name="PermissionDescriptionHrAttendanceLock" xml:space="preserve"><value>Lock attendance periods.</value></data>
+  <data name="PermissionGroupHrOvertime" xml:space="preserve"><value>HR Overtime</value></data>
+  <data name="PermissionDescriptionHrOvertimeView" xml:space="preserve"><value>View overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Create and cancel overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Approve and reject overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Manage overtime configuration and all requests.</value></data>
 </root>

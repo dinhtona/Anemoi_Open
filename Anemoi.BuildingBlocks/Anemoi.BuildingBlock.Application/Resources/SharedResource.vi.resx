@@ -247,4 +247,9 @@
   <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Tạo dữ liệu chấm công.</value></data>
   <data name="PermissionDescriptionHrAttendanceUpdate" xml:space="preserve"><value>Cập nhật dữ liệu chấm công.</value></data>
   <data name="PermissionDescriptionHrAttendanceLock" xml:space="preserve"><value>Khóa chu kỳ chấm công.</value></data>
+  <data name="PermissionGroupHrOvertime" xml:space="preserve"><value>Làm thêm giờ</value></data>
+  <data name="PermissionDescriptionHrOvertimeView" xml:space="preserve"><value>Xem yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Tạo và hủy yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Phê duyệt và từ chối yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Quản lý cấu hình và tất cả yêu cầu làm thêm giờ.</value></data>
 </root>

@@ -76,5 +76,16 @@ public static class HrBusinessErrorCodes
     public const string ReportDateRangeInvalid = "HR_REPORT_DATE_RANGE_INVALID";
     public const string ReportSortDirectionInvalid = "HR_REPORT_SORT_DIRECTION_INVALID";
     public const string ReportStatusInvalid = "HR_REPORT_STATUS_INVALID";
+
+    // Overtime error codes
+    public const string OvertimeRequestNotFound = "HR_OVERTIME_REQUEST_NOT_FOUND";
+    public const string OvertimeDateInvalid = "HR_OVERTIME_DATE_INVALID";
+    public const string OvertimeTimeInvalid = "HR_OVERTIME_TIME_INVALID";
+    public const string OvertimeDurationExceedsLimit = "HR_OVERTIME_DURATION_EXCEEDS_LIMIT";
+    public const string OvertimeReasonInvalid = "HR_OVERTIME_REASON_INVALID";
+    public const string OverlappingOvertimeRequestsNotAllowed = "HR_OVERLAPPING_OVERTIME_REQUESTS_NOT_ALLOWED";
+    public const string OvertimeApproverRequired = "HR_OVERTIME_APPROVER_REQUIRED";
+    public const string OvertimeRequestConcurrencyConflict = "HR_OVERTIME_REQUEST_CONCURRENCY_CONFLICT";
 }
+
 
