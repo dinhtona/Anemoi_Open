@@ -57,6 +57,10 @@ public static class HrPermissions
     public const string AttendanceUpdate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceUpdate;
     public const string AttendanceLock = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAttendanceLock;
     public const string PayrollExport = "hr.payroll.export";
+    public const string ShiftView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrShiftView;
+    public const string ShiftManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrShiftManage;
+    public const string ShiftAssign = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrShiftAssign;
+    public const string ShiftCancel = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrShiftCancel;
     public const string OvertimeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeView;
     public const string OvertimeCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeRequest;
     public const string OvertimeApprove = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOvertimeApprove;
@@ -111,6 +115,10 @@ public static class HrPermissions
         AttendanceCreate,
         AttendanceUpdate,
         AttendanceLock
+        ,ShiftView
+        ,ShiftManage
+        ,ShiftAssign
+        ,ShiftCancel
         ,OvertimeView
         ,OvertimeCreate
         ,OvertimeApprove

@@ -11,7 +11,11 @@ public sealed class ExportPayrollRunSummaryCsvQueryValidator : AbstractValidator
     public ExportPayrollRunSummaryCsvQueryValidator()
     {
         RuleFor(x => x.SortDirection)
-            .Must(x => string.IsNullOrWhiteSpace(x) || x.Equals("asc", StringComparison.OrdinalIgnoreCase) || x.Equals("desc", StringComparison.OrdinalIgnoreCase))
+            .Must(x => string.IsNullOrWhiteSpace(x)
+                || x.Equals(SortDirectionConstants.Asc, StringComparison.OrdinalIgnoreCase)
+                || x.Equals(SortDirectionConstants.Desc, StringComparison.OrdinalIgnoreCase)
+                || x.Equals(SortDirectionConstants.Ascending, StringComparison.OrdinalIgnoreCase)
+                || x.Equals(SortDirectionConstants.Descending, StringComparison.OrdinalIgnoreCase))
             .WithMessage(HrBusinessErrorCodes.ReportSortDirectionInvalid);
         RuleFor(x => x.Status)
             .Must(x => string.IsNullOrWhiteSpace(x) || Enum.TryParse<PayrollRunStatus>(x, true, out _))

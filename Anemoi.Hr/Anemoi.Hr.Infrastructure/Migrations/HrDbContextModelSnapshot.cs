@@ -1270,6 +1270,79 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.ToTable("LeaveTransactions", (string)null);
                 });
 
+            modelBuilder.Entity("Anemoi.Hr.Domain.Overtime.OvertimeRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CancelledBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<DateOnly>("OvertimeDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("RejectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RejectedBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("OvertimeDate");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("EmployeeId", "OvertimeDate");
+
+                    b.ToTable("hr_overtime_requests", (string)null);
+                });
+
             modelBuilder.Entity("Anemoi.Hr.Domain.Payroll.PayrollItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1650,6 +1723,48 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.ToTable("Payslips", (string)null);
                 });
 
+            modelBuilder.Entity("Anemoi.Hr.Domain.Positions.Position", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PositionTypeCode")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Positions", (string)null);
+                });
+
             modelBuilder.Entity("Anemoi.Hr.Domain.Reporting.ReportExportAuditLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1700,53 +1815,147 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("ExportedAt");
 
-                    b.HasIndex("ModuleCode", "ReportType");
-
                     b.HasIndex("ExportedBy", "ExportedAt");
+
+                    b.HasIndex("ModuleCode", "ReportType");
 
                     b.ToTable("ReportExportAuditLogs", (string)null);
                 });
 
-            modelBuilder.Entity("Anemoi.Hr.Domain.Positions.Position", b =>
+            modelBuilder.Entity("Anemoi.Hr.Domain.ShiftManagement.EmployeeShiftAssignment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Code")
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AssignedBy")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("BreakMinutesSnapshot")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CancelledBy")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("DepartmentId")
+                    b.Property<Guid>("EmployeeId")
                         .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("EndTimeSnapshot")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<decimal>("ExpectedWorkingHoursSnapshot")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("numeric(9,2)");
+
+                    b.Property<string>("ShiftNameSnapshot")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ShiftTemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<TimeOnly>("StartTimeSnapshot")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("WorkDate")
+                        .HasColumnType("date");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("ShiftTemplateId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("WorkDate");
+
+                    b.HasIndex("EmployeeId", "WorkDate", "Status");
+
+                    b.ToTable("EmployeeShiftAssignments", (string)null);
+                });
+
+            modelBuilder.Entity("Anemoi.Hr.Domain.ShiftManagement.ShiftTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("BreakMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<decimal>("ExpectedWorkingHours")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("numeric(9,2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
-                    b.Property<string>("PositionTypeCode")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.HasIndex("DepartmentId");
+                    b.HasIndex("IsActive");
 
-                    b.ToTable("Positions", (string)null);
+                    b.ToTable("ShiftTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Attendance.AttendanceRecord", b =>
@@ -2107,6 +2316,17 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.Navigation("LeaveRequest");
                 });
 
+            modelBuilder.Entity("Anemoi.Hr.Domain.Overtime.OvertimeRequest", b =>
+                {
+                    b.HasOne("Anemoi.Hr.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Anemoi.Hr.Domain.Payroll.PayrollItem", b =>
                 {
                     b.HasOne("Anemoi.Hr.Domain.Payroll.PayrollRun", "PayrollRun")
@@ -2164,6 +2384,25 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("Anemoi.Hr.Domain.ShiftManagement.EmployeeShiftAssignment", b =>
+                {
+                    b.HasOne("Anemoi.Hr.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Anemoi.Hr.Domain.ShiftManagement.ShiftTemplate", "ShiftTemplate")
+                        .WithMany()
+                        .HasForeignKey("ShiftTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ShiftTemplate");
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Compensation.SalaryGrade", b =>

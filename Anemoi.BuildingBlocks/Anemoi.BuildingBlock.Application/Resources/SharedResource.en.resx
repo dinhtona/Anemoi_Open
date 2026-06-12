@@ -252,4 +252,9 @@
   <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Create and cancel overtime requests.</value></data>
   <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Approve and reject overtime requests.</value></data>
   <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Manage overtime configuration and all requests.</value></data>
+  <data name="PermissionGroupHrShift" xml:space="preserve"><value>HR Shift Management</value></data>
+  <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>View shift templates, assignments and schedule calendar.</value></data>
+  <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Create, update, activate and deactivate shift templates.</value></data>
+  <data name="PermissionDescriptionHrShiftAssign" xml:space="preserve"><value>Assign and bulk assign shifts to employees.</value></data>
+  <data name="PermissionDescriptionHrShiftCancel" xml:space="preserve"><value>Cancel employee shift assignments.</value></data>
 </root>

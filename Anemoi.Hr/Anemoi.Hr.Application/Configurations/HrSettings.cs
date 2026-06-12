@@ -8,4 +8,5 @@ public sealed class HrSettings
     public int ContractExpirationAlertDays { get; set; } = 30;
     public int OvertimeMaxHoursPerRequest { get; set; } = 12;
     public int OvertimeHistoricalDaysLimit { get; set; } = 365;
+    public int ShiftMaxHoursPerDay { get; set; } = 16;
 }

@@ -252,4 +252,9 @@
   <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Tạo và hủy yêu cầu làm thêm giờ.</value></data>
   <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Phê duyệt và từ chối yêu cầu làm thêm giờ.</value></data>
   <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Quản lý cấu hình và tất cả yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionGroupHrShift" xml:space="preserve"><value>Quản lý Ca làm</value></data>
+  <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>Xem mẫu ca, phân ca và lịch làm việc.</value></data>
+  <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Tạo, cập nhật, kích hoạt và vô hiệu hóa mẫu ca.</value></data>
+  <data name="PermissionDescriptionHrShiftAssign" xml:space="preserve"><value>Phân ca cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrShiftCancel" xml:space="preserve"><value>Hủy phân ca cho nhân viên.</value></data>
 </root>

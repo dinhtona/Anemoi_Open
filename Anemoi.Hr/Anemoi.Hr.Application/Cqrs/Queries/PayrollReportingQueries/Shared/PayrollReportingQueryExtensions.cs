@@ -1,5 +1,6 @@
 #nullable enable
 
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -69,15 +70,43 @@ public sealed record PayslipSummaryProjection
     public string? CancelledBy { get; init; }
 }
 
-internal sealed record PayrollReportingFilter(
-    PayrollPeriodId? PayrollPeriodId,
-    PayrollRunId? PayrollRunId,
-    EmployeeId? EmployeeId,
-    string? Status,
-    DateTime? From,
-    DateTime? To,
-    string? SortBy,
-    string? SortDirection);
+internal sealed record PayrollReportingFilter
+{
+    public PayrollPeriodId? PayrollPeriodId { get; }
+    public PayrollRunId? PayrollRunId { get; }
+    public EmployeeId? EmployeeId { get; }
+    public string? Status { get; }
+    public DateTime? From { get; }
+    public DateTime? To { get; }
+    public string? SortBy { get; }
+    public string? SortDirection { get; }
+
+    public PayrollReportingFilter(
+        PayrollPeriodId? payrollPeriodId,
+        PayrollRunId? payrollRunId,
+        EmployeeId? employeeId,
+        string? status,
+        DateTime? from,
+        DateTime? to,
+        string? sortBy,
+        string? sortDirection)
+    {
+        PayrollPeriodId = payrollPeriodId;
+        PayrollRunId = payrollRunId;
+        EmployeeId = employeeId;
+        Status = status;
+        From = from.ToUtc();
+        To = to.ToUtc();
+        SortBy = sortBy;
+        SortDirection = sortDirection;
+    }
+}
+
+internal static class DateTimeHelpers
+{
+    internal static DateTime? ToUtc(this DateTime? dt) =>
+        dt.HasValue ? DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc) : null;
+}
 
 internal static class PayrollReportingQueryExtensions
 {
@@ -266,5 +295,6 @@ internal static class PayrollReportingQueryExtensions
     }
 
     private static bool IsDescending(string? sortDirection) =>
-        string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+        string.Equals(sortDirection, SortDirectionConstants.Desc, StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(sortDirection, SortDirectionConstants.Descending, StringComparison.OrdinalIgnoreCase);
 }

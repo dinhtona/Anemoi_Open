@@ -86,6 +86,21 @@ public static class HrBusinessErrorCodes
     public const string OverlappingOvertimeRequestsNotAllowed = "HR_OVERLAPPING_OVERTIME_REQUESTS_NOT_ALLOWED";
     public const string OvertimeApproverRequired = "HR_OVERTIME_APPROVER_REQUIRED";
     public const string OvertimeRequestConcurrencyConflict = "HR_OVERTIME_REQUEST_CONCURRENCY_CONFLICT";
+
+    // Shift Management error codes
+    public const string ShiftTemplateNotFound = "HR_SHIFT_TEMPLATE_NOT_FOUND";
+    public const string ShiftTemplateCodeAlreadyExists = "HR_SHIFT_TEMPLATE_CODE_ALREADY_EXISTS";
+    public const string ShiftTemplateInvalidTimeRange = "HR_SHIFT_TEMPLATE_INVALID_TIME_RANGE";
+    public const string ShiftTemplateInvalidBreakMinutes = "HR_SHIFT_TEMPLATE_INVALID_BREAK_MINUTES";
+    public const string ShiftTemplateInactive = "HR_SHIFT_TEMPLATE_INACTIVE";
+    public const string ShiftAssignmentNotFound = "HR_SHIFT_ASSIGNMENT_NOT_FOUND";
+    public const string ShiftAssignmentDuplicate = "HR_SHIFT_ASSIGNMENT_DUPLICATE";
+    public const string ShiftAssignmentOverlap = "HR_SHIFT_ASSIGNMENT_OVERLAP";
+    public const string ShiftAssignmentInvalidStatus = "HR_SHIFT_ASSIGNMENT_INVALID_STATUS";
+    public const string ShiftTemplateCodeRequired = "HR_SHIFT_TEMPLATE_CODE_REQUIRED";
+    public const string ShiftTemplateNameRequired = "HR_SHIFT_TEMPLATE_NAME_REQUIRED";
+    public const string ShiftAssignmentConcurrencyConflict = "HR_SHIFT_ASSIGNMENT_CONCURRENCY_CONFLICT";
+    public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 }
 
 

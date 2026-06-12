@@ -75,6 +75,10 @@ public static class Permissions
     public const string HrAttendanceCreate = "hr.attendance.create";
     public const string HrAttendanceUpdate = "hr.attendance.update";
     public const string HrAttendanceLock = "hr.attendance.lock";
+    public const string HrShiftView = "hr.shift.view";
+    public const string HrShiftManage = "hr.shift.manage";
+    public const string HrShiftAssign = "hr.shift.assign";
+    public const string HrShiftCancel = "hr.shift.cancel";
 
     public static readonly IReadOnlyList<Definition> Definitions =
     [
@@ -142,7 +146,11 @@ public static class Permissions
         new(HrOvertimeView, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeView"),
         new(HrOvertimeRequest, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeRequest"),
         new(HrOvertimeApprove, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeApprove"),
-        new(HrOvertimeManage, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeManage", true, "High")
+        new(HrOvertimeManage, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeManage", true, "High"),
+        new(HrShiftView, "PermissionGroupHrShift", "PermissionDescriptionHrShiftView"),
+        new(HrShiftManage, "PermissionGroupHrShift", "PermissionDescriptionHrShiftManage"),
+        new(HrShiftAssign, "PermissionGroupHrShift", "PermissionDescriptionHrShiftAssign"),
+        new(HrShiftCancel, "PermissionGroupHrShift", "PermissionDescriptionHrShiftCancel")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

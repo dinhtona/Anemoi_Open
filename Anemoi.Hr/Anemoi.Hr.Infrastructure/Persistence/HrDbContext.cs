@@ -6,6 +6,7 @@ using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Overtime;
 using Anemoi.Hr.Domain.Payroll;
+using Anemoi.Hr.Domain.ShiftManagement;
 using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Reporting;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,8 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<Payslip> Payslips { get; set; }
     public DbSet<ReportExportAuditLog> ReportExportAuditLogs { get; set; }
     public DbSet<OvertimeRequest> OvertimeRequests { get; set; }
+    public DbSet<ShiftTemplate> ShiftTemplates { get; set; }
+    public DbSet<EmployeeShiftAssignment> EmployeeShiftAssignments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
