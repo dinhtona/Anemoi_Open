@@ -10,11 +10,11 @@ public sealed class CancelEmployeeShiftAssignmentValidator : AbstractValidator<C
     {
         RuleFor(x => x.CancelledBy)
             .NotEmpty()
-            .WithErrorCode("HR_CANCELLED_BY_REQUIRED");
+            .WithErrorCode(HrBusinessErrorCodes.CancelledByRequired);
         RuleFor(x => x.CancellationReason)
             .NotEmpty()
-            .WithErrorCode("HR_CANCELLATION_REASON_REQUIRED")
+            .WithErrorCode(HrBusinessErrorCodes.CancellationReasonRequired)
             .MaximumLength(500)
-            .WithErrorCode("HR_CANCELLATION_REASON_MAX_LENGTH");
+            .WithErrorCode(HrBusinessErrorCodes.CancellationReasonMaxLength);
     }
 }

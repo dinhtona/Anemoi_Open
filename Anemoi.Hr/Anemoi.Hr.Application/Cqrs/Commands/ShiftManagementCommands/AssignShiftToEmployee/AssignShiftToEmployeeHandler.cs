@@ -41,6 +41,15 @@ public sealed class AssignShiftToEmployeeHandler(
         if (existingActive)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ShiftAssignmentDuplicate);
 
+        var hasOverlap = await assignmentRepository.GetQueryable()
+            .AnyAsync(x => x.EmployeeId == request.EmployeeId
+                && x.WorkDate == request.WorkDate
+                && x.Status == EmployeeShiftAssignmentStatusCode.Assigned
+                && shiftTemplate.StartTime < x.EndTimeSnapshot
+                && shiftTemplate.EndTime > x.StartTimeSnapshot, cancellationToken);
+        if (hasOverlap)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ShiftAssignmentOverlap);
+
         var assignment = EmployeeShiftAssignment.Create(
             request.EmployeeId,
             shiftTemplate,
@@ -54,7 +63,7 @@ public sealed class AssignShiftToEmployeeHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ShiftAssignmentConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new SuccessResponse();

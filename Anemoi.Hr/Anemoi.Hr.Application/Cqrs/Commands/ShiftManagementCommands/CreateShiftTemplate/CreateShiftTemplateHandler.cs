@@ -39,7 +39,7 @@ public sealed class CreateShiftTemplateHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ShiftTemplateConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToShiftTemplateIdResponse(shiftTemplate);

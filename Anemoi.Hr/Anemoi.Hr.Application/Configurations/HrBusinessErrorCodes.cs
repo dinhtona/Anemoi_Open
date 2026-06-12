@@ -88,6 +88,10 @@ public static class HrBusinessErrorCodes
     public const string OvertimeRequestConcurrencyConflict = "HR_OVERTIME_REQUEST_CONCURRENCY_CONFLICT";
 
     // Shift Management error codes
+    public const string AssignedByRequired = "HR_ASSIGNED_BY_REQUIRED";
+    public const string CancelledByRequired = "HR_CANCELLED_BY_REQUIRED";
+    public const string CancellationReasonRequired = "HR_CANCELLATION_REASON_REQUIRED";
+    public const string CancellationReasonMaxLength = "HR_CANCELLATION_REASON_MAX_LENGTH";
     public const string ShiftTemplateNotFound = "HR_SHIFT_TEMPLATE_NOT_FOUND";
     public const string ShiftTemplateCodeAlreadyExists = "HR_SHIFT_TEMPLATE_CODE_ALREADY_EXISTS";
     public const string ShiftTemplateInvalidTimeRange = "HR_SHIFT_TEMPLATE_INVALID_TIME_RANGE";
@@ -100,6 +104,7 @@ public static class HrBusinessErrorCodes
     public const string ShiftTemplateCodeRequired = "HR_SHIFT_TEMPLATE_CODE_REQUIRED";
     public const string ShiftTemplateNameRequired = "HR_SHIFT_TEMPLATE_NAME_REQUIRED";
     public const string ShiftAssignmentConcurrencyConflict = "HR_SHIFT_ASSIGNMENT_CONCURRENCY_CONFLICT";
+    public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 }
 

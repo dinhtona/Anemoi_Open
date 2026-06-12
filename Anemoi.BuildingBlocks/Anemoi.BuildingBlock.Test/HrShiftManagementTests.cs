@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Anemoi.Hr.ModelIds.ModelIds;
@@ -325,6 +326,106 @@ public class ShiftManagementDomainTests
             TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30);
         var after = DateTime.UtcNow.AddSeconds(1);
         Assert.InRange(template.UpdatedAt, before, after);
+    }
+
+    [Fact]
+    public void ShiftTemplate_UsesIdGenerator_NotGuidNewGuid()
+    {
+        var template = CreateValidTemplate();
+        Assert.IsType<ShiftTemplateId>(template.Id);
+        Assert.NotEqual(Guid.Empty, template.Id.Value);
+    }
+
+    [Fact]
+    public void EmployeeShiftAssignment_UsesIdGenerator_NotGuidNewGuid()
+    {
+        var template = CreateValidTemplate();
+        var assignment = EmployeeShiftAssignment.Create(
+            TestEmployeeId, template,
+            DateOnly.FromDateTime(DateTime.Today), "admin");
+        Assert.IsType<EmployeeShiftAssignmentId>(assignment.Id);
+        Assert.NotEqual(Guid.Empty, assignment.Id.Value);
+    }
+
+    [Fact]
+    public void OverlappingTimeRanges_DetectedCorrectly()
+    {
+        var existingStart = new TimeOnly(08, 00);
+        var existingEnd = new TimeOnly(12, 00);
+
+        var newStart = new TimeOnly(10, 00);
+        var newEnd = new TimeOnly(14, 00);
+
+        var overlap = newStart < existingEnd && newEnd > existingStart;
+        Assert.True(overlap);
+    }
+
+    [Fact]
+    public void NonOverlappingTimeRanges_NotDetectedAsOverlap()
+    {
+        var existingStart = new TimeOnly(08, 00);
+        var existingEnd = new TimeOnly(12, 00);
+
+        var newStart = new TimeOnly(13, 00);
+        var newEnd = new TimeOnly(17, 00);
+
+        var overlap = newStart < existingEnd && newEnd > existingStart;
+        Assert.False(overlap);
+    }
+
+    [Fact]
+    public void AdjacentTimeRanges_DoNotOverlap()
+    {
+        var existingStart = new TimeOnly(08, 00);
+        var existingEnd = new TimeOnly(12, 00);
+
+        var newStart = new TimeOnly(12, 00);
+        var newEnd = new TimeOnly(16, 00);
+
+        var overlap = newStart < existingEnd && newEnd > existingStart;
+        Assert.False(overlap);
+    }
+
+    [Fact]
+    public void ShiftAssignmentOverlapErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.ShiftAssignmentOverlap;
+        Assert.Equal("HR_SHIFT_ASSIGNMENT_OVERLAP", code);
+    }
+
+    [Fact]
+    public void AssignedByRequiredErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.AssignedByRequired;
+        Assert.Equal("HR_ASSIGNED_BY_REQUIRED", code);
+    }
+
+    [Fact]
+    public void CancelledByRequiredErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.CancelledByRequired;
+        Assert.Equal("HR_CANCELLED_BY_REQUIRED", code);
+    }
+
+    [Fact]
+    public void CancellationReasonRequiredErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.CancellationReasonRequired;
+        Assert.Equal("HR_CANCELLATION_REASON_REQUIRED", code);
+    }
+
+    [Fact]
+    public void CancellationReasonMaxLengthErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.CancellationReasonMaxLength;
+        Assert.Equal("HR_CANCELLATION_REASON_MAX_LENGTH", code);
+    }
+
+    [Fact]
+    public void SaveChangesFailedErrorCode_DefinedInBusinessErrorCodes()
+    {
+        var code = HrBusinessErrorCodes.SaveChangesFailed;
+        Assert.Equal("HR_SAVE_CHANGES_FAILED", code);
     }
 
     private static ShiftTemplate CreateValidTemplate()

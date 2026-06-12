@@ -14,6 +14,6 @@ public sealed class AssignShiftToEmployeeValidator : AbstractValidator<AssignShi
 
         RuleFor(x => x.AssignedBy)
             .NotEmpty()
-            .WithErrorCode("HR_ASSIGNED_BY_REQUIRED");
+            .WithErrorCode(HrBusinessErrorCodes.AssignedByRequired);
     }
 }

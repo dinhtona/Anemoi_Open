@@ -135,17 +135,17 @@ Route: `api/hr/shift-management/[action]`
 
 ### EF Core Config (`Anemoi.Hr.Infrastructure/Configurations/ShiftManagementModelMapping.cs`)
 
-**Table:** `hr_shift_templates`
+**Table:** `ShiftTemplates`
 - PK: `Id` (uuid)
 - Columns: Code (varchar 50, unique), Name (varchar 200), StartTime (time), EndTime (time), BreakMinutes (int), ExpectedWorkingHours (decimal 9,2), IsActive (bool), CreatedAt/UpdatedAt (timestamptz)
-- Indexes: `IX_hr_shift_templates_Code` (unique), `IX_hr_shift_templates_IsActive`
+- Indexes: `IX_ShiftTemplates_Code` (unique), `IX_ShiftTemplates_IsActive`
 - Concurrency: xmin (row version)
 
-**Table:** `hr_employee_shift_assignments`
+**Table:** `EmployeeShiftAssignments`
 - PK: `Id` (uuid)
-- Columns: EmployeeId (FK → Employees), ShiftTemplateId (FK → hr_shift_templates), WorkDate (date), ShiftNameSnapshot, StartTimeSnapshot, EndTimeSnapshot, BreakMinutesSnapshot, ExpectedWorkingHoursSnapshot, Status (varchar 20), AssignedBy (varchar 128), AssignedAt (timestamptz), CancelledBy (varchar 128, nullable), CancelledAt (timestamptz, nullable), CancellationReason (varchar 500, nullable)
-- FK: `EmployeeId` → `hr_employees` (Restrict), `ShiftTemplateId` → `hr_shift_templates` (Restrict)
-- Indexes: `IX_hr_shift_assignments_EmployeeId_WorkDate_Status`, `IX_hr_shift_assignments_ShiftTemplateId`, `IX_hr_shift_assignments_WorkDate`, `IX_hr_shift_assignments_Status`, `IX_hr_shift_assignments_CreatedAt`
+- Columns: EmployeeId (FK → Employees), ShiftTemplateId (FK → ShiftTemplates), WorkDate (date), ShiftNameSnapshot, StartTimeSnapshot, EndTimeSnapshot, BreakMinutesSnapshot, ExpectedWorkingHoursSnapshot, Status (varchar 20), AssignedBy (varchar 128), AssignedAt (timestamptz), CancelledBy (varchar 128, nullable), CancelledAt (timestamptz, nullable), CancellationReason (varchar 500, nullable)
+- FK: `EmployeeId` → `Employees` (Restrict), `ShiftTemplateId` → `ShiftTemplates` (Restrict)
+- Indexes: `IX_EmployeeShiftAssignments_EmployeeId_WorkDate_Status`, `IX_EmployeeShiftAssignments_ShiftTemplateId`, `IX_EmployeeShiftAssignments_WorkDate`, `IX_EmployeeShiftAssignments_Status`, `IX_EmployeeShiftAssignments_CreatedAt`
 - Concurrency: xmin (row version)
 
 ### Migration
@@ -281,7 +281,7 @@ PermissionDescriptionHrShiftCancel = "Hủy phân ca cho nhân viên."
 3. **Same-day shifts** — MVP chỉ hỗ trợ ca trong ngày (không cross-midnight)
 4. **PostgreSQL xmin** — Sử dụng xmin cho concurrency thay vì RowVersion, đồng bộ với các module khác
 5. **No overtime/payroll coupling** — Shift Management là module độc lập; `IShiftScheduleSnapshotProvider` interface dự phòng cho tích hợp tương lai
-6. **Table naming** — Sử dụng `hr_shift_templates` và `hr_employee_shift_assignments` (snake_case + `hr_` prefix), đồng bộ với Overtime module
+6. **Table naming** — Sử dụng `ShiftTemplates` và `EmployeeShiftAssignments` (PascalCase), đồng bộ với convention chung của HR module
 
 ---
 

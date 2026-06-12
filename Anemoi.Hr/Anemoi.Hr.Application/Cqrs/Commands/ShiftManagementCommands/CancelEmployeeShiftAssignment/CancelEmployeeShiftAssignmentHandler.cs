@@ -37,7 +37,7 @@ public sealed class CancelEmployeeShiftAssignmentHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ShiftAssignmentConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new SuccessResponse();
