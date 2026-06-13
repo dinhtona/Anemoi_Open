@@ -136,6 +136,18 @@ public static class HrBusinessErrorCodes
 
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
+
+    public const string PayslipNotFound = "HR_PAYSLIP_NOT_FOUND";
+    public const string PayslipDocumentNotFound = "HR_PAYSLIP_DOCUMENT_NOT_FOUND";
+    public const string PayslipDocumentAlreadyExists = "HR_PAYSLIP_DOCUMENT_ALREADY_EXISTS";
+    public const string PayslipDocumentGenerationNotAllowed = "HR_PAYSLIP_DOCUMENT_GENERATION_NOT_ALLOWED";
+    public const string PayslipDocumentGenerationFailed = "HR_PAYSLIP_DOCUMENT_GENERATION_FAILED";
+    public const string PayslipDocumentStorageFailed = "HR_PAYSLIP_DOCUMENT_STORAGE_FAILED";
+    public const string PayslipEmailNotFound = "HR_PAYSLIP_EMAIL_NOT_FOUND";
+    public const string PayslipEmailRequired = "HR_PAYSLIP_EMAIL_REQUIRED";
+    public const string PayslipEmailSendNotAllowed = "HR_PAYSLIP_EMAIL_SEND_NOT_ALLOWED";
+    public const string PayslipEmailSendFailed = "HR_PAYSLIP_EMAIL_SEND_FAILED";
+    public const string PayslipActiveDocumentRequired = "HR_PAYSLIP_ACTIVE_DOCUMENT_REQUIRED";
 }
 
 

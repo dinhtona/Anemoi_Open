@@ -56,6 +56,10 @@ public static class Permissions
     public const string HrContractCreate = "hr.contract.create";
     public const string HrContractUpdate = "hr.contract.update";
     public const string HrContractTerminate = "hr.contract.terminate";
+    
+    public const string HrPayslipDocumentView = "hr.payslip.document.view";
+    public const string HrPayslipDocumentGenerate = "hr.payslip.document.generate";
+    public const string HrPayslipEmailSend = "hr.payslip.email.send";
 
     public const string HrSalaryView = "hr.salary.view";
     public const string HrSalaryChange = "hr.salary.change";
@@ -187,7 +191,10 @@ public static class Permissions
         new(HrEssOvertimeView, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeView"),
         new(HrEssOvertimeCreate, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeCreate"),
         new(HrEssPayrollView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayrollView"),
-        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView")
+        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView"),
+        new(HrPayslipDocumentView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentView"),
+        new(HrPayslipDocumentGenerate, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentGenerate"),
+        new(HrPayslipEmailSend, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipEmailSend")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

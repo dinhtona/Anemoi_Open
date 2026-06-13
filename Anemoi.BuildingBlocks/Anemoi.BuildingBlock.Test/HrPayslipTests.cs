@@ -4,7 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
+using MediatR;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
 using Anemoi.Hr.Application.Configurations;
@@ -552,5 +556,472 @@ public sealed class HrPayslipTests
         }
 
         public ValueTask<bool> MoveNextAsync() => new(inner.MoveNext());
+    }
+
+    [Fact]
+    public async Task GeneratePayslipPdf_ShouldSucceed_AndSaveToStorageAndDb()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
+
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([]);
+        var uow = new FakeUnitOfWork();
+        var mapper = new PayslipDocumentMapper();
+        var pdfRenderer = new FakePdfRenderer();
+        var docStorage = new FakeDocumentStorage();
+
+        var handler = new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdf.GeneratePayslipPdfHandler(
+            payslipRepo, docRepo, uow, pdfRenderer, docStorage, mapper);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdf.GeneratePayslipPdfCommand(
+                payslipId.Value, "test-user", false),
+            CancellationToken.None
+        );
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal(payslipId.Value, response.PayslipId);
+        Assert.Equal(1, response.Version);
+        Assert.True(response.IsActive);
+
+        // Verify file stored
+        Assert.True(docStorage.Files.ContainsKey(response.StoragePath));
+        // Verify doc saved to repo
+        Assert.Equal(1, await docRepo.CountByConditionAsync());
+    }
+
+    [Fact]
+    public async Task GeneratePayslipPdf_WithForceRegenerate_ShouldDeactivatePreviousAndCreateNewVersion()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
+
+        var existingDocId = new PayslipDocumentId(Guid.NewGuid());
+        var existingDoc = PayslipDocument.Create(
+            payslipId, "payslip_v1.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash1", "test-user", DateTime.UtcNow, 1);
+
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([existingDoc]);
+        var uow = new FakeUnitOfWork();
+        var mapper = new PayslipDocumentMapper();
+        var pdfRenderer = new FakePdfRenderer();
+        var docStorage = new FakeDocumentStorage();
+
+        var handler = new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdf.GeneratePayslipPdfHandler(
+            payslipRepo, docRepo, uow, pdfRenderer, docStorage, mapper);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdf.GeneratePayslipPdfCommand(
+                payslipId.Value, "test-user", true),
+            CancellationToken.None
+        );
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal(2, response.Version);
+        Assert.True(response.IsActive);
+
+        // Verify existing document was deactivated
+        Assert.False(existingDoc.IsActive);
+        Assert.Equal(2, await docRepo.CountByConditionAsync());
+    }
+
+    [Fact]
+    public async Task SendPayslipEmail_ShouldSucceed_AndWritePendingThenSentAuditLogs()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Published);
+
+        var docId = new PayslipDocumentId(Guid.NewGuid());
+        var doc = PayslipDocument.Create(
+            payslipId, "payslip_v1.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash1", "test-user", DateTime.UtcNow, 1);
+
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([doc]);
+        var deliveryRepo = new FakeRepository<PayslipEmailDelivery>([]);
+        var employeeRepo = new FakeRepository<Anemoi.Hr.Domain.Employees.Employee>([]);
+        var uow = new FakeUnitOfWork();
+        var mapper = new PayslipDocumentMapper();
+        var emailSender = new FakeEmailSender();
+        var docStorage = new FakeDocumentStorage();
+        docStorage.Files[doc.StoragePath] = [1, 2, 3];
+
+        var handler = new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmail.SendPayslipEmailHandler(
+            payslipRepo, docRepo, deliveryRepo, employeeRepo, uow, emailSender, docStorage, mapper);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmail.SendPayslipEmailCommand(
+                payslipId.Value, "test-user", "test@example.com"),
+            CancellationToken.None
+        );
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal("test@example.com", response.ToEmail);
+        Assert.Equal(PayslipEmailDeliveryStatus.Sent.ToString(), response.Status);
+
+        // Verify audit log exists
+        Assert.Equal(1, await deliveryRepo.CountByConditionAsync());
+        // Verify email sent
+        Assert.Single(emailSender.SentEmails);
+    }
+
+    private sealed class FakePdfRenderer : IPayslipPdfRenderer
+    {
+        public Task<byte[]> RenderAsync(Payslip payslip, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new byte[] { 1, 2, 3 });
+        }
+    }
+
+    private sealed class FakeDocumentStorage : IPayslipDocumentStorage
+    {
+        public Dictionary<string, byte[]> Files { get; } = new();
+
+        public Task SaveAsync(string fileKey, Stream content, CancellationToken cancellationToken = default)
+        {
+            using var ms = new MemoryStream();
+            content.CopyTo(ms);
+            Files[fileKey] = ms.ToArray();
+            return Task.CompletedTask;
+        }
+
+        public Task<Stream> OpenReadAsync(string fileKey, CancellationToken cancellationToken = default)
+        {
+            if (!Files.TryGetValue(fileKey, out var bytes))
+                throw new FileNotFoundException();
+            return Task.FromResult<Stream>(new MemoryStream(bytes));
+        }
+
+        public Task DeleteAsync(string fileKey, CancellationToken cancellationToken = default)
+        {
+            Files.Remove(fileKey);
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> ExistsAsync(string fileKey, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(Files.ContainsKey(fileKey));
+        }
+    }
+
+    private sealed class FakeEmailSender : IPayslipEmailSender
+    {
+        public List<(string To, string Subject, string Body, string FileName, byte[] FileBytes)> SentEmails { get; } = new();
+
+        public Task SendEmailWithAttachmentAsync(
+            string toEmail,
+            string subject,
+            string body,
+            string attachmentFileName,
+            byte[] attachmentBytes,
+            CancellationToken cancellationToken = default)
+        {
+            SentEmails.Add((toEmail, subject, body, attachmentFileName, attachmentBytes));
+            return Task.CompletedTask;
+        }
+    }
+
+    [Fact]
+    public async Task GetPayslipDocumentDownload_ShouldFail_WhenPayslipDoesNotExist()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var docId = new PayslipDocumentId(Guid.NewGuid());
+        var payslipRepo = new FakeRepository<Payslip>([]);
+        var docRepo = new FakeRepository<PayslipDocument>([]);
+        var storage = new FakeDocumentStorage();
+        var handler = new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadHandler(
+            payslipRepo, docRepo, storage);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadQuery(
+                payslipId.Value, docId.Value),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.PayslipNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task GetPayslipDocumentDownload_ShouldFail_WhenActiveDocumentDoesNotExist()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var docId = new PayslipDocumentId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
+        
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([]);
+        var storage = new FakeDocumentStorage();
+        var handler = new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadHandler(
+            payslipRepo, docRepo, storage);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadQuery(
+                payslipId.Value, docId.Value),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.PayslipDocumentNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task GetPayslipDocumentDownload_ShouldFail_WhenPhysicalFileIsMissing()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
+        
+        var doc = PayslipDocument.Create(
+            payslipId, "payslip.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash", "test", DateTime.UtcNow, 1);
+
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([doc]);
+        var storage = new FakeDocumentStorage(); // No files saved in storage
+        var handler = new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadHandler(
+            payslipRepo, docRepo, storage);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadQuery(
+                payslipId.Value, doc.Id.Value),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.PayslipDocumentNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task GetPayslipDocumentDownload_ShouldSucceed_WhenEverythingIsValid()
+    {
+        // Arrange
+        var payslipId = new PayslipId(Guid.NewGuid());
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var empId = new EmployeeId(Guid.NewGuid());
+        var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
+        
+        var doc = PayslipDocument.Create(
+            payslipId, "payslip.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash", "test", DateTime.UtcNow, 1);
+
+        var payslipRepo = new FakeRepository<Payslip>([payslip]);
+        var docRepo = new FakeRepository<PayslipDocument>([doc]);
+        var storage = new FakeDocumentStorage();
+        storage.Files[doc.StoragePath] = [1, 2, 3];
+        
+        var handler = new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadHandler(
+            payslipRepo, docRepo, storage);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload.GetPayslipDocumentDownloadQuery(
+                payslipId.Value, doc.Id.Value),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal("payslip.pdf", response.FileName);
+        Assert.Equal("application/pdf", response.ContentType);
+        Assert.NotNull(response.Stream);
+    }
+
+    [Fact]
+    public async Task GeneratePayslipPdfsForPayrollRun_ShouldReturnPartialFailure_WhenSomePayslipsFail()
+    {
+        // Arrange
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var run = CreatePayrollRun(runId, PayrollRunStatus.Finalized);
+
+        var payslip1 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Generated);
+        var payslip2 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Generated);
+
+        var payrollRunRepo = new FakeRepository<PayrollRun>([run]);
+        var payslipRepo = new FakeRepository<Payslip>([payslip1, payslip2]);
+        var docRepo = new FakeRepository<PayslipDocument>([]);
+
+        // Mediator callback: succeed for payslip1, fail for payslip2
+        var mediator = new FakeMediator(req =>
+        {
+            if (req is Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdf.GeneratePayslipPdfCommand cmd)
+            {
+                if (cmd.PayslipId == payslip1.Id.Value)
+                {
+                    return OneOf<PayslipDocumentResponse, ErrorDetailResponse>.FromT0(new PayslipDocumentResponse
+                    {
+                        Id = Guid.NewGuid(),
+                        PayslipId = payslip1.Id.Value,
+                        FileName = "payslip1.pdf",
+                        StoragePath = "path1",
+                        Version = 1,
+                        IsActive = true
+                    });
+                }
+                else
+                {
+                    return OneOf<PayslipDocumentResponse, ErrorDetailResponse>.FromT1(
+                        new ErrorDetailResponse { Code = "MOCK_ERROR", Messages = new[] { "Generation failed" } });
+                }
+            }
+            throw new InvalidOperationException();
+        });
+
+        var handler = new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdfsForPayrollRun.GeneratePayslipPdfsForPayrollRunHandler(
+            payrollRunRepo, payslipRepo, docRepo, mediator);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.GeneratePayslipPdfsForPayrollRun.GeneratePayslipPdfsForPayrollRunCommand(
+                runId.Value, "test", false),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal(2, response.Total);
+        Assert.Equal(1, response.Succeeded);
+        Assert.Equal(1, response.Failed);
+        Assert.Equal(0, response.Skipped);
+
+        var item1 = response.Items.First(x => x.PayslipId == payslip1.Id.Value);
+        Assert.Equal("Succeeded", item1.Status);
+
+        var item2 = response.Items.First(x => x.PayslipId == payslip2.Id.Value);
+        Assert.Equal("Failed", item2.Status);
+        Assert.Equal("MOCK_ERROR", item2.ErrorCode);
+    }
+
+    [Fact]
+    public async Task SendPayslipEmailsForPayrollRun_ShouldReturnPartialFailure_WhenSomeEmailsFail()
+    {
+        // Arrange
+        var runId = new PayrollRunId(Guid.NewGuid());
+        var run = CreatePayrollRun(runId, PayrollRunStatus.Finalized);
+
+        var payslip1 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Published);
+        var payslip2 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Published);
+        var payslip3 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Generated);
+
+        var doc1 = PayslipDocument.Create(
+            payslip1.Id, "payslip1.pdf", "application/pdf", "path1", 100, "h1", "test", DateTime.UtcNow, 1);
+        var doc2 = PayslipDocument.Create(
+            payslip2.Id, "payslip2.pdf", "application/pdf", "path2", 100, "h2", "test", DateTime.UtcNow, 1);
+
+        var payrollRunRepo = new FakeRepository<PayrollRun>([run]);
+        var payslipRepo = new FakeRepository<Payslip>([payslip1, payslip2, payslip3]);
+        var docRepo = new FakeRepository<PayslipDocument>([doc1, doc2]);
+
+        // Mediator callback
+        var mediator = new FakeMediator(req =>
+        {
+            if (req is Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmail.SendPayslipEmailCommand cmd)
+            {
+                if (cmd.PayslipId == payslip1.Id.Value)
+                {
+                    return OneOf<PayslipEmailDeliveryResponse, ErrorDetailResponse>.FromT0(new PayslipEmailDeliveryResponse
+                    {
+                        Id = Guid.NewGuid(),
+                        PayslipId = payslip1.Id.Value,
+                        PayslipDocumentId = doc1.Id.Value,
+                        ToEmail = "emp1@test.com",
+                        Status = "Sent"
+                    });
+                }
+                else
+                {
+                    return OneOf<PayslipEmailDeliveryResponse, ErrorDetailResponse>.FromT1(
+                        new ErrorDetailResponse { Code = "SMTP_ERROR", Messages = new[] { "Connection timeout" } });
+                }
+            }
+            throw new InvalidOperationException();
+        });
+
+        var handler = new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmailsForPayrollRun.SendPayslipEmailsForPayrollRunHandler(
+            payrollRunRepo, payslipRepo, docRepo, mediator);
+
+        // Act
+        var result = await handler.Handle(
+            new Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmailsForPayrollRun.SendPayslipEmailsForPayrollRunCommand(
+                runId.Value, "test"),
+            CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsT0);
+        var response = result.AsT0;
+        Assert.Equal(3, response.Total);
+        Assert.Equal(1, response.Succeeded);
+        Assert.Equal(1, response.Failed);
+        Assert.Equal(1, response.Skipped);
+
+        var item1 = response.Items.First(x => x.PayslipId == payslip1.Id.Value);
+        Assert.Equal("Succeeded", item1.Status);
+
+        var item2 = response.Items.First(x => x.PayslipId == payslip2.Id.Value);
+        Assert.Equal("Failed", item2.Status);
+        Assert.Equal("SMTP_ERROR", item2.ErrorCode);
+
+        var item3 = response.Items.First(x => x.PayslipId == payslip3.Id.Value);
+        Assert.Equal("Skipped", item3.Status);
+    }
+
+    private sealed class FakeMediator(Func<object, object> sendCallback) : IMediator
+    {
+        public Task Publish(object notification, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+            where TNotification : INotification => Task.CompletedTask;
+
+        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            var res = sendCallback(request);
+            return Task.FromResult((TResponse)res);
+        }
+
+        public Task<TResponse> Send<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = default)
+            where TRequest : IRequest<TResponse>
+        {
+            var res = sendCallback(request);
+            return Task.FromResult((TResponse)res);
+        }
+
+        public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default)
+            where TRequest : IRequest
+        {
+            sendCallback(request);
+            return Task.CompletedTask;
+        }
+
+        public Task<object> Send(object request, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(sendCallback(request));
+        }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
 }

@@ -619,3 +619,10 @@ This register intentionally excludes:
 * Future roadmap items that are not yet debt
 
 Only known unresolved technical debt should remain in this document.
+
+
+Phase 22 Status:
+COMPLETED WITH ACCEPTED TECH DEBT
+
+TD-PDF-001: Vietnamese accents require embedded Unicode font support.
+TD-STOR-001: Local file storage should be replaced by durable object storage before production multi-instance deployment.

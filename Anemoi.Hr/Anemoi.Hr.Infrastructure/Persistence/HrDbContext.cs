@@ -47,6 +47,8 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
     public DbSet<AttendanceSummary> AttendanceSummaries { get; set; }
     public DbSet<Payslip> Payslips { get; set; }
+    public DbSet<PayslipDocument> PayslipDocuments { get; set; }
+    public DbSet<PayslipEmailDelivery> PayslipEmailDeliveries { get; set; }
     public DbSet<ReportExportAuditLog> ReportExportAuditLogs { get; set; }
     public DbSet<OvertimeRequest> OvertimeRequests { get; set; }
     public DbSet<ShiftTemplate> ShiftTemplates { get; set; }

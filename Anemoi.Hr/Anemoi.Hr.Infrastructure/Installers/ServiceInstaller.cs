@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.ApproveLeaveRequest;
@@ -25,12 +26,24 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<PayrollMapper>();
         services.AddScoped<AttendanceMapper>();
         services.AddScoped<PayslipMapper>();
+        services.AddScoped<PayslipDocumentMapper>();
         services.AddScoped<PayrollReportingMapper>();
         services.AddScoped<TaxationMapper>();
         services.AddScoped<InsuranceMapper>();
         services.AddScoped<EssMapper>();
         services.AddScoped<PayrollReportExportService>();
         services.AddScoped<IReportExporter, CsvReportExporter>();
+        services.AddScoped<IPayslipDocumentStorage, LocalPayslipDocumentStorage>();
+        services.AddScoped<IPayslipPdfRenderer, PayslipPdfRenderer>();
+        var hrSettings = configuration.GetSection(nameof(HrSettings)).Get<HrSettings>() ?? new HrSettings();
+        if (hrSettings.UseSmtp)
+        {
+            services.AddScoped<IPayslipEmailSender, SmtpPayslipEmailSender>();
+        }
+        else
+        {
+            services.AddScoped<IPayslipEmailSender, LoggingPayslipEmailSender>();
+        }
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddHttpContextAccessor();
         services.AddScoped<ApproveLeaveRequestHandler>();
