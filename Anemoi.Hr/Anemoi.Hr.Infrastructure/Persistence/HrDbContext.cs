@@ -10,6 +10,7 @@ using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Reporting;
+using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,6 +58,11 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<TaxBracket> TaxBrackets { get; set; }
     public DbSet<TaxDeductionRule> TaxDeductionRules { get; set; }
     public DbSet<TaxCalculationSnapshot> TaxCalculationSnapshots { get; set; }
+    public DbSet<InsuranceRuleSet> InsuranceRuleSets { get; set; }
+    public DbSet<InsuranceContributionRule> InsuranceContributionRules { get; set; }
+    public DbSet<InsuranceCalculationSnapshot> InsuranceCalculationSnapshots { get; set; }
+    public DbSet<InsuranceCalculationSnapshotItem> InsuranceCalculationSnapshotItems { get; set; }
+    public DbSet<InsuranceAuditLog> InsuranceAuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -71,6 +71,11 @@ public static class HrPermissions
     public const string TaxManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrTaxManage;
     public const string TaxCalculate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrTaxCalculate;
 
+    public const string InsuranceView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceView;
+    public const string InsuranceManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceManage;
+    public const string InsuranceCalculate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceCalculate;
+    public const string InsuranceReport = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceReport;
+
     public static readonly IReadOnlyList<string> All =
     [
         LeavePolicyView,
@@ -132,7 +137,11 @@ public static class HrPermissions
         CalendarManage,
         TaxView,
         TaxManage,
-        TaxCalculate
+        TaxCalculate,
+        InsuranceView,
+        InsuranceManage,
+        InsuranceCalculate,
+        InsuranceReport
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -160,7 +169,8 @@ public static class HrPermissions
             [PayrollLock] = new(PayrollLock, "Critical"),
             [PayrollExport] = new(PayrollExport, "High"),
             [AttendanceLock] = new(AttendanceLock, "High"),
-            [TaxManage] = new(TaxManage, "High")
+            [TaxManage] = new(TaxManage, "High"),
+            [InsuranceManage] = new(InsuranceManage, "High")
         };
 }
 

@@ -86,6 +86,11 @@ public static class Permissions
     public const string HrTaxManage = "hr.tax.manage";
     public const string HrTaxCalculate = "hr.tax.calculate";
 
+    public const string HrInsuranceView = "hr.insurance.view";
+    public const string HrInsuranceManage = "hr.insurance.manage";
+    public const string HrInsuranceCalculate = "hr.insurance.calculate";
+    public const string HrInsuranceReport = "hr.insurance.report";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -161,7 +166,11 @@ public static class Permissions
         new(HrCalendarManage, "PermissionGroupHrCalendar", "PermissionDescriptionHrCalendarManage"),
         new(HrTaxView, "PermissionGroupHrTax", "PermissionDescriptionHrTaxView"),
         new(HrTaxManage, "PermissionGroupHrTax", "PermissionDescriptionHrTaxManage", true, "High"),
-        new(HrTaxCalculate, "PermissionGroupHrTax", "PermissionDescriptionHrTaxCalculate")
+        new(HrTaxCalculate, "PermissionGroupHrTax", "PermissionDescriptionHrTaxCalculate"),
+        new(HrInsuranceView, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceView"),
+        new(HrInsuranceManage, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceManage", true, "High"),
+        new(HrInsuranceCalculate, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceCalculate"),
+        new(HrInsuranceReport, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceReport")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();
