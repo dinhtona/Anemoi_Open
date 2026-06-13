@@ -9,7 +9,7 @@ public sealed class TaxRuleSetModelMapping : IEntityTypeConfiguration<TaxRuleSet
 {
     public void Configure(EntityTypeBuilder<TaxRuleSet> builder)
     {
-        builder.ToTable("hr_tax_rule_sets");
+        builder.ToTable("TaxRuleSets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new TaxRuleSetId(id));
 
@@ -30,7 +30,7 @@ public sealed class TaxBracketModelMapping : IEntityTypeConfiguration<TaxBracket
 {
     public void Configure(EntityTypeBuilder<TaxBracket> builder)
     {
-        builder.ToTable("hr_tax_brackets");
+        builder.ToTable("TaxBrackets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new TaxBracketId(id));
         builder.Property(x => x.TaxRuleSetId).HasConversion(x => x.Value, id => new TaxRuleSetId(id));
@@ -50,7 +50,7 @@ public sealed class TaxDeductionRuleModelMapping : IEntityTypeConfiguration<TaxD
 {
     public void Configure(EntityTypeBuilder<TaxDeductionRule> builder)
     {
-        builder.ToTable("hr_tax_deduction_rules");
+        builder.ToTable("TaxDeductionRules");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new TaxDeductionRuleId(id));
         builder.Property(x => x.TaxRuleSetId).HasConversion(x => x.Value, id => new TaxRuleSetId(id));
@@ -71,7 +71,7 @@ public sealed class TaxCalculationSnapshotModelMapping : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<TaxCalculationSnapshot> builder)
     {
-        builder.ToTable("hr_tax_calculation_snapshots");
+        builder.ToTable("TaxCalculationSnapshots");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new TaxCalculationSnapshotId(id));
         builder.Property(x => x.EmployeeId).HasConversion(x => x!.Value, id => new EmployeeId(id));

@@ -91,6 +91,15 @@ public static class Permissions
     public const string HrInsuranceCalculate = "hr.insurance.calculate";
     public const string HrInsuranceReport = "hr.insurance.report";
 
+    public const string HrEssProfileView = "hr.ess.profile.view";
+    public const string HrEssLeaveView = "hr.ess.leave.view";
+    public const string HrEssLeaveRequest = "hr.ess.leave.request";
+    public const string HrEssAttendanceView = "hr.ess.attendance.view";
+    public const string HrEssOvertimeView = "hr.ess.overtime.view";
+    public const string HrEssOvertimeCreate = "hr.ess.overtime.create";
+    public const string HrEssPayrollView = "hr.ess.payroll.view";
+    public const string HrEssPayslipView = "hr.ess.payslip.view";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -170,7 +179,15 @@ public static class Permissions
         new(HrInsuranceView, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceView"),
         new(HrInsuranceManage, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceManage", true, "High"),
         new(HrInsuranceCalculate, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceCalculate"),
-        new(HrInsuranceReport, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceReport")
+        new(HrInsuranceReport, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceReport"),
+        new(HrEssProfileView, "PermissionGroupHrEss", "PermissionDescriptionHrEssProfileView"),
+        new(HrEssLeaveView, "PermissionGroupHrEss", "PermissionDescriptionHrEssLeaveView"),
+        new(HrEssLeaveRequest, "PermissionGroupHrEss", "PermissionDescriptionHrEssLeaveRequest"),
+        new(HrEssAttendanceView, "PermissionGroupHrEss", "PermissionDescriptionHrEssAttendanceView"),
+        new(HrEssOvertimeView, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeView"),
+        new(HrEssOvertimeCreate, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeCreate"),
+        new(HrEssPayrollView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayrollView"),
+        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

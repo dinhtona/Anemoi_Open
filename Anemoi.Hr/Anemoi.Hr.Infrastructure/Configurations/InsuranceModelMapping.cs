@@ -9,7 +9,7 @@ public sealed class InsuranceRuleSetModelMapping : IEntityTypeConfiguration<Insu
 {
     public void Configure(EntityTypeBuilder<InsuranceRuleSet> builder)
     {
-        builder.ToTable("hr_insurance_rule_sets");
+        builder.ToTable("InsuranceRuleSets");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new InsuranceRuleSetId(id));
 
@@ -32,7 +32,7 @@ public sealed class InsuranceContributionRuleModelMapping : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<InsuranceContributionRule> builder)
     {
-        builder.ToTable("hr_insurance_contribution_rules");
+        builder.ToTable("InsuranceContributionRules");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new InsuranceContributionRuleId(id));
         builder.Property(x => x.RuleSetId).HasConversion(x => x.Value, id => new InsuranceRuleSetId(id));
@@ -56,7 +56,7 @@ public sealed class InsuranceCalculationSnapshotModelMapping : IEntityTypeConfig
 {
     public void Configure(EntityTypeBuilder<InsuranceCalculationSnapshot> builder)
     {
-        builder.ToTable("hr_insurance_calculation_snapshots");
+        builder.ToTable("InsuranceCalculationSnapshots");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new InsuranceCalculationSnapshotId(id));
         builder.Property(x => x.EmployeeId).HasConversion(x => x!.Value, id => new EmployeeId(id));
@@ -83,7 +83,7 @@ public sealed class InsuranceCalculationSnapshotItemModelMapping : IEntityTypeCo
 {
     public void Configure(EntityTypeBuilder<InsuranceCalculationSnapshotItem> builder)
     {
-        builder.ToTable("hr_insurance_calculation_snapshot_items");
+        builder.ToTable("InsuranceCalculationSnapshotItems");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new InsuranceCalculationSnapshotItemId(id));
         builder.Property(x => x.SnapshotId).HasConversion(x => x.Value, id => new InsuranceCalculationSnapshotId(id));
@@ -106,7 +106,7 @@ public sealed class InsuranceAuditLogModelMapping : IEntityTypeConfiguration<Ins
 {
     public void Configure(EntityTypeBuilder<InsuranceAuditLog> builder)
     {
-        builder.ToTable("hr_insurance_audit_logs");
+        builder.ToTable("InsuranceAuditLogs");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new InsuranceAuditLogId(id));
         builder.Property(x => x.RuleSetId).HasConversion(x => x!.Value, id => new InsuranceRuleSetId(id));

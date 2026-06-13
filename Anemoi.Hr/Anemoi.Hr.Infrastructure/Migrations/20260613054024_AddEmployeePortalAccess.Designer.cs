@@ -3,6 +3,7 @@ using System;
 using Anemoi.Hr.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Anemoi.Hr.Infrastructure.Migrations
 {
     [DbContext(typeof(HrDbContext))]
-    partial class HrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260613054024_AddEmployeePortalAccess")]
+    partial class AddEmployeePortalAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1256,7 +1259,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("RuleSetId");
 
-                    b.ToTable("InsuranceAuditLogs", (string)null);
+                    b.ToTable("hr_insurance_audit_logs", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Insurance.InsuranceCalculationSnapshot", b =>
@@ -1342,7 +1345,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId", "CalculationPeriodStart", "CalculationPeriodEnd");
 
-                    b.ToTable("InsuranceCalculationSnapshots", (string)null);
+                    b.ToTable("hr_insurance_calculation_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Insurance.InsuranceCalculationSnapshotItem", b =>
@@ -1394,7 +1397,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("SnapshotId", "SortOrder");
 
-                    b.ToTable("InsuranceCalculationSnapshotItems", (string)null);
+                    b.ToTable("hr_insurance_calculation_snapshot_items", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Insurance.InsuranceContributionRule", b =>
@@ -1448,7 +1451,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("RuleSetId", "SortOrder");
 
-                    b.ToTable("InsuranceContributionRules", (string)null);
+                    b.ToTable("hr_insurance_contribution_rules", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Insurance.InsuranceRuleSet", b =>
@@ -1516,7 +1519,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("CountryCode", "InsuranceType", "EffectiveFrom", "EffectiveTo");
 
-                    b.ToTable("InsuranceRuleSets", (string)null);
+                    b.ToTable("hr_insurance_rule_sets", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Leaves.LeaveAccrualRun", b =>
@@ -1851,7 +1854,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId", "OvertimeDate");
 
-                    b.ToTable("OvertimeRequests", (string)null);
+                    b.ToTable("hr_overtime_requests", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Payroll.PayrollItem", b =>
@@ -2508,7 +2511,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("TaxRuleSetId", "SortOrder");
 
-                    b.ToTable("TaxBrackets", (string)null);
+                    b.ToTable("hr_tax_brackets", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Taxation.TaxCalculationSnapshot", b =>
@@ -2599,7 +2602,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeId", "CalculationPeriodStart", "CalculationPeriodEnd");
 
-                    b.ToTable("TaxCalculationSnapshots", (string)null);
+                    b.ToTable("hr_tax_calculation_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Taxation.TaxDeductionRule", b =>
@@ -2637,7 +2640,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("TaxRuleSetId", "DeductionType");
 
-                    b.ToTable("TaxDeductionRules", (string)null);
+                    b.ToTable("hr_tax_deduction_rules", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Taxation.TaxRuleSet", b =>
@@ -2698,7 +2701,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("CountryCode", "TaxType", "EffectiveFrom", "EffectiveTo");
 
-                    b.ToTable("TaxRuleSets", (string)null);
+                    b.ToTable("hr_tax_rule_sets", (string)null);
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.Attendance.AttendanceRecord", b =>

@@ -76,6 +76,15 @@ public static class HrPermissions
     public const string InsuranceCalculate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceCalculate;
     public const string InsuranceReport = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceReport;
 
+    public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
+    public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
+    public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
+    public const string EssAttendanceView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssAttendanceView;
+    public const string EssOvertimeView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssOvertimeView;
+    public const string EssOvertimeCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssOvertimeCreate;
+    public const string EssPayrollView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssPayrollView;
+    public const string EssPayslipView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssPayslipView;
+
     public static readonly IReadOnlyList<string> All =
     [
         LeavePolicyView,
@@ -141,7 +150,15 @@ public static class HrPermissions
         InsuranceView,
         InsuranceManage,
         InsuranceCalculate,
-        InsuranceReport
+        InsuranceReport,
+        EssProfileView,
+        EssLeaveView,
+        EssLeaveRequest,
+        EssAttendanceView,
+        EssOvertimeView,
+        EssOvertimeCreate,
+        EssPayrollView,
+        EssPayslipView
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =

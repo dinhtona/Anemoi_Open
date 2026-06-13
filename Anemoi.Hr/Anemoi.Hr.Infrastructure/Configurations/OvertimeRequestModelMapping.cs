@@ -9,7 +9,7 @@ public sealed class OvertimeRequestModelMapping : IEntityTypeConfiguration<Overt
 {
     public void Configure(EntityTypeBuilder<OvertimeRequest> builder)
     {
-        builder.ToTable("hr_overtime_requests");
+        builder.ToTable("OvertimeRequests");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new OvertimeRequestId(id))

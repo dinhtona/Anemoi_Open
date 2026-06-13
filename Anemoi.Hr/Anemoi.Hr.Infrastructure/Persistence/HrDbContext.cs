@@ -4,6 +4,7 @@ using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Ess;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Overtime;
 using Anemoi.Hr.Domain.Payroll;
@@ -63,6 +64,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<InsuranceCalculationSnapshot> InsuranceCalculationSnapshots { get; set; }
     public DbSet<InsuranceCalculationSnapshotItem> InsuranceCalculationSnapshotItems { get; set; }
     public DbSet<InsuranceAuditLog> InsuranceAuditLogs { get; set; }
+    public DbSet<EmployeePortalAccess> EmployeePortalAccesses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
