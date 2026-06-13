@@ -11,10 +11,6 @@ public sealed class GetOvertimeRequestsValidator : AbstractValidator<GetOvertime
 {
     public GetOvertimeRequestsValidator()
     {
-        RuleFor(x => x.EmployeeId)
-            .NotNull()
-            .WithErrorCode(HrBusinessErrorCodes.EmployeeNotFound);
-
         RuleFor(x => x.Page)
             .GreaterThan(0)
             .WithErrorCode(HrBusinessErrorCodes.ReportPageInvalid);

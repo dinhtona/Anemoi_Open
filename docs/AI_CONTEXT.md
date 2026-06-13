@@ -7,6 +7,9 @@ Before doing anything, read:
 - docs/architecture/ARCHITECTURE_DECISIONS.md
 - docs/architecture/TECHNICAL_DEBT_REGISTER.md
 
+
+
+
 Architecture:
 
 - Clean Architecture

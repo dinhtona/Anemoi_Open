@@ -26,7 +26,8 @@ public partial class OvertimeMapper
             RejectedBy = source.RejectedBy,
             RejectedAt = source.RejectedAt,
             CancelledBy = source.CancelledBy,
-            CancelledAt = source.CancelledAt
+            CancelledAt = source.CancelledAt,
+            CreatedAt = source.CreatedAt
         };
     }
 

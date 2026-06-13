@@ -18,4 +18,5 @@ public sealed class OvertimeRequestResponse
     public DateTime? RejectedAt { get; init; }
     public string CancelledBy { get; init; }
     public DateTime? CancelledAt { get; init; }
+    public DateTime CreatedAt { get; init; }
 }

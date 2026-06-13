@@ -17,7 +17,11 @@ public sealed class GetOvertimeRequestsHandler(
         CancellationToken cancellationToken)
     {
         var query = overtimeRequestRepository.GetQueryable().AsNoTracking()
-            .Where(x => x.EmployeeId == request.EmployeeId);
+            .Include(x => x.Employee)
+            .AsQueryable();
+
+        if (request.EmployeeId is not null)
+            query = query.Where(x => x.EmployeeId == request.EmployeeId);
 
         if (!string.IsNullOrEmpty(request.Status))
             query = query.Where(x => x.Status == request.Status);
