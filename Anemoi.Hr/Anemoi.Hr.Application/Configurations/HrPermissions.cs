@@ -52,6 +52,9 @@ public static class HrPermissions
     public const string PayrollApprove = "hr.payroll.approve";
     public const string PayrollLock = "hr.payroll.lock";
 
+    public const string PayrollReportingView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPayrollReportingView;
+    public const string PayrollReportingExport = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPayrollReportingExport;
+
     public const string PayslipDocumentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPayslipDocumentView;
     public const string PayslipDocumentGenerate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPayslipDocumentGenerate;
     public const string PayslipEmailSend = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPayslipEmailSend;
@@ -133,6 +136,8 @@ public static class HrPermissions
         PayrollCalculate,
         PayrollApprove,
         PayrollLock,
+        PayrollReportingView,
+        PayrollReportingExport,
         PayslipDocumentView,
         PayslipDocumentGenerate,
         PayslipEmailSend,
@@ -196,7 +201,8 @@ public static class HrPermissions
             [TaxManage] = new(TaxManage, "High"),
             [InsuranceManage] = new(InsuranceManage, "High"),
             [PayslipDocumentGenerate] = new(PayslipDocumentGenerate, "High"),
-            [PayslipEmailSend] = new(PayslipEmailSend, "High")
+            [PayslipEmailSend] = new(PayslipEmailSend, "High"),
+            [PayrollReportingExport] = new(PayrollReportingExport, "High")
         };
 }
 

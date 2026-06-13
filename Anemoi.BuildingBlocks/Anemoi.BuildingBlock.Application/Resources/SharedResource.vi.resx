@@ -260,4 +260,6 @@
   <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>Lịch</value></data>
   <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>Xem lịch và ngày lễ</value></data>
   <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Quản lý lịch, ngày lễ và ngoại lệ</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>Xem các báo cáo lương nâng cao.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Xuất các báo cáo lương nâng cao ra file CSV.</value></data>
 </root>

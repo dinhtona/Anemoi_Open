@@ -95,6 +95,9 @@ public static class Permissions
     public const string HrInsuranceCalculate = "hr.insurance.calculate";
     public const string HrInsuranceReport = "hr.insurance.report";
 
+    public const string HrPayrollReportingView = "hr.payroll.reporting.view";
+    public const string HrPayrollReportingExport = "hr.payroll.reporting.export";
+
     public const string HrEssProfileView = "hr.ess.profile.view";
     public const string HrEssLeaveView = "hr.ess.leave.view";
     public const string HrEssLeaveRequest = "hr.ess.leave.request";
@@ -194,7 +197,9 @@ public static class Permissions
         new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView"),
         new(HrPayslipDocumentView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentView"),
         new(HrPayslipDocumentGenerate, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentGenerate"),
-        new(HrPayslipEmailSend, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipEmailSend")
+        new(HrPayslipEmailSend, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipEmailSend"),
+        new(HrPayrollReportingView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingView"),
+        new(HrPayrollReportingExport, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingExport", true, "High")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

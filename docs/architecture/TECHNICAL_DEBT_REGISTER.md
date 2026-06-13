@@ -506,6 +506,36 @@ Security Review Phase
 
 ---
 
+## TD-010 — Payroll Reporting Department/Position Fallback
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Current State
+
+Advanced Payroll Cost, Department Breakdown, and Employee Breakdown reports query the employee's current `PrimaryDepartment` and `PrimaryPosition` navigations because historical department and position snapshots are not persisted in `PayrollRun` or `Payslip` entities.
+
+### Risk
+
+If an employee transfers departments or positions, past period payroll reports will show their current department/position instead of their historical department/position at the time of the payroll run.
+
+### Recommended Fix
+
+Store `DepartmentId`, `DepartmentName`, `PositionId`, and `PositionName` snapshots directly in the `PayrollRun` entity at calculation time (Phase 24 or next optimization sprint).
+
+BuildPayrollVariance fix not used full outer join
+
+### Suggested Target
+
+Next Optimization Sprint
+
+---
+
 # Historical Debt Resolved
 
 The following items were discovered during implementation and later resolved.

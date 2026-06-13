@@ -2,8 +2,8 @@ ANEMOI HR MASTER CONTEXT
 
 Before doing anything, read:
 
-- README.md
-- AI_CONTEXT.md
+- docs/ai/README.md
+- docs/AI_CONTEXT.md
 - docs/architecture/ARCHITECTURE_DECISIONS.md
 - docs/architecture/TECHNICAL_DEBT_REGISTER.md
 

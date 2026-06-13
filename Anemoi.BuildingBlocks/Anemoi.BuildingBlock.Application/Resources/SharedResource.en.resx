@@ -260,4 +260,6 @@
   <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>HR Calendar</value></data>
   <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>View calendar and holidays</value></data>
   <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Manage calendar settings, holidays, and exceptions</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>View advanced payroll reports.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Export advanced payroll reports to CSV format.</value></data>
 </root>
