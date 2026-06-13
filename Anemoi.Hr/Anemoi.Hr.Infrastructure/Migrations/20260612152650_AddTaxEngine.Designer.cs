@@ -2166,7 +2166,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("TaxRuleSetId")
+                    b.Property<Guid>("TaxRuleSetId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal?>("ToAmount")
@@ -2243,7 +2243,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.Property<Guid?>("SourceReferenceId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("TaxRuleSetId")
+                    b.Property<Guid>("TaxRuleSetId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("TaxRuleSetVersion")
@@ -2294,7 +2294,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("TaxRuleSetId")
+                    b.Property<Guid>("TaxRuleSetId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")

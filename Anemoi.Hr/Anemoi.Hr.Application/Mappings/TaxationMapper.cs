@@ -72,6 +72,7 @@ public partial class TaxationMapper
             TaxRuleSetVersion = entity.TaxRuleSetVersion,
             GrossIncomeSnapshot = entity.GrossIncomeSnapshot,
             TaxableIncomeSnapshot = entity.TaxableIncomeSnapshot,
+            RuleSetSnapshotJson = entity.RuleSetSnapshotJson,
             DeductionSnapshotJson = entity.DeductionSnapshotJson,
             BracketSnapshotJson = entity.BracketSnapshotJson,
             CalculationResultJson = entity.CalculationResultJson,

@@ -52,6 +52,7 @@ public sealed class TaxCalculationSnapshotResponse
     public int TaxRuleSetVersion { get; set; }
     public decimal GrossIncomeSnapshot { get; set; }
     public decimal TaxableIncomeSnapshot { get; set; }
+    public string RuleSetSnapshotJson { get; set; }
     public string DeductionSnapshotJson { get; set; }
     public string BracketSnapshotJson { get; set; }
     public string CalculationResultJson { get; set; }

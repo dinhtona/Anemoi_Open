@@ -206,6 +206,17 @@ public sealed class CalculateTaxHandler(
             TaxRuleSetVersion = ruleSet.Version,
             GrossIncomeSnapshot = request.GrossIncome,
             TaxableIncomeSnapshot = taxableIncome,
+            RuleSetSnapshotJson = JsonSerializer.Serialize(new
+            {
+                ruleSet.Id,
+                ruleSet.CountryCode,
+                ruleSet.TaxType,
+                ruleSet.Name,
+                ruleSet.EffectiveFrom,
+                ruleSet.EffectiveTo,
+                ruleSet.Status,
+                ruleSet.Version
+            }),
             DeductionSnapshotJson = JsonSerializer.Serialize(deductionItems),
             BracketSnapshotJson = JsonSerializer.Serialize(sortedBrackets.Select(x => new
             {

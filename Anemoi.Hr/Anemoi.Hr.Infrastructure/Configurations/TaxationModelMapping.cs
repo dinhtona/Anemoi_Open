@@ -85,6 +85,7 @@ public sealed class TaxCalculationSnapshotModelMapping : IEntityTypeConfiguratio
         builder.Property(x => x.SourceModule).HasMaxLength(64).IsRequired();
 
         builder.Property(x => x.DeductionSnapshotJson).HasColumnType("text");
+        builder.Property(x => x.RuleSetSnapshotJson).HasColumnType("text").IsRequired();
         builder.Property(x => x.BracketSnapshotJson).HasColumnType("text");
         builder.Property(x => x.CalculationResultJson).HasColumnType("text");
 

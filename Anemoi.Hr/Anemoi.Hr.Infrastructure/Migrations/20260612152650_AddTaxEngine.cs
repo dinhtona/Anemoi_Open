@@ -20,7 +20,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     PayrollRunId = table.Column<Guid>(type: "uuid", nullable: true),
                     CountryCode = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     TaxType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     TaxRuleSetVersion = table.Column<int>(type: "integer", nullable: false),
                     GrossIncomeSnapshot = table.Column<decimal>(type: "numeric", nullable: false),
                     TaxableIncomeSnapshot = table.Column<decimal>(type: "numeric", nullable: false),
@@ -70,7 +70,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     FromAmount = table.Column<decimal>(type: "numeric", nullable: false),
                     ToAmount = table.Column<decimal>(type: "numeric", nullable: true),
                     Rate = table.Column<decimal>(type: "numeric", nullable: false),
@@ -96,7 +96,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TaxRuleSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     DeductionType = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),

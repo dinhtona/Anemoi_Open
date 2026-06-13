@@ -197,6 +197,7 @@ public sealed class HrTaxTests
             Id = ruleSetId,
             CountryCode = "VN",
             TaxType = "PIT",
+            Name = "VN PIT 2026",
             Status = "Active",
             EffectiveFrom = new DateOnly(2026, 1, 1),
             EffectiveTo = null,
@@ -268,6 +269,7 @@ public sealed class HrTaxTests
             Id = ruleSetId,
             CountryCode = "VN",
             TaxType = "PIT",
+            Name = "VN PIT 2026",
             Status = "Active",
             EffectiveFrom = new DateOnly(2026, 1, 1),
             EffectiveTo = null,
@@ -318,6 +320,8 @@ public sealed class HrTaxTests
         // And the serialised bracket snapshot records the original 10% rate
         Assert.Contains("\"Rate\":0.10", snapshot.BracketSnapshotJson);
         Assert.DoesNotContain("\"Rate\":0.50", snapshot.BracketSnapshotJson);
+        Assert.Contains("\"Name\":\"VN PIT 2026\"", snapshot.RuleSetSnapshotJson);
+        Assert.Contains("\"Version\":1", snapshot.RuleSetSnapshotJson);
     }
 
     [Fact]
@@ -347,6 +351,76 @@ public sealed class HrTaxTests
         // Assert
         Assert.True(result.IsT1);
         Assert.Equal("HR_TAX_CALCULATION_NEGATIVE_INCOME", result.AsT1.Code);
+    }
+
+    [Fact]
+    public void CalculateTaxValidator_Should_Reject_Invalid_Period_And_Required_Fields()
+    {
+        var validator = new CalculateTaxValidator();
+        var command = new CalculateTaxCommand(
+            EmployeeId: Guid.NewGuid().ToString(),
+            CountryCode: "",
+            TaxType: "",
+            GrossIncome: 1000,
+            TaxableIncome: 1000,
+            Currency: "",
+            PeriodStart: new DateOnly(2026, 6, 30),
+            PeriodEnd: new DateOnly(2026, 6, 1),
+            DeductionInputs: new Dictionary<string, decimal>(),
+            SourceModule: ""
+        );
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CalculateTaxCommand.CountryCode));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CalculateTaxCommand.TaxType));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CalculateTaxCommand.Currency));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CalculateTaxCommand.SourceModule));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(CalculateTaxCommand.PeriodStart));
+    }
+
+    [Fact]
+    public async Task Should_Fail_To_Calculate_When_No_Active_Rule_Set_Exists()
+    {
+        var ruleSetId = new TaxRuleSetId(Guid.NewGuid());
+        var ruleSets = new List<TaxRuleSet>
+        {
+            new()
+            {
+                Id = ruleSetId,
+                CountryCode = "VN",
+                TaxType = "PIT",
+                Status = "Draft",
+                EffectiveFrom = new DateOnly(2026, 1, 1),
+                Name = "Draft PIT",
+                Version = 1
+            }
+        };
+        var handler = new CalculateTaxHandler(
+            new FakeRepository<TaxRuleSet>(ruleSets),
+            new FakeRepository<TaxBracket>([]),
+            new FakeRepository<TaxDeductionRule>([]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            _unitOfWork);
+
+        var command = new CalculateTaxCommand(
+            EmployeeId: Guid.NewGuid().ToString(),
+            CountryCode: "VN",
+            TaxType: "PIT",
+            GrossIncome: 1000,
+            TaxableIncome: 1000,
+            Currency: "VND",
+            PeriodStart: new DateOnly(2026, 6, 1),
+            PeriodEnd: new DateOnly(2026, 6, 30),
+            DeductionInputs: new Dictionary<string, decimal>(),
+            SourceModule: "Simulator"
+        );
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal("HR_TAX_RULE_SET_NOT_FOUND", result.AsT1.Code);
     }
 
     private sealed class FakeUnitOfWork : IUnitOfWork
