@@ -82,3 +82,16 @@ Then execute one phase prompt at a time from:
 ```text
 docs/ai/prompts/hr/
 ```
+
+# ANEMOI HR
+
+## Mandatory Reading Before Making Changes
+
+All contributors, reviewers, and AI agents must read:
+
+- docs/architecture/ARCHITECTURE_DECISIONS.md
+- docs/architecture/TECHNICAL_DEBT_REGISTER.md
+
+These documents contain approved architectural decisions and known technical debt.
+
+Implementations that violate ARCHITECTURE_DECISIONS.md should be considered incorrect unless an explicit architecture review supersedes the decision.

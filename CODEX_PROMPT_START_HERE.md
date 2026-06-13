@@ -1,5 +1,19 @@
 # Codex Prompt - Start Here
 
+```
+
+Before making any changes, read:
+
+- docs/ai/README.md
+- docs/AI_CONTEXT.md
+- docs/architecture/ARCHITECTURE_DECISIONS.md
+- docs/architecture/TECHNICAL_DEBT_REGISTER.md
+
+Architecture decisions take precedence over implementation convenience.
+Technical debt items must not be considered architecture defects unless explicitly stated.
+
+```
+
 Copy this prompt into Codex when starting HR implementation.
 
 ```text
