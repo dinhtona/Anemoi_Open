@@ -1,20 +1,38 @@
-# ANEMOI HR - AI Context
+ANEMOI HR MASTER CONTEXT
 
-Before implementing any feature, read:
+Before doing anything, read:
 
-1. docs/architecture/ARCHITECTURE_DECISIONS.md
-2. docs/architecture/TECHNICAL_DEBT_REGISTER.md
+- README.md
+- AI_CONTEXT.md
+- docs/architecture/ARCHITECTURE_DECISIONS.md
+- docs/architecture/TECHNICAL_DEBT_REGISTER.md
 
-Key Rules:
+Architecture:
+
+- Clean Architecture
+- CQRS + MediatR
+- PostgreSQL
+- Next.js
+- React Query
+- shadcn/ui
+
+Principles:
 
 - Snapshot-based architecture
-- Historical records are immutable
-- Payroll consumes snapshots
-- Tax Engine is independent from Payroll
-- Insurance Engine must follow Tax Engine patterns
+- Historical preservation
 - PostgreSQL xmin concurrency
 - Permission-based authorization
-- CQRS + MediatR
-- Clean Architecture
+- Payroll consumes snapshots
+- Tax Engine independent
+- Insurance Engine independent
 
-Do not introduce new architectural patterns without checking ADRs first.
+Frontend:
+
+./cody-web-app
+
+Review Format:
+
+1. Overall Review
+2. Issues Found
+3. Recommended Design
+4. Final Decision
