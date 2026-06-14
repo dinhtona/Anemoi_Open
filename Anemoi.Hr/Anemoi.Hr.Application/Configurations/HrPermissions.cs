@@ -25,6 +25,7 @@ public static class HrPermissions
     public const string DepartmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrDepartmentView;
     public const string PositionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPositionView;
     public const string DashboardView = "hr.dashboard.view";
+    public const string AnalyticsView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrAnalyticsView;
     public const string EmployeeTransferView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferView;
     public const string EmployeeTransferCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTransferCreate;
     public const string PromotionView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrPromotionView;
@@ -111,6 +112,7 @@ public static class HrPermissions
         DepartmentView,
         PositionView,
         DashboardView,
+        AnalyticsView,
         EmployeeTransferView,
         EmployeeTransferCreate,
         PromotionView,

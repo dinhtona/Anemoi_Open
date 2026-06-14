@@ -44,6 +44,7 @@ public static class Permissions
     public const string HrDepartmentView = "hr.department.view";
     public const string HrPositionView = "hr.position.view";
     public const string HrDashboardView = "hr.dashboard.view";
+    public const string HrAnalyticsView = "hr.analytics.view";
     public const string HrEmployeeTransferView = "hr.employee.transfer.view";
     public const string HrEmployeeTransferCreate = "hr.employee.transfer.create";
     public const string HrPromotionView = "hr.promotion.view";
@@ -145,6 +146,7 @@ public static class Permissions
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),
         new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView"),
+        new(HrAnalyticsView, "PermissionGroupHrEmployee", "PermissionDescriptionHrAnalyticsView"),
         new(HrEmployeeTransferView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferView"),
         new(HrEmployeeTransferCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferCreate", true, "High"),
         new(HrPromotionView, "PermissionGroupHrEmployee", "PermissionDescriptionHrPromotionView"),
