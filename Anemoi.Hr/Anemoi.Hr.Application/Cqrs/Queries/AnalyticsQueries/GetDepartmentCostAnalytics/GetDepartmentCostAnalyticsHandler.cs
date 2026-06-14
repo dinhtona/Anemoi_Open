@@ -23,7 +23,6 @@ public sealed class GetDepartmentCostAnalyticsHandler(
             .AsNoTracking()
             .Select(x => new
             {
-                HasSnapshot = x.DepartmentIdSnapshot != null,
                 DeptId = x.DepartmentIdSnapshot != null
                     ? x.DepartmentIdSnapshot.Value
                     : x.Employee.PrimaryDepartmentId.Value,

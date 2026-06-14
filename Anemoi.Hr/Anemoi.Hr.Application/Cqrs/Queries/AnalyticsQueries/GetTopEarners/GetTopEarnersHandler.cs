@@ -22,7 +22,7 @@ public sealed class GetTopEarnersHandler(
 
         if (payrollRunId is null)
         {
-            var latestRun = await payrollRunRepository.GetQueryable()
+            var latestRun = await payrollRunRepository.GetQueryable().AsNoTracking()
                 .Where(x => x.Status == PayrollRunStatus.Finalized)
                 .OrderByDescending(x => x.FinalizedAt)
                 .Select(x => x.Id)

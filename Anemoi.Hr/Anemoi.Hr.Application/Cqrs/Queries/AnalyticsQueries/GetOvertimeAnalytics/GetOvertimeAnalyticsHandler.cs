@@ -20,25 +20,34 @@ public sealed class GetOvertimeAnalyticsHandler(
     {
         var query = overtimeRepository.GetQueryable().AsNoTracking();
 
-        var totals = await query
-            .GroupBy(x => 1)
-            .Select(g => new
-            {
-                TotalOvertimeHours = g.Sum(x => (decimal)(x.EndTime - x.StartTime).TotalHours),
-                AverageOvertimeHours = g.Average(x => (decimal)(x.EndTime - x.StartTime).TotalHours),
-                ApprovedCount = g.Count(x => x.Status == OvertimeStatusCode.Approved),
-                RejectedCount = g.Count(x => x.Status == OvertimeStatusCode.Rejected)
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        var approvedCount = await query.CountAsync(x => x.Status == OvertimeStatusCode.Approved, cancellationToken);
+        var rejectedCount = await query.CountAsync(x => x.Status == OvertimeStatusCode.Rejected, cancellationToken);
 
-        if (totals is null)
-            return new OvertimeAnalyticsResponse(0, 0, 0, 0);
+        var overtimeHours = await query
+            .Select(x => new
+            {
+                x.Status,
+                StartTicks = (long)x.StartTime.Ticks,
+                EndTicks = (long)x.EndTime.Ticks
+            })
+            .ToListAsync(cancellationToken);
+
+        var hoursData = overtimeHours
+            .Select(x => new
+            {
+                x.Status,
+                Hours = new TimeSpan(x.EndTicks - x.StartTicks).TotalHours
+            })
+            .ToList();
+
+        var totalHours = hoursData.Sum(x => x.Hours);
+        var avgHours = hoursData.Count > 0 ? hoursData.Average(x => x.Hours) : 0;
 
         return new OvertimeAnalyticsResponse(
-            Math.Round(totals.TotalOvertimeHours, 2),
-            Math.Round(totals.AverageOvertimeHours, 2),
-            totals.ApprovedCount,
-            totals.RejectedCount
+            Math.Round((decimal)totalHours, 2),
+            Math.Round((decimal)avgHours, 2),
+            approvedCount,
+            rejectedCount
         );
     }
 }
