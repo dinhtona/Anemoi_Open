@@ -530,6 +530,9 @@ Store `DepartmentId`, `DepartmentName`, `PositionId`, and `PositionName` snapsho
 
 BuildPayrollVariance fix not used full outer join
 
+HR_PAYROLL_RUN_ALREADY_EXISTS employee payroll status Draft but can not re calculation payroll
+
+
 ### Suggested Target
 
 Next Optimization Sprint
