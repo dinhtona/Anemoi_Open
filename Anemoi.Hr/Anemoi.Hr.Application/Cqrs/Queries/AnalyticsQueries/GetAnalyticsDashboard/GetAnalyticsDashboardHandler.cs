@@ -17,18 +17,11 @@ public sealed class GetAnalyticsDashboardHandler(ISender sender)
         GetAnalyticsDashboardQuery request,
         CancellationToken cancellationToken)
     {
-        var workforceTask = sender.Send(new GetWorkforceOverviewQuery(), cancellationToken);
-        var payrollTask = sender.Send(new GetPayrollAnalyticsQuery(), cancellationToken);
-        var attendanceTask = sender.Send(new GetAttendanceAnalyticsQuery(), cancellationToken);
-        var overtimeTask = sender.Send(new GetOvertimeAnalyticsQuery(), cancellationToken);
+        var workforce = await sender.Send(new GetWorkforceOverviewQuery(), cancellationToken);
+        var payroll = await sender.Send(new GetPayrollAnalyticsQuery(), cancellationToken);
+        var attendance = await sender.Send(new GetAttendanceAnalyticsQuery(), cancellationToken);
+        var overtime = await sender.Send(new GetOvertimeAnalyticsQuery(), cancellationToken);
 
-        await Task.WhenAll(workforceTask, payrollTask, attendanceTask, overtimeTask);
-
-        return new AnalyticsDashboardResponse(
-            workforceTask.Result,
-            payrollTask.Result,
-            attendanceTask.Result,
-            overtimeTask.Result
-        );
+        return new AnalyticsDashboardResponse(workforce, payroll, attendance, overtime);
     }
 }

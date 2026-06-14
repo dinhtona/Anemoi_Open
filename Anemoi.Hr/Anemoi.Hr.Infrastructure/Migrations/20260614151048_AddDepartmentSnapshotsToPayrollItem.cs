@@ -11,14 +11,6 @@ namespace Anemoi.Hr.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "DepartmentIdSnapshot",
-                table: "PayrollRuns");
-
-            migrationBuilder.DropColumn(
-                name: "DepartmentNameSnapshot",
-                table: "PayrollRuns");
-
             migrationBuilder.AddColumn<Guid>(
                 name: "DepartmentIdSnapshot",
                 table: "PayrollItems",
@@ -43,19 +35,6 @@ namespace Anemoi.Hr.Infrastructure.Migrations
             migrationBuilder.DropColumn(
                 name: "DepartmentNameSnapshot",
                 table: "PayrollItems");
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "DepartmentIdSnapshot",
-                table: "PayrollRuns",
-                type: "uuid",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "DepartmentNameSnapshot",
-                table: "PayrollRuns",
-                type: "character varying(256)",
-                maxLength: 256,
-                nullable: true);
         }
     }
 }

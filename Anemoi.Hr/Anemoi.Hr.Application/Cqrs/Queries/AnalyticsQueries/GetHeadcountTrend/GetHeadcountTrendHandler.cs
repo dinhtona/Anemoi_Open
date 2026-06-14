@@ -19,7 +19,7 @@ public sealed class GetHeadcountTrendHandler(
         GetHeadcountTrendQuery request,
         CancellationToken cancellationToken)
     {
-        var endDate = new DateTime(request.ToDate.Year, request.ToDate.Month, 1).AddMonths(1);
+        var endDate = new DateTime(request.ToDate.Year, request.ToDate.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(1);
         var monthlyJoins = await employeeRepository.GetQueryable()
             .Where(x => x.CreatedAt < endDate)
             .Select(x => new { x.CreatedAt, x.EmploymentStatusCode })
