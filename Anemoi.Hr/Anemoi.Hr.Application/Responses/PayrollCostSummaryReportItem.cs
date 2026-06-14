@@ -1,6 +1,8 @@
 #nullable enable
 
 using System;
+using System.Text.Json.Serialization;
+using Anemoi.Hr.Domain.Payroll;
 
 namespace Anemoi.Hr.Application.Responses;
 
@@ -8,7 +10,8 @@ public sealed record PayrollCostSummaryReportItem
 {
     public Guid PayrollPeriodId { get; init; }
     public string PeriodCode { get; init; } = default!;
-    public string Status { get; init; } = default!;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public PayrollRunStatus Status { get; init; }
     public int EmployeeCount { get; init; }
     public decimal TotalGrossIncome { get; init; }
     public decimal TotalTaxableIncome { get; init; }

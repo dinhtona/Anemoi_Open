@@ -3,11 +3,11 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Application.Services;
 using Anemoi.Hr.Domain.Attendance;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,29 +45,18 @@ public sealed class GetEmployeeAttendanceSummaryHandler(
             null,
             cancellationToken);
 
-        var workedDays = records.Sum(x => x.WorkedDays);
-        var workedHours = records.Sum(x => x.WorkedHours);
-        var leaveDays = records
-            .Where(x => x.Status == AttendanceStatusCodes.Leave)
-            .Sum(x => x.WorkedDays);
-        var absentDays = records
-            .Where(x => x.Status == AttendanceStatusCodes.Absent)
-            .Sum(x => x.WorkedDays);
-        var holidayDays = records
-            .Where(x => x.Status == AttendanceStatusCodes.Holiday)
-            .Sum(x => x.WorkedDays);
+        var totals = AttendanceSummaryCalculator.Calculate(records);
 
         return new AttendanceSummaryResponse
         {
-            WorkedDays = workedDays,
-            WorkedHours = workedHours,
-            LeaveDays = leaveDays,
-            AbsentDays = absentDays,
-            HolidayDays = holidayDays,
-            // Temporary until attendance can classify paid and unpaid leave.
-            PaidWorkingDays = workedDays,
-            PaidLeaveDays = 0,
-            UnpaidLeaveDays = 0
+            WorkedDays = totals.WorkedDays,
+            WorkedHours = totals.WorkedHours,
+            LeaveDays = totals.LeaveDays,
+            AbsentDays = totals.AbsentDays,
+            HolidayDays = totals.HolidayDays,
+            PaidWorkingDays = totals.PaidWorkingDays,
+            PaidLeaveDays = totals.PaidLeaveDays,
+            UnpaidLeaveDays = totals.UnpaidLeaveDays
         };
     }
 }

@@ -1,6 +1,7 @@
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Attendance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -30,6 +31,12 @@ public sealed class PayrollModelMapping :
                 id => id != null ? id.Value : (Guid?)null,
                 value => value.HasValue ? new AttendancePeriodId(value.Value) : null)
             .IsRequired(false);
+
+        // Relationship
+        builder.HasOne(x => x.AttendancePeriod)
+            .WithMany()
+            .HasForeignKey(x => x.AttendancePeriodId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Unique Index
         builder.HasIndex(x => x.PeriodCode).IsUnique();

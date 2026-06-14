@@ -197,7 +197,7 @@ public static class PayrollReportingQueryExtensions
                       {
                           PayrollPeriodId = g.Key.PayrollPeriodId.Value,
                           PeriodCode = g.Key.PeriodCode,
-                          Status = g.Key.Status.ToString(),
+                           Status = g.Key.Status,
                           EmployeeCount = g.Count(),
                           TotalGrossIncome = g.Sum(x => x.GrossAmount),
                           TotalTaxableIncome = g.Sum(x => x.TaxableIncome),

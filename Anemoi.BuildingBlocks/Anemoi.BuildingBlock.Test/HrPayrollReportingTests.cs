@@ -230,7 +230,7 @@ public sealed class HrPayrollReportingTests
         var item = result.First();
         Assert.Equal(periodId.Value, item.PayrollPeriodId);
         Assert.Equal("PERIOD_01", item.PeriodCode);
-        Assert.Equal("Finalized", item.Status);
+        Assert.Equal(PayrollRunStatus.Finalized, item.Status);
         Assert.Equal(2, item.EmployeeCount);
         Assert.Equal(3000m, item.TotalGrossIncome);
         Assert.Equal(2700m, item.TotalTaxableIncome);

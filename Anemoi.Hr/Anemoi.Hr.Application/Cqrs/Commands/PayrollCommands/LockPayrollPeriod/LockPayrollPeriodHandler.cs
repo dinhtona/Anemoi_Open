@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Attendance;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -15,6 +16,7 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.LockPayrollPeriod;
 
 public sealed class LockPayrollPeriodHandler(
     ISqlRepository<PayrollPeriod> payrollPeriodRepository,
+    ISqlRepository<AttendancePeriod> attendancePeriodRepository,
     IUnitOfWork unitOfWork,
     PayrollMapper mapper)
     : ICommandHandler<LockPayrollPeriodCommand, OneOf<PayrollPeriodResponse, ErrorDetailResponse>>
@@ -32,10 +34,31 @@ public sealed class LockPayrollPeriodHandler(
         if (period is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodNotFound);
 
-        // 2. Lock the period
+        // 2. Reject if already locked
+        if (period.StatusCode == "Locked")
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
+
+        // 3. Validate AttendancePeriodId
+        if (period.AttendancePeriodId is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodAttendancePeriodRequired);
+
+        // 4. Fetch AttendancePeriod
+        var attendancePeriod = await attendancePeriodRepository.GetFirstByConditionAsync(
+            x => x.Id == period.AttendancePeriodId,
+            null,
+            cancellationToken);
+
+        if (attendancePeriod is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
+
+        if (attendancePeriod.StatusCode != "Locked")
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
+
+        var now = DateTime.UtcNow;
+        var updatedBy = request.UpdatedBy ?? "system";
         period.StatusCode = "Locked";
-        period.UpdatedAt = DateTime.UtcNow;
-        period.UpdatedBy = request.UpdatedBy ?? "system";
+        period.UpdatedAt = now;
+        period.UpdatedBy = updatedBy;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -8,7 +8,9 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
 using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Application.Cqrs.Commands.AttendanceCommands.LockAttendancePeriod;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
+using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.LockPayrollPeriod;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Attendance;
@@ -18,6 +20,7 @@ using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Logging.Abstractions;
 using OneOf;
 using Xunit;
 
@@ -55,6 +58,334 @@ public sealed class HrAttendancePayrollIntegrationTests
             CreatedBy = "test"
         };
     }
+
+    private static AttendancePeriod CreateAttendancePeriod(AttendancePeriodId id)
+    {
+        return new AttendancePeriod
+        {
+            Id = id,
+            PeriodCode = "202605",
+            StatusCode = "Draft",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test",
+            UpdatedAt = DateTime.UtcNow,
+            UpdatedBy = "test"
+        };
+    }
+
+    private static AttendanceRecord CreateAttendanceRecord(
+        AttendancePeriodId attendancePeriodId,
+        EmployeeId employeeId,
+        DateOnly workDate,
+        decimal workedDays,
+        decimal workedHours,
+        string status)
+    {
+        return new AttendanceRecord
+        {
+            Id = new AttendanceRecordId(Guid.NewGuid()),
+            AttendancePeriodId = attendancePeriodId,
+            EmployeeId = employeeId,
+            WorkDate = workDate,
+            WorkedDays = workedDays,
+            WorkedHours = workedHours,
+            Status = status,
+            CreatedAt = DateTime.UtcNow,
+            CreatedBy = "test",
+            UpdatedAt = DateTime.UtcNow,
+            UpdatedBy = "test"
+        };
+    }
+
+    private static LockAttendancePeriodHandler CreateLockAttendancePeriodHandler(
+        AttendancePeriod period,
+        List<AttendanceRecord> records,
+        List<AttendanceSummary> summaries,
+        IUnitOfWork unitOfWork = null)
+    {
+        return new LockAttendancePeriodHandler(
+            new FakeRepository<AttendancePeriod>([period]),
+            new FakeRepository<AttendanceRecord>(records),
+            new FakeRepository<AttendanceSummary>(summaries),
+            unitOfWork ?? new FakeUnitOfWork(),
+            new AttendanceMapper(),
+            NullLogger<LockAttendancePeriodHandler>.Instance);
+    }
+
+    [Fact]
+    public async Task LockAttendancePeriod_CreatesAttendanceSummaries()
+    {
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var period = CreateAttendancePeriod(attendancePeriodId);
+        var summaries = new List<AttendanceSummary>();
+        var records = new List<AttendanceRecord>
+        {
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 5), 1, 8, AttendanceStatusCodes.Present),
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 6), 0.5m, 4, AttendanceStatusCodes.Leave)
+        };
+
+        var handler = CreateLockAttendancePeriodHandler(period, records, summaries);
+
+        var result = await handler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+        Assert.Equal("Locked", period.StatusCode);
+        var summary = Assert.Single(summaries);
+        Assert.Equal(attendancePeriodId, summary.AttendancePeriodId);
+        Assert.Equal(employeeId, summary.EmployeeId);
+        Assert.Equal(1.5m, summary.WorkedDays);
+        Assert.Equal(12, summary.WorkedHours);
+        Assert.Equal(0.5m, summary.LeaveDays);
+        Assert.Equal(1.5m, summary.PaidWorkingDays);
+        Assert.Equal(0, summary.PaidLeaveDays);
+        Assert.Equal(0, summary.UnpaidLeaveDays);
+    }
+
+    [Fact]
+    public async Task LockAttendancePeriod_MultipleEmployeesCreateSeparateSummaries()
+    {
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var firstEmployeeId = new EmployeeId(Guid.NewGuid());
+        var secondEmployeeId = new EmployeeId(Guid.NewGuid());
+        var period = CreateAttendancePeriod(attendancePeriodId);
+        var summaries = new List<AttendanceSummary>();
+        var records = new List<AttendanceRecord>
+        {
+            CreateAttendanceRecord(attendancePeriodId, firstEmployeeId, new DateOnly(2026, 5, 5), 1, 8, AttendanceStatusCodes.Present),
+            CreateAttendanceRecord(attendancePeriodId, secondEmployeeId, new DateOnly(2026, 5, 5), 0, 0, AttendanceStatusCodes.Absent)
+        };
+
+        var handler = CreateLockAttendancePeriodHandler(period, records, summaries);
+
+        var result = await handler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+        Assert.Equal(2, summaries.Count);
+        Assert.Contains(summaries, x => x.EmployeeId == firstEmployeeId);
+        Assert.Contains(summaries, x => x.EmployeeId == secondEmployeeId);
+    }
+
+    [Fact]
+    public async Task LockAttendancePeriod_EmptyPeriodReturnsRecordsNotFound()
+    {
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var period = CreateAttendancePeriod(attendancePeriodId);
+
+        var handler = CreateLockAttendancePeriodHandler(period, [], []);
+
+        var result = await handler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AttendanceRecordsNotFoundForPeriod, result.AsT1.Code);
+        Assert.Equal("Draft", period.StatusCode);
+    }
+
+    [Fact]
+    public async Task LockAttendancePeriod_ExistingSummaryReturnsAlreadyExistsWithoutMutation()
+    {
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var period = CreateAttendancePeriod(attendancePeriodId);
+        var existingSummary = new AttendanceSummary
+        {
+            Id = new AttendanceSummaryId(Guid.NewGuid()),
+            AttendancePeriodId = attendancePeriodId,
+            EmployeeId = employeeId,
+            WorkedDays = 20,
+            WorkedHours = 160,
+            PaidWorkingDays = 20,
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            CreatedBy = "original",
+            UpdatedAt = DateTime.UtcNow.AddDays(-1),
+            UpdatedBy = "original"
+        };
+        var records = new List<AttendanceRecord>
+        {
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 5), 1, 8, AttendanceStatusCodes.Present)
+        };
+
+        var handler = CreateLockAttendancePeriodHandler(period, records, [existingSummary]);
+
+        var result = await handler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AttendanceSummaryAlreadyExists, result.AsT1.Code);
+        Assert.Equal("Draft", period.StatusCode);
+        Assert.Equal(20, existingSummary.WorkedDays);
+        Assert.Equal(160, existingSummary.WorkedHours);
+        Assert.Equal("original", existingSummary.UpdatedBy);
+    }
+
+    [Fact]
+    public async Task LockAttendancePeriod_SaveFailureLeavesPeriodUnlocked()
+    {
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var period = CreateAttendancePeriod(attendancePeriodId);
+        var summaries = new List<AttendanceSummary>();
+        var records = new List<AttendanceRecord>
+        {
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 5), 1, 8, AttendanceStatusCodes.Present)
+        };
+        var handler = CreateLockAttendancePeriodHandler(
+            period,
+            records,
+            summaries,
+            new FailingUnitOfWork());
+
+        var result = await handler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AttendanceSummaryGenerationFailed, result.AsT1.Code);
+        Assert.Equal("Draft", period.StatusCode);
+    }
+
+    // ===== LockPayrollPeriod Tests =====
+
+    [Fact]
+    public async Task LockPayrollPeriod_NoAttendancePeriodId_Returns_AttendancePeriodRequired()
+    {
+        var payrollPeriodId = new PayrollPeriodId(Guid.NewGuid());
+
+        var period = new PayrollPeriod
+        {
+            Id = payrollPeriodId,
+            PeriodCode = "202605",
+            StatusCode = "Draft",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            StandardWorkingDays = 22,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
+        typeof(PayrollPeriod).GetProperty(nameof(PayrollPeriod.AttendancePeriodId))
+            ?.SetValue(period, null);
+
+        var handler = new LockPayrollPeriodHandler(
+            new FakeRepository<PayrollPeriod>([period]),
+            new FakeRepository<AttendancePeriod>([]),
+            new FakeUnitOfWork(),
+            new PayrollMapper()
+        );
+
+        var result = await handler.Handle(
+            new LockPayrollPeriodCommand(payrollPeriodId, true, "test"),
+            CancellationToken.None
+        );
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.PayrollPeriodAttendancePeriodRequired, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task LockPayrollPeriod_AttendancePeriodNotFound_Returns_AttendancePeriodNotFound()
+    {
+        var payrollPeriodId = new PayrollPeriodId(Guid.NewGuid());
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+
+        var period = new PayrollPeriod
+        {
+            Id = payrollPeriodId,
+            PeriodCode = "202605",
+            StatusCode = "Draft",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            StandardWorkingDays = 22,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
+        typeof(PayrollPeriod).GetProperty(nameof(PayrollPeriod.AttendancePeriodId))
+            ?.SetValue(period, attendancePeriodId);
+
+        var handler = new LockPayrollPeriodHandler(
+            new FakeRepository<PayrollPeriod>([period]),
+            new FakeRepository<AttendancePeriod>([]), // No attendance period
+            new FakeUnitOfWork(),
+            new PayrollMapper()
+        );
+
+        var result = await handler.Handle(
+            new LockPayrollPeriodCommand(payrollPeriodId, true, "test"),
+            CancellationToken.None
+        );
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AttendancePeriodNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task LockPayrollPeriod_DoesNotCreateOrUpdateAttendanceSummaries()
+    {
+        var payrollPeriodId = new PayrollPeriodId(Guid.NewGuid());
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+
+        var period = new PayrollPeriod
+        {
+            Id = payrollPeriodId,
+            PeriodCode = "202605",
+            StatusCode = "Draft",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            StandardWorkingDays = 22,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
+        typeof(PayrollPeriod).GetProperty(nameof(PayrollPeriod.AttendancePeriodId))
+            ?.SetValue(period, attendancePeriodId);
+
+        var attPeriod = new AttendancePeriod
+        {
+            Id = attendancePeriodId,
+            PeriodCode = "202605",
+            StatusCode = "Locked",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
+
+        var existingSummary = new AttendanceSummary
+        {
+            Id = new AttendanceSummaryId(Guid.NewGuid()),
+            AttendancePeriodId = attendancePeriodId,
+            EmployeeId = new EmployeeId(Guid.NewGuid()),
+            WorkedDays = 20,
+            WorkedHours = 160,
+            UpdatedBy = "original"
+        };
+
+        var handler = new LockPayrollPeriodHandler(
+            new FakeRepository<PayrollPeriod>([period]),
+            new FakeRepository<AttendancePeriod>([attPeriod]),
+            new FakeUnitOfWork(),
+            new PayrollMapper());
+
+        var result = await handler.Handle(
+            new LockPayrollPeriodCommand(payrollPeriodId, true, "test"),
+            CancellationToken.None
+        );
+
+        Assert.True(result.IsT0);
+        Assert.Equal("Locked", period.StatusCode);
+        Assert.Equal(20, existingSummary.WorkedDays);
+        Assert.Equal(160, existingSummary.WorkedHours);
+        Assert.Equal("original", existingSummary.UpdatedBy);
+    }
+
+    // ===== CalculatePayrollRun Tests =====
 
     [Fact]
     public async Task CalculatePayrollRun_MissingAttendancePeriodId_Returns_NotLinked()
@@ -202,6 +533,62 @@ public sealed class HrAttendancePayrollIntegrationTests
 
         Assert.True(result.IsT1);
         Assert.Equal(HrBusinessErrorCodes.AttendanceSummaryNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task CalculatePayrollRun_SucceedsAfterAttendanceLockGeneratesSummary()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var payrollPeriodId = new PayrollPeriodId(Guid.NewGuid());
+        var attendancePeriodId = new AttendancePeriodId(Guid.NewGuid());
+        var attendancePeriod = CreateAttendancePeriod(attendancePeriodId);
+        var summaries = new List<AttendanceSummary>();
+        var records = new List<AttendanceRecord>
+        {
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 5), 1, 8, AttendanceStatusCodes.Present),
+            CreateAttendanceRecord(attendancePeriodId, employeeId, new DateOnly(2026, 5, 6), 1, 8, AttendanceStatusCodes.Present)
+        };
+
+        var lockHandler = CreateLockAttendancePeriodHandler(attendancePeriod, records, summaries);
+        var lockResult = await lockHandler.Handle(
+            new LockAttendancePeriodCommand(attendancePeriodId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(lockResult.IsT0);
+
+        var payrollPeriod = new PayrollPeriod
+        {
+            Id = payrollPeriodId,
+            PeriodCode = "202605",
+            StatusCode = "Draft",
+            StartDate = new DateOnly(2026, 5, 1),
+            EndDate = new DateOnly(2026, 5, 31),
+            StandardWorkingDays = 22,
+            AttendancePeriodId = attendancePeriodId,
+            CreatedBy = "test",
+            UpdatedBy = "test"
+        };
+        var payrollRuns = new List<PayrollRun>();
+        var calculateHandler = new CalculatePayrollRunHandler(
+            new FakeRepository<PayrollPeriod>([payrollPeriod]),
+            new FakeRepository<PayrollRun>(payrollRuns),
+            new FakeRepository<Employee>([CreateEmployee(employeeId)]),
+            new FakeRepository<EmployeeSalary>([CreateSalary(employeeId, 2200, SalaryType.Monthly)]),
+            new FakeRepository<EmployeeAllowance>([]),
+            new FakeRepository<AttendancePeriod>([attendancePeriod]),
+            new FakeRepository<AttendanceSummary>(summaries),
+            new FakeUnitOfWork(),
+            new PayrollMapper());
+
+        var calculateResult = await calculateHandler.Handle(
+            new CalculatePayrollRunCommand(payrollPeriodId, employeeId, true, "test"),
+            CancellationToken.None);
+
+        Assert.True(calculateResult.IsT0);
+        Assert.Single(payrollRuns);
+        Assert.Equal(200, payrollRuns[0].BasePayAmount);
+        Assert.Equal(2, payrollRuns[0].PayrollItems.Single().PaidWorkingDays);
+        Assert.Equal(summaries.Single().Id, payrollRuns[0].PayrollItems.Single().AttendanceSummaryId);
     }
 
     [Fact]
@@ -533,6 +920,14 @@ public sealed class HrAttendancePayrollIntegrationTests
         public Task<OneOf<None, Exception>> SaveChangesAsync(CancellationToken token = default)
         {
             return Task.FromResult<OneOf<None, Exception>>(None.Value);
+        }
+    }
+
+    private sealed class FailingUnitOfWork : IUnitOfWork
+    {
+        public Task<OneOf<None, Exception>> SaveChangesAsync(CancellationToken token = default)
+        {
+            return Task.FromResult<OneOf<None, Exception>>(new InvalidOperationException("Save failed"));
         }
     }
 

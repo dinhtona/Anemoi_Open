@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Domain;
+using Anemoi.Hr.Domain.Attendance;
 using Anemoi.Hr.ModelIds.ModelIds;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ public sealed class PayrollPeriod : ValueObject
     public string CreatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string UpdatedBy { get; set; }
+
+    // Navigation property
+    public AttendancePeriod AttendancePeriod { get; set; }
 
     protected override IEnumerable<object> GetEqualityComponents()
     {

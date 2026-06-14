@@ -10,6 +10,8 @@ using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OneOf;
 using System;
 using System.Linq;
@@ -28,7 +30,8 @@ public sealed class CalculatePayrollRunHandler(
     ISqlRepository<AttendancePeriod> attendancePeriodRepository,
     ISqlRepository<AttendanceSummary> attendanceSummaryRepository,
     IUnitOfWork unitOfWork,
-    PayrollMapper mapper)
+    PayrollMapper mapper,
+    ILogger<CalculatePayrollRunHandler> logger = null)
     : ICommandHandler<CalculatePayrollRunCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<PayrollRunDetailResponse, ErrorDetailResponse>> Handle(
@@ -102,7 +105,14 @@ public sealed class CalculatePayrollRunHandler(
             cancellationToken);
 
         if (summary is null)
+        {
+            (logger ?? NullLogger<CalculatePayrollRunHandler>.Instance).LogWarning(
+                "Attendance summary not found for payroll calculation. PayrollPeriodId: {PayrollPeriodId}, AttendancePeriodId: {AttendancePeriodId}, EmployeeId: {EmployeeId}",
+                request.PayrollPeriodId.Value,
+                period.AttendancePeriodId.Value,
+                request.EmployeeId.Value);
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendanceSummaryNotFound);
+        }
 
         // 8. Calculate details
         var baseSalary = activeSalary.BaseSalary;

@@ -56,6 +56,7 @@ public static class HrBusinessErrorCodes
     public const string AttendanceRecordNotFound = "HR_ATTENDANCE_RECORD_NOT_FOUND";
     public const string AttendancePeriodDuplicated = "HR_ATTENDANCE_PERIOD_DUPLICATED";
     public const string AttendancePeriodLocked = "HR_ATTENDANCE_PERIOD_LOCKED";
+    public const string AttendancePeriodAlreadyLocked = "HR_ATTENDANCE_PERIOD_ALREADY_LOCKED";
     public const string AttendanceRecordAlreadyExists = "HR_ATTENDANCE_RECORD_ALREADY_EXISTS";
     public const string AttendanceInvalidTimeRange = "HR_ATTENDANCE_INVALID_TIME_RANGE";
     public const string AttendanceConcurrencyConflict = "HR_ATTENDANCE_CONCURRENCY_CONFLICT";
@@ -64,6 +65,11 @@ public static class HrBusinessErrorCodes
     public const string PayrollAttendancePeriodNotLinked = "HR_PAYROLL_ATTENDANCE_PERIOD_NOT_LINKED";
     public const string AttendanceSummaryNotFound = "HR_ATTENDANCE_SUMMARY_NOT_FOUND";
     public const string AttendancePeriodNotLocked = "HR_ATTENDANCE_PERIOD_NOT_LOCKED";
+
+    public const string PayrollPeriodAttendancePeriodRequired = "HR_PAYROLL_PERIOD_ATTENDANCE_PERIOD_REQUIRED";
+    public const string AttendanceRecordsNotFoundForPeriod = "HR_ATTENDANCE_RECORDS_NOT_FOUND_FOR_PERIOD";
+    public const string AttendanceSummaryAlreadyExists = "HR_ATTENDANCE_SUMMARY_ALREADY_EXISTS";
+    public const string AttendanceSummaryGenerationFailed = "HR_ATTENDANCE_SUMMARY_GENERATION_FAILED";
 
     public const string PayrollRunNotFinalized = "HR_PAYROLL_RUN_NOT_FINALIZED";
     public const string PayslipInvalidStatus = "HR_PAYSLIP_INVALID_STATUS";
@@ -149,5 +155,3 @@ public static class HrBusinessErrorCodes
     public const string PayslipEmailSendFailed = "HR_PAYSLIP_EMAIL_SEND_FAILED";
     public const string PayslipActiveDocumentRequired = "HR_PAYSLIP_ACTIVE_DOCUMENT_REQUIRED";
 }
-
-
