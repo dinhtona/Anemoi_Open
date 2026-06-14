@@ -7,6 +7,30 @@ Before doing anything, read:
 - docs/architecture/ARCHITECTURE_DECISIONS.md
 - docs/architecture/TECHNICAL_DEBT_REGISTER.md
 
+ERROR CODE RULE
+
+Never use inline string literals for business error codes,
+validation codes, permission codes, route names,
+status codes, or localization keys.
+
+Always reference the appropriate constant from:
+- HrBusinessErrorCodes
+- HrPermissions
+- Permissions
+- TranslationKeys
+- Domain constants
+
+If a constant does not exist:
+1. Create it.
+2. Use the constant.
+3. Do not use raw string literals.
+
+String literals are allowed only for:
+- UI labels in resource files
+- Logging text
+- Test data
+
+
 
 
 

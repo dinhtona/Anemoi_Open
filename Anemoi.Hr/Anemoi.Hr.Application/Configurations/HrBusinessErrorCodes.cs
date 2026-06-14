@@ -143,6 +143,17 @@ public static class HrBusinessErrorCodes
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 
+    // Allowance error codes
+    public const string EmployeeAllowanceNotFound = "HR_EMPLOYEE_ALLOWANCE_NOT_FOUND";
+    public const string AllowanceInvalidEffectiveRange = "HR_ALLOWANCE_INVALID_EFFECTIVE_RANGE";
+    public const string AllowanceTimelineOverlap = "HR_ALLOWANCE_TIMELINE_OVERLAP";
+    public const string AllowanceTimelineDuplicateDate = "HR_ALLOWANCE_TIMELINE_DUPLICATE_DATE";
+    public const string AllowanceAlreadyUsedInPayroll = "HR_ALLOWANCE_ALREADY_USED_IN_PAYROLL";
+    public const string AllowanceConcurrencyConflict = "HR_ALLOWANCE_CONCURRENCY_CONFLICT";
+    public const string AllowanceTypeNotFound = "HR_ALLOWANCE_TYPE_NOT_FOUND";
+    public const string AllowanceTypeCodeAlreadyExists = "HR_ALLOWANCE_TYPE_CODE_ALREADY_EXISTS";
+    public const string AllowanceTypeConcurrencyConflict = "HR_ALLOWANCE_TYPE_CONCURRENCY_CONFLICT";
+
     public const string PayslipNotFound = "HR_PAYSLIP_NOT_FOUND";
     public const string PayslipDocumentNotFound = "HR_PAYSLIP_DOCUMENT_NOT_FOUND";
     public const string PayslipDocumentAlreadyExists = "HR_PAYSLIP_DOCUMENT_ALREADY_EXISTS";

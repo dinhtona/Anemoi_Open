@@ -5,9 +5,12 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.AssignEmployeeAllowance;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.AssignPositionAllowance;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.CreateAllowanceType;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.UpdateAllowanceType;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.DeactivateAllowanceType;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.CreateSalaryGrade;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.CreateSalaryRange;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.TerminateEmployeeAllowance;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.UpdateEmployeeAllowance;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeSalary;
 using Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetAllowanceTypes;
 using Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensationDashboard;
@@ -77,6 +80,17 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(HrPermissions.EmployeeAllowanceChange)]
+    [ProducesResponseType(typeof(UpdateEmployeeAllowanceResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateEmployeeAllowance(
+        [FromBody] UpdateEmployeeAllowanceCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { UpdatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
     [HasPermission(HrPermissions.SalaryGradeManage)]
     [ProducesResponseType(typeof(AssignPositionAllowanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> AssignPositionAllowance(
@@ -92,6 +106,28 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(CreateAllowanceTypeResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateAllowanceType(
         [FromBody] CreateAllowanceTypeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.AllowanceTypeManage)]
+    [ProducesResponseType(typeof(UpdateAllowanceTypeResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateAllowanceType(
+        [FromBody] UpdateAllowanceTypeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.AllowanceTypeManage)]
+    [ProducesResponseType(typeof(DeactivateAllowanceTypeResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeactivateAllowanceType(
+        [FromBody] DeactivateAllowanceTypeCommand command,
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(command, cancellationToken);

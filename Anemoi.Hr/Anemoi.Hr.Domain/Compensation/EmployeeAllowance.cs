@@ -23,6 +23,21 @@ public sealed class EmployeeAllowance : ValueObject
     public Employee Employee { get; set; }
     public AllowanceType AllowanceType { get; set; }
 
+    public void UpdateDetails(
+        decimal amount,
+        string currency,
+        DateOnly effectiveFrom,
+        DateOnly? effectiveTo,
+        string updatedBy)
+    {
+        Amount = amount;
+        Currency = currency;
+        EffectiveFrom = effectiveFrom;
+        EffectiveTo = effectiveTo;
+        UpdatedAt = DateTime.UtcNow;
+        UpdatedBy = updatedBy ?? "system";
+    }
+
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Id;

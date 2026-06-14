@@ -53,7 +53,7 @@ public sealed class AssignEmployeeAllowanceHandler(
         var existingAllowances = await employeeAllowanceRepository.GetManyByConditionAsync(
             x => x.EmployeeId == request.EmployeeId &&
                  x.AllowanceTypeId == request.AllowanceTypeId &&
-                 string.Equals(x.Currency, request.Currency, StringComparison.OrdinalIgnoreCase),
+                 x.Currency == request.Currency,
             null,
             cancellationToken);
 

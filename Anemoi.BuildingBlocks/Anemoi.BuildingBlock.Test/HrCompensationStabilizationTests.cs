@@ -4,12 +4,16 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.AssignEmployeeAllowance;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.UpdateAllowanceType;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.DeactivateAllowanceType;
+using Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.UpdateEmployeeAllowance;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeSalary;
 using Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensationDashboard;
 using Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensationSnapshot;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Infrastructure.Persistence;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MediatR;
@@ -199,6 +203,284 @@ public sealed class HrCompensationStabilizationTests
         Assert.Equal("HR_ALLOWANCE_CONCURRENCY_CONFLICT", result.AsT1.Code);
     }
 
+    [Fact]
+    public void UpdateEmployeeAllowanceValidator_Rejects_ZeroAmount()
+    {
+        var validator = new UpdateEmployeeAllowanceValidator();
+        var command = new UpdateEmployeeAllowanceCommand(
+            new EmployeeAllowanceId(Guid.NewGuid()),
+            0,
+            "USD",
+            new DateOnly(2026, 6, 1),
+            null,
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, x => x.ErrorMessage == "VAL_AMOUNT_MUST_BE_POSITIVE");
+    }
+
+    [Fact]
+    public void UpdateEmployeeAllowanceValidator_Allows_ValidCommand()
+    {
+        var validator = new UpdateEmployeeAllowanceValidator();
+        var command = new UpdateEmployeeAllowanceCommand(
+            new EmployeeAllowanceId(Guid.NewGuid()),
+            500,
+            "USD",
+            new DateOnly(2026, 6, 1),
+            new DateOnly(2026, 12, 31),
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void UpdateEmployeeAllowanceValidator_Rejects_EffectiveToBeforeEffectiveFrom()
+    {
+        var validator = new UpdateEmployeeAllowanceValidator();
+        var command = new UpdateEmployeeAllowanceCommand(
+            new EmployeeAllowanceId(Guid.NewGuid()),
+            500,
+            "USD",
+            new DateOnly(2026, 6, 1),
+            new DateOnly(2026, 5, 31),
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, x => x.ErrorMessage == "HR_ALLOWANCE_INVALID_DATE_RANGE");
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_Rejects_WhenAllowanceNotFound()
+    {
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([]),
+            new FakeRepository<PayrollRun>([]),
+            new FailingUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                new EmployeeAllowanceId(Guid.NewGuid()),
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.EmployeeAllowanceNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_Succeeds_WhenNoPayrollHistory()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+        var allowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 6, 1));
+        allowance.Id = allowanceId;
+
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([allowance]),
+            new FakeRepository<PayrollRun>([]),
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                new DateOnly(2026, 12, 31),
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_Rejects_OverlapWithAnotherAllowanceOfSameEmployeeAndType()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+
+        // Another allowance that overlaps with the new effective range
+        var overlappingAllowance = Allowance(employeeId, allowanceTypeId, 200, "USD", new DateOnly(2026, 3, 1));
+        overlappingAllowance.EffectiveTo = new DateOnly(2026, 9, 30);
+
+        var targetAllowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 10, 1));
+        targetAllowance.Id = allowanceId;
+
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([overlappingAllowance, targetAllowance]),
+            new FakeRepository<PayrollRun>([]),
+            new FakeUnitOfWork());
+
+        // Try to update target to overlap with the existing allowance
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceTimelineOverlap, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_Rejects_DuplicateEffectiveFrom()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+
+        var existingAllowance = Allowance(employeeId, allowanceTypeId, 200, "USD", new DateOnly(2026, 6, 1));
+
+        var targetAllowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 10, 1));
+        targetAllowance.Id = allowanceId;
+
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([existingAllowance, targetAllowance]),
+            new FakeRepository<PayrollRun>([]),
+            new FakeUnitOfWork());
+
+        // Try to set effectiveFrom to the same date as existing
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceTimelineDuplicateDate, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_Rejects_AfterFinalizedPayrollOverlap()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+
+        var payrollPeriodId = new PayrollPeriodId(Guid.NewGuid());
+        var payrollPeriod = new PayrollPeriod
+        {
+            Id = payrollPeriodId,
+            PeriodCode = "2026-06",
+            StartDate = new DateOnly(2026, 6, 1),
+            EndDate = new DateOnly(2026, 6, 30)
+        };
+
+        var payrollRun = new PayrollRun
+        {
+            Id = new PayrollRunId(Guid.NewGuid()),
+            EmployeeId = employeeId,
+            PayrollPeriodId = payrollPeriodId,
+            PayrollPeriod = payrollPeriod,
+        };
+        // Transition to Finalized via lifecycle
+        payrollRun.SubmitForApproval("test", DateTime.UtcNow);
+        payrollRun.Approve("test", DateTime.UtcNow);
+        payrollRun.FinalizeRun("test", DateTime.UtcNow);
+
+        var allowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 6, 1));
+        allowance.Id = allowanceId;
+
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([allowance]),
+            new FakeRepository<PayrollRun>([payrollRun]),
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceAlreadyUsedInPayroll, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_ConcurrencyConflict_ReturnsError()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+
+        var allowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 6, 1));
+        allowance.Id = allowanceId;
+
+        var handler = new UpdateEmployeeAllowanceHandler(
+            new FakeRepository<EmployeeAllowance>([allowance]),
+            new FakeRepository<PayrollRun>([]),
+            new FailingUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "USD",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceConcurrencyConflict, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAllowance_UpdatesAmountAndCurrency()
+    {
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceId = new EmployeeAllowanceId(Guid.NewGuid());
+
+        var allowance = Allowance(employeeId, allowanceTypeId, 300, "USD", new DateOnly(2026, 6, 1));
+        allowance.Id = allowanceId;
+
+        var repo = new FakeRepository<EmployeeAllowance>([allowance]);
+        var handler = new UpdateEmployeeAllowanceHandler(
+            repo,
+            new FakeRepository<PayrollRun>([]),
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateEmployeeAllowanceCommand(
+                allowanceId,
+                500,
+                "VND",
+                new DateOnly(2026, 6, 1),
+                null,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+        Assert.Equal(500, allowance.Amount);
+        Assert.Equal("VND", allowance.Currency);
+    }
+
     private static Employee Employee(EmployeeId id)
     {
         return new Employee
@@ -238,6 +520,191 @@ public sealed class HrCompensationStabilizationTests
         };
     }
 
+    [Fact]
+    public void UpdateAllowanceTypeValidator_Rejects_EmptyName()
+    {
+        var validator = new UpdateAllowanceTypeValidator();
+        var command = new UpdateAllowanceTypeCommand(
+            new AllowanceTypeId(Guid.NewGuid()),
+            "",
+            "desc",
+            true,
+            true,
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, x => x.PropertyName == "Name");
+    }
+
+    [Fact]
+    public void UpdateAllowanceTypeValidator_Rejects_NoConfirmation()
+    {
+        var validator = new UpdateAllowanceTypeValidator();
+        var command = new UpdateAllowanceTypeCommand(
+            new AllowanceTypeId(Guid.NewGuid()),
+            "Test",
+            "desc",
+            true,
+            true,
+            false);
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, x => x.ErrorMessage == HrBusinessErrorCodes.PermissionSensitiveConfirmationRequired);
+    }
+
+    [Fact]
+    public void UpdateAllowanceTypeValidator_Allows_ValidCommand()
+    {
+        var validator = new UpdateAllowanceTypeValidator();
+        var command = new UpdateAllowanceTypeCommand(
+            new AllowanceTypeId(Guid.NewGuid()),
+            "Meal Allowance",
+            "Lunch benefit",
+            true,
+            true,
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public async Task UpdateAllowanceType_Rejects_WhenNotFound()
+    {
+        var handler = new UpdateAllowanceTypeHandler(
+            new FakeRepository<AllowanceType>([]),
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateAllowanceTypeCommand(
+                new AllowanceTypeId(Guid.NewGuid()),
+                "Test",
+                "desc",
+                true,
+                true,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceTypeNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task UpdateAllowanceType_Succeeds_UpdatesName()
+    {
+        var allowanceType = new AllowanceType
+        {
+            Id = new AllowanceTypeId(Guid.NewGuid()),
+            Code = "MEAL",
+            Name = "Old Name",
+            Description = "Old desc",
+            IsTaxable = false,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var repo = new FakeRepository<AllowanceType>([allowanceType]);
+        var handler = new UpdateAllowanceTypeHandler(
+            repo,
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new UpdateAllowanceTypeCommand(
+                allowanceType.Id,
+                "New Name",
+                "New desc",
+                true,
+                false,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+        Assert.Equal("New Name", allowanceType.Name);
+        Assert.Equal("New desc", allowanceType.Description);
+        Assert.True(allowanceType.IsTaxable);
+        Assert.False(allowanceType.IsActive);
+    }
+
+    [Fact]
+    public void DeactivateAllowanceTypeValidator_Rejects_NoConfirmation()
+    {
+        var validator = new DeactivateAllowanceTypeValidator();
+        var command = new DeactivateAllowanceTypeCommand(
+            new AllowanceTypeId(Guid.NewGuid()),
+            false);
+
+        var result = validator.Validate(command);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, x => x.ErrorMessage == HrBusinessErrorCodes.PermissionSensitiveConfirmationRequired);
+    }
+
+    [Fact]
+    public void DeactivateAllowanceTypeValidator_Allows_ValidCommand()
+    {
+        var validator = new DeactivateAllowanceTypeValidator();
+        var command = new DeactivateAllowanceTypeCommand(
+            new AllowanceTypeId(Guid.NewGuid()),
+            true);
+
+        var result = validator.Validate(command);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public async Task DeactivateAllowanceType_Rejects_WhenNotFound()
+    {
+        var handler = new DeactivateAllowanceTypeHandler(
+            new FakeRepository<AllowanceType>([]),
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new DeactivateAllowanceTypeCommand(
+                new AllowanceTypeId(Guid.NewGuid()),
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT1);
+        Assert.Equal(HrBusinessErrorCodes.AllowanceTypeNotFound, result.AsT1.Code);
+    }
+
+    [Fact]
+    public async Task DeactivateAllowanceType_Succeeds()
+    {
+        var allowanceType = new AllowanceType
+        {
+            Id = new AllowanceTypeId(Guid.NewGuid()),
+            Code = "MEAL",
+            Name = "Meal Allowance",
+            Description = "Lunch benefit",
+            IsTaxable = true,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var repo = new FakeRepository<AllowanceType>([allowanceType]);
+        var handler = new DeactivateAllowanceTypeHandler(
+            repo,
+            new FakeUnitOfWork());
+
+        var result = await handler.Handle(
+            new DeactivateAllowanceTypeCommand(
+                allowanceType.Id,
+                true),
+            CancellationToken.None);
+
+        Assert.True(result.IsT0);
+        Assert.False(allowanceType.IsActive);
+    }
+
     private static EmployeeAllowance Allowance(
         EmployeeId employeeId,
         AllowanceTypeId allowanceTypeId,
@@ -260,6 +727,14 @@ public sealed class HrCompensationStabilizationTests
             UpdatedAt = DateTime.UtcNow,
             UpdatedBy = "test"
         };
+    }
+
+    private sealed class FakeUnitOfWork : IUnitOfWork
+    {
+        public Task<OneOf<None, Exception>> SaveChangesAsync(CancellationToken token = default)
+        {
+            return Task.FromResult<OneOf<None, Exception>>(None.Value);
+        }
     }
 
     private sealed class FailingUnitOfWork : IUnitOfWork

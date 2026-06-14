@@ -20,4 +20,19 @@ public sealed class AllowanceType : ValueObject
     {
         yield return Id;
     }
+
+    public void UpdateDetails(string name, string description, bool isTaxable, bool isActive)
+    {
+        Name = name?.Trim();
+        Description = description?.Trim();
+        IsTaxable = isTaxable;
+        IsActive = isActive;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

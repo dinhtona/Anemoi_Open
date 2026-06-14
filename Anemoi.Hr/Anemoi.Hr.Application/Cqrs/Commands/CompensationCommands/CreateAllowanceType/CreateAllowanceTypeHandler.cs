@@ -28,7 +28,7 @@ public sealed class CreateAllowanceTypeHandler(
             cancellationToken);
 
         if (exists)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TYPE_CODE_ALREADY_EXISTS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTypeCodeAlreadyExists);
 
         var newType = new AllowanceType
         {
@@ -46,7 +46,7 @@ public sealed class CreateAllowanceTypeHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateAllowanceTypeResponse { AllowanceTypeId = newType.Id.Value.ToString() };
     }
