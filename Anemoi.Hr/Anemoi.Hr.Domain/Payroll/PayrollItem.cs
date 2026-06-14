@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Domain;
+using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.ModelIds.ModelIds;
 using System.Collections.Generic;
 
@@ -20,6 +21,10 @@ public sealed class PayrollItem : ValueObject
     public decimal BaseSalarySnapshot { get; set; }
     public decimal DailyRateSnapshot { get; set; }
     public decimal BasePayAmount { get; set; }
+
+    // Department snapshot
+    public DepartmentId? DepartmentIdSnapshot { get; set; }
+    public string DepartmentNameSnapshot { get; set; }
 
     // Navigation
     public PayrollRun PayrollRun { get; set; }

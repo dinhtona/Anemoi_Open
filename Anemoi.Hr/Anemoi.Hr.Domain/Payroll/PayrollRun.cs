@@ -16,10 +16,6 @@ public sealed class PayrollRun : ValueObject
     public string EmployeeCode { get; set; }
     public string EmployeeName { get; set; }
 
-    // Department snapshot
-    public DepartmentId? DepartmentIdSnapshot { get; set; }
-    public string DepartmentNameSnapshot { get; set; }
-
     // Compensation snapshot
     public decimal BaseSalary { get; set; }
     public string CurrencyCode { get; set; }

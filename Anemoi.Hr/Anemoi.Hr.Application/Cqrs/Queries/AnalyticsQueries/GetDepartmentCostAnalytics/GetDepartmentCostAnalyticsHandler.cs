@@ -11,26 +11,26 @@ using Microsoft.EntityFrameworkCore;
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetDepartmentCostAnalytics;
 
 public sealed class GetDepartmentCostAnalyticsHandler(
-    ISqlRepository<PayrollRun> payrollRunRepository)
+    ISqlRepository<PayrollItem> payrollItemRepository)
     : IQueryHandler<GetDepartmentCostAnalyticsQuery, ICollection<DepartmentCostItem>>
 {
     public async Task<ICollection<DepartmentCostItem>> Handle(
         GetDepartmentCostAnalyticsQuery request,
         CancellationToken cancellationToken)
     {
-        var payrollData = await payrollRunRepository.GetQueryable()
-            .Where(x => x.Status == PayrollRunStatus.Finalized)
+        var payrollData = await payrollItemRepository.GetQueryable()
+            .Where(x => x.PayrollRun.Status == PayrollRunStatus.Finalized)
             .AsNoTracking()
             .Select(x => new
             {
                 DeptId = x.DepartmentIdSnapshot != null
                     ? x.DepartmentIdSnapshot.Value
-                    : x.Employee.PrimaryDepartmentId.Value,
+                    : x.PayrollRun.Employee.PrimaryDepartmentId.Value,
                 DeptName = x.DepartmentNameSnapshot != null
                     ? x.DepartmentNameSnapshot
-                    : x.Employee.PrimaryDepartment.Name,
-                x.NetAmount,
-                x.EmployeeId
+                    : x.PayrollRun.Employee.PrimaryDepartment.Name,
+                x.BasePayAmount,
+                EmployeeId = x.PayrollRun.EmployeeId
             })
             .ToListAsync(cancellationToken);
 
@@ -39,7 +39,7 @@ public sealed class GetDepartmentCostAnalyticsHandler(
             .Select(g => new DepartmentCostItem(
                 g.Key.DeptId,
                 g.Key.DeptName,
-                g.Sum(x => x.NetAmount),
+                g.Sum(x => x.BasePayAmount),
                 g.Select(x => x.EmployeeId).Distinct().Count()
             ))
             .OrderByDescending(x => x.PayrollCost)

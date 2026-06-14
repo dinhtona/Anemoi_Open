@@ -79,7 +79,17 @@ public sealed class HrAnalyticsTests
             CreateFinalizedPayrollRun("10000000-0000-0000-0000-000000000003", "20000000-0000-0000-0000-000000000012", "30000000-0000-0000-0000-000000000020", 3000)
         };
 
-        var handler = new GetPayrollAnalyticsHandler(new FakeRepository<PayrollRun>(runs));
+        var payrollItems = runs.Select(r => CreatePayrollItem(
+            Guid.NewGuid().ToString(),
+            r.Id.Value.ToString(),
+            r.NetAmount,
+            r.NetAmount)).ToList();
+
+        // Set navigation properties
+        foreach (var item in payrollItems)
+            item.PayrollRun = runs.Single(r => r.Id == item.PayrollRunId);
+
+        var handler = new GetPayrollAnalyticsHandler(new FakeRepository<PayrollItem>(payrollItems));
 
         var result = await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None);
 
@@ -122,8 +132,19 @@ public sealed class HrAnalyticsTests
             CalculatedBy = "test"
         };
 
+        var runs = new List<PayrollRun> { finalizedRun, calculatedRun };
+
+        var payrollItems = runs.Select(r => CreatePayrollItem(
+            Guid.NewGuid().ToString(),
+            r.Id.Value.ToString(),
+            r.NetAmount,
+            r.NetAmount)).ToList();
+
+        foreach (var item in payrollItems)
+            item.PayrollRun = runs.Single(r => r.Id == item.PayrollRunId);
+
         var handler = new GetPayrollAnalyticsHandler(
-            new FakeRepository<PayrollRun>([finalizedRun, calculatedRun]));
+            new FakeRepository<PayrollItem>(payrollItems));
 
         var result = await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None);
 
@@ -189,20 +210,33 @@ public sealed class HrAnalyticsTests
                 "30000000-0000-0000-0000-000000000001",
                 "40000000-0000-0000-0000-000000000010",
                 "50000000-0000-0000-0000-000000000020",
-                1000, "10000000-0000-0000-0000-000000000001", "Engineering"),
+                1000),
             CreateFinalizedPayrollRun(
                 "30000000-0000-0000-0000-000000000002",
                 "40000000-0000-0000-0000-000000000011",
                 "50000000-0000-0000-0000-000000000020",
-                1000, "10000000-0000-0000-0000-000000000001", "Engineering"),
+                1000),
             CreateFinalizedPayrollRun(
                 "30000000-0000-0000-0000-000000000003",
                 "40000000-0000-0000-0000-000000000012",
                 "50000000-0000-0000-0000-000000000020",
-                500, "20000000-0000-0000-0000-000000000002", "Marketing")
+                500)
         };
 
-        var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollRun>(runs));
+        var payrollItems = new List<PayrollItem>
+        {
+            CreatePayrollItem("60000000-0000-0000-0000-000000000001", "30000000-0000-0000-0000-000000000001",
+                1000, 1000, "10000000-0000-0000-0000-000000000001", "Engineering"),
+            CreatePayrollItem("60000000-0000-0000-0000-000000000002", "30000000-0000-0000-0000-000000000002",
+                1000, 1000, "10000000-0000-0000-0000-000000000001", "Engineering"),
+            CreatePayrollItem("60000000-0000-0000-0000-000000000003", "30000000-0000-0000-0000-000000000003",
+                500, 500, "20000000-0000-0000-0000-000000000002", "Marketing")
+        };
+
+        foreach (var item in payrollItems)
+            item.PayrollRun = runs.Single(r => r.Id == item.PayrollRunId);
+
+        var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollItem>(payrollItems));
 
         var result = await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None);
 
@@ -228,10 +262,16 @@ public sealed class HrAnalyticsTests
             "40000000-0000-0000-0000-000000000001",
             "30000000-0000-0000-0000-000000000010",
             "50000000-0000-0000-0000-000000000020",
-            1000, "20000000-0000-0000-0000-000000000002", "Marketing");
+            1000);
         run.Employee = employee;
 
-        var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollRun>([run]));
+        var item = CreatePayrollItem(
+            "60000000-0000-0000-0000-000000000001",
+            "40000000-0000-0000-0000-000000000001",
+            1000, 1000, "20000000-0000-0000-0000-000000000002", "Marketing");
+        item.PayrollRun = run;
+
+        var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollItem>([item]));
 
         var result = await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None);
 
@@ -246,15 +286,24 @@ public sealed class HrAnalyticsTests
         var runId1 = new PayrollRunId(Guid.Parse("10000000-0000-0000-0000-000000000001"));
         var runId2 = new PayrollRunId(Guid.Parse("20000000-0000-0000-0000-000000000002"));
 
-        var emp1 = new EmployeeId(Guid.Parse("30000000-0000-0000-0000-000000000010"));
-        var emp2 = new EmployeeId(Guid.Parse("30000000-0000-0000-0000-000000000011"));
-        var emp3 = new EmployeeId(Guid.Parse("30000000-0000-0000-0000-000000000012"));
-
         var periodId = new PayrollPeriodId(Guid.Parse("40000000-0000-0000-0000-000000000020"));
 
-        var run1 = CreateFinalizedPayrollRunForTopEarner(runId1, emp1, periodId, "EMP001", "Alice", 3000, "Engineering");
-        var run2 = CreateFinalizedPayrollRunForTopEarner(runId2, emp2, periodId, "EMP002", "Bob", 2000, "Marketing");
-        var run3 = CreateFinalizedPayrollRunForTopEarner(runId1, emp3, periodId, "EMP003", "Charlie", 1000, "Engineering");
+        var engDept = CreateDepartment("50000000-0000-0000-0000-000000000001", "Engineering");
+        var mktDept = CreateDepartment("50000000-0000-0000-0000-000000000002", "Marketing");
+
+        var emp1Obj = CreateEmployee("30000000-0000-0000-0000-000000000010", engDept.Id, "active");
+        emp1Obj.PrimaryDepartment = engDept;
+        var emp2Obj = CreateEmployee("30000000-0000-0000-0000-000000000011", mktDept.Id, "active");
+        emp2Obj.PrimaryDepartment = mktDept;
+        var emp3Obj = CreateEmployee("30000000-0000-0000-0000-000000000012", engDept.Id, "active");
+        emp3Obj.PrimaryDepartment = engDept;
+
+        var run1 = CreateFinalizedPayrollRunForTopEarner(runId1, emp1Obj.Id, periodId, "EMP001", "Alice", 3000);
+        run1.Employee = emp1Obj;
+        var run2 = CreateFinalizedPayrollRunForTopEarner(runId2, emp2Obj.Id, periodId, "EMP002", "Bob", 2000);
+        run2.Employee = emp2Obj;
+        var run3 = CreateFinalizedPayrollRunForTopEarner(runId1, emp3Obj.Id, periodId, "EMP003", "Charlie", 1000);
+        run3.Employee = emp3Obj;
 
         var handler = new GetTopEarnersHandler(new FakeRepository<PayrollRun>([run1, run2, run3]));
 
@@ -269,19 +318,26 @@ public sealed class HrAnalyticsTests
     [Fact]
     public async Task TopEarners_UsesLatestRunWhenNoIdProvided()
     {
-        var emp1 = new EmployeeId(Guid.Parse("30000000-0000-0000-0000-000000000010"));
-        var emp2 = new EmployeeId(Guid.Parse("30000000-0000-0000-0000-000000000011"));
-
         var periodId = new PayrollPeriodId(Guid.Parse("40000000-0000-0000-0000-000000000020"));
+
+        var engDept = CreateDepartment("50000000-0000-0000-0000-000000000001", "Engineering");
+        var mktDept = CreateDepartment("50000000-0000-0000-0000-000000000002", "Marketing");
+
+        var emp1Obj = CreateEmployee("30000000-0000-0000-0000-000000000010", engDept.Id, "active");
+        emp1Obj.PrimaryDepartment = engDept;
+        var emp2Obj = CreateEmployee("30000000-0000-0000-0000-000000000011", mktDept.Id, "active");
+        emp2Obj.PrimaryDepartment = mktDept;
 
         var earlierRun = CreateFinalizedPayrollRunForTopEarner(
             new PayrollRunId(Guid.Parse("10000000-0000-0000-0000-000000000001")),
-            emp1, periodId, "EMP001", "Alice", 3000, "Engineering");
+            emp1Obj.Id, periodId, "EMP001", "Alice", 3000);
+        earlierRun.Employee = emp1Obj;
         SetFinalizedAt(earlierRun, new DateTime(2025, 6, 1, 0, 0, 0, DateTimeKind.Utc));
 
         var laterRun = CreateFinalizedPayrollRunForTopEarner(
             new PayrollRunId(Guid.Parse("20000000-0000-0000-0000-000000000002")),
-            emp2, periodId, "EMP002", "Bob", 2000, "Marketing");
+            emp2Obj.Id, periodId, "EMP002", "Bob", 2000);
+        laterRun.Employee = emp2Obj;
         SetFinalizedAt(laterRun, new DateTime(2025, 7, 1, 0, 0, 0, DateTimeKind.Utc));
 
         var handler = new GetTopEarnersHandler(new FakeRepository<PayrollRun>([earlierRun, laterRun]));
@@ -367,7 +423,7 @@ public sealed class HrAnalyticsTests
         };
     }
 
-    private static PayrollRun CreateFinalizedPayrollRun(string id, string employeeId, string periodId, decimal netAmount, string deptId = null, string deptName = null)
+    private static PayrollRun CreateFinalizedPayrollRun(string id, string employeeId, string periodId, decimal netAmount)
     {
         var run = new PayrollRun
         {
@@ -392,17 +448,11 @@ public sealed class HrAnalyticsTests
             CalculatedBy = "test"
         };
 
-        if (deptId != null)
-        {
-            run.DepartmentIdSnapshot = new DepartmentId(Guid.Parse(deptId));
-            run.DepartmentNameSnapshot = deptName;
-        }
-
         typeof(PayrollRun).GetProperty("Status")!.SetValue(run, PayrollRunStatus.Finalized);
         return run;
     }
 
-    private static PayrollRun CreateFinalizedPayrollRunForTopEarner(PayrollRunId id, EmployeeId employeeId, PayrollPeriodId periodId, string empCode, string empName, decimal netAmount, string deptName)
+    private static PayrollRun CreateFinalizedPayrollRunForTopEarner(PayrollRunId id, EmployeeId employeeId, PayrollPeriodId periodId, string empCode, string empName, decimal netAmount)
     {
         var run = new PayrollRun
         {
@@ -423,7 +473,6 @@ public sealed class HrAnalyticsTests
             UnpaidLeaveDays = 0,
             DailyRate = netAmount / 22,
             BasePayAmount = netAmount,
-            DepartmentNameSnapshot = deptName,
             CalculatedAt = DateTime.UtcNow,
             CalculatedBy = "test"
         };
@@ -431,6 +480,34 @@ public sealed class HrAnalyticsTests
         typeof(PayrollRun).GetProperty("Status")!.SetValue(run, PayrollRunStatus.Finalized);
         typeof(PayrollRun).GetProperty("FinalizedAt")!.SetValue(run, DateTime.UtcNow);
         return run;
+    }
+
+    private static PayrollItem CreatePayrollItem(string id, string payrollRunId, decimal basePayAmount, decimal baseSalarySnapshot, string deptId = null, string deptName = null)
+    {
+        var item = new PayrollItem
+        {
+            Id = new PayrollItemId(Guid.Parse(id)),
+            PayrollRunId = new PayrollRunId(Guid.Parse(payrollRunId)),
+            ItemCode = "BASE",
+            ItemName = "Base Pay",
+            ItemTypeCode = PayrollItemType.BasePay,
+            Amount = basePayAmount,
+            CurrencyCode = "VND",
+            PaidWorkingDays = 22,
+            PaidLeaveDays = 0,
+            UnpaidLeaveDays = 0,
+            BaseSalarySnapshot = baseSalarySnapshot,
+            DailyRateSnapshot = baseSalarySnapshot / 22,
+            BasePayAmount = basePayAmount
+        };
+
+        if (deptId != null)
+        {
+            item.DepartmentIdSnapshot = new DepartmentId(Guid.Parse(deptId));
+            item.DepartmentNameSnapshot = deptName;
+        }
+
+        return item;
     }
 
     private static void SetFinalizedAt(PayrollRun run, DateTime finalizedAt)

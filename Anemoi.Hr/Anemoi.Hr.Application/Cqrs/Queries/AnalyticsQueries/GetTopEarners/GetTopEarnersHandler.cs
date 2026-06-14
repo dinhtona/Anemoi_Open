@@ -43,7 +43,9 @@ public sealed class GetTopEarnersHandler(
             {
                 EmployeeId = x.EmployeeId.Value,
                 x.EmployeeName,
-                DepartmentName = x.DepartmentNameSnapshot ?? x.Employee.PrimaryDepartment.Name,
+                DepartmentName = x.PayrollItems
+                    .Select(pi => pi.DepartmentNameSnapshot)
+                    .FirstOrDefault() ?? x.Employee.PrimaryDepartment.Name,
                 x.NetAmount
             })
             .ToListAsync(cancellationToken);

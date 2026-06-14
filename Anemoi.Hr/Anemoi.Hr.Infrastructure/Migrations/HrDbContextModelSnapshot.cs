@@ -1883,6 +1883,13 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
 
+                    b.Property<Guid?>("DepartmentIdSnapshot")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DepartmentNameSnapshot")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("ItemCode")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -2032,13 +2039,6 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     b.Property<decimal>("DailyRate")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
-
-                    b.Property<Guid?>("DepartmentIdSnapshot")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DepartmentNameSnapshot")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("EmployeeCode")
                         .IsRequired()
