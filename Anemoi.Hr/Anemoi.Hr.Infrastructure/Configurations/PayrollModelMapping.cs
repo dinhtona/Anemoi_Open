@@ -66,6 +66,17 @@ public sealed class PayrollModelMapping :
         builder.Property(x => x.EmployeeName).HasMaxLength(256).IsRequired();
         builder.Property(x => x.CurrencyCode).HasMaxLength(16).IsRequired();
         builder.Property(x => x.PayScheduleType).HasMaxLength(64).IsRequired();
+
+        builder.Property(x => x.DepartmentIdSnapshot)
+            .HasConversion(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? new DepartmentId(value.Value) : null)
+            .IsRequired(false);
+
+        builder.Property(x => x.DepartmentNameSnapshot)
+            .HasMaxLength(256)
+            .IsRequired(false);
+
         builder.Property(x => x.CalculatedBy).HasMaxLength(128).IsRequired();
 
         builder.Property(x => x.Status)
