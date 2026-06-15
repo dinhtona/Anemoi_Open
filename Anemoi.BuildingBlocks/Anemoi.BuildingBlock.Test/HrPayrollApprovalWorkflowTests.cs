@@ -24,6 +24,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using OneOf;
 using Xunit;
+using MassTransit;
+using NSubstitute;
 
 namespace Anemoi.BuildingBlock.Test;
 
@@ -138,6 +140,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         var handler = new SubmitPayrollRunForApprovalHandler(
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
+            Substitute.For<IPublishEndpoint>(),
             new PayrollMapper()
         );
 
@@ -175,6 +178,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         var handler = new ApprovePayrollRunHandler(
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
+            Substitute.For<IPublishEndpoint>(),
             new PayrollMapper()
         );
 
@@ -212,6 +216,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         var handler = new RejectPayrollRunHandler(
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
+            Substitute.For<IPublishEndpoint>(),
             new PayrollMapper()
         );
 
@@ -244,6 +249,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         var handler = new RejectPayrollRunHandler(
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
+            Substitute.For<IPublishEndpoint>(),
             new PayrollMapper()
         );
 
@@ -271,6 +277,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         var handler = new FinalizePayrollRunHandler(
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
+            Substitute.For<IPublishEndpoint>(),
             new PayrollMapper()
         );
 

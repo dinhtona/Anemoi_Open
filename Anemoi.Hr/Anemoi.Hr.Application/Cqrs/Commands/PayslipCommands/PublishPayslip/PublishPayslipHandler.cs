@@ -4,9 +4,11 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using OneOf;
 using System;
 using System.Threading;
@@ -17,6 +19,7 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.PublishPayslip;
 public sealed class PublishPayslipHandler(
     ISqlRepository<Payslip> payslipRepository,
     IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint,
     PayslipMapper mapper)
     : ICommandHandler<PublishPayslipCommand, OneOf<PayslipResponse, ErrorDetailResponse>>
 {
@@ -38,6 +41,10 @@ public sealed class PublishPayslipHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
             return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+
+        await publishEndpoint.Publish(new PayslipPublishedIntegrationEvent(
+            payslip.Id.Value.ToString(),
+            payslip.EmployeeId.Value.ToString()), cancellationToken);
 
         return mapper.ToResponse(payslip);
     }

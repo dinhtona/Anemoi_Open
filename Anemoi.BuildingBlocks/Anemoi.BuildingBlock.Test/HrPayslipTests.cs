@@ -24,6 +24,8 @@ using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore.Query;
 using OneOf;
 using Xunit;
+using MassTransit;
+using NSubstitute;
 
 namespace Anemoi.BuildingBlock.Test;
 
@@ -253,7 +255,7 @@ public sealed class HrPayslipTests
         var uow = new FakeUnitOfWork();
         var mapper = new PayslipMapper();
 
-        var handler = new PublishPayslipHandler(payslipRepo, uow, mapper);
+        var handler = new PublishPayslipHandler(payslipRepo, uow, Substitute.For<IPublishEndpoint>(), mapper);
 
         // Act
         var result = await handler.Handle(
@@ -283,7 +285,7 @@ public sealed class HrPayslipTests
         var uow = new FakeUnitOfWork();
         var mapper = new PayslipMapper();
 
-        var handler = new PublishPayslipHandler(payslipRepo, uow, mapper);
+        var handler = new PublishPayslipHandler(payslipRepo, uow, Substitute.For<IPublishEndpoint>(), mapper);
 
         // Act
         var result = await handler.Handle(
@@ -311,7 +313,7 @@ public sealed class HrPayslipTests
         var uow = new FakeUnitOfWork();
         var mapper = new PayslipMapper();
 
-        var handler = new CancelPayslipHandler(payslipRepo, uow, mapper);
+        var handler = new CancelPayslipHandler(payslipRepo, uow, Substitute.For<IPublishEndpoint>(), mapper);
 
         // Act
         var result = await handler.Handle(
@@ -339,7 +341,7 @@ public sealed class HrPayslipTests
         var uow = new FakeUnitOfWork();
         var mapper = new PayslipMapper();
 
-        var handler = new CancelPayslipHandler(payslipRepo, uow, mapper);
+        var handler = new CancelPayslipHandler(payslipRepo, uow, Substitute.For<IPublishEndpoint>(), mapper);
 
         // Act
         var result = await handler.Handle(

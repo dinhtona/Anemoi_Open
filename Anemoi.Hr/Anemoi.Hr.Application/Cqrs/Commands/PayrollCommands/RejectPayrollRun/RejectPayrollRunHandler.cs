@@ -4,9 +4,11 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using System;
@@ -18,6 +20,7 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RejectPayrollRun;
 public sealed class RejectPayrollRunHandler(
     ISqlRepository<PayrollRun> payrollRunRepository,
     IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint,
     PayrollMapper mapper)
     : ICommandHandler<RejectPayrollRunCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
 {
@@ -42,6 +45,10 @@ public sealed class RejectPayrollRunHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
             return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+
+        await publishEndpoint.Publish(new PayrollRunRejectedIntegrationEvent(
+            run.Id.Value.ToString(),
+            request.RejectedBy ?? PayrollConstants.SystemActor), cancellationToken);
 
         return mapper.ToDetailResponse(run);
     }
