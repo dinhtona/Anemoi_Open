@@ -45,7 +45,7 @@ public sealed class PayslipPublishedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.payslip.published.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.payslip.published.content",
             Category: NotificationConstants.Categories.Payroll,
             ActionUrl: "/ess/payslips",
             DeduplicationKey: $"payslip:{message.PayslipId}:published:{userId}",
@@ -91,7 +91,7 @@ public sealed class PayslipCancelledConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.payslip.cancelled.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.payslip.cancelled.content",
             Category: NotificationConstants.Categories.Payroll,
             ActionUrl: "/ess/payslips",
             DeduplicationKey: $"payslip:{message.PayslipId}:cancelled:{userId}",

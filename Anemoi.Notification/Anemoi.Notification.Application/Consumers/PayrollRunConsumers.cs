@@ -58,7 +58,7 @@ public sealed class PayrollRunSubmittedConsumer(
                 var command = new CreateNotificationCommand(
                     UserId: userId,
                     TitleLocalizationKey: "notification.payroll.submitted.title",
-                    ContentLocalizationKey: null,
+                    ContentLocalizationKey: "notification.payroll.submitted.content",
                     Category: NotificationConstants.Categories.Payroll,
                     ActionUrl: "/hr/payroll",
                     DeduplicationKey: $"payroll:{message.PayrollRunId}:submitted:{userId}",
@@ -125,7 +125,7 @@ public sealed class PayrollRunApprovedConsumer(
                 var command = new CreateNotificationCommand(
                     UserId: userId,
                     TitleLocalizationKey: "notification.payroll.approved.title",
-                    ContentLocalizationKey: null,
+                    ContentLocalizationKey: "notification.payroll.approved.content",
                     Category: NotificationConstants.Categories.Payroll,
                     ActionUrl: "/hr/payroll",
                     DeduplicationKey: $"payroll:{message.PayrollRunId}:approved:{userId}",
@@ -192,7 +192,7 @@ public sealed class PayrollRunRejectedConsumer(
                 var command = new CreateNotificationCommand(
                     UserId: userId,
                     TitleLocalizationKey: "notification.payroll.rejected.title",
-                    ContentLocalizationKey: null,
+                    ContentLocalizationKey: "notification.payroll.rejected.content",
                     Category: NotificationConstants.Categories.Payroll,
                     ActionUrl: "/hr/payroll",
                     DeduplicationKey: $"payroll:{message.PayrollRunId}:rejected:{userId}",
@@ -259,7 +259,7 @@ public sealed class PayrollRunFinalizedConsumer(
                 var command = new CreateNotificationCommand(
                     UserId: userId,
                     TitleLocalizationKey: "notification.payroll.finalized.title",
-                    ContentLocalizationKey: null,
+                    ContentLocalizationKey: "notification.payroll.finalized.content",
                     Category: NotificationConstants.Categories.Payroll,
                     ActionUrl: "/hr/payroll",
                     DeduplicationKey: $"payroll:{message.PayrollRunId}:finalized:{userId}",

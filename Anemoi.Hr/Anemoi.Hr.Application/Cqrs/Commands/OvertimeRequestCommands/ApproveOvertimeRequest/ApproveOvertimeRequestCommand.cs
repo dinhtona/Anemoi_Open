@@ -6,5 +6,5 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OvertimeRequestCommands.ApproveOvertimeRequest;
 
 public sealed record ApproveOvertimeRequestCommand(
-    OvertimeRequestId Id,
+    OvertimeRequestId? Id,
     string ApprovedBy) : ICommandResult<SuccessResponse>;

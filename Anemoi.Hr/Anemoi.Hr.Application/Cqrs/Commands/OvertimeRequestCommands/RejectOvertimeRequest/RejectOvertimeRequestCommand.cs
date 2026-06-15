@@ -6,6 +6,6 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OvertimeRequestCommands.RejectOvertimeRequest;
 
 public sealed record RejectOvertimeRequestCommand(
-    OvertimeRequestId Id,
+    OvertimeRequestId? Id,
     string RejectedBy,
     string Reason = null) : ICommandResult<SuccessResponse>;

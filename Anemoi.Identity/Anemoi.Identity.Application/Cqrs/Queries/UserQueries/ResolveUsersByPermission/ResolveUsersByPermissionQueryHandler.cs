@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Identity.Queries.UserQueries.ResolveUsersByPermission;
 using Anemoi.Identity.Application.Abstractions;

@@ -51,7 +51,7 @@ public sealed class OvertimeRequestCreatedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.overtime.submitted.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.overtime.submitted.content",
             Category: NotificationConstants.Categories.Overtime,
             ActionUrl: "/hr/overtime",
             DeduplicationKey: $"overtime:{message.OvertimeRequestId}:submitted:{userId}",
@@ -97,7 +97,7 @@ public sealed class OvertimeRequestApprovedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.overtime.approved.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.overtime.approved.content",
             Category: NotificationConstants.Categories.Overtime,
             ActionUrl: "/ess/overtime",
             DeduplicationKey: $"overtime:{message.OvertimeRequestId}:approved:{userId}",
@@ -143,7 +143,7 @@ public sealed class OvertimeRequestRejectedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.overtime.rejected.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.overtime.rejected.content",
             Category: NotificationConstants.Categories.Overtime,
             ActionUrl: "/ess/overtime",
             DeduplicationKey: $"overtime:{message.OvertimeRequestId}:rejected:{userId}",
@@ -189,7 +189,7 @@ public sealed class OvertimeRequestCancelledConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.overtime.cancelled.title",
-            ContentLocalizationKey: null,
+            ContentLocalizationKey: "notification.overtime.cancelled.content",
             Category: NotificationConstants.Categories.Overtime,
             ActionUrl: "/ess/overtime",
             DeduplicationKey: $"overtime:{message.OvertimeRequestId}:cancelled:{userId}",

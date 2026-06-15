@@ -6,5 +6,5 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OvertimeRequestCommands.CancelOvertimeRequest;
 
 public sealed record CancelOvertimeRequestCommand(
-    OvertimeRequestId Id,
+    OvertimeRequestId? Id,
     string CancelledBy) : ICommandResult<SuccessResponse>;
