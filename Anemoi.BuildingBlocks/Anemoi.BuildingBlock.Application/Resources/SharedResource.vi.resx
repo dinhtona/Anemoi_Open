@@ -260,6 +260,24 @@
   <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>Lịch</value></data>
   <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>Xem lịch và ngày lễ</value></data>
   <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Quản lý lịch, ngày lễ và ngoại lệ</value></data>
+  <data name="PermissionGroupHrPayroll" xml:space="preserve"><value>Bảng lương</value></data>
+  <data name="PermissionDescriptionHrPayrollView" xml:space="preserve"><value>Xem kỳ lương và bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollCalculate" xml:space="preserve"><value>Tính toán bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollApprove" xml:space="preserve"><value>Phê duyệt và từ chối bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollLock" xml:space="preserve"><value>Khóa kỳ lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollExport" xml:space="preserve"><value>Xuất dữ liệu bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentView" xml:space="preserve"><value>Xem phiếu lương.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentGenerate" xml:space="preserve"><value>Tạo phiếu lương PDF.</value></data>
+  <data name="PermissionDescriptionHrPayslipEmailSend" xml:space="preserve"><value>Gửi email phiếu lương.</value></data>
+  <data name="PermissionGroupHrEss" xml:space="preserve"><value>Tự phục vụ nhân viên</value></data>
+  <data name="PermissionDescriptionHrEssProfileView" xml:space="preserve"><value>Xem hồ sơ cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveView" xml:space="preserve"><value>Xem đơn nghỉ phép của bản thân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveRequest" xml:space="preserve"><value>Gửi và hủy đơn nghỉ phép qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssAttendanceView" xml:space="preserve"><value>Xem dữ liệu chấm công cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeView" xml:space="preserve"><value>Xem yêu cầu làm thêm giờ của bản thân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeCreate" xml:space="preserve"><value>Gửi yêu cầu làm thêm giờ qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayrollView" xml:space="preserve"><value>Xem lịch sử lương cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>Xem phiếu lương cá nhân qua ESS.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>Xem các báo cáo lương nâng cao.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Xuất các báo cáo lương nâng cao ra file CSV.</value></data>
 </root>

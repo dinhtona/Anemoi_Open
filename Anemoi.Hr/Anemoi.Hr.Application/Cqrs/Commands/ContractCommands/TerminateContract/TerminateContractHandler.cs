@@ -51,14 +51,14 @@ public sealed class TerminateContractHandler(
             TerminationAttachmentId = request.TerminationAttachmentId
         };
         contract.UpdatedAt = DateTime.UtcNow;
-        contract.UpdatedBy = request.UpdatedBy ?? "system";
+        contract.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ContractConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToDetailResponse(contract);

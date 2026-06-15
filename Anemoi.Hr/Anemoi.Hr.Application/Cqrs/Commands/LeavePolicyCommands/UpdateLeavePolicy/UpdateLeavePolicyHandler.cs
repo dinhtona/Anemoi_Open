@@ -28,6 +28,6 @@ public sealed class UpdateLeavePolicyHandler(ISqlRepository<LeavePolicy> leavePo
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         return saveResult.Match<OneOf<None, ErrorDetailResponse>>(
             _ => None.Value,
-            _ => HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED"));
+            _ => HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed));
     }
 }

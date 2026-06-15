@@ -45,7 +45,7 @@ public sealed class ApproveOvertimeRequestHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.OvertimeRequestConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         await publishEndpoint.Publish(new OvertimeRequestApprovedIntegrationEvent(

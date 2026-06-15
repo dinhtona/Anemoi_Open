@@ -1,11 +1,13 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
-using Microsoft.EntityFrameworkCore;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.ShiftManagement;
+using Anemoi.Hr.ModelIds.ModelIds;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.ShiftManagementCommands.AssignShiftToEmployee;
@@ -51,6 +53,7 @@ public sealed class AssignShiftToEmployeeHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ShiftAssignmentOverlap);
 
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(IdGenerator.NextGuid()),
             request.EmployeeId,
             shiftTemplate,
             request.WorkDate,

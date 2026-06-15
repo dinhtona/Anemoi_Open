@@ -85,7 +85,7 @@ public sealed class UpdateContractHandler(
                     }
                 }
                 prevContract.UpdatedAt = DateTime.UtcNow;
-                prevContract.UpdatedBy = request.UpdatedBy ?? "system";
+                prevContract.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
             }
         }
 
@@ -98,7 +98,7 @@ public sealed class UpdateContractHandler(
         contract.Notes = request.Notes;
         contract.AttachmentFileId = request.AttachmentFileId;
         contract.UpdatedAt = DateTime.UtcNow;
-        contract.UpdatedBy = request.UpdatedBy ?? "system";
+        contract.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         if (request.Activate)
         {
@@ -110,7 +110,7 @@ public sealed class UpdateContractHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ContractConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToDetailResponse(contract);

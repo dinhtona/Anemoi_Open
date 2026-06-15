@@ -8,9 +8,9 @@ public sealed class AssignPositionAllowanceValidator : AbstractValidator<AssignP
 {
     public AssignPositionAllowanceValidator()
     {
-        RuleFor(x => x.PositionId).RequiredId("VAL_POSITION_ID_REQUIRED");
-        RuleFor(x => x.AllowanceTypeId).RequiredId("VAL_ALLOWANCE_TYPE_ID_REQUIRED");
-        RuleFor(x => x.Amount).GreaterThan(0).WithMessage("VAL_AMOUNT_MUST_BE_POSITIVE");
+        RuleFor(x => x.PositionId).RequiredId(HrBusinessErrorCodes.ValPositionIdRequired);
+        RuleFor(x => x.AllowanceTypeId).RequiredId(HrBusinessErrorCodes.ValAllowanceTypeIdRequired);
+        RuleFor(x => x.Amount).GreaterThan(0).WithMessage(HrBusinessErrorCodes.ValAmountMustBePositive);
         RuleFor(x => x.Currency).NotEmpty().MaximumLength(16);
         
         RuleFor(x => x.SensitivePermissionConfirmed)

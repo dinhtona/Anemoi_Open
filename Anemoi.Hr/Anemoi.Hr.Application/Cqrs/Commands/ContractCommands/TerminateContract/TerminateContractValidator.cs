@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,7 +8,7 @@ public sealed class TerminateContractValidator : AbstractValidator<TerminateCont
 {
     public TerminateContractValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_CONTRACT_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValContractIdRequired);
         RuleFor(x => x.TerminationDate).NotEmpty();
         RuleFor(x => x.ReasonCode).NotEmpty().MaximumLength(64);
         RuleFor(x => x.Notes).MaximumLength(1024);

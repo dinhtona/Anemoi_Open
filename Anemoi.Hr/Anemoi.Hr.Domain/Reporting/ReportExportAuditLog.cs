@@ -27,6 +27,7 @@ public sealed class ReportExportAuditLog : Entity<ReportExportAuditLogId>
     private ReportExportAuditLog() { }
 
     public static ReportExportAuditLog Export(
+        ReportExportAuditLogId id,
         string moduleCode,
         string reportType,
         string exportedBy,
@@ -62,7 +63,7 @@ public sealed class ReportExportAuditLog : Entity<ReportExportAuditLogId>
 
         var auditLog = new ReportExportAuditLog
         {
-            Id = new ReportExportAuditLogId(Guid.NewGuid()),
+            Id = id,
             ModuleCode = moduleCode,
             ReportType = reportType,
             ExportedBy = exportedBy,

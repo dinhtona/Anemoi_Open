@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
@@ -61,6 +62,7 @@ public sealed class BulkAssignShiftHandler(
                 continue;
 
             var assignment = EmployeeShiftAssignment.Create(
+                new EmployeeShiftAssignmentId(IdGenerator.NextGuid()),
                 employeeId,
                 shiftTemplate,
                 request.WorkDate,

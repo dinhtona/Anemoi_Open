@@ -25,7 +25,7 @@ public sealed class UpdateTaxBracketHandler(
     {
         if (!Guid.TryParse(request.Id, out var bracketGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketNotFound);
         }
 
         var bracketId = new TaxBracketId(bracketGuid);
@@ -35,7 +35,7 @@ public sealed class UpdateTaxBracketHandler(
 
         if (bracket is null)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketNotFound);
         }
 
         var ruleSet = await ruleSetRepository.GetFirstByConditionAsync(
@@ -44,27 +44,27 @@ public sealed class UpdateTaxBracketHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status != "Draft")
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
 
         if (request.FromAmount < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_FROM_AMOUNT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidFromAmount);
         }
 
         if (request.ToAmount.HasValue && request.ToAmount.Value <= request.FromAmount)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_TO_AMOUNT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidToAmount);
         }
 
         if (request.Rate < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_RATE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidRate);
         }
 
         // Check overlaps with other brackets in the same set
@@ -78,7 +78,7 @@ public sealed class UpdateTaxBracketHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_OVERLAPS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketOverlaps);
         }
 
         bracket.FromAmount = request.FromAmount;
@@ -91,7 +91,7 @@ public sealed class UpdateTaxBracketHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

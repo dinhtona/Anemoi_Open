@@ -8,7 +8,7 @@ public sealed class UpdateAllowanceTypeValidator : AbstractValidator<UpdateAllow
 {
     public UpdateAllowanceTypeValidator()
     {
-        RuleFor(x => x.AllowanceTypeId).RequiredId("VAL_ALLOWANCE_TYPE_ID_REQUIRED");
+        RuleFor(x => x.AllowanceTypeId).RequiredId(HrBusinessErrorCodes.ValAllowanceTypeIdRequired);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
         RuleFor(x => x.Description).MaximumLength(512);
 

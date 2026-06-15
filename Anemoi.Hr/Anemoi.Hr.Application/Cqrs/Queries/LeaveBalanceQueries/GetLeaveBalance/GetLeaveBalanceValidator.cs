@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,6 +8,6 @@ public sealed class GetLeaveBalanceValidator : AbstractValidator<GetLeaveBalance
 {
     public GetLeaveBalanceValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_LEAVE_BALANCE_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveBalanceIdRequired);
     }
 }

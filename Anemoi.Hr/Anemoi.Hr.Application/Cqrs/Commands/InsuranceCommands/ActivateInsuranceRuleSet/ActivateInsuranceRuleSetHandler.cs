@@ -27,7 +27,7 @@ public sealed class ActivateInsuranceRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         var ruleSetId = new InsuranceRuleSetId(ruleSetGuid);
@@ -37,12 +37,12 @@ public sealed class ActivateInsuranceRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         if (ruleSet.Status != InsuranceRuleSetStatuses.Draft)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotDraft);
         }
 
         // Check if there are contribution rules defined
@@ -52,7 +52,7 @@ public sealed class ActivateInsuranceRuleSetHandler(
 
         if (!hasRules)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_HAS_NO_RULES");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetHasNoRules);
         }
 
         // Check for overlaps with other ACTIVE sets for same CountryCode + InsuranceType
@@ -66,12 +66,12 @@ public sealed class ActivateInsuranceRuleSetHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_OVERLAP_WITH_ACTIVE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetOverlapWithActive);
         }
 
         ruleSet.Status = InsuranceRuleSetStatuses.Active;
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.ActivatedBy ?? "system";
+        ruleSet.UpdatedBy = request.ActivatedBy ?? PayrollConstants.SystemActor;
 
         var auditLog = new InsuranceAuditLog
         {
@@ -79,7 +79,7 @@ public sealed class ActivateInsuranceRuleSetHandler(
             RuleSetId = ruleSetId,
             Action = "Activate",
             Description = $"Insurance rule set '{ruleSet.Name}' activated",
-            PerformedBy = request.ActivatedBy ?? "system",
+            PerformedBy = request.ActivatedBy ?? PayrollConstants.SystemActor,
             PerformedAt = DateTime.UtcNow
         };
 
@@ -88,7 +88,7 @@ public sealed class ActivateInsuranceRuleSetHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

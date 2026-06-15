@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,6 +8,6 @@ public sealed class CancelMyOvertimeRequestValidator : AbstractValidator<CancelM
 {
     public CancelMyOvertimeRequestValidator()
     {
-        RuleFor(x => x.OvertimeRequestId).RequiredId("VAL_OVERTIME_REQUEST_ID_REQUIRED");
+        RuleFor(x => x.OvertimeRequestId).RequiredId(HrBusinessErrorCodes.ValOvertimeRequestIdRequired);
     }
 }

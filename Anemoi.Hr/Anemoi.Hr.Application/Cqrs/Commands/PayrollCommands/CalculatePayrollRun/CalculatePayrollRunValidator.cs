@@ -9,10 +9,10 @@ public sealed class CalculatePayrollRunValidator : AbstractValidator<CalculatePa
     public CalculatePayrollRunValidator()
     {
         RuleFor(x => x.PayrollPeriodId)
-            .RequiredId("VAL_PAYROLL_PERIOD_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValPayrollPeriodIdRequired);
 
         RuleFor(x => x.EmployeeId)
-            .RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
 
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

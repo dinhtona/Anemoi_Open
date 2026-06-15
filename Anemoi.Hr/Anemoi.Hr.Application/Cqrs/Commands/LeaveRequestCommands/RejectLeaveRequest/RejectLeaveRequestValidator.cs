@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,8 +8,8 @@ public sealed class RejectLeaveRequestValidator : AbstractValidator<RejectLeaveR
 {
     public RejectLeaveRequestValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_LEAVE_REQUEST_ID_REQUIRED");
-        RuleFor(x => x.ApproverEmployeeId).RequiredId("VAL_APPROVER_EMPLOYEE_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
+        RuleFor(x => x.ApproverEmployeeId).RequiredId(HrBusinessErrorCodes.ValApproverEmployeeIdRequired);
         RuleFor(x => x.Comment).NotEmpty().MaximumLength(1024);
     }
 }

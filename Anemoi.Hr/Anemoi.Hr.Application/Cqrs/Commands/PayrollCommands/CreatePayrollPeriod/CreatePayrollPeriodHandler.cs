@@ -44,9 +44,9 @@ public sealed class CreatePayrollPeriodHandler(
             AttendancePeriodId = request.AttendancePeriodId.HasValue ? new AttendancePeriodId(request.AttendancePeriodId.Value) : null,
             StatusCode = "Draft",
             CreatedAt = DateTime.UtcNow,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow,
-            UpdatedBy = request.CreatedBy ?? "system"
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor
         };
 
         await payrollPeriodRepository.CreateOneAsync(period, cancellationToken);
@@ -55,8 +55,8 @@ public sealed class CreatePayrollPeriodHandler(
         if (saveResult.IsT1)
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create("HR_PAYROLL_PERIOD_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToResponse(period);

@@ -1,4 +1,3 @@
-using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -16,6 +15,7 @@ public sealed class CalendarException : Entity<CalendarExceptionId>
     private CalendarException() { }
 
     public static CalendarException Create(
+        CalendarExceptionId id,
         DateOnly exceptionDate,
         CalendarStatus exceptionType,
         string reason,
@@ -25,7 +25,7 @@ public sealed class CalendarException : Entity<CalendarExceptionId>
 
         return new CalendarException
         {
-            Id = new CalendarExceptionId(IdGenerator.NextGuid()),
+            Id = id,
             ExceptionDate = exceptionDate,
             ExceptionType = exceptionType,
             Reason = reason,

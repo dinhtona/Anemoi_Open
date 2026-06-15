@@ -7,4 +7,4 @@ public sealed record CancelMyLeaveRequestCommand(
     string UserId,
     string Email,
     LeaveRequestId LeaveRequestId,
-    string Reason) : ICommandVoid;
+    string? Reason) : ICommandVoid;

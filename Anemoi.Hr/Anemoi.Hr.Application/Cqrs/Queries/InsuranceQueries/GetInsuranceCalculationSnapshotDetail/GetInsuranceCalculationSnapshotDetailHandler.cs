@@ -26,7 +26,7 @@ public sealed class GetInsuranceCalculationSnapshotDetailHandler(
     {
         if (!Guid.TryParse(request.Id, out var guid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_SNAPSHOT_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceSnapshotNotFound);
         }
 
         var snapshotId = new InsuranceCalculationSnapshotId(guid);
@@ -36,7 +36,7 @@ public sealed class GetInsuranceCalculationSnapshotDetailHandler(
 
         if (snapshot is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_SNAPSHOT_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceSnapshotNotFound);
         }
 
         return mapper.ToInsuranceCalculationSnapshotResponse(snapshot);

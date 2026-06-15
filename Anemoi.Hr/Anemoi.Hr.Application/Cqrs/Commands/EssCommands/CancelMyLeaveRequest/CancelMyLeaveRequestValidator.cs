@@ -8,6 +8,6 @@ public sealed class CancelMyLeaveRequestValidator : AbstractValidator<CancelMyLe
 {
     public CancelMyLeaveRequestValidator()
     {
-        RuleFor(x => x.LeaveRequestId).RequiredId("VAL_LEAVE_REQUEST_ID_REQUIRED");
+        RuleFor(x => x.LeaveRequestId).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
     }
 }

@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,6 +8,6 @@ public sealed class GetEmployeeValidator : AbstractValidator<GetEmployeeQuery>
 {
     public GetEmployeeValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
     }
 }

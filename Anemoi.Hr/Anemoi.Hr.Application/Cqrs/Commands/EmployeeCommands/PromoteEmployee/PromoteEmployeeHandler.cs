@@ -95,7 +95,7 @@ public sealed class PromoteEmployeeHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.PromotionConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new PromoteEmployeeResponse
@@ -136,7 +136,7 @@ public sealed class PromoteEmployeeHandler(
             EffectiveFrom = request.EffectiveDate,
             EffectiveTo = null,
             ReasonCode = request.ReasonCode,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -174,7 +174,7 @@ public sealed class PromoteEmployeeHandler(
             EffectiveFrom = request.EffectiveDate,
             EffectiveTo = null,
             ReasonCode = request.ReasonCode,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow
         };
 

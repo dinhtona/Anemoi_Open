@@ -41,7 +41,7 @@ public abstract class Entity<TId>
     {
         if (EqualityComparer<TId>.Default.Equals(Id, default!)) return base.GetHashCode();
 
-        return Id.GetHashCode() ^ 1;
+        return Id!.GetHashCode() ^ 1;
     }
 
     public static bool operator ==(Entity<TId>? a, Entity<TId>? b)

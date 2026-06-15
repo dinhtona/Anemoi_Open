@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
@@ -107,13 +108,14 @@ public sealed class GeneratePayslipPdfHandler(
         // 9. Save new document to database
         var fileName = $"payslip_{payslip.PeriodCode}_{payslip.EmployeeCode}_v{nextVersion}.pdf";
         var doc = PayslipDocument.Create(
+            new PayslipDocumentId(IdGenerator.NextGuid()),
             payslip.Id,
             fileName,
             "application/pdf",
             fileKey,
             pdfBytes.Length,
             checksumHash,
-            request.GeneratedBy ?? "system",
+            request.GeneratedBy ?? PayrollConstants.SystemActor,
             DateTime.UtcNow,
             nextVersion);
 

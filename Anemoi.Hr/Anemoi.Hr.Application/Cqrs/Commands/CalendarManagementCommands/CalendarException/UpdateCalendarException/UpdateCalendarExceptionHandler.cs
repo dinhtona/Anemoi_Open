@@ -29,7 +29,7 @@ public sealed class UpdateCalendarExceptionHandler(
         if (duplicate)
             return HrErrorResponses.Create(HrBusinessErrorCodes.CalendarExceptionDuplicate);
 
-        var status = request.ExceptionType == "WorkingDayOverride"
+        var status = request.ExceptionType == CalendarExceptionTypeConstants.WorkingDayOverride
             ? CalendarStatus.WorkingDay
             : CalendarStatus.Holiday;
 

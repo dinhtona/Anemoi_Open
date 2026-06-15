@@ -8,7 +8,7 @@ public sealed class TerminateEmployeeAllowanceValidator : AbstractValidator<Term
 {
     public TerminateEmployeeAllowanceValidator()
     {
-        RuleFor(x => x.EmployeeAllowanceId).RequiredId("VAL_EMPLOYEE_ALLOWANCE_ID_REQUIRED");
+        RuleFor(x => x.EmployeeAllowanceId).RequiredId(HrBusinessErrorCodes.ValEmployeeAllowanceIdRequired);
         RuleFor(x => x.TerminationDate).NotEmpty();
         
         RuleFor(x => x.SensitivePermissionConfirmed)

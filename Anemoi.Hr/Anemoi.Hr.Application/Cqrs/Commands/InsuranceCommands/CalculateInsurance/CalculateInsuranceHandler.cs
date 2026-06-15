@@ -32,12 +32,12 @@ public sealed class CalculateInsuranceHandler(
 
         if (request.PeriodStart > request.PeriodEnd)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_CALCULATION_INVALID_PERIOD");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceCalculationInvalidPeriod);
         }
 
         if (request.GrossSalarySnapshot < 0)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_CALCULATION_NEGATIVE_SALARY");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceCalculationNegativeSalary);
         }
 
         // Find active rule set for the period
@@ -50,7 +50,7 @@ public sealed class CalculateInsuranceHandler(
         var ruleSet = activeRuleSets.FirstOrDefault();
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         // Load contribution rules
@@ -151,7 +151,7 @@ public sealed class CalculateInsuranceHandler(
                 x.SortOrder
             })),
             CalculatedAt = DateTime.UtcNow,
-            CalculatedBy = request.CalculatedBy ?? "system",
+            CalculatedBy = request.CalculatedBy ?? PayrollConstants.SystemActor,
             SourceModule = request.SourceModule?.Trim(),
             SourceReferenceId = request.SourceReferenceId,
             Items = items
@@ -161,7 +161,7 @@ public sealed class CalculateInsuranceHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CalculateInsuranceResponse
         {

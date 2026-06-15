@@ -24,7 +24,7 @@ public sealed class GetTaxCalculationSnapshotDetailHandler(
     {
         if (!Guid.TryParse(request.Id, out var guid))
         {
-            return HrErrorResponses.Create("HR_TAX_CALCULATION_SNAPSHOT_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxCalculationSnapshotNotFound);
         }
 
         var snapshotId = new TaxCalculationSnapshotId(guid);
@@ -34,7 +34,7 @@ public sealed class GetTaxCalculationSnapshotDetailHandler(
 
         if (snapshot is null)
         {
-            return HrErrorResponses.Create("HR_TAX_CALCULATION_SNAPSHOT_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxCalculationSnapshotNotFound);
         }
 
         return mapper.ToTaxCalculationSnapshotResponse(snapshot);

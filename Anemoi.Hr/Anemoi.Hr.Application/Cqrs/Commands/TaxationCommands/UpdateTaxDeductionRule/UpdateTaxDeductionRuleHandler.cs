@@ -24,7 +24,7 @@ public sealed class UpdateTaxDeductionRuleHandler(
     {
         if (!Guid.TryParse(request.Id, out var deductionRuleGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_DEDUCTION_RULE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxDeductionRuleNotFound);
         }
 
         var deductionRuleId = new TaxDeductionRuleId(deductionRuleGuid);
@@ -34,7 +34,7 @@ public sealed class UpdateTaxDeductionRuleHandler(
 
         if (rule is null)
         {
-            return HrErrorResponses.Create("HR_TAX_DEDUCTION_RULE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxDeductionRuleNotFound);
         }
 
         var ruleSet = await ruleSetRepository.GetFirstByConditionAsync(
@@ -43,17 +43,17 @@ public sealed class UpdateTaxDeductionRuleHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status != "Draft")
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
 
         if (request.Amount < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_DEDUCTION_RULE_INVALID_AMOUNT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxDeductionRuleInvalidAmount);
         }
 
         rule.Amount = request.Amount;
@@ -63,7 +63,7 @@ public sealed class UpdateTaxDeductionRuleHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

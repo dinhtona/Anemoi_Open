@@ -33,12 +33,12 @@ public sealed class FinalizePayrollRunHandler(
         if (run is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunNotFound);
 
-        if (!run.FinalizeRun(request.FinalizedBy ?? "system", DateTime.UtcNow))
+        if (!run.FinalizeRun(request.FinalizedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToDetailResponse(run);
     }

@@ -25,6 +25,7 @@ public sealed class PayslipDocument : Entity<PayslipDocumentId>
     private PayslipDocument() { }
 
     public static PayslipDocument Create(
+        PayslipDocumentId id,
         PayslipId payslipId,
         string fileName,
         string contentType,
@@ -37,7 +38,7 @@ public sealed class PayslipDocument : Entity<PayslipDocumentId>
     {
         return new PayslipDocument
         {
-            Id = new PayslipDocumentId(Guid.NewGuid()),
+            Id = id,
             PayslipId = payslipId,
             FileName = fileName,
             ContentType = contentType,

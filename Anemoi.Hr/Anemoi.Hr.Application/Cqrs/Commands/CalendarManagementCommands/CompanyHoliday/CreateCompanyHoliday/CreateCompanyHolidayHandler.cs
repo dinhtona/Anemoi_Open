@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
+using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 
@@ -26,6 +28,7 @@ public sealed class CreateCompanyHolidayHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.CompanyHolidayDuplicate);
 
         var companyHoliday = Domain.CalendarManagement.CompanyHoliday.Create(
+            new CompanyHolidayId(IdGenerator.NextGuid()),
             request.HolidayDate,
             request.Name,
             request.Description,

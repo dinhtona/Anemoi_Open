@@ -27,7 +27,7 @@ public sealed class CreateTaxBracketHandler(
     {
         if (!Guid.TryParse(request.TaxRuleSetId, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         var ruleSetId = new TaxRuleSetId(ruleSetGuid);
@@ -37,27 +37,27 @@ public sealed class CreateTaxBracketHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status != "Draft")
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
 
         if (request.FromAmount < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_FROM_AMOUNT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidFromAmount);
         }
 
         if (request.ToAmount.HasValue && request.ToAmount.Value <= request.FromAmount)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_TO_AMOUNT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidToAmount);
         }
 
         if (request.Rate < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_INVALID_RATE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketInvalidRate);
         }
 
         // Check overlaps
@@ -71,7 +71,7 @@ public sealed class CreateTaxBracketHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_OVERLAPS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketOverlaps);
         }
 
         var newBracket = new TaxBracket
@@ -91,7 +91,7 @@ public sealed class CreateTaxBracketHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateTaxBracketResponse { TaxBracketId = newBracket.Id.Value.ToString() };
     }

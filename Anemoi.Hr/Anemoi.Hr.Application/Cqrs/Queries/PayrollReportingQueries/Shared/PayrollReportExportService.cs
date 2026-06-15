@@ -3,10 +3,12 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Reporting;
+using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 
@@ -36,6 +38,7 @@ public sealed class PayrollReportExportService(
         var filtersJson = JsonSerializer.Serialize(filters);
 
         var auditLog = ReportExportAuditLog.Export(
+            new ReportExportAuditLogId(IdGenerator.NextGuid()),
             ModuleCodes.Payroll,
             reportType,
             exportedBy,

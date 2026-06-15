@@ -93,7 +93,7 @@ public sealed class TransferEmployeeHandler(
             EffectiveFrom = request.EffectiveDate,
             EffectiveTo = null,
             ReasonCode = request.ReasonCode,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow
         };
         await employeeDepartmentHistoryRepository.CreateOneAsync(newHistory, cancellationToken);
@@ -110,7 +110,7 @@ public sealed class TransferEmployeeHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new EmployeeDepartmentHistoryIdResponse(newHistory.Id.Value.ToString());

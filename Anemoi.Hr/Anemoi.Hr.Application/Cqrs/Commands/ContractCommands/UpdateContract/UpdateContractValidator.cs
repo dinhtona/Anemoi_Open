@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,7 +8,7 @@ public sealed class UpdateContractValidator : AbstractValidator<UpdateContractCo
 {
     public UpdateContractValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_CONTRACT_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValContractIdRequired);
         RuleFor(x => x.ContractNumber).NotEmpty().MaximumLength(64);
         RuleFor(x => x.ContractTypeCode).NotEmpty().MaximumLength(64);
         RuleFor(x => x.StartDate).NotEmpty();

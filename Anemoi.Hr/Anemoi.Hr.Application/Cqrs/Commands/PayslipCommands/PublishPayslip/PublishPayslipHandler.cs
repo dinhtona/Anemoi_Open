@@ -30,14 +30,14 @@ public sealed class PublishPayslipHandler(
             cancellationToken);
 
         if (payslip is null)
-            return HrErrorResponses.Create("HR_PAYSLIP_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayslipNotFound);
 
-        if (!payslip.Publish(request.PublishedBy ?? "system", DateTime.UtcNow))
+        if (!payslip.Publish(request.PublishedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayslipInvalidStatus);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToResponse(payslip);
     }

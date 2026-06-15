@@ -35,7 +35,7 @@ public sealed class ChangeSalaryHandler(
         var today = GetBusinessToday();
 
         if (request.EffectiveFrom > today)
-            return HrErrorResponses.Create("HR_SALARY_EFFECTIVE_DATE_IN_FUTURE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryEffectiveDateInFuture);
 
         var employee = await employeeRepository.GetFirstByConditionAsync(
             x => x.Id == request.EmployeeId,
@@ -46,7 +46,7 @@ public sealed class ChangeSalaryHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
         if (request.EffectiveFrom < employee.JoinDate)
-            return HrErrorResponses.Create("HR_SALARY_DATE_BEFORE_JOIN_DATE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryDateBeforeJoinDate);
 
         // Load existing salaries to enforce sequential appends
         var histories = await employeeSalaryRepository.GetManyByConditionAsync(
@@ -58,7 +58,7 @@ public sealed class ChangeSalaryHandler(
         if (latestSalary is not null)
         {
             if (request.EffectiveFrom <= latestSalary.EffectiveFrom)
-                return HrErrorResponses.Create("HR_SALARY_TIMELINE_NOT_SEQUENTIAL");
+                return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryTimelineNotSequential);
         }
 
         // Fetch salary grade and check boundaries if a range exists
@@ -83,7 +83,7 @@ public sealed class ChangeSalaryHandler(
         if (activeRange is not null)
         {
             if (request.BaseSalary < activeRange.MinSalary || request.BaseSalary > activeRange.MaxSalary)
-                return HrErrorResponses.Create("HR_SALARY_OUT_OF_GRADE_RANGE");
+                return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryOutOfGradeRange);
         }
         else
         {
@@ -99,7 +99,7 @@ public sealed class ChangeSalaryHandler(
                 RequestedSalary = request.BaseSalary,
                 Currency = request.Currency,
                 BypassReason = warningCode,
-                CreatedBy = request.CreatedBy ?? "system",
+                CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -111,7 +111,7 @@ public sealed class ChangeSalaryHandler(
                 request.BaseSalary,
                 request.Currency,
                 warningCode,
-                request.CreatedBy ?? "system",
+                request.CreatedBy ?? PayrollConstants.SystemActor,
                 DateTime.UtcNow
             );
 
@@ -137,7 +137,7 @@ public sealed class ChangeSalaryHandler(
             EffectiveFrom = request.EffectiveFrom,
             EffectiveTo = null,
             Reason = request.Reason,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -148,8 +148,8 @@ public sealed class ChangeSalaryHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException ||
                    CompensationPersistenceErrors.IsUniqueConstraintViolation(saveResult.AsT1)
-                ? HrErrorResponses.Create("HR_SALARY_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.SalaryConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new ChangeSalaryResponse

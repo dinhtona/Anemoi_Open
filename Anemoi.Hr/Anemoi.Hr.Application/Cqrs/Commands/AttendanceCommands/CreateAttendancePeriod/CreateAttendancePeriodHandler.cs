@@ -42,9 +42,9 @@ public sealed class CreateAttendancePeriodHandler(
             EndDate = request.EndDate,
             StatusCode = "Draft",
             CreatedAt = DateTime.UtcNow,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow,
-            UpdatedBy = request.CreatedBy ?? "system"
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor
         };
 
         await attendancePeriodRepository.CreateOneAsync(period, cancellationToken);
@@ -54,7 +54,7 @@ public sealed class CreateAttendancePeriodHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.AttendanceConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToResponse(period);

@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,8 +8,8 @@ public sealed class TransferEmployeeValidator : AbstractValidator<TransferEmploy
 {
     public TransferEmployeeValidator()
     {
-        RuleFor(x => x.EmployeeId).RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
-        RuleFor(x => x.NewDepartmentId).RequiredId("VAL_NEW_DEPARTMENT_ID_REQUIRED");
+        RuleFor(x => x.EmployeeId).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
+        RuleFor(x => x.NewDepartmentId).RequiredId(HrBusinessErrorCodes.ValNewDepartmentIdRequired);
         RuleFor(x => x.ReasonCode).NotEmpty().MaximumLength(64);
         RuleFor(x => x.EffectiveDate).NotEmpty();
     }

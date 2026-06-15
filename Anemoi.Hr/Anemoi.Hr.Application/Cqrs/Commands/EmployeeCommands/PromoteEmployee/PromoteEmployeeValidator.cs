@@ -8,7 +8,7 @@ public sealed class PromoteEmployeeValidator : AbstractValidator<PromoteEmployee
 {
     public PromoteEmployeeValidator()
     {
-        RuleFor(x => x.EmployeeId).RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
+        RuleFor(x => x.EmployeeId).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
         RuleFor(x => x)
             .Must(x => x.NewPositionId is not null || !string.IsNullOrWhiteSpace(x.NewGradeCode))
             .WithMessage(HrBusinessErrorCodes.PromotionNoChange);

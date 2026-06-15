@@ -24,7 +24,7 @@ public sealed class UpdateInsuranceContributionRuleHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleGuid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_CONTRIBUTION_RULE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceContributionRuleNotFound);
         }
 
         var ruleId = new InsuranceContributionRuleId(ruleGuid);
@@ -34,7 +34,7 @@ public sealed class UpdateInsuranceContributionRuleHandler(
 
         if (rule is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_CONTRIBUTION_RULE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceContributionRuleNotFound);
         }
 
         var ruleSet = await ruleSetRepository.GetFirstByConditionAsync(
@@ -43,7 +43,7 @@ public sealed class UpdateInsuranceContributionRuleHandler(
 
         if (ruleSet is null || ruleSet.Status != InsuranceRuleSetStatuses.Draft)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotDraft);
         }
 
         rule.ContributionType = request.ContributionType.Trim();
@@ -58,7 +58,7 @@ public sealed class UpdateInsuranceContributionRuleHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

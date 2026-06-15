@@ -25,7 +25,7 @@ public sealed class GetInsuranceRuleSetDetailHandler(
     {
         if (!Guid.TryParse(request.Id, out var guid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         var ruleSetId = new InsuranceRuleSetId(guid);
@@ -36,7 +36,7 @@ public sealed class GetInsuranceRuleSetDetailHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         ruleSet.ContributionRules = ruleSet.ContributionRules.OrderBy(r => r.SortOrder).ToList();

@@ -1,3 +1,7 @@
+// RMG012/RMG020: Intentional - wrapper methods set identity framework properties,
+// navigation entities, and computed fields manually after auto-mapping
+#pragma warning disable RMG012, RMG020
+
 using System;
 using System.Linq;
 using Anemoi.BuildingBlock.Application.Abstractions;

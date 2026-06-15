@@ -62,7 +62,7 @@ Domain
 → BuildingBlock.Application
 ```
 
-currently exists and is tracked as Technical Debt TD-001.
+previously existed and was resolved as TD-001 (Sep 2026).
 
 No new violations are allowed.
 

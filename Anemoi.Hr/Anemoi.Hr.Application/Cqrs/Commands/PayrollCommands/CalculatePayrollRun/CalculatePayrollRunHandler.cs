@@ -169,7 +169,7 @@ public sealed class CalculatePayrollRunHandler(
             TotalDeductionAmount = totalDeductionAmount,
             NetAmount = netAmount,
             CalculatedAt = DateTime.UtcNow,
-            CalculatedBy = request.CalculatedBy ?? "system"
+            CalculatedBy = request.CalculatedBy ?? PayrollConstants.SystemActor
         };
 
         // 10. Add PayrollItems
@@ -178,8 +178,8 @@ public sealed class CalculatePayrollRunHandler(
         {
             Id = new PayrollItemId(IdGenerator.NextGuid()),
             PayrollRunId = payrollRun.Id,
-            ItemCode = "BASE_SALARY",
-            ItemName = "Base Salary",
+            ItemCode = PayrollConstants.BaseSalaryItemCode,
+            ItemName = PayrollConstants.BaseSalaryItemName,
             ItemTypeCode = PayrollItemType.BasePay,
             Amount = basePayAmount,
             CurrencyCode = currencyCode,
@@ -224,8 +224,8 @@ public sealed class CalculatePayrollRunHandler(
         if (saveResult.IsT1)
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create("HR_PAYROLL_RUN_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToDetailResponse(payrollRun);

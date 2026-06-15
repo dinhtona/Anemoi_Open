@@ -80,7 +80,7 @@ public sealed class CreateContractHandler(
                 prevContract.StatusCode = "Expired";
             }
             prevContract.UpdatedAt = DateTime.UtcNow;
-            prevContract.UpdatedBy = request.CreatedBy ?? "system";
+            prevContract.UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor;
         }
 
         // 7. Create new contract
@@ -99,9 +99,9 @@ public sealed class CreateContractHandler(
             Notes = request.Notes,
             AttachmentFileId = request.AttachmentFileId,
             PreviousContractId = request.PreviousContractId,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow,
-            UpdatedBy = request.CreatedBy ?? "system",
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow
         };
 
@@ -111,7 +111,7 @@ public sealed class CreateContractHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.ContractConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToDetailResponse(newContract);

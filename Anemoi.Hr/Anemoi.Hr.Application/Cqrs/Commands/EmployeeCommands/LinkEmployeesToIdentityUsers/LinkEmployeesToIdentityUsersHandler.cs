@@ -74,7 +74,7 @@ public sealed class LinkEmployeesToIdentityUsersHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         return saveResult.Match<OneOf<EmployeeIdentityLinkResultResponse, ErrorDetailResponse>>(
             _ => result,
-            _ => HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED"));
+            _ => HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed));
     }
 
     private static string ResolveStatus(

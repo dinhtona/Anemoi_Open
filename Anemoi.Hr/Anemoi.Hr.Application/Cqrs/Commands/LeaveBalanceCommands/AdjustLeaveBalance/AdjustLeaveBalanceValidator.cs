@@ -8,9 +8,9 @@ public sealed class AdjustLeaveBalanceValidator : AbstractValidator<AdjustLeaveB
 {
     public AdjustLeaveBalanceValidator()
     {
-        RuleFor(x => x.EmployeeId).RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
-        RuleFor(x => x.LeavePolicyId).RequiredId("VAL_LEAVE_POLICY_ID_REQUIRED");
-        RuleFor(x => x.ActorEmployeeId).RequiredId("VAL_ACTOR_EMPLOYEE_ID_REQUIRED");
+        RuleFor(x => x.EmployeeId).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
+        RuleFor(x => x.LeavePolicyId).RequiredId(HrBusinessErrorCodes.ValLeavePolicyIdRequired);
+        RuleFor(x => x.ActorEmployeeId).RequiredId(HrBusinessErrorCodes.ValActorEmployeeIdRequired);
         RuleFor(x => x.Year).InclusiveBetween(1900, 9999);
         RuleFor(x => x.Days).NotEqual(0);
         RuleFor(x => x.Reason)

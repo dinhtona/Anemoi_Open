@@ -375,10 +375,10 @@ public sealed class HrPayrollReportingTests
         var payslip = new Payslip { Id = new PayslipId(Guid.NewGuid()), PayrollRunId = runId, EmployeeId = empId, EmployeeCode = "EMP001", EmployeeName = "Emp 1" };
         var payslips = new List<Payslip> { payslip }.AsQueryable();
 
-        var doc = PayslipDocument.Create(payslip.Id, "payslip.pdf", "application/pdf", "path/to/file", 1024, "hash", "generator", DateTime.UtcNow, 1);
+        var doc = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), payslip.Id, "payslip.pdf", "application/pdf", "path/to/file", 1024, "hash", "generator", DateTime.UtcNow, 1);
         var documents = new List<PayslipDocument> { doc }.AsQueryable();
 
-        var email = PayslipEmailDelivery.Create(payslip.Id, doc.Id, "test@example.com", "Subject", "sender");
+        var email = PayslipEmailDelivery.Create(new PayslipEmailDeliveryId(Guid.NewGuid()), payslip.Id, doc.Id, "test@example.com", "Subject", "sender");
         email.MarkSent(DateTime.UtcNow);
         var emails = new List<PayslipEmailDelivery> { email }.AsQueryable();
 

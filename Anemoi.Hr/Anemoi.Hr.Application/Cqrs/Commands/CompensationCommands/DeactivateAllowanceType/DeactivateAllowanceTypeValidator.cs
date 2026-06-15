@@ -8,7 +8,7 @@ public sealed class DeactivateAllowanceTypeValidator : AbstractValidator<Deactiv
 {
     public DeactivateAllowanceTypeValidator()
     {
-        RuleFor(x => x.AllowanceTypeId).RequiredId("VAL_ALLOWANCE_TYPE_ID_REQUIRED");
+        RuleFor(x => x.AllowanceTypeId).RequiredId(HrBusinessErrorCodes.ValAllowanceTypeIdRequired);
 
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

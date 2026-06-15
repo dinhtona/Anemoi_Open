@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Validators;
 using FluentValidation;
 
@@ -7,7 +8,7 @@ public sealed class UpdateLeavePolicyValidator : AbstractValidator<UpdateLeavePo
 {
     public UpdateLeavePolicyValidator()
     {
-        RuleFor(x => x.Id).RequiredId("VAL_LEAVE_POLICY_ID_REQUIRED");
+        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeavePolicyIdRequired);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
         RuleFor(x => x.MonthlyAccrualDays).GreaterThanOrEqualTo(0);
         RuleFor(x => x.AnnualMaxDays).GreaterThanOrEqualTo(0);

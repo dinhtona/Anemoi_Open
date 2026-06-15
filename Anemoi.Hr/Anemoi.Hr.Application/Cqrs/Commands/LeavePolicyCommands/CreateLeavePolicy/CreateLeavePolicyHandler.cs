@@ -26,6 +26,6 @@ public sealed class CreateLeavePolicyHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         return saveResult.Match<OneOf<LeavePolicyIdResponse, ErrorDetailResponse>>(
             _ => mapper.ToLeavePolicyIdResponse(policy),
-            _ => HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED"));
+            _ => HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed));
     }
 }

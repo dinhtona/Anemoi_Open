@@ -42,6 +42,7 @@ public sealed class HrCalendarManagementTests
 
         // Monday-Friday work pattern rule
         var rule = WorkingCalendarRule.Create(
+            new WorkingCalendarRuleId(Guid.NewGuid()),
             "Default Rule",
             "Mon-Fri work schedule",
             new DateOnly(2026, 1, 1),
@@ -66,12 +67,13 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
         dbContext.Set<WorkingCalendarRule>().Add(rule);
 
         // 2026-06-08 is Monday (Normal working, but set public holiday)
         var date = new DateOnly(2026, 6, 8);
-        var pubHoliday = PublicHoliday.Create(date, "New Year in June", "Description", "VN", false);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          date, "New Year in June", "Description", "VN", false);
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
         await dbContext.SaveChangesAsync();
 
@@ -85,12 +87,14 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
         dbContext.Set<WorkingCalendarRule>().Add(rule);
 
         var date = new DateOnly(2026, 6, 8); // Monday
-        var pubHoliday = PublicHoliday.Create(date, "Public Holiday", "Desc", "VN", false);
-        var compHoliday = CompanyHoliday.Create(date, "Company Anniversary", "Desc", false);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          date, "Public Holiday", "Desc", "VN", false);
+        var compHoliday = CompanyHoliday.Create(new CompanyHolidayId(Guid.NewGuid()),
+          date, "Company Anniversary", "Desc", false);
 
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
         dbContext.Set<CompanyHoliday>().Add(compHoliday);
@@ -106,15 +110,18 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2026, 1, 1), null, true, true, true, true, true, false, false);
         dbContext.Set<WorkingCalendarRule>().Add(rule);
 
         var date = new DateOnly(2026, 6, 8); // Monday
-        var pubHoliday = PublicHoliday.Create(date, "Public Holiday", "Desc", "VN", false);
-        var compHoliday = CompanyHoliday.Create(date, "Company Anniversary", "Desc", false);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          date, "Public Holiday", "Desc", "VN", false);
+        var compHoliday = CompanyHoliday.Create(new CompanyHolidayId(Guid.NewGuid()),
+          date, "Company Anniversary", "Desc", false);
 
         // Create exception that makes it a working day override
-        var exception = CalendarException.Create(date, CalendarStatus.WorkingDay, "Important makeup working day", null);
+        var exception = CalendarException.Create(new CalendarExceptionId(Guid.NewGuid()),
+          date, CalendarStatus.WorkingDay, "Important makeup working day", null);
 
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
         dbContext.Set<CompanyHoliday>().Add(compHoliday);
@@ -131,11 +138,12 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
         dbContext.Set<WorkingCalendarRule>().Add(rule);
 
         // Register recurring holiday on Jan 1st 2020
-        var pubHoliday = PublicHoliday.Create(new DateOnly(2020, 1, 1), "New Year", "Desc", "VN", true);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          new DateOnly(2020, 1, 1), "New Year", "Desc", "VN", true);
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
         await dbContext.SaveChangesAsync();
 
@@ -150,11 +158,12 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
         dbContext.Set<WorkingCalendarRule>().Add(rule);
 
         // Register recurring company holiday on June 1st 2020
-        var compHoliday = CompanyHoliday.Create(new DateOnly(2020, 6, 1), "Foundation Day", "Desc", true);
+        var compHoliday = CompanyHoliday.Create(new CompanyHolidayId(Guid.NewGuid()),
+          new DateOnly(2020, 6, 1), "Foundation Day", "Desc", true);
         dbContext.Set<CompanyHoliday>().Add(compHoliday);
         await dbContext.SaveChangesAsync();
 
@@ -173,7 +182,8 @@ public sealed class HrCalendarManagementTests
         var dbContext = CreateInMemoryDbContext();
         var engine = new WorkingCalendarEngine(dbContext);
 
-        var pubHoliday = PublicHoliday.Create(new DateOnly(2020, 1, 1), "Recurring New Year", "Desc", "VN", true);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          new DateOnly(2020, 1, 1), "Recurring New Year", "Desc", "VN", true);
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
         await dbContext.SaveChangesAsync();
 
@@ -195,9 +205,11 @@ public sealed class HrCalendarManagementTests
         var engine = new WorkingCalendarEngine(dbContext);
 
         // Mon-Fri schedule
-        var rule = WorkingCalendarRule.Create("Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
-        var pubHoliday = PublicHoliday.Create(new DateOnly(2020, 1, 1), "New Year", "Desc", "VN", true);
-        var compHoliday = CompanyHoliday.Create(new DateOnly(2020, 1, 15), "Comp Holiday", "Desc", true);
+        var rule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Default", "Mon-Fri", new DateOnly(2020, 1, 1), null, true, true, true, true, true, false, false);
+        var pubHoliday = PublicHoliday.Create(new PublicHolidayId(Guid.NewGuid()),
+          new DateOnly(2020, 1, 1), "New Year", "Desc", "VN", true);
+        var compHoliday = CompanyHoliday.Create(new CompanyHolidayId(Guid.NewGuid()),
+          new DateOnly(2020, 1, 15), "Comp Holiday", "Desc", true);
 
         dbContext.Set<WorkingCalendarRule>().Add(rule);
         dbContext.Set<PublicHoliday>().Add(pubHoliday);
@@ -229,7 +241,7 @@ public sealed class HrCalendarManagementTests
     public async Task CreateWorkingCalendarRule_OverlappingDateRanges_ReturnsOverlapError()
     {
         // Existing active rule: 2026-06-01 to 2026-06-30
-        var existing = WorkingCalendarRule.Create("Existing", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
+        var existing = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Existing", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
         var ruleRepo = new FakeRepository<WorkingCalendarRule>([existing]);
         var unitOfWork = new FakeUnitOfWork();
 
@@ -256,10 +268,10 @@ public sealed class HrCalendarManagementTests
         var ruleId1 = new WorkingCalendarRuleId(Guid.NewGuid());
         var ruleId2 = new WorkingCalendarRuleId(Guid.NewGuid());
 
-        var rule1 = WorkingCalendarRule.Create("Rule1", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
+        var rule1 = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Rule1", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
         typeof(WorkingCalendarRule).GetProperty(nameof(WorkingCalendarRule.Id))?.SetValue(rule1, ruleId1);
 
-        var rule2 = WorkingCalendarRule.Create("Rule2", null, new DateOnly(2026, 7, 1), new DateOnly(2026, 7, 31), true, false, false, false, false, false, false);
+        var rule2 = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "Rule2", null, new DateOnly(2026, 7, 1), new DateOnly(2026, 7, 31), true, false, false, false, false, false, false);
         typeof(WorkingCalendarRule).GetProperty(nameof(WorkingCalendarRule.Id))?.SetValue(rule2, ruleId2);
 
         var ruleRepo = new FakeRepository<WorkingCalendarRule>([rule1, rule2]);
@@ -286,10 +298,10 @@ public sealed class HrCalendarManagementTests
     [Fact]
     public async Task ActivateWorkingCalendarRule_OverlappingDateRanges_ReturnsOverlapError()
     {
-        var activeRule = WorkingCalendarRule.Create("ActiveRule", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
+        var activeRule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "ActiveRule", null, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 30), true, false, false, false, false, false, false);
 
         var inactiveRuleId = new WorkingCalendarRuleId(Guid.NewGuid());
-        var inactiveRule = WorkingCalendarRule.Create("InactiveRule", null, new DateOnly(2026, 6, 10), new DateOnly(2026, 6, 20), true, false, false, false, false, false, false);
+        var inactiveRule = WorkingCalendarRule.Create(new WorkingCalendarRuleId(Guid.NewGuid()), "InactiveRule", null, new DateOnly(2026, 6, 10), new DateOnly(2026, 6, 20), true, false, false, false, false, false, false);
         typeof(WorkingCalendarRule).GetProperty(nameof(WorkingCalendarRule.Id))?.SetValue(inactiveRule, inactiveRuleId);
         inactiveRule.Deactivate();
 

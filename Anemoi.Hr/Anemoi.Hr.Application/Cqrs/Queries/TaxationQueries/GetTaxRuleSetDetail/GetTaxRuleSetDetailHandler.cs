@@ -26,7 +26,7 @@ public sealed class GetTaxRuleSetDetailHandler(
     {
         if (!Guid.TryParse(request.Id, out var guid))
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         var ruleSetId = new TaxRuleSetId(guid);
@@ -38,7 +38,7 @@ public sealed class GetTaxRuleSetDetailHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         // Sort brackets before returning

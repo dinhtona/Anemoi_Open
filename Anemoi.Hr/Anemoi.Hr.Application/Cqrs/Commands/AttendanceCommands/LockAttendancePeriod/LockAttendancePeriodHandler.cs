@@ -86,7 +86,7 @@ public sealed class LockAttendancePeriodHandler(
             employeeGroups.Count);
 
         var now = DateTime.UtcNow;
-        var updatedBy = request.UpdatedBy ?? "system";
+        var updatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
         var summaries = new List<AttendanceSummary>(employeeGroups.Count);
 
         foreach (var group in employeeGroups)

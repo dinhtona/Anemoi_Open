@@ -9,7 +9,7 @@ public sealed class LockPayrollPeriodValidator : AbstractValidator<LockPayrollPe
     public LockPayrollPeriodValidator()
     {
         RuleFor(x => x.PayrollPeriodId)
-            .RequiredId("VAL_PAYROLL_PERIOD_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValPayrollPeriodIdRequired);
 
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

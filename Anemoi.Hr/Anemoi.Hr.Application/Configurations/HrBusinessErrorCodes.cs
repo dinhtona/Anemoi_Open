@@ -143,6 +143,16 @@ public static class HrBusinessErrorCodes
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 
+    // Salary error codes
+    public const string SalaryEffectiveDateInFuture = "HR_SALARY_EFFECTIVE_DATE_IN_FUTURE";
+    public const string SalaryDateBeforeJoinDate = "HR_SALARY_DATE_BEFORE_JOIN_DATE";
+    public const string SalaryTimelineNotSequential = "HR_SALARY_TIMELINE_NOT_SEQUENTIAL";
+    public const string SalaryOutOfGradeRange = "HR_SALARY_OUT_OF_GRADE_RANGE";
+    public const string SalaryConcurrencyConflict = "HR_SALARY_CONCURRENCY_CONFLICT";
+    public const string SalaryGradeAlreadyExists = "HR_SALARY_GRADE_ALREADY_EXISTS";
+    public const string SalaryGradeNotFound = "HR_SALARY_GRADE_NOT_FOUND";
+    public const string SalaryRangeOverlapping = "HR_SALARY_RANGE_OVERLAPPING";
+
     // Allowance error codes
     public const string EmployeeAllowanceNotFound = "HR_EMPLOYEE_ALLOWANCE_NOT_FOUND";
     public const string AllowanceInvalidEffectiveRange = "HR_ALLOWANCE_INVALID_EFFECTIVE_RANGE";
@@ -153,6 +163,92 @@ public static class HrBusinessErrorCodes
     public const string AllowanceTypeNotFound = "HR_ALLOWANCE_TYPE_NOT_FOUND";
     public const string AllowanceTypeCodeAlreadyExists = "HR_ALLOWANCE_TYPE_CODE_ALREADY_EXISTS";
     public const string AllowanceTypeConcurrencyConflict = "HR_ALLOWANCE_TYPE_CONCURRENCY_CONFLICT";
+    public const string AllowanceTerminationDateInFuture = "HR_ALLOWANCE_TERMINATION_DATE_IN_FUTURE";
+    public const string AllowanceTerminationBeforeEffectiveFrom = "HR_ALLOWANCE_TERMINATION_BEFORE_EFFECTIVE_FROM";
+    public const string AllowanceEffectiveDateInFuture = "HR_ALLOWANCE_EFFECTIVE_DATE_IN_FUTURE";
+    public const string AllowanceDateBeforeJoinDate = "HR_ALLOWANCE_DATE_BEFORE_JOIN_DATE";
+    public const string AllowanceTimelineNotSequential = "HR_ALLOWANCE_TIMELINE_NOT_SEQUENTIAL";
+    public const string PositionAllowanceAlreadyExists = "HR_POSITION_ALLOWANCE_ALREADY_EXISTS";
+
+    // Payroll error codes
+    public const string PayrollPeriodConcurrencyConflict = "HR_PAYROLL_PERIOD_CONCURRENCY_CONFLICT";
+    public const string PayrollRunConcurrencyConflict = "HR_PAYROLL_RUN_CONCURRENCY_CONFLICT";
+
+    // Tax error codes
+    public const string TaxRuleSetNotFound = "HR_TAX_RULE_SET_NOT_FOUND";
+    public const string TaxRuleSetNotDraft = "HR_TAX_RULE_SET_NOT_DRAFT";
+    public const string TaxRuleSetInvalidDateRange = "HR_TAX_RULE_SET_INVALID_DATE_RANGE";
+    public const string TaxRuleSetOverlappingPeriod = "HR_TAX_RULE_SET_OVERLAPPING_PERIOD";
+    public const string TaxRuleSetOverlapWithActive = "HR_TAX_RULE_SET_OVERLAP_WITH_ACTIVE";
+    public const string TaxRuleSetHasNoBrackets = "HR_TAX_RULE_SET_HAS_NO_BRACKETS";
+    public const string TaxBracketNotFound = "HR_TAX_BRACKET_NOT_FOUND";
+    public const string TaxBracketInvalidFromAmount = "HR_TAX_BRACKET_INVALID_FROM_AMOUNT";
+    public const string TaxBracketInvalidToAmount = "HR_TAX_BRACKET_INVALID_TO_AMOUNT";
+    public const string TaxBracketInvalidRate = "HR_TAX_BRACKET_INVALID_RATE";
+    public const string TaxBracketOverlaps = "HR_TAX_BRACKET_OVERLAPS";
+    public const string TaxDeductionRuleNotFound = "HR_TAX_DEDUCTION_RULE_NOT_FOUND";
+    public const string TaxDeductionRuleInvalidAmount = "HR_TAX_DEDUCTION_RULE_INVALID_AMOUNT";
+    public const string TaxDeductionRuleTypeAlreadyExists = "HR_TAX_DEDUCTION_RULE_TYPE_ALREADY_EXISTS";
+    public const string TaxCalculationInvalidPeriod = "HR_TAX_CALCULATION_INVALID_PERIOD";
+    public const string TaxCalculationNegativeIncome = "HR_TAX_CALCULATION_NEGATIVE_INCOME";
+    public const string TaxCalculationSnapshotNotFound = "HR_TAX_CALCULATION_SNAPSHOT_NOT_FOUND";
+
+    // Insurance error codes
+    public const string InsuranceRuleSetNotFound = "HR_INSURANCE_RULE_SET_NOT_FOUND";
+    public const string InsuranceRuleSetNotDraft = "HR_INSURANCE_RULE_SET_NOT_DRAFT";
+    public const string InsuranceRuleSetNotActive = "HR_INSURANCE_RULE_SET_NOT_ACTIVE";
+    public const string InsuranceRuleSetHasNoRules = "HR_INSURANCE_RULE_SET_HAS_NO_RULES";
+    public const string InsuranceRuleSetOverlapWithActive = "HR_INSURANCE_RULE_SET_OVERLAP_WITH_ACTIVE";
+    public const string InsuranceContributionRuleNotFound = "HR_INSURANCE_CONTRIBUTION_RULE_NOT_FOUND";
+    public const string InsuranceCalculationInvalidPeriod = "HR_INSURANCE_CALCULATION_INVALID_PERIOD";
+    public const string InsuranceCalculationNegativeSalary = "HR_INSURANCE_CALCULATION_NEGATIVE_SALARY";
+    public const string InsuranceSnapshotNotFound = "HR_INSURANCE_SNAPSHOT_NOT_FOUND";
+
+    // Report error codes
+    public const string ReportVarianceCurrentCriteriaRequired = "HR_REPORT_VARIANCE_CURRENT_CRITERIA_REQUIRED";
+    public const string ReportVariancePreviousCriteriaRequired = "HR_REPORT_VARIANCE_PREVIOUS_CRITERIA_REQUIRED";
+
+    // Validation error codes
+    public const string ValActorEmployeeIdRequired = "VAL_ACTOR_EMPLOYEE_ID_REQUIRED";
+    public const string ValAllowanceTypeIdRequired = "VAL_ALLOWANCE_TYPE_ID_REQUIRED";
+    public const string ValAmountMustBePositive = "VAL_AMOUNT_MUST_BE_POSITIVE";
+    public const string ValApproverEmployeeIdRequired = "VAL_APPROVER_EMPLOYEE_ID_REQUIRED";
+    public const string ValAttendancePeriodIdRequired = "VAL_ATTENDANCE_PERIOD_ID_REQUIRED";
+    public const string ValAttendanceRecordIdRequired = "VAL_ATTENDANCE_RECORD_ID_REQUIRED";
+    public const string ValAttendanceStatusUnsupported = "VAL_ATTENDANCE_STATUS_UNSUPPORTED";
+    public const string ValBaseSalaryMustBePositive = "VAL_BASE_SALARY_MUST_BE_POSITIVE";
+    public const string ValContractIdRequired = "VAL_CONTRACT_ID_REQUIRED";
+    public const string ValCurrencyRequired = "VAL_CURRENCY_REQUIRED";
+    public const string ValEffectiveFromRequired = "VAL_EFFECTIVE_FROM_REQUIRED";
+    public const string ValEmployeeAllowanceIdRequired = "VAL_EMPLOYEE_ALLOWANCE_ID_REQUIRED";
+    public const string ValEmployeeIdRequired = "VAL_EMPLOYEE_ID_REQUIRED";
+    public const string ValEndDateBeforeStartDate = "VAL_END_DATE_BEFORE_START_DATE";
+    public const string ValEndDateRequired = "VAL_END_DATE_REQUIRED";
+    public const string ValLeaveBalanceIdRequired = "VAL_LEAVE_BALANCE_ID_REQUIRED";
+    public const string ValLeavePolicyIdRequired = "VAL_LEAVE_POLICY_ID_REQUIRED";
+    public const string ValLeaveRequestIdRequired = "VAL_LEAVE_REQUEST_ID_REQUIRED";
+    public const string ValMaxSalaryMustBeGeMinSalary = "VAL_MAX_SALARY_MUST_BE_GE_MIN_SALARY";
+    public const string ValMinSalaryMustBePositive = "VAL_MIN_SALARY_MUST_BE_POSITIVE";
+    public const string ValNewDepartmentIdRequired = "VAL_NEW_DEPARTMENT_ID_REQUIRED";
+    public const string ValOvertimeRequestIdRequired = "VAL_OVERTIME_REQUEST_ID_REQUIRED";
+    public const string ValPayrollPeriodIdRequired = "VAL_PAYROLL_PERIOD_ID_REQUIRED";
+    public const string ValPayrollRunIdRequired = "VAL_PAYROLL_RUN_ID_REQUIRED";
+    public const string ValPeriodCodeRequired = "VAL_PERIOD_CODE_REQUIRED";
+    public const string ValPeriodCodeTooLong = "VAL_PERIOD_CODE_TOO_LONG";
+    public const string ValPositionIdRequired = "VAL_POSITION_ID_REQUIRED";
+    public const string ValReasonInvalid = "VAL_REASON_INVALID";
+    public const string ValSalaryGradeIdRequired = "VAL_SALARY_GRADE_ID_REQUIRED";
+    public const string ValSalaryTypeInvalid = "VAL_SALARY_TYPE_INVALID";
+    public const string ValStandardWorkingDaysMustBePos = "VAL_STANDARD_WORKING_DAYS_MUST_BE_POS";
+    public const string ValStartDateRequired = "VAL_START_DATE_REQUIRED";
+    public const string ValStatusRequired = "VAL_STATUS_REQUIRED";
+    public const string ValWorkedDaysOutOfRange = "VAL_WORKED_DAYS_OUT_OF_RANGE";
+    public const string ValWorkedHoursOutOfRange = "VAL_WORKED_HOURS_OUT_OF_RANGE";
+    public const string ValWorkDateOutOfPeriod = "VAL_WORK_DATE_OUT_OF_PERIOD";
+    public const string ValWorkDateRequired = "VAL_WORK_DATE_REQUIRED";
+
+    // Allowance validator error codes
+    public const string AllowanceInvalidDateRange = "HR_ALLOWANCE_INVALID_DATE_RANGE";
 
     public const string PayslipNotFound = "HR_PAYSLIP_NOT_FOUND";
     public const string PayslipDocumentNotFound = "HR_PAYSLIP_DOCUMENT_NOT_FOUND";

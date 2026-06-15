@@ -9,7 +9,7 @@ public sealed class LockAttendancePeriodValidator : AbstractValidator<LockAttend
     public LockAttendancePeriodValidator()
     {
         RuleFor(x => x.AttendancePeriodId)
-            .RequiredId("VAL_ATTENDANCE_PERIOD_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValAttendancePeriodIdRequired);
 
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

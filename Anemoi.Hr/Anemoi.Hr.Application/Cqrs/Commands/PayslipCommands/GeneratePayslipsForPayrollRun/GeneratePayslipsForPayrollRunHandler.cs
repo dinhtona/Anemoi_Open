@@ -80,16 +80,16 @@ public sealed class GeneratePayslipsForPayrollRunHandler(
             GrossPay = run.GrossAmount,
             NetPay = run.NetAmount,
             GeneratedAt = DateTime.UtcNow,
-            GeneratedBy = request.GeneratedBy ?? "system"
+            GeneratedBy = request.GeneratedBy ?? PayrollConstants.SystemActor
         };
 
         var createResult = await payslipRepository.CreateOneAsync(payslip, cancellationToken);
         if (createResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new List<PayslipResponse> { mapper.ToResponse(payslip) };
     }

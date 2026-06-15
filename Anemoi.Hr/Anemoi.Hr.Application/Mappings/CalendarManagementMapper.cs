@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Anemoi.Hr.ModelIds.ModelIds;
@@ -92,7 +93,9 @@ public partial class CalendarManagementMapper
         {
             Id = source.Id.Value,
             ExceptionDate = source.ExceptionDate,
-            ExceptionType = source.ExceptionType == CalendarStatus.WorkingDay ? "WorkingDayOverride" : "HolidayOverride",
+            ExceptionType = source.ExceptionType == CalendarStatus.WorkingDay
+                ? CalendarExceptionTypeConstants.WorkingDayOverride
+                : CalendarExceptionTypeConstants.HolidayOverride,
             Name = source.Reason,
             Description = "",
             RelatedHolidayId = source.RelatedHolidayId?.Value,

@@ -54,62 +54,50 @@ P1
 
 High
 
-### Current State
+### Status
 
-The HR Domain project currently references:
+✅ **Resolved** — Sep 2026
 
-```txt
-Anemoi.BuildingBlock.Application
-```
+### Fix Applied
 
-Example usage:
+1. **Removed `Anemoi.BuildingBlock.Application` dependency** from `Anemoi.Hr.Domain.csproj`.
+2. **Domain factories now accept IDs externally** — 10 entity factory methods were refactored to take a strongly-typed ID as first parameter instead of calling `Guid.NewGuid()`.
+3. **Application layer generates IDs** — All call sites use `IdGenerator.NextGuid()` (MassTransit sequential GUID) and pass the typed ID to the domain factory.
 
-```csharp
-IdGenerator.NextGuid()
-```
-
-inside domain entities.
-
-### Problem
-
-Violates Clean Architecture dependency direction.
-
-Current dependency:
+### Current Pattern
 
 ```txt
-Domain
-  ↓
 Application
+  → IdGenerator.NextGuid()          (sequential GUID via MassTransit)
+  → new XxxId(guid)                 (strongly-typed ID wrapper)
+  → Domain.Factory(id, ...)         (entity creation, no ID generation)
 ```
 
-Domain should not depend on Application.
+### Entities Refactored
 
-### Risk
+| Entity | Factory | ID Param |
+|--------|---------|----------|
+| ShiftTemplate | `Create(id, code, name, ...)` | `ShiftTemplateId` |
+| EmployeeShiftAssignment | `Create(id, employeeId, template, ...)` | `EmployeeShiftAssignmentId` |
+| CalendarException | `Create(id, exceptionDate, ...)` | `CalendarExceptionId` |
+| WorkingCalendarRule | `Create(id, name, ...)` | `WorkingCalendarRuleId` |
+| CompanyHoliday | `Create(id, holidayDate, ...)` | `CompanyHolidayId` |
+| PublicHoliday | `Create(id, holidayDate, ...)` | `PublicHolidayId` |
+| OvertimeRequest | `Create(id, employeeId, ...)` | `OvertimeRequestId` |
+| PayslipEmailDelivery | `Create(id, payslipId, ...)` | `PayslipEmailDeliveryId` |
+| PayslipDocument | `Create(id, payslipId, ...)` | `PayslipDocumentId` |
+| ReportExportAuditLog | `Export(id, moduleCode, ...)` | `ReportExportAuditLogId` |
 
-* Architectural erosion
-* Harder future modularization
-* Harder domain isolation
-* Harder unit testing
+### IIdGenerator Abstraction
 
-### Recommended Fix
+The `IIdGenerator` interface (briefly created in `BuildingBlock.Domain/Abstractions/`) was **removed** — it had no consumers. The Application layer uses the static `IdGenerator.NextGuid()` directly via `Anemoi.BuildingBlock.Application.Helpers`. No dead abstraction remains.
 
-Introduce abstraction:
+### Verification
 
-```csharp
-IIdGenerator
+```txt
+dotnet build → 0 warnings, 0 errors
+dotnet test  → 232/232 passed
 ```
-
-or
-
-```csharp
-IDomainGuidGenerator
-```
-
-and inject implementation from outer layers.
-
-### Suggested Target
-
-Architecture Cleanup Phase
 
 ---
 

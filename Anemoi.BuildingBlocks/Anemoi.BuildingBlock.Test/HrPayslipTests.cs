@@ -607,7 +607,7 @@ public sealed class HrPayslipTests
         var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
 
         var existingDocId = new PayslipDocumentId(Guid.NewGuid());
-        var existingDoc = PayslipDocument.Create(
+        var existingDoc = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslipId, "payslip_v1.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash1", "test-user", DateTime.UtcNow, 1);
 
         var payslipRepo = new FakeRepository<Payslip>([payslip]);
@@ -648,7 +648,7 @@ public sealed class HrPayslipTests
         var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Published);
 
         var docId = new PayslipDocumentId(Guid.NewGuid());
-        var doc = PayslipDocument.Create(
+        var doc = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslipId, "payslip_v1.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash1", "test-user", DateTime.UtcNow, 1);
 
         var payslipRepo = new FakeRepository<Payslip>([payslip]);
@@ -798,7 +798,7 @@ public sealed class HrPayslipTests
         var empId = new EmployeeId(Guid.NewGuid());
         var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
         
-        var doc = PayslipDocument.Create(
+        var doc = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslipId, "payslip.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash", "test", DateTime.UtcNow, 1);
 
         var payslipRepo = new FakeRepository<Payslip>([payslip]);
@@ -827,7 +827,7 @@ public sealed class HrPayslipTests
         var empId = new EmployeeId(Guid.NewGuid());
         var payslip = CreatePayslip(payslipId, runId, empId, PayslipStatus.Generated);
         
-        var doc = PayslipDocument.Create(
+        var doc = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslipId, "payslip.pdf", "application/pdf", $"{payslipId.Value}/v1.pdf", 100, "hash", "test", DateTime.UtcNow, 1);
 
         var payslipRepo = new FakeRepository<Payslip>([payslip]);
@@ -928,9 +928,9 @@ public sealed class HrPayslipTests
         var payslip2 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Published);
         var payslip3 = CreatePayslip(new PayslipId(Guid.NewGuid()), runId, new EmployeeId(Guid.NewGuid()), PayslipStatus.Generated);
 
-        var doc1 = PayslipDocument.Create(
+        var doc1 = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslip1.Id, "payslip1.pdf", "application/pdf", "path1", 100, "h1", "test", DateTime.UtcNow, 1);
-        var doc2 = PayslipDocument.Create(
+        var doc2 = PayslipDocument.Create(new PayslipDocumentId(Guid.NewGuid()), 
             payslip2.Id, "payslip2.pdf", "application/pdf", "path2", 100, "h2", "test", DateTime.UtcNow, 1);
 
         var payrollRunRepo = new FakeRepository<PayrollRun>([run]);

@@ -1,3 +1,7 @@
+// RMG012/RMG020: Intentional - wrapper methods set Id, navigation entities,
+// and computed fields manually after auto-mapping
+#pragma warning disable RMG012, RMG020
+
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;

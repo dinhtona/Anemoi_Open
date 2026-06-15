@@ -33,12 +33,12 @@ public sealed class SubmitPayrollRunForApprovalHandler(
         if (run is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunNotFound);
 
-        if (!run.SubmitForApproval(request.SubmittedBy ?? "system", DateTime.UtcNow))
+        if (!run.SubmitForApproval(request.SubmittedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToDetailResponse(run);
     }

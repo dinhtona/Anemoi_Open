@@ -202,7 +202,7 @@ public class OvertimeRequestDomainTests
     public void Create_NullEmployeeId_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            OvertimeRequest.Create(null!, DateOnly.FromDateTime(DateTime.Today),
+            OvertimeRequest.Create(new OvertimeRequestId(Guid.NewGuid()), null!, DateOnly.FromDateTime(DateTime.Today),
                 TimeOnly.Parse("18:00"), TimeOnly.Parse("20:00"), "Test"));
     }
 
@@ -249,6 +249,6 @@ public class OvertimeRequestDomainTests
         TimeOnly endTime,
         string reason)
     {
-        return OvertimeRequest.Create(employeeId, overtimeDate, startTime, endTime, reason);
+        return OvertimeRequest.Create(new OvertimeRequestId(Guid.NewGuid()), employeeId, overtimeDate, startTime, endTime, reason);
     }
 }

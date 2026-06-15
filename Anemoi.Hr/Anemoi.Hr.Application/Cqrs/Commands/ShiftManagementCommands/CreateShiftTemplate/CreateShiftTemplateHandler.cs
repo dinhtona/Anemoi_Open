@@ -1,11 +1,13 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
-using Microsoft.EntityFrameworkCore;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.ShiftManagement;
+using Anemoi.Hr.ModelIds.ModelIds;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.ShiftManagementCommands.CreateShiftTemplate;
@@ -26,6 +28,7 @@ public sealed class CreateShiftTemplateHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ShiftTemplateCodeAlreadyExists);
 
         var shiftTemplate = ShiftTemplate.Create(
+            new ShiftTemplateId(IdGenerator.NextGuid()),
             request.Code,
             request.Name,
             request.StartTime,

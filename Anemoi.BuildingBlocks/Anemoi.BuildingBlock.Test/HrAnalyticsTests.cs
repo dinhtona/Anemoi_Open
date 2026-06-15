@@ -543,7 +543,7 @@ public sealed class HrAnalyticsTests
         var startTime = new TimeOnly(8, 0);
         var endTime = new TimeOnly(8, 0).AddHours(hours);
 
-        var request = (OvertimeRequest)System.Runtime.Serialization.FormatterServices
+        var request = (OvertimeRequest)System.Runtime.CompilerServices.RuntimeHelpers
             .GetUninitializedObject(typeof(OvertimeRequest));
 
         typeof(Entity<OvertimeRequestId>).GetProperty("Id")!.SetValue(request, new OvertimeRequestId(Guid.Parse(id)));

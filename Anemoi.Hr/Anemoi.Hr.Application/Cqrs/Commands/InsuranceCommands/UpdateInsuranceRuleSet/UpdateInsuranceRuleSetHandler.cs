@@ -23,7 +23,7 @@ public sealed class UpdateInsuranceRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         var ruleSetId = new InsuranceRuleSetId(ruleSetGuid);
@@ -33,12 +33,12 @@ public sealed class UpdateInsuranceRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         if (ruleSet.Status != InsuranceRuleSetStatuses.Draft)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotDraft);
         }
 
         ruleSet.Name = request.Name.Trim();
@@ -46,12 +46,12 @@ public sealed class UpdateInsuranceRuleSetHandler(
         ruleSet.EffectiveFrom = request.EffectiveFrom;
         ruleSet.EffectiveTo = request.EffectiveTo;
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.UpdatedBy ?? "system";
+        ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

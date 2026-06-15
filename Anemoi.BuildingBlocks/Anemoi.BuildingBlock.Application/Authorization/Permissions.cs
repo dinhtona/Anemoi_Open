@@ -96,6 +96,11 @@ public static class Permissions
     public const string HrInsuranceCalculate = "hr.insurance.calculate";
     public const string HrInsuranceReport = "hr.insurance.report";
 
+    public const string HrPayrollView = "hr.payroll.view";
+    public const string HrPayrollCalculate = "hr.payroll.calculate";
+    public const string HrPayrollApprove = "hr.payroll.approve";
+    public const string HrPayrollLock = "hr.payroll.lock";
+    public const string HrPayrollExport = "hr.payroll.export";
     public const string HrPayrollReportingView = "hr.payroll.reporting.view";
     public const string HrPayrollReportingExport = "hr.payroll.reporting.export";
 
@@ -189,6 +194,16 @@ public static class Permissions
         new(HrInsuranceManage, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceManage", true, "High"),
         new(HrInsuranceCalculate, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceCalculate"),
         new(HrInsuranceReport, "PermissionGroupHrInsurance", "PermissionDescriptionHrInsuranceReport"),
+        new(HrPayrollView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollView"),
+        new(HrPayrollCalculate, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollCalculate", true, "High"),
+        new(HrPayrollApprove, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollApprove", true, "High"),
+        new(HrPayrollLock, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollLock", true, "Critical"),
+        new(HrPayrollExport, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollExport", true, "High"),
+        new(HrPayslipDocumentView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentView"),
+        new(HrPayslipDocumentGenerate, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentGenerate"),
+        new(HrPayslipEmailSend, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipEmailSend"),
+        new(HrPayrollReportingView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingView"),
+        new(HrPayrollReportingExport, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingExport", true, "High"),
         new(HrEssProfileView, "PermissionGroupHrEss", "PermissionDescriptionHrEssProfileView"),
         new(HrEssLeaveView, "PermissionGroupHrEss", "PermissionDescriptionHrEssLeaveView"),
         new(HrEssLeaveRequest, "PermissionGroupHrEss", "PermissionDescriptionHrEssLeaveRequest"),
@@ -196,12 +211,7 @@ public static class Permissions
         new(HrEssOvertimeView, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeView"),
         new(HrEssOvertimeCreate, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeCreate"),
         new(HrEssPayrollView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayrollView"),
-        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView"),
-        new(HrPayslipDocumentView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentView"),
-        new(HrPayslipDocumentGenerate, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipDocumentGenerate"),
-        new(HrPayslipEmailSend, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayslipEmailSend"),
-        new(HrPayrollReportingView, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingView"),
-        new(HrPayrollReportingExport, "PermissionGroupHrPayroll", "PermissionDescriptionHrPayrollReportingExport", true, "High")
+        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

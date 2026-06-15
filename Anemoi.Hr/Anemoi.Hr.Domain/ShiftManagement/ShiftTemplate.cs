@@ -1,4 +1,3 @@
-using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -19,6 +18,7 @@ public sealed class ShiftTemplate : Entity<ShiftTemplateId>
     private ShiftTemplate() { }
 
     public static ShiftTemplate Create(
+        ShiftTemplateId id,
         string code,
         string name,
         TimeOnly startTime,
@@ -31,7 +31,7 @@ public sealed class ShiftTemplate : Entity<ShiftTemplateId>
 
         return new ShiftTemplate
         {
-            Id = new ShiftTemplateId(IdGenerator.NextGuid()),
+            Id = id,
             Code = code,
             Name = name,
             StartTime = startTime,

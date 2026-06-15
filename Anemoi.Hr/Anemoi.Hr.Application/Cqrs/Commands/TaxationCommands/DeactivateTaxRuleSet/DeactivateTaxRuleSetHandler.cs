@@ -23,7 +23,7 @@ public sealed class DeactivateTaxRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         var ruleSetId = new TaxRuleSetId(ruleSetGuid);
@@ -33,17 +33,17 @@ public sealed class DeactivateTaxRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         ruleSet.Status = "Inactive";
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.UpdatedBy ?? "system";
+        ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

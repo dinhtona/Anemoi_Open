@@ -9,27 +9,27 @@ public sealed class UpdateAttendanceRecordValidator : AbstractValidator<UpdateAt
     public UpdateAttendanceRecordValidator()
     {
         RuleFor(x => x.Id)
-            .RequiredId("VAL_ATTENDANCE_RECORD_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValAttendanceRecordIdRequired);
 
         RuleFor(x => x.AttendancePeriodId)
-            .RequiredId("VAL_ATTENDANCE_PERIOD_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValAttendancePeriodIdRequired);
 
         RuleFor(x => x.EmployeeId)
-            .RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
 
         RuleFor(x => x.WorkDate)
-            .NotEmpty().WithMessage("VAL_WORK_DATE_REQUIRED");
+            .NotEmpty().WithMessage(HrBusinessErrorCodes.ValWorkDateRequired);
 
         RuleFor(x => x.WorkedHours)
-            .InclusiveBetween(0, 24).WithMessage("VAL_WORKED_HOURS_OUT_OF_RANGE");
+            .InclusiveBetween(0, 24).WithMessage(HrBusinessErrorCodes.ValWorkedHoursOutOfRange);
 
         RuleFor(x => x.WorkedDays)
-            .InclusiveBetween(0, 1).WithMessage("VAL_WORKED_DAYS_OUT_OF_RANGE");
+            .InclusiveBetween(0, 1).WithMessage(HrBusinessErrorCodes.ValWorkedDaysOutOfRange);
 
         RuleFor(x => x.StatusCode)
-            .NotEmpty().WithMessage("VAL_STATUS_REQUIRED")
+            .NotEmpty().WithMessage(HrBusinessErrorCodes.ValStatusRequired)
             .Must(AttendanceStatusCodes.All.Contains)
-            .WithMessage("VAL_ATTENDANCE_STATUS_UNSUPPORTED");
+            .WithMessage(HrBusinessErrorCodes.ValAttendanceStatusUnsupported);
 
         RuleFor(x => x)
             .Must(x => !x.CheckInTime.HasValue || !x.CheckOutTime.HasValue || x.CheckOutTime.Value > x.CheckInTime.Value)

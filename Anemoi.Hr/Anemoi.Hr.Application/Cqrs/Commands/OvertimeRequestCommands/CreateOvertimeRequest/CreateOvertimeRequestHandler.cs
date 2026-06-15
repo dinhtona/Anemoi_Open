@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
@@ -8,6 +9,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using OneOf;
 
@@ -58,6 +60,7 @@ public sealed class CreateOvertimeRequestHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.OvertimeDurationExceedsLimit);
 
         var overtimeRequest = OvertimeRequest.Create(
+            new OvertimeRequestId(IdGenerator.NextGuid()),
             request.EmployeeId,
             request.OvertimeDate,
             request.StartTime,
@@ -71,7 +74,7 @@ public sealed class CreateOvertimeRequestHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.OvertimeRequestConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         await publishEndpoint.Publish(new OvertimeRequestCreatedIntegrationEvent(

@@ -1,4 +1,3 @@
-using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.ModelIds.ModelIds;
@@ -30,6 +29,7 @@ public sealed class EmployeeShiftAssignment : Entity<EmployeeShiftAssignmentId>
     private EmployeeShiftAssignment() { }
 
     public static EmployeeShiftAssignment Create(
+        EmployeeShiftAssignmentId id,
         EmployeeId employeeId,
         ShiftTemplate shiftTemplate,
         DateOnly workDate,
@@ -46,7 +46,7 @@ public sealed class EmployeeShiftAssignment : Entity<EmployeeShiftAssignmentId>
 
         return new EmployeeShiftAssignment
         {
-            Id = new EmployeeShiftAssignmentId(IdGenerator.NextGuid()),
+            Id = id,
             EmployeeId = employeeId,
             ShiftTemplateId = shiftTemplate.Id,
             WorkDate = workDate,

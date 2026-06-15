@@ -25,7 +25,7 @@ public class ShiftManagementDomainTests
     [Fact]
     public void CreateShiftTemplate_ExpectedWorkingHours_DerivedCorrectly()
     {
-        var template = ShiftTemplate.Create("MORNING", "Morning Shift",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "MORNING", "Morning Shift",
             TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30);
         Assert.Equal(7.5m, template.ExpectedWorkingHours);
     }
@@ -33,7 +33,7 @@ public class ShiftManagementDomainTests
     [Fact]
     public void CreateShiftTemplate_NoBreak_ExpectedHoursEqualsDuration()
     {
-        var template = ShiftTemplate.Create("NOBREAK", "No Break Shift",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "NOBREAK", "No Break Shift",
             TimeOnly.Parse("09:00"), TimeOnly.Parse("17:00"), 0);
         Assert.Equal(8m, template.ExpectedWorkingHours);
     }
@@ -41,7 +41,7 @@ public class ShiftManagementDomainTests
     [Fact]
     public void CreateShiftTemplate_ExpectedHours_RoundedToTwoDecimals()
     {
-        var template = ShiftTemplate.Create("PRECISE", "Precise Shift",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "PRECISE", "Precise Shift",
             TimeOnly.Parse("08:00"), TimeOnly.Parse("17:15"), 45);
         Assert.Equal(8.5m, template.ExpectedWorkingHours);
     }
@@ -50,7 +50,7 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_EmptyCode_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            ShiftTemplate.Create("", "Morning Shift",
+            ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "", "Morning Shift",
                 TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30));
     }
 
@@ -58,7 +58,7 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_EmptyName_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            ShiftTemplate.Create("MORNING", "",
+            ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "MORNING", "",
                 TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30));
     }
 
@@ -66,14 +66,14 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_StartTimeEqualsEndTime_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            ShiftTemplate.Create("INVALID", "Invalid Shift",
+            ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "INVALID", "Invalid Shift",
                 TimeOnly.Parse("08:00"), TimeOnly.Parse("08:00"), 30));
     }
 
     [Fact]
     public void CreateShiftTemplate_CrossMidnight_CreatesSuccessfully()
     {
-        var template = ShiftTemplate.Create("NIGHT", "Night Shift",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "NIGHT", "Night Shift",
             TimeOnly.Parse("22:00"), TimeOnly.Parse("06:00"), 30);
         Assert.Equal("NIGHT", template.Code);
         Assert.Equal("Night Shift", template.Name);
@@ -87,7 +87,7 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_CrossMidnight_ExpectedWorkingHours_Correct()
     {
         // 22:00 to 06:00 = 8 hours, minus 30 min break = 7.5 hours
-        var template = ShiftTemplate.Create("NIGHT", "Night Shift",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "NIGHT", "Night Shift",
             TimeOnly.Parse("22:00"), TimeOnly.Parse("06:00"), 30);
         Assert.Equal(7.5m, template.ExpectedWorkingHours);
     }
@@ -96,7 +96,7 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_CrossMidnight_NoBreak_ExpectedHours_Correct()
     {
         // 23:00 to 07:00 = 8 hours, no break
-        var template = ShiftTemplate.Create("NIGHT2", "Night Shift 2",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "NIGHT2", "Night Shift 2",
             TimeOnly.Parse("23:00"), TimeOnly.Parse("07:00"), 0);
         Assert.Equal(8m, template.ExpectedWorkingHours);
     }
@@ -105,14 +105,14 @@ public class ShiftManagementDomainTests
     public void CreateShiftTemplate_NegativeBreakMinutes_Throws()
     {
         Assert.Throws<ArgumentException>(() =>
-            ShiftTemplate.Create("INVALID", "Invalid Shift",
+            ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "INVALID", "Invalid Shift",
                 TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), -1));
     }
 
     [Fact]
     public void CreateShiftTemplate_ZeroBreakMinutes_IsValid()
     {
-        var template = ShiftTemplate.Create("NOBREAK", "No Break",
+        var template = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "NOBREAK", "No Break",
             TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 0);
         Assert.Equal(0, template.BreakMinutes);
         Assert.Equal(8m, template.ExpectedWorkingHours);
@@ -165,6 +165,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
 
@@ -185,6 +186,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
 
@@ -206,6 +208,7 @@ public class ShiftManagementDomainTests
 
         Assert.Throws<ArgumentException>(() =>
             EmployeeShiftAssignment.Create(
+                new EmployeeShiftAssignmentId(Guid.NewGuid()),
                 TestEmployeeId, template,
                 DateOnly.FromDateTime(DateTime.Today), "admin"));
     }
@@ -216,6 +219,7 @@ public class ShiftManagementDomainTests
         var template = CreateValidTemplate();
         Assert.Throws<ArgumentException>(() =>
             EmployeeShiftAssignment.Create(
+                new EmployeeShiftAssignmentId(Guid.NewGuid()),
                 null!, template,
                 DateOnly.FromDateTime(DateTime.Today), "admin"));
     }
@@ -225,6 +229,7 @@ public class ShiftManagementDomainTests
     {
         Assert.Throws<ArgumentException>(() =>
             EmployeeShiftAssignment.Create(
+                new EmployeeShiftAssignmentId(Guid.NewGuid()),
                 TestEmployeeId, null!,
                 DateOnly.FromDateTime(DateTime.Today), "admin"));
     }
@@ -234,6 +239,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
 
@@ -250,6 +256,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
 
@@ -264,10 +271,12 @@ public class ShiftManagementDomainTests
         var workDate = DateOnly.FromDateTime(DateTime.Today);
 
         var firstAssignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template, workDate, "admin");
         firstAssignment.Cancel("manager1");
 
         var secondAssignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template, workDate, "admin");
         Assert.Equal(EmployeeShiftAssignmentStatusCode.Assigned, secondAssignment.Status);
         Assert.NotEqual(firstAssignment.Id, secondAssignment.Id);
@@ -285,6 +294,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
         Assert.NotEqual(Guid.Empty, assignment.Id.Value);
@@ -293,8 +303,8 @@ public class ShiftManagementDomainTests
     [Fact]
     public void DifferentShiftTemplates_HaveDifferentIds()
     {
-        var a = ShiftTemplate.Create("A", "A", TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30);
-        var b = ShiftTemplate.Create("B", "B", TimeOnly.Parse("14:00"), TimeOnly.Parse("22:00"), 30);
+        var a = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "A", "A", TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30);
+        var b = ShiftTemplate.Create(new ShiftTemplateId(Guid.NewGuid()), "B", "B", TimeOnly.Parse("14:00"), TimeOnly.Parse("22:00"), 30);
         Assert.NotEqual(a.Id, b.Id);
     }
 
@@ -341,6 +351,7 @@ public class ShiftManagementDomainTests
     {
         var template = CreateValidTemplate();
         var assignment = EmployeeShiftAssignment.Create(
+            new EmployeeShiftAssignmentId(Guid.NewGuid()),
             TestEmployeeId, template,
             DateOnly.FromDateTime(DateTime.Today), "admin");
         Assert.IsType<EmployeeShiftAssignmentId>(assignment.Id);
@@ -430,7 +441,9 @@ public class ShiftManagementDomainTests
 
     private static ShiftTemplate CreateValidTemplate()
     {
-        return ShiftTemplate.Create("MORNING", "Morning Shift",
+        return ShiftTemplate.Create(
+            new ShiftTemplateId(Guid.NewGuid()),
+            "MORNING", "Morning Shift",
             TimeOnly.Parse("06:00"), TimeOnly.Parse("14:00"), 30);
     }
 }

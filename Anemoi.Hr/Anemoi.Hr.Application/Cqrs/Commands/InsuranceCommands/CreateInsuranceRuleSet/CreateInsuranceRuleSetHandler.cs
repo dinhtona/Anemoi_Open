@@ -46,15 +46,15 @@ public sealed class CreateInsuranceRuleSetHandler(
             Version = maxVersion + 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            CreatedBy = request.CreatedBy ?? "system",
-            UpdatedBy = request.CreatedBy ?? "system"
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor
         };
 
         await ruleSetRepository.CreateOneAsync(newRuleSet, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateInsuranceRuleSetResponse { InsuranceRuleSetId = newRuleSet.Id.Value.ToString() };
     }

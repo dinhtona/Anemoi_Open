@@ -8,15 +8,15 @@ public sealed class AssignEmployeeAllowanceValidator : AbstractValidator<AssignE
 {
     public AssignEmployeeAllowanceValidator()
     {
-        RuleFor(x => x.EmployeeId).RequiredId("VAL_EMPLOYEE_ID_REQUIRED");
-        RuleFor(x => x.AllowanceTypeId).RequiredId("VAL_ALLOWANCE_TYPE_ID_REQUIRED");
-        RuleFor(x => x.Amount).GreaterThan(0).WithMessage("VAL_AMOUNT_MUST_BE_POSITIVE");
+        RuleFor(x => x.EmployeeId).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
+        RuleFor(x => x.AllowanceTypeId).RequiredId(HrBusinessErrorCodes.ValAllowanceTypeIdRequired);
+        RuleFor(x => x.Amount).GreaterThan(0).WithMessage(HrBusinessErrorCodes.ValAmountMustBePositive);
         RuleFor(x => x.Currency).NotEmpty().MaximumLength(16);
         RuleFor(x => x.EffectiveFrom).NotEmpty();
         RuleFor(x => x.EffectiveTo)
             .GreaterThanOrEqualTo(x => x.EffectiveFrom)
             .When(x => x.EffectiveTo.HasValue)
-            .WithMessage("HR_ALLOWANCE_INVALID_DATE_RANGE");
+            .WithMessage(HrBusinessErrorCodes.AllowanceInvalidDateRange);
         
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

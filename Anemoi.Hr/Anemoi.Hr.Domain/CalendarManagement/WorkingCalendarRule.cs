@@ -1,4 +1,3 @@
-using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -24,6 +23,7 @@ public sealed class WorkingCalendarRule : Entity<WorkingCalendarRuleId>
     private WorkingCalendarRule() { }
 
     public static WorkingCalendarRule Create(
+        WorkingCalendarRuleId id,
         string name,
         string? description,
         DateOnly effectiveFrom,
@@ -43,7 +43,7 @@ public sealed class WorkingCalendarRule : Entity<WorkingCalendarRuleId>
 
         return new WorkingCalendarRule
         {
-            Id = new WorkingCalendarRuleId(IdGenerator.NextGuid()),
+            Id = id,
             Name = name,
             Description = description,
             WorkMonday = workMonday,

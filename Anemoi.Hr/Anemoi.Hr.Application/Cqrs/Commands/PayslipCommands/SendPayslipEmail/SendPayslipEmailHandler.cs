@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
@@ -89,11 +90,12 @@ public sealed class SendPayslipEmailHandler(
 
         // 6. Audit-First Step A: Create and Save Pending Log
         var delivery = PayslipEmailDelivery.Create(
+            new PayslipEmailDeliveryId(IdGenerator.NextGuid()),
             payslip.Id,
             activeDoc.Id,
             targetEmail,
             $"Payslip for Period {payslip.PeriodCode}",
-            request.SentBy ?? "system");
+            request.SentBy ?? PayrollConstants.SystemActor);
 
         var createResult = await payslipEmailDeliveryRepository.CreateOneAsync(delivery, cancellationToken);
         if (createResult.IsT1)

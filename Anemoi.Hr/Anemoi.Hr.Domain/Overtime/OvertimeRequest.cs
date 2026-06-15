@@ -26,6 +26,7 @@ public sealed class OvertimeRequest : Entity<OvertimeRequestId>
     private OvertimeRequest() { }
 
     public static OvertimeRequest Create(
+        OvertimeRequestId id,
         EmployeeId employeeId,
         DateOnly overtimeDate,
         TimeOnly startTime,
@@ -37,7 +38,7 @@ public sealed class OvertimeRequest : Entity<OvertimeRequestId>
 
         var overtimeRequest = new OvertimeRequest
         {
-            Id = new OvertimeRequestId(Guid.NewGuid()),
+            Id = id,
             EmployeeId = employeeId,
             OvertimeDate = overtimeDate,
             StartTime = startTime,

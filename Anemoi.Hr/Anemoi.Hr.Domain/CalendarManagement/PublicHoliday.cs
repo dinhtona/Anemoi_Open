@@ -1,4 +1,3 @@
-using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -17,6 +16,7 @@ public sealed class PublicHoliday : Entity<PublicHolidayId>
     private PublicHoliday() { }
 
     public static PublicHoliday Create(
+        PublicHolidayId id,
         DateOnly holidayDate,
         string name,
         string? description,
@@ -27,7 +27,7 @@ public sealed class PublicHoliday : Entity<PublicHolidayId>
 
         return new PublicHoliday
         {
-            Id = new PublicHolidayId(IdGenerator.NextGuid()),
+            Id = id,
             HolidayDate = holidayDate,
             Name = name,
             Description = description,

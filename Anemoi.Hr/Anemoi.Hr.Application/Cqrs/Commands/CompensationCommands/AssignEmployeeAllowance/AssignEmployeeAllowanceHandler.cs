@@ -30,7 +30,7 @@ public sealed class AssignEmployeeAllowanceHandler(
     {
         var today = GetBusinessToday();
         if (request.EffectiveFrom > today)
-            return HrErrorResponses.Create("HR_ALLOWANCE_EFFECTIVE_DATE_IN_FUTURE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceEffectiveDateInFuture);
 
         var employee = await employeeRepository.GetFirstByConditionAsync(
             x => x.Id == request.EmployeeId,
@@ -41,13 +41,13 @@ public sealed class AssignEmployeeAllowanceHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
         if (request.EffectiveFrom < employee.JoinDate)
-            return HrErrorResponses.Create("HR_ALLOWANCE_DATE_BEFORE_JOIN_DATE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceDateBeforeJoinDate);
 
         var typeExists = await allowanceTypeRepository.ExistByConditionAsync(
             x => x.Id == request.AllowanceTypeId && x.IsActive,
             cancellationToken);
         if (!typeExists)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TYPE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTypeNotFound);
 
         // Fetch existing allowances for this type and currency
         var existingAllowances = await employeeAllowanceRepository.GetManyByConditionAsync(
@@ -59,7 +59,7 @@ public sealed class AssignEmployeeAllowanceHandler(
 
         // Check for duplicate EffectiveFrom
         if (existingAllowances.Any(x => x.EffectiveFrom == request.EffectiveFrom))
-            return HrErrorResponses.Create("HR_ALLOWANCE_TIMELINE_DUPLICATE_DATE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTimelineDuplicateDate);
 
         // Find active allowance at request.EffectiveFrom
         var activeAllowance = existingAllowances.FirstOrDefault(x =>
@@ -69,18 +69,18 @@ public sealed class AssignEmployeeAllowanceHandler(
         if (activeAllowance is not null)
         {
             if (request.EffectiveFrom <= activeAllowance.EffectiveFrom)
-                return HrErrorResponses.Create("HR_ALLOWANCE_TIMELINE_NOT_SEQUENTIAL");
+                return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTimelineNotSequential);
 
             // Close the currently active allowance
             activeAllowance.EffectiveTo = request.EffectiveFrom.AddDays(-1);
             activeAllowance.UpdatedAt = DateTime.UtcNow;
-            activeAllowance.UpdatedBy = request.CreatedBy ?? "system";
+            activeAllowance.UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor;
         }
 
         // Verify no future allowances overlap
         var hasFutureOverlap = existingAllowances.Any(x => x.EffectiveFrom > request.EffectiveFrom);
         if (hasFutureOverlap)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TIMELINE_NOT_SEQUENTIAL");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTimelineNotSequential);
 
         var newAllowance = new EmployeeAllowance
         {
@@ -91,9 +91,9 @@ public sealed class AssignEmployeeAllowanceHandler(
             Currency = request.Currency.Trim(),
             EffectiveFrom = request.EffectiveFrom,
             EffectiveTo = request.EffectiveTo,
-            CreatedBy = request.CreatedBy ?? "system",
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow,
-            UpdatedBy = request.CreatedBy ?? "system",
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow
         };
 
@@ -104,8 +104,8 @@ public sealed class AssignEmployeeAllowanceHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException ||
                    CompensationPersistenceErrors.IsUniqueConstraintViolation(saveResult.AsT1)
-                ? HrErrorResponses.Create("HR_ALLOWANCE_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new AssignEmployeeAllowanceResponse { EmployeeAllowanceId = newAllowance.Id.Value.ToString() };

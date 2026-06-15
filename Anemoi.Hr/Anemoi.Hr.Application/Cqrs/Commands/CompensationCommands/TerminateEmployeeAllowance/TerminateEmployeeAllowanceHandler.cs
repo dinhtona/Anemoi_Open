@@ -25,7 +25,7 @@ public sealed class TerminateEmployeeAllowanceHandler(
     {
         var today = GetBusinessToday();
         if (request.TerminationDate > today)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TERMINATION_DATE_IN_FUTURE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTerminationDateInFuture);
 
         var allowance = await employeeAllowanceRepository.GetFirstByConditionAsync(
             x => x.Id == request.EmployeeAllowanceId,
@@ -33,22 +33,22 @@ public sealed class TerminateEmployeeAllowanceHandler(
             cancellationToken);
 
         if (allowance is null)
-            return HrErrorResponses.Create("HR_EMPLOYEE_ALLOWANCE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeAllowanceNotFound);
 
         if (request.TerminationDate < allowance.EffectiveFrom)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TERMINATION_BEFORE_EFFECTIVE_FROM");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTerminationBeforeEffectiveFrom);
 
         allowance.EffectiveTo = request.TerminationDate;
         allowance.UpdatedAt = DateTime.UtcNow;
-        allowance.UpdatedBy = request.UpdatedBy ?? "system";
+        allowance.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create("HR_ALLOWANCE_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return new TerminateEmployeeAllowanceResponse { EmployeeAllowanceId = allowance.Id.Value.ToString() };

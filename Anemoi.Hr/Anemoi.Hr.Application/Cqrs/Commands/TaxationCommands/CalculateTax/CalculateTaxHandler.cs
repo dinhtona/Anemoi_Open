@@ -33,12 +33,12 @@ public sealed class CalculateTaxHandler(
 
         if (request.PeriodStart > request.PeriodEnd)
         {
-            return HrErrorResponses.Create("HR_TAX_CALCULATION_INVALID_PERIOD");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxCalculationInvalidPeriod);
         }
 
         if (request.GrossIncome < 0 || request.TaxableIncome < 0)
         {
-            return HrErrorResponses.Create("HR_TAX_CALCULATION_NEGATIVE_INCOME");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxCalculationNegativeIncome);
         }
 
         // Find active rule set for the period
@@ -51,7 +51,7 @@ public sealed class CalculateTaxHandler(
         var ruleSet = activeRuleSets.FirstOrDefault();
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         // Load brackets and deduction rules
@@ -233,7 +233,7 @@ public sealed class CalculateTaxHandler(
             CalculationPeriodStart = request.PeriodStart,
             CalculationPeriodEnd = request.PeriodEnd,
             CalculatedAt = DateTime.UtcNow,
-            CalculatedBy = request.CalculatedBy ?? "system",
+            CalculatedBy = request.CalculatedBy ?? PayrollConstants.SystemActor,
             SourceModule = request.SourceModule.Trim(),
             SourceReferenceId = request.SourceReferenceId
         };
@@ -242,7 +242,7 @@ public sealed class CalculateTaxHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CalculateTaxResponse
         {

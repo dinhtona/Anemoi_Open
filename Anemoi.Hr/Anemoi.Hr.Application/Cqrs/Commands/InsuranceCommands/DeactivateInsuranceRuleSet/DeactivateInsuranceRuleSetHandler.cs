@@ -25,7 +25,7 @@ public sealed class DeactivateInsuranceRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         var ruleSetId = new InsuranceRuleSetId(ruleSetGuid);
@@ -35,17 +35,17 @@ public sealed class DeactivateInsuranceRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotFound);
         }
 
         if (ruleSet.Status != InsuranceRuleSetStatuses.Active)
         {
-            return HrErrorResponses.Create("HR_INSURANCE_RULE_SET_NOT_ACTIVE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.InsuranceRuleSetNotActive);
         }
 
         ruleSet.Status = InsuranceRuleSetStatuses.Inactive;
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.DeactivatedBy ?? "system";
+        ruleSet.UpdatedBy = request.DeactivatedBy ?? PayrollConstants.SystemActor;
 
         var auditLog = new InsuranceAuditLog
         {
@@ -53,7 +53,7 @@ public sealed class DeactivateInsuranceRuleSetHandler(
             RuleSetId = ruleSetId,
             Action = "Deactivate",
             Description = $"Insurance rule set '{ruleSet.Name}' deactivated",
-            PerformedBy = request.DeactivatedBy ?? "system",
+            PerformedBy = request.DeactivatedBy ?? PayrollConstants.SystemActor,
             PerformedAt = DateTime.UtcNow
         };
 
@@ -62,7 +62,7 @@ public sealed class DeactivateInsuranceRuleSetHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

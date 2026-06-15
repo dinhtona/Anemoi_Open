@@ -8,9 +8,9 @@ public sealed class CreateSalaryRangeValidator : AbstractValidator<CreateSalaryR
 {
     public CreateSalaryRangeValidator()
     {
-        RuleFor(x => x.SalaryGradeId).RequiredId("VAL_SALARY_GRADE_ID_REQUIRED");
-        RuleFor(x => x.MinSalary).GreaterThan(0).WithMessage("VAL_MIN_SALARY_MUST_BE_POSITIVE");
-        RuleFor(x => x.MaxSalary).GreaterThanOrEqualTo(x => x.MinSalary).WithMessage("VAL_MAX_SALARY_MUST_BE_GE_MIN_SALARY");
+        RuleFor(x => x.SalaryGradeId).RequiredId(HrBusinessErrorCodes.ValSalaryGradeIdRequired);
+        RuleFor(x => x.MinSalary).GreaterThan(0).WithMessage(HrBusinessErrorCodes.ValMinSalaryMustBePositive);
+        RuleFor(x => x.MaxSalary).GreaterThanOrEqualTo(x => x.MinSalary).WithMessage(HrBusinessErrorCodes.ValMaxSalaryMustBeGeMinSalary);
         RuleFor(x => x.Currency).NotEmpty().MaximumLength(16);
         RuleFor(x => x.EffectiveFrom).NotEmpty();
         

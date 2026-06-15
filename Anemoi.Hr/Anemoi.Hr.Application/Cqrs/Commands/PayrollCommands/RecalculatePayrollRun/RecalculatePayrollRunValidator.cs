@@ -9,7 +9,7 @@ public sealed class RecalculatePayrollRunValidator : AbstractValidator<Recalcula
     public RecalculatePayrollRunValidator()
     {
         RuleFor(x => x.PayrollRunId)
-            .RequiredId("VAL_PAYROLL_RUN_ID_REQUIRED");
+            .RequiredId(HrBusinessErrorCodes.ValPayrollRunIdRequired);
 
         RuleFor(x => x.SensitivePermissionConfirmed)
             .Equal(true)

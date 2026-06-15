@@ -25,6 +25,7 @@ public sealed class PayslipEmailDelivery : Entity<PayslipEmailDeliveryId>
     private PayslipEmailDelivery() { }
 
     public static PayslipEmailDelivery Create(
+        PayslipEmailDeliveryId id,
         PayslipId payslipId,
         PayslipDocumentId payslipDocumentId,
         string toEmail,
@@ -33,7 +34,7 @@ public sealed class PayslipEmailDelivery : Entity<PayslipEmailDeliveryId>
     {
         return new PayslipEmailDelivery
         {
-            Id = new PayslipEmailDeliveryId(Guid.NewGuid()),
+            Id = id,
             PayslipId = payslipId,
             PayslipDocumentId = payslipDocumentId,
             ToEmail = toEmail,

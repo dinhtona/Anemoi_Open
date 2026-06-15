@@ -13,7 +13,7 @@ public sealed class CreateCalendarExceptionValidator : AbstractValidator<CreateC
             .WithErrorCode(HrBusinessErrorCodes.CalendarExceptionDateRequired);
 
         RuleFor(x => x.ExceptionType)
-            .Must(x => x is "WorkingDayOverride" or "HolidayOverride")
+            .Must(x => x is CalendarExceptionTypeConstants.WorkingDayOverride or CalendarExceptionTypeConstants.HolidayOverride)
             .WithErrorCode(HrBusinessErrorCodes.CalendarExceptionTypeRequired);
 
         RuleFor(x => x.Name)

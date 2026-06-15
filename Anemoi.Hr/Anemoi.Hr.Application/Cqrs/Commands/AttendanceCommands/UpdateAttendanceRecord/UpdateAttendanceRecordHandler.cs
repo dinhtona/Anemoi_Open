@@ -62,7 +62,7 @@ public sealed class UpdateAttendanceRecordHandler(
 
         // Validate work date is within the period
         if (request.WorkDate < period.StartDate || request.WorkDate > period.EndDate)
-            return HrErrorResponses.Create("VAL_WORK_DATE_OUT_OF_PERIOD");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ValWorkDateOutOfPeriod);
 
         // 3. Validate employee
         var employeeExists = await employeeRepository.ExistByConditionAsync(
@@ -91,7 +91,7 @@ public sealed class UpdateAttendanceRecordHandler(
         record.Status = request.StatusCode;
         record.LeaveRequestId = request.LeaveRequestId;
         record.UpdatedAt = DateTime.UtcNow;
-        record.UpdatedBy = request.UpdatedBy ?? "system";
+        record.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -99,7 +99,7 @@ public sealed class UpdateAttendanceRecordHandler(
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.AttendanceConcurrencyConflict)
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToResponse(record);

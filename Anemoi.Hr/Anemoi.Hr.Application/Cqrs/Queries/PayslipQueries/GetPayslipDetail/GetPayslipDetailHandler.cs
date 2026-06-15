@@ -27,7 +27,7 @@ public sealed class GetPayslipDetailHandler(
             cancellationToken);
 
         if (payslip is null)
-            return HrErrorResponses.Create("HR_PAYSLIP_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PayslipNotFound);
 
         return mapper.ToResponse(payslip);
     }

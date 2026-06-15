@@ -29,7 +29,7 @@ public sealed class CreateSalaryRangeHandler(
             cancellationToken);
 
         if (!gradeExists)
-            return HrErrorResponses.Create("HR_SALARY_GRADE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryGradeNotFound);
 
         // Validate range overlap for the same Grade + Currency
         var ranges = await salaryRangeRepository.GetManyByConditionAsync(
@@ -44,7 +44,7 @@ public sealed class CreateSalaryRangeHandler(
             (r.EffectiveTo == null || r.EffectiveTo >= request.EffectiveFrom));
 
         if (hasOverlap)
-            return HrErrorResponses.Create("HR_SALARY_RANGE_OVERLAPPING");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryRangeOverlapping);
 
         var newRange = new SalaryRange
         {
@@ -64,7 +64,7 @@ public sealed class CreateSalaryRangeHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateSalaryRangeResponse { SalaryRangeId = newRange.Id.Value.ToString() };
     }

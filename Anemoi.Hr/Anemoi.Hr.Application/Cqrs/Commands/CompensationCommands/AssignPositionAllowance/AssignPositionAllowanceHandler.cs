@@ -35,13 +35,13 @@ public sealed class AssignPositionAllowanceHandler(
             x => x.Id == request.AllowanceTypeId && x.IsActive,
             cancellationToken);
         if (!typeExists)
-            return HrErrorResponses.Create("HR_ALLOWANCE_TYPE_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTypeNotFound);
 
         var exists = await positionAllowanceRepository.ExistByConditionAsync(
             x => x.PositionId == request.PositionId && x.AllowanceTypeId == request.AllowanceTypeId,
             cancellationToken);
         if (exists)
-            return HrErrorResponses.Create("HR_POSITION_ALLOWANCE_ALREADY_EXISTS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PositionAllowanceAlreadyExists);
 
         var newAllowance = new PositionAllowance
         {
@@ -59,7 +59,7 @@ public sealed class AssignPositionAllowanceHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new AssignPositionAllowanceResponse { PositionAllowanceId = newAllowance.Id.Value.ToString() };
     }

@@ -31,7 +31,7 @@ public sealed class CreateTaxRuleSetHandler(
 
         if (effectiveTo.HasValue && effectiveFrom > effectiveTo.Value)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_INVALID_DATE_RANGE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetInvalidDateRange);
         }
 
         // Check for overlapping rule sets (only those that are Active or Draft, not Inactive)
@@ -45,7 +45,7 @@ public sealed class CreateTaxRuleSetHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_OVERLAPPING_PERIOD");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetOverlappingPeriod);
         }
 
         // Determine next version for CountryCode + TaxType
@@ -63,15 +63,15 @@ public sealed class CreateTaxRuleSetHandler(
             Version = maxVersion + 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            CreatedBy = request.CreatedBy ?? "system",
-            UpdatedBy = request.CreatedBy ?? "system"
+            CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
+            UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor
         };
 
         await ruleSetRepository.CreateOneAsync(newRuleSet, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateTaxRuleSetResponse { TaxRuleSetId = newRuleSet.Id.Value.ToString() };
     }

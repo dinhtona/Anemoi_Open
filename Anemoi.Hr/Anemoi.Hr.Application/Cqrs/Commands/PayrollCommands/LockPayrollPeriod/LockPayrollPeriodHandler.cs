@@ -55,7 +55,7 @@ public sealed class LockPayrollPeriodHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
 
         var now = DateTime.UtcNow;
-        var updatedBy = request.UpdatedBy ?? "system";
+        var updatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
         period.StatusCode = "Locked";
         period.UpdatedAt = now;
         period.UpdatedBy = updatedBy;
@@ -65,8 +65,8 @@ public sealed class LockPayrollPeriodHandler(
         if (saveResult.IsT1)
         {
             return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create("HR_PAYROLL_PERIOD_CONCURRENCY_CONFLICT")
-                : HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
         return mapper.ToResponse(period);

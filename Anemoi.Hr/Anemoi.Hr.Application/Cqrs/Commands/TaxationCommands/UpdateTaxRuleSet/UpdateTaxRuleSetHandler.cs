@@ -24,7 +24,7 @@ public sealed class UpdateTaxRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         var ruleSetId = new TaxRuleSetId(ruleSetGuid);
@@ -34,12 +34,12 @@ public sealed class UpdateTaxRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status != "Draft")
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
 
         var effectiveFrom = request.EffectiveFrom;
@@ -47,7 +47,7 @@ public sealed class UpdateTaxRuleSetHandler(
 
         if (effectiveTo.HasValue && effectiveFrom > effectiveTo.Value)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_INVALID_DATE_RANGE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetInvalidDateRange);
         }
 
         // Check for overlaps with other sets (excluding current one)
@@ -61,19 +61,19 @@ public sealed class UpdateTaxRuleSetHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_OVERLAPPING_PERIOD");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetOverlappingPeriod);
         }
 
         ruleSet.Name = request.Name.Trim();
         ruleSet.EffectiveFrom = effectiveFrom;
         ruleSet.EffectiveTo = effectiveTo;
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.UpdatedBy ?? "system";
+        ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

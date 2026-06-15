@@ -20,8 +20,8 @@ public sealed class ExportPayrollVarianceCsvQueryValidator : AbstractValidator<E
 
         RuleFor(x => x)
             .Must(x => x.CurrentPayrollPeriodId != null || x.CurrentPayrollRunId != null)
-            .WithMessage("HR_REPORT_VARIANCE_CURRENT_CRITERIA_REQUIRED")
+            .WithMessage(HrBusinessErrorCodes.ReportVarianceCurrentCriteriaRequired)
             .Must(x => x.PreviousPayrollPeriodId != null || x.PreviousPayrollRunId != null)
-            .WithMessage("HR_REPORT_VARIANCE_PREVIOUS_CRITERIA_REQUIRED");
+            .WithMessage(HrBusinessErrorCodes.ReportVariancePreviousCriteriaRequired);
     }
 }

@@ -28,7 +28,7 @@ public sealed class CreateSalaryGradeHandler(
             cancellationToken);
 
         if (exists)
-            return HrErrorResponses.Create("HR_SALARY_GRADE_ALREADY_EXISTS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SalaryGradeAlreadyExists);
 
         var newGrade = new SalaryGrade
         {
@@ -45,7 +45,7 @@ public sealed class CreateSalaryGradeHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new CreateSalaryGradeResponse { SalaryGradeId = newGrade.Id.Value.ToString() };
     }

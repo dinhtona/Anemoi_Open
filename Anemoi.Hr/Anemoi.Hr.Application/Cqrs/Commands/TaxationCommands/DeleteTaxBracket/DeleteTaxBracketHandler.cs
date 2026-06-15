@@ -24,7 +24,7 @@ public sealed class DeleteTaxBracketHandler(
     {
         if (!Guid.TryParse(request.Id, out var bracketGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketNotFound);
         }
 
         var bracketId = new TaxBracketId(bracketGuid);
@@ -34,7 +34,7 @@ public sealed class DeleteTaxBracketHandler(
 
         if (bracket is null)
         {
-            return HrErrorResponses.Create("HR_TAX_BRACKET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxBracketNotFound);
         }
 
         var ruleSet = await ruleSetRepository.GetFirstByConditionAsync(
@@ -43,19 +43,19 @@ public sealed class DeleteTaxBracketHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status != "Draft")
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_DRAFT");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
 
         await bracketRepository.RemoveOneAsync(bracket, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }

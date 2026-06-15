@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
@@ -26,11 +27,12 @@ public sealed class CreateCalendarExceptionHandler(
         if (existing)
             return HrErrorResponses.Create(HrBusinessErrorCodes.CalendarExceptionDuplicate);
 
-        var status = request.ExceptionType == "WorkingDayOverride"
+        var status = request.ExceptionType == CalendarExceptionTypeConstants.WorkingDayOverride
             ? CalendarStatus.WorkingDay
             : CalendarStatus.Holiday;
 
         var calendarException = Domain.CalendarManagement.CalendarException.Create(
+            new CalendarExceptionId(IdGenerator.NextGuid()),
             request.ExceptionDate,
             status,
             request.Name,

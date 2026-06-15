@@ -26,7 +26,7 @@ public sealed class ActivateTaxRuleSetHandler(
     {
         if (!Guid.TryParse(request.Id, out var ruleSetGuid))
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         var ruleSetId = new TaxRuleSetId(ruleSetGuid);
@@ -36,7 +36,7 @@ public sealed class ActivateTaxRuleSetHandler(
 
         if (ruleSet is null)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_NOT_FOUND");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
         if (ruleSet.Status == "Active")
@@ -51,7 +51,7 @@ public sealed class ActivateTaxRuleSetHandler(
 
         if (!hasBrackets)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_HAS_NO_BRACKETS");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetHasNoBrackets);
         }
 
         // Check for overlaps with other ACTIVE sets
@@ -65,17 +65,17 @@ public sealed class ActivateTaxRuleSetHandler(
 
         if (overlaps)
         {
-            return HrErrorResponses.Create("HR_TAX_RULE_SET_OVERLAP_WITH_ACTIVE");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetOverlapWithActive);
         }
 
         ruleSet.Status = "Active";
         ruleSet.UpdatedAt = DateTime.UtcNow;
-        ruleSet.UpdatedBy = request.UpdatedBy ?? "system";
+        ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create("HR_SAVE_CHANGES_FAILED");
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return new SuccessResponse();
     }
