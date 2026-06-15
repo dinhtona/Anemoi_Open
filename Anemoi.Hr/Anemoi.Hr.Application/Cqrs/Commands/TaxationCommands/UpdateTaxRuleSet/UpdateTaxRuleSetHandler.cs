@@ -37,7 +37,7 @@ public sealed class UpdateTaxRuleSetHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
-        if (ruleSet.Status != "Draft")
+        if (ruleSet.Status != TaxRuleSetStatusCode.Draft)
         {
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }
@@ -52,7 +52,7 @@ public sealed class UpdateTaxRuleSetHandler(
 
         // Check for overlaps with other sets (excluding current one)
         var existingSets = await ruleSetRepository.GetManyByConditionAsync(
-            x => x.CountryCode == ruleSet.CountryCode && x.TaxType == ruleSet.TaxType && x.Id != ruleSetId && x.Status != "Inactive",
+            x => x.CountryCode == ruleSet.CountryCode && x.TaxType == ruleSet.TaxType && x.Id != ruleSetId && x.Status != TaxRuleSetStatusCode.Inactive,
             token: cancellationToken);
 
         var overlaps = existingSets.Any(x =>

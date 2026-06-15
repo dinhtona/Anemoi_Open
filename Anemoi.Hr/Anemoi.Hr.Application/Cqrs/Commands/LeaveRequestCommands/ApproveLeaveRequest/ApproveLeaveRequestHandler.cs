@@ -27,9 +27,9 @@ public sealed class ApproveLeaveRequestHandler(
         var leaveRequest = await leaveRequestRepository.GetFirstByConditionAsync(x => x.Id == request.Id,
             null, cancellationToken);
         if (leaveRequest is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestNotFound);
-        if (leaveRequest.StatusCode == "Approved")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Approved)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyApproved);
-        if (leaveRequest.StatusCode is "Rejected" or "Cancelled")
+        if (leaveRequest.StatusCode is LeaveRequestStatusCode.Rejected or LeaveRequestStatusCode.Cancelled)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestInvalidStatus);
 
         var balance = await leaveBalanceRepository.GetFirstByConditionAsync(
@@ -43,12 +43,12 @@ public sealed class ApproveLeaveRequestHandler(
         balance.PendingDays -= leaveRequest.RequestedDays;
         balance.UsedDays += leaveRequest.RequestedDays;
         balance.UpdatedAt = DateTime.UtcNow;
-        leaveRequest.StatusCode = "Approved";
+        leaveRequest.StatusCode = LeaveRequestStatusCode.Approved;
         leaveRequest.UpdatedAt = DateTime.UtcNow;
 
         await leaveTransactionRepository.CreateManyAsync([
-            NewTransaction(leaveRequest, balance, "PendingRelease", leaveRequest.RequestedDays, request.Comment),
-            NewTransaction(leaveRequest, balance, "Used", leaveRequest.RequestedDays, request.Comment)
+            NewTransaction(leaveRequest, balance, LeaveBalanceTransactionType.PendingRelease, leaveRequest.RequestedDays, request.Comment),
+            NewTransaction(leaveRequest, balance, LeaveBalanceTransactionType.Used, leaveRequest.RequestedDays, request.Comment)
         ], cancellationToken);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -68,7 +68,7 @@ public sealed class ApproveLeaveRequestHandler(
             balance.LeavePolicyId.Value.ToString(),
             balance.Year,
             balance.RemainingDays,
-            "Used"), cancellationToken);
+            LeaveBalanceTransactionType.Used), cancellationToken);
 
         return None.Value;
     }
@@ -86,7 +86,7 @@ public sealed class ApproveLeaveRequestHandler(
             TransactionTypeCode = type,
             Days = days,
             BalanceAfterDays = balance.RemainingDays,
-            SourceType = "LeaveRequest",
+            SourceType = LeaveBalanceTransactionType.SourceTypeLeaveRequest,
             SourceId = request.Id.Value.ToString(),
             Reason = reason,
             CreatedAt = DateTime.UtcNow

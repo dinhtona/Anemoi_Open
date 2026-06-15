@@ -48,7 +48,7 @@ public sealed class CalculatePayrollRunHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodNotFound);
 
         // 2. Reject if payroll period is locked
-        if (period.StatusCode == "Locked")
+        if (period.StatusCode == PayrollPeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
 
         // Validate Standard Working Days
@@ -68,7 +68,7 @@ public sealed class CalculatePayrollRunHandler(
         if (attendancePeriod is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
 
-        if (attendancePeriod.StatusCode != "Locked")
+        if (attendancePeriod.StatusCode != AttendancePeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
 
         // 4. Reject if payroll run already exists
@@ -202,8 +202,8 @@ public sealed class CalculatePayrollRunHandler(
                 {
                     Id = new PayrollItemId(IdGenerator.NextGuid()),
                     PayrollRunId = payrollRun.Id,
-                    ItemCode = allowance.AllowanceType?.Code ?? "ALLOWANCE",
-                    ItemName = allowance.AllowanceType?.Name ?? "Allowance",
+                    ItemCode = allowance.AllowanceType?.Code ?? PayrollConstants.AllowanceItemCodeFallback,
+                    ItemName = allowance.AllowanceType?.Name ?? PayrollConstants.AllowanceItemNameFallback,
                     ItemTypeCode = PayrollItemType.Allowance,
                     Amount = allowance.Amount,
                     CurrencyCode = allowance.Currency,

@@ -27,11 +27,11 @@ public sealed class CancelLeaveRequestHandler(
         var leaveRequest = await leaveRequestRepository.GetFirstByConditionAsync(x => x.Id == request.Id,
             null, cancellationToken);
         if (leaveRequest is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestNotFound);
-        if (leaveRequest.StatusCode == "Cancelled")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Cancelled)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyCancelled);
-        if (leaveRequest.StatusCode == "Rejected")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Rejected)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyRejected);
-        if (leaveRequest.StatusCode is not ("Pending" or "Approved"))
+        if (leaveRequest.StatusCode is not (LeaveRequestStatusCode.Pending or LeaveRequestStatusCode.Approved))
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestInvalidStatus);
 
         var balance = await leaveBalanceRepository.GetFirstByConditionAsync(
@@ -42,8 +42,10 @@ public sealed class CancelLeaveRequestHandler(
             cancellationToken);
         if (balance is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceNotFound);
 
-        var transactionType = leaveRequest.StatusCode == "Approved" ? "Refund" : "PendingRelease";
-        if (leaveRequest.StatusCode == "Approved")
+        var transactionType = leaveRequest.StatusCode == LeaveRequestStatusCode.Approved
+            ? LeaveBalanceTransactionType.Refund
+            : LeaveBalanceTransactionType.PendingRelease;
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Approved)
         {
             balance.UsedDays -= leaveRequest.RequestedDays;
             balance.RemainingDays += leaveRequest.RequestedDays;
@@ -55,7 +57,7 @@ public sealed class CancelLeaveRequestHandler(
         }
 
         balance.UpdatedAt = DateTime.UtcNow;
-        leaveRequest.StatusCode = "Cancelled";
+        leaveRequest.StatusCode = LeaveRequestStatusCode.Cancelled;
         leaveRequest.UpdatedAt = DateTime.UtcNow;
         await leaveTransactionRepository.CreateOneAsync(NewTransaction(leaveRequest, balance, transactionType,
             request.Reason), cancellationToken);
@@ -90,7 +92,7 @@ public sealed class CancelLeaveRequestHandler(
             TransactionTypeCode = type,
             Days = request.RequestedDays,
             BalanceAfterDays = balance.RemainingDays,
-            SourceType = "LeaveRequest",
+            SourceType = LeaveBalanceTransactionType.SourceTypeLeaveRequest,
             SourceId = request.Id.Value.ToString(),
             Reason = reason,
             CreatedAt = DateTime.UtcNow

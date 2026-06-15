@@ -247,6 +247,11 @@ public static class HrBusinessErrorCodes
     public const string ValWorkDateOutOfPeriod = "VAL_WORK_DATE_OUT_OF_PERIOD";
     public const string ValWorkDateRequired = "VAL_WORK_DATE_REQUIRED";
 
+    // Validation error codes (HR-specific)
+    public const string PayslipIdRequired = "VAL_PAYSLIP_ID_REQUIRED";
+    public const string DocumentIdRequired = "VAL_DOCUMENT_ID_REQUIRED";
+    public const string AtLeastOneInsuranceRateRequired = "HR_INSURANCE_AT_LEAST_ONE_RATE_REQUIRED";
+
     // Allowance validator error codes
     public const string AllowanceInvalidDateRange = "HR_ALLOWANCE_INVALID_DATE_RANGE";
 

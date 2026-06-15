@@ -14,7 +14,7 @@ Version: After Phase 19 Approval
 
 Status: Active
 
-Last Updated: 2026-06-13
+Last Updated: 2026-06-15
 
 ---
 
@@ -494,6 +494,65 @@ Security Review Phase
 
 ---
 
+## TD-011 — Backend Validation Localization Strategy Cleanup
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Current State
+
+HR validators use a mixed strategy:
+- Some use stable error-code constants (`HrBusinessErrorCodes.ValXxx`, `HrBusinessErrorCodes.Xxx`) in `.WithMessage(...)` — ✅ already migrated.
+- Some still use hard-coded English `.WithMessage("...")` — ⚠️ not yet migrated.
+
+### Remaining English Messages (10 occurrences, 8 files)
+
+| File | Message |
+|---|---|
+| `PayslipQueries/GetPayslipDocumentDownload/...` | `"PayslipId must not be empty."`, `"DocumentId must not be empty."` |
+| `PayslipQueries/GetPayslipEmailDeliveries/...` | `"PayslipId must not be empty."` |
+| `PayslipQueries/GetPayslipDocuments/...` | `"PayslipId must not be empty."` |
+| `PayslipCommands/SendPayslipEmail/...` | `"PayslipId must not be empty."` |
+| `PayslipCommands/GeneratePayslipPdf/...` | `"PayslipId must not be empty."` |
+| `PayslipCommands/SendPayslipEmailsForPayrollRun/...` | `"PayrollRunId must not be empty."` |
+| `PayslipCommands/GeneratePayslipPdfsForPayrollRun/...` | `"PayrollRunId must not be empty."` |
+| `InsuranceCommands/CreateInsuranceContributionRule/...` | `"At least one rate must be greater than zero"` |
+| `InsuranceCommands/UpdateInsuranceContributionRule/...` | `"At least one rate must be greater than zero"` |
+
+### Problem
+
+Mixed strategy: backend-localized English messages vs. frontend-localized error codes. Hard-coded English strings cannot be translated without a code change and violate ADR-017 (Localization Is Mandatory) and ADR-021 (Error Localization Strategy).
+
+### Risk
+
+- Non-English users see English validation messages.
+- Frontend has no way to map these messages to localized text.
+- Future validators might copy the wrong pattern.
+
+### Recommended Fix
+
+1. Create error-code constants for each English message (either `VAL_*` or dedicated constants).
+2. Replace `.WithMessage("...")` with `.WithMessage(HrBusinessErrorCodes.ConstantName)`.
+3. Add frontend mappings for the new error codes via `next-intl`.
+4. Injecting `IStringLocalizer<SharedResource>` into validators is **not** recommended for HR validators per ADR-021.
+
+### Exclusions
+
+- Existing `SharedResource.resx` messages for BuildingBlock/Auth/Identity are **not** in scope.
+- This task does not require injecting `IStringLocalizer` into HR validators.
+- This task does not change the API response shape.
+
+### Suggested Target
+
+Next localization cleanup sprint
+
+---
+
 ## TD-010 — Payroll Reporting Department/Position Fallback
 
 ### Priority
@@ -628,6 +687,7 @@ Resolved.
 
 7. TD-005 Localization audit
 8. TD-008 Snapshot storage optimization
+9. TD-011 Validation localization strategy cleanup
 
 ---
 

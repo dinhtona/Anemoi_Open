@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using FluentValidation;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.PayslipCommands.SendPayslipEmail;
@@ -8,6 +9,6 @@ public sealed class SendPayslipEmailCommandValidator : AbstractValidator<SendPay
     {
         RuleFor(x => x.PayslipId)
             .NotEmpty()
-            .WithMessage("PayslipId must not be empty.");
+            .WithMessage(HrBusinessErrorCodes.PayslipIdRequired);
     }
 }

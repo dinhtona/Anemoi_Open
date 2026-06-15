@@ -35,7 +35,7 @@ public sealed class GetHeadcountTrendHandler(
             var monthEnd = current.AddMonths(1);
             var headcount = monthlyJoins.Count(e =>
                 DateOnly.FromDateTime(e.CreatedAt) < monthEnd &&
-                e.EmploymentStatusCode == "active");
+                e.EmploymentStatusCode == EmploymentStatusCode.Active);
             trend.Add(new HeadcountTrendItem(current, headcount));
             current = current.AddMonths(1);
         }

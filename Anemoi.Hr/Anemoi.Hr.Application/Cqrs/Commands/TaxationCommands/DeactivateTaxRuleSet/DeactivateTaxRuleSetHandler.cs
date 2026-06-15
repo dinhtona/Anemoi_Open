@@ -36,7 +36,7 @@ public sealed class DeactivateTaxRuleSetHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
-        ruleSet.Status = "Inactive";
+        ruleSet.Status = TaxRuleSetStatusCode.Inactive;
         ruleSet.UpdatedAt = DateTime.UtcNow;
         ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 

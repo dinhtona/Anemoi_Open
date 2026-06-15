@@ -23,7 +23,7 @@ public sealed class GetWorkforceOverviewHandler(
     {
         var totalEmployees = await employeeRepository.GetQueryable().AsNoTracking().LongCountAsync(cancellationToken);
         var activeEmployees = await employeeRepository.GetQueryable().AsNoTracking()
-            .CountAsync(x => x.EmploymentStatusCode == "active", cancellationToken);
+            .CountAsync(x => x.EmploymentStatusCode == EmploymentStatusCode.Active, cancellationToken);
         var inactiveEmployees = totalEmployees - activeEmployees;
         var totalDepartments = await departmentRepository.GetQueryable().AsNoTracking().LongCountAsync(cancellationToken);
         var totalPositions = await positionRepository.GetQueryable().AsNoTracking().LongCountAsync(cancellationToken);

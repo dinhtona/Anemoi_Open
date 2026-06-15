@@ -19,7 +19,7 @@ public sealed class OvertimeSnapshotProvider(
         CancellationToken cancellationToken)
     {
         var query = overtimeRequestRepository.GetQueryable().AsNoTracking()
-            .Where(x => x.Status == "Approved" && x.ApprovedAt >= fromDate && x.ApprovedAt <= toDate);
+            .Where(x => x.Status == OvertimeStatusCode.Approved && x.ApprovedAt >= fromDate && x.ApprovedAt <= toDate);
 
         var overtimeRequests = await query.ToListAsync(cancellationToken);
         return overtimeRequests.Select(mapper.ToOvertimeRequestResponse).ToList();

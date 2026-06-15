@@ -34,30 +34,30 @@ public sealed class GetDashboardOverviewHandler(
 
         // 1. Summary Metrics
         var totalActiveEmployees = (int)await employeeRepository.CountByConditionAsync(
-            x => x.EmploymentStatusCode == "active",
+            x => x.EmploymentStatusCode == EmploymentStatusCode.Active,
             null,
             cancellationToken);
 
         var pendingLeaveRequests = (int)await leaveRequestRepository.CountByConditionAsync(
-            x => x.StatusCode == "Pending",
+            x => x.StatusCode == LeaveRequestStatusCode.Pending,
             null,
             cancellationToken);
 
         var firstDayOfMonth = new DateOnly(now.Year, now.Month, 1);
         var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
         var newEmployeesThisMonth = (int)await employeeRepository.CountByConditionAsync(
-            x => x.EmploymentStatusCode == "active" && x.JoinDate >= firstDayOfMonth && x.JoinDate <= lastDayOfMonth,
+            x => x.EmploymentStatusCode == EmploymentStatusCode.Active && x.JoinDate >= firstDayOfMonth && x.JoinDate <= lastDayOfMonth,
             null,
             cancellationToken);
 
         var employeesWithoutIdentityMapping = (int)await employeeRepository.CountByConditionAsync(
-            x => x.EmploymentStatusCode == "active" && x.IdentityUserId == null,
+            x => x.EmploymentStatusCode == EmploymentStatusCode.Active && x.IdentityUserId == null,
             null,
             cancellationToken);
 
         // 2. Near Leave Exhaustion (Annual leave balance <= 3 days)
         var nearExhaustionBalances = await leaveBalanceRepository.GetManyByConditionAsync(
-            x => x.Year == now.Year && x.RemainingDays <= 3m && x.LeavePolicy.LeaveTypeCode == "annual" && x.Employee.EmploymentStatusCode == "active",
+            x => x.Year == now.Year && x.RemainingDays <= 3m && x.LeavePolicy.LeaveTypeCode == LeaveTypeCode.Annual && x.Employee.EmploymentStatusCode == EmploymentStatusCode.Active,
             q => q.Include(x => x.Employee)
                   .Include(x => x.LeavePolicy)
                   .OrderBy(x => x.RemainingDays),
@@ -78,7 +78,7 @@ public sealed class GetDashboardOverviewHandler(
             null,
             cancellationToken);
 
-        var departmentHeadcounts = await employeeRepository.GetQueryable(x => x.EmploymentStatusCode == "active" && x.PrimaryDepartmentId != null)
+        var departmentHeadcounts = await employeeRepository.GetQueryable(x => x.EmploymentStatusCode == EmploymentStatusCode.Active && x.PrimaryDepartmentId != null)
             .GroupBy(x => x.PrimaryDepartmentId)
             .Select(g => new { DepartmentId = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
@@ -97,7 +97,7 @@ public sealed class GetDashboardOverviewHandler(
             null,
             cancellationToken);
 
-        var positionHeadcounts = await employeeRepository.GetQueryable(x => x.EmploymentStatusCode == "active" && x.PrimaryPositionId != null)
+        var positionHeadcounts = await employeeRepository.GetQueryable(x => x.EmploymentStatusCode == EmploymentStatusCode.Active && x.PrimaryPositionId != null)
             .GroupBy(x => x.PrimaryPositionId)
             .Select(g => new { PositionId = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
@@ -113,7 +113,7 @@ public sealed class GetDashboardOverviewHandler(
 
         // 4. Leave Section (Who's Out Today / This Week)
         var outTodayRequests = await leaveRequestRepository.GetManyByConditionAsync(
-            x => x.StatusCode == "Approved" && x.StartDate <= today && x.EndDate >= today,
+            x => x.StatusCode == LeaveRequestStatusCode.Approved && x.StartDate <= today && x.EndDate >= today,
             q => q.Include(x => x.Employee)
                   .Include(x => x.Employee.PrimaryDepartment)
                   .OrderBy(x => x.StartDate),
@@ -137,7 +137,7 @@ public sealed class GetDashboardOverviewHandler(
         var endOfWeek = DateOnly.FromDateTime(endOfWeekDateTime);
 
         var outThisWeekRequests = await leaveRequestRepository.GetManyByConditionAsync(
-            x => x.StatusCode == "Approved" && x.StartDate <= endOfWeek && x.EndDate >= startOfWeek,
+            x => x.StatusCode == LeaveRequestStatusCode.Approved && x.StartDate <= endOfWeek && x.EndDate >= startOfWeek,
             q => q.Include(x => x.Employee)
                   .Include(x => x.Employee.PrimaryDepartment)
                   .OrderBy(x => x.StartDate),
@@ -155,7 +155,7 @@ public sealed class GetDashboardOverviewHandler(
         // 5. Alerts Section
         var thresholdDate = today.AddDays(hrSettings.ContractExpirationAlertDays);
         var expiringContracts = await contractRepository.GetManyByConditionAsync(
-            x => x.StatusCode == "Active" && x.EndDate != null && x.EndDate >= today && x.EndDate <= thresholdDate,
+            x => x.StatusCode == ContractStatusCode.Active && x.EndDate != null && x.EndDate >= today && x.EndDate <= thresholdDate,
             q => q.Include(x => x.Employee),
             cancellationToken);
 

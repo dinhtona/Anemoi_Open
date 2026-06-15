@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using FluentValidation;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipDocumentDownload;
@@ -8,10 +9,10 @@ public sealed class GetPayslipDocumentDownloadQueryValidator : AbstractValidator
     {
         RuleFor(x => x.PayslipId)
             .NotEmpty()
-            .WithMessage("PayslipId must not be empty.");
+            .WithMessage(HrBusinessErrorCodes.PayslipIdRequired);
 
         RuleFor(x => x.DocumentId)
             .NotEmpty()
-            .WithMessage("DocumentId must not be empty.");
+            .WithMessage(HrBusinessErrorCodes.DocumentIdRequired);
     }
 }

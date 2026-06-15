@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +40,7 @@ public sealed class GetEmployeePromotionTimelineHandler(
         {
             Id = history.Id.Value.ToString(),
             EmployeeId = history.EmployeeId.Value.ToString(),
-            ChangeType = "position",
+            ChangeType = ChangeTypeCode.Position,
             OldValueId = history.OldPositionId?.Value.ToString(),
             OldValueCode = history.OldPosition?.Code,
             OldValueName = history.OldPosition?.Name,
@@ -60,7 +61,7 @@ public sealed class GetEmployeePromotionTimelineHandler(
         {
             Id = history.Id.Value.ToString(),
             EmployeeId = history.EmployeeId.Value.ToString(),
-            ChangeType = "grade",
+            ChangeType = ChangeTypeCode.Grade,
             OldValueCode = history.OldGradeCode,
             OldValueName = history.OldGradeCode,
             NewValueCode = history.GradeCode,

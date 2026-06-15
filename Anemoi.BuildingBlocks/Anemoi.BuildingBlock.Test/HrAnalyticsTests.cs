@@ -37,9 +37,9 @@ public sealed class HrAnalyticsTests
 
         var employees = new List<Employee>
         {
-            CreateEmployee("10000000-0000-0000-0000-000000000001", deptId1, "active"),
-            CreateEmployee("20000000-0000-0000-0000-000000000002", deptId1, "active"),
-            CreateEmployee("30000000-0000-0000-0000-000000000003", deptId2, "inactive")
+            CreateEmployee("10000000-0000-0000-0000-000000000001", deptId1, EmploymentStatusCode.Active),
+            CreateEmployee("20000000-0000-0000-0000-000000000002", deptId1, EmploymentStatusCode.Active),
+            CreateEmployee("30000000-0000-0000-0000-000000000003", deptId2, EmploymentStatusCode.Inactive)
         };
 
         var departments = new List<Department>

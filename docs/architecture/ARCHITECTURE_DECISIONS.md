@@ -16,7 +16,7 @@ Version: After Phase 19 Approval
 
 Status: Active
 
-Last Updated: 2026-06-13
+Last Updated: 2026-06-15
 
 ---
 
@@ -566,6 +566,41 @@ Configuration
 ```
 
 rather than direct recalculation.
+
+---
+
+# ADR-021 — Error Localization Strategy
+
+## Status
+
+Approved
+
+## Context
+
+Legacy modules (BuildingBlock, Auth, Identity) localized error messages server-side using `SharedResource.resx`. Newer HR modules (Payroll, Tax, Attendance, Leave, etc.) introduced a pattern where the backend returns a stable error code and the frontend handles translation via `next-intl`.
+
+This created a mixed localization strategy.
+
+## Decision
+
+1. **Backend business modules return stable error codes**, not localized user-facing text.
+2. **Frontend owns localization for HR business errors** — the frontend maps error codes to user-facing messages via `next-intl`.
+3. **Error codes are API contracts** — they must be defined as constants (e.g., `HrBusinessErrorCodes`, `Val*` constants), not inline string literals.
+4. **HR handlers and validators must use constants** — inline `"HR_SAVE_CHANGES_FAILED"` or `"VAL_AMOUNT_MUST_BE_POSITIVE"` inside `.Create()` or `.WithMessage()` is prohibited.
+5. **`SharedResource.resx` remains allowed** for legacy BuildingBlock, Auth, Identity, and common infrastructure errors. No migration of `SharedResource.resx` is planned in this ADR.
+6. **New HR business errors must not depend on backend resource localization** — do not add HR-specific keys to `SharedResource.resx` unless backend rendering requires them.
+7. **FluentValidation `.WithMessage(...)` in HR should use error-code constants** — not English strings.
+8. **English hard-coded validation messages are technical debt** unless the message is internal-only (logs, developer diagnostics).
+
+## Exceptions
+
+Legacy error codes that already use `SharedResource.resx` (e.g., `IDE_01`, `AUE_01`, `ROE_01`, `VAL_REQUIRED`, `UnhandledError`) are exempt from this ADR. They may continue using server-side localization until a future architecture review decides otherwise.
+
+## Implications
+
+- Frontend must maintain a mapping of `HR_*` / `VAL_*` / `REPORT_*` error codes to localized messages.
+- Backend must never assume the frontend displays error codes directly. The frontend maps them.
+- New validators in HR must use `WithErrorCode(HrBusinessErrorCodes.SomeConstant)` or `WithMessage(HrBusinessErrorCodes.SomeConstant)`, never English strings.
 
 ---
 

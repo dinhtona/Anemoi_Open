@@ -49,7 +49,7 @@ public sealed class MonthlyLeaveAccrualWorker(
         var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
         var activeEmployees = await employees.GetManyByConditionAsync(
-            x => x.EmploymentStatusCode == "Active",
+            x => x.EmploymentStatusCode == EmploymentStatusCode.Active,
             null,
             cancellationToken);
         var activePolicies = await policies.GetManyByConditionAsync(x => x.IsActive, null, cancellationToken);

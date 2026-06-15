@@ -40,7 +40,7 @@ public sealed class CreateTaxBracketHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
-        if (ruleSet.Status != "Draft")
+        if (ruleSet.Status != TaxRuleSetStatusCode.Draft)
         {
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotDraft);
         }

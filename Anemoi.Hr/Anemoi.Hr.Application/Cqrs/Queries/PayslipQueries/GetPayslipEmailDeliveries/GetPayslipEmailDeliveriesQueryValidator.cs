@@ -1,3 +1,4 @@
+using Anemoi.Hr.Application.Configurations;
 using FluentValidation;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayslipQueries.GetPayslipEmailDeliveries;
@@ -8,6 +9,6 @@ public sealed class GetPayslipEmailDeliveriesQueryValidator : AbstractValidator<
     {
         RuleFor(x => x.PayslipId)
             .NotEmpty()
-            .WithMessage("PayslipId must not be empty.");
+            .WithMessage(HrBusinessErrorCodes.PayslipIdRequired);
     }
 }

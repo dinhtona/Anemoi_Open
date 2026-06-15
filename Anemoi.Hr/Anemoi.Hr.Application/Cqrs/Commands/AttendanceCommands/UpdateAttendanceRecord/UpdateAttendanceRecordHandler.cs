@@ -45,7 +45,7 @@ public sealed class UpdateAttendanceRecordHandler(
         if (period is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
 
-        if (period.StatusCode == "Locked")
+        if (period.StatusCode == AttendancePeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodLocked);
 
         // Check original period as well in case it's different and locked
@@ -56,7 +56,7 @@ public sealed class UpdateAttendanceRecordHandler(
                 null,
                 cancellationToken);
 
-            if (originalPeriod?.StatusCode == "Locked")
+            if (originalPeriod?.StatusCode == AttendancePeriodStatusCode.Locked)
                 return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodLocked);
         }
 

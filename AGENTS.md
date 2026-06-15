@@ -111,6 +111,14 @@
 - User-facing messages via `IStringLocalizer<SharedResource>`, never hardcoded
 - Stable error codes, not localized labels, in API responses
 
+### Business String Literals (Backend)
+- Never use inline business/status/type string literals in `Anemoi.Hr.*` production code
+- Domain status values: use constant classes in the domain namespace (e.g., `LeaveRequestStatusCode`, `ContractStatusCode`, `PayrollPeriodStatusCode`, `AttendancePeriodStatusCode`, `TaxRuleSetStatusCode`, `OvertimeStatusCode`, `EmployeeShiftAssignmentStatusCode`, `EmploymentStatusCode`)
+- Domain type keys: use constant classes (e.g., `LeaveBalanceTransactionType`, `TaxDeductionTypeCode`, `TaxDeductionInputKey`, `HrSourceModuleCode`, `ChangeTypeCode`, `LeaveTypeCode`, `CalendarExceptionTypeConstants`)
+- Application-level constants (display fallbacks, UI strings, API response values): use `PayrollConstants.cs`, `CalendarExceptionTypeConstants.cs` in `Application/Configurations/`
+- Allowed inline strings: log message templates, route templates, JSON property names for external contracts, constants definition values, test data in test projects
+- CI should reject any `.cs` file in `Anemoi.Hr.Application/` containing `== "` or `!= "` or `= "` with business string values (not error codes or validation messages, which have their own constants)
+
 ### Authorization
 - Permission constants declared in `BuildingBlocks/Application/Authorization/Permissions.cs`
 - Protect with `[HasPermission]`, never hardcode role names in feature code

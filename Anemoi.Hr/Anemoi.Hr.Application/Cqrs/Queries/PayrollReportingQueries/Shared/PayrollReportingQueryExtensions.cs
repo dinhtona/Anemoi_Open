@@ -250,7 +250,7 @@ public static class PayrollReportingQueryExtensions
                          select new
                          {
                              DepartmentId = emp.PrimaryDepartmentId != null ? (Guid?)emp.PrimaryDepartmentId.Value : null,
-                             DepartmentName = dept != null ? dept.Name : "No Department",
+                            DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
                              run.GrossAmount,
                              TaxAmount = tax != null ? tax.TotalTaxAmount : 0m,
                              EmployeeInsurance = ins != null ? ins.TotalEmployeeContribution : 0m,
@@ -321,8 +321,8 @@ public static class PayrollReportingQueryExtensions
                             EmployeeId = run.EmployeeId.Value,
                             EmployeeCode = run.EmployeeCode,
                             EmployeeName = run.EmployeeName,
-                            DepartmentName = dept != null ? dept.Name : "No Department",
-                            PositionName = pos != null ? pos.Name : "No Position",
+                            DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
+                            PositionName = pos != null ? pos.Name : PayrollConstants.FallbackPositionName,
                             GrossIncome = run.GrossAmount,
                             TaxableIncome = tax != null ? tax.TaxableIncomeSnapshot : 0m,
                             EmployeeTax = tax != null ? tax.TotalTaxAmount : 0m,
@@ -330,7 +330,7 @@ public static class PayrollReportingQueryExtensions
                             EmployerInsurance = ins != null ? ins.TotalEmployerContribution : 0m,
                             TotalDeductions = run.TotalDeductionAmount,
                             NetPay = run.NetAmount,
-                            PayslipStatus = ps != null ? ps.Status.ToString() : "NotGenerated",
+                            PayslipStatus = ps != null ? ps.Status.ToString() : PayrollConstants.PayslipStatusNotGenerated,
                             PayslipPublishedAt = ps != null ? ps.PublishedAt : null
                         };
 
@@ -514,7 +514,7 @@ public static class PayrollReportingQueryExtensions
                             EmployeeId = run.EmployeeId.Value,
                             EmployeeCode = run.EmployeeCode,
                             EmployeeName = run.EmployeeName,
-                            PayslipStatus = ps != null ? ps.Status.ToString() : "NotGenerated",
+                            PayslipStatus = ps != null ? ps.Status.ToString() : PayrollConstants.PayslipStatusNotGenerated,
                             PdfGenerated = doc != null,
                             PublishedAt = ps != null ? ps.PublishedAt : null,
                             EmailSent = email != null && email.Status == PayslipEmailDeliveryStatus.Sent,

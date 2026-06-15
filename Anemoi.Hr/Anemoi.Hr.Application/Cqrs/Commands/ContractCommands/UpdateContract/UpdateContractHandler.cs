@@ -33,7 +33,7 @@ public sealed class UpdateContractHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNotFound);
 
         // 2. Reject modifications unless contract is Draft
-        if (contract.StatusCode != "Draft")
+        if (contract.StatusCode != ContractStatusCode.Draft)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNotDraft);
 
         // 3. Date range validation
@@ -51,7 +51,7 @@ public sealed class UpdateContractHandler(
             var existingContracts = await employeeContractRepository.GetManyByConditionAsync(x => x.EmployeeId == contract.EmployeeId && x.Id != request.Id, null, cancellationToken);
             var newEndDateVal = request.EndDate ?? DateOnly.MaxValue;
             var hasOverlap = existingContracts.Any(c =>
-                c.StatusCode != "Draft" &&
+                c.StatusCode != ContractStatusCode.Draft &&
                 (contract.PreviousContractId == null || c.Id.Value != contract.PreviousContractId.Value) &&
                 c.StartDate <= newEndDateVal &&
                 request.StartDate <= (c.EndDate ?? DateOnly.MaxValue));
@@ -75,13 +75,13 @@ public sealed class UpdateContractHandler(
                 var today = GetBusinessToday();
                 if (targetEndDate < today)
                 {
-                    prevContract.StatusCode = "Expired";
+                    prevContract.StatusCode = ContractStatusCode.Expired;
                 }
                 else
                 {
-                    if (prevContract.StatusCode == "Expired")
+                    if (prevContract.StatusCode == ContractStatusCode.Expired)
                     {
-                        prevContract.StatusCode = "Active";
+                        prevContract.StatusCode = ContractStatusCode.Active;
                     }
                 }
                 prevContract.UpdatedAt = DateTime.UtcNow;
@@ -102,7 +102,7 @@ public sealed class UpdateContractHandler(
 
         if (request.Activate)
         {
-            contract.StatusCode = "Active";
+            contract.StatusCode = ContractStatusCode.Active;
         }
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);

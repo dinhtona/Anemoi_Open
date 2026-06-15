@@ -59,7 +59,7 @@ public sealed class CreateContractHandler(
         var existingContracts = await employeeContractRepository.GetManyByConditionAsync(x => x.EmployeeId == request.EmployeeId, null, cancellationToken);
         var newEndDateVal = request.EndDate ?? DateOnly.MaxValue;
         var hasOverlap = existingContracts.Any(c =>
-            c.StatusCode != "Draft" &&
+            c.StatusCode != ContractStatusCode.Draft &&
             (prevContract == null || c.Id != prevContract.Id) &&
             c.StartDate <= newEndDateVal &&
             request.StartDate <= (c.EndDate ?? DateOnly.MaxValue));
@@ -68,7 +68,7 @@ public sealed class CreateContractHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractOverlapping);
 
         // 6. Close the previous contract if it was active
-        if (prevContract is not null && prevContract.StatusCode == "Active")
+        if (prevContract is not null && prevContract.StatusCode == ContractStatusCode.Active)
         {
             var targetEndDate = request.StartDate.AddDays(-1);
             if (targetEndDate < prevContract.StartDate)
@@ -77,14 +77,14 @@ public sealed class CreateContractHandler(
             prevContract.EndDate = targetEndDate;
             if (targetEndDate < today)
             {
-                prevContract.StatusCode = "Expired";
+                prevContract.StatusCode = ContractStatusCode.Expired;
             }
             prevContract.UpdatedAt = DateTime.UtcNow;
             prevContract.UpdatedBy = request.CreatedBy ?? PayrollConstants.SystemActor;
         }
 
         // 7. Create new contract
-        var statusCode = request.IsDraft ? "Draft" : "Active";
+        var statusCode = request.IsDraft ? ContractStatusCode.Draft : ContractStatusCode.Active;
 
         var newContract = new EmployeeContract
         {

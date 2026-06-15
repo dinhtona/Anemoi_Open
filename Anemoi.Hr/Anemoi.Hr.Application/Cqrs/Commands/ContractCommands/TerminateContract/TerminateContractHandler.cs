@@ -30,10 +30,10 @@ public sealed class TerminateContractHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractNotFound);
 
         // 2. Reject termination if already Terminated or Expired
-        if (contract.StatusCode == "Terminated")
+        if (contract.StatusCode == ContractStatusCode.Terminated)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractAlreadyTerminated);
 
-        if (contract.StatusCode == "Expired")
+        if (contract.StatusCode == ContractStatusCode.Expired)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractAlreadyExpired);
 
         // 3. Date validation: termination date cannot be before contract start date
@@ -41,7 +41,7 @@ public sealed class TerminateContractHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ContractInvalidDateRange);
 
         // 4. Update status and populate termination details
-        contract.StatusCode = "Terminated";
+        contract.StatusCode = ContractStatusCode.Terminated;
         contract.EndDate = request.TerminationDate;
         contract.TerminationDetail = new ContractTerminationDetail
         {

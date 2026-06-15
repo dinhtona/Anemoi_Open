@@ -43,7 +43,7 @@ public sealed class CalculateTaxHandler(
 
         // Find active rule set for the period
         var activeRuleSets = await ruleSetRepository.GetManyByConditionAsync(
-            x => x.CountryCode == countryCode && x.TaxType == taxType && x.Status == "Active" &&
+            x => x.CountryCode == countryCode && x.TaxType == taxType && x.Status == TaxRuleSetStatusCode.Active &&
                  x.EffectiveFrom <= request.PeriodEnd &&
                  (x.EffectiveTo == null || x.EffectiveTo >= request.PeriodStart),
             token: cancellationToken);
@@ -75,16 +75,16 @@ public sealed class CalculateTaxHandler(
             decimal ruleAmount = rule.Amount;
             decimal multiplier = 1;
 
-            if (rule.DeductionType.Equals("PersonalDeduction", StringComparison.OrdinalIgnoreCase))
+            if (rule.DeductionType.Equals(TaxDeductionTypeCode.PersonalDeduction, StringComparison.OrdinalIgnoreCase))
             {
                 multiplier = 1;
             }
-            else if (rule.DeductionType.Equals("DependentDeduction", StringComparison.OrdinalIgnoreCase))
+            else if (rule.DeductionType.Equals(TaxDeductionTypeCode.DependentDeduction, StringComparison.OrdinalIgnoreCase))
             {
                 decimal dependents = 0;
                 if (request.DeductionInputs != null &&
-                    (request.DeductionInputs.TryGetValue("Dependents", out var depVal) ||
-                     request.DeductionInputs.TryGetValue("DependentCount", out depVal)))
+                    (request.DeductionInputs.TryGetValue(TaxDeductionInputKey.Dependents, out var depVal) ||
+                     request.DeductionInputs.TryGetValue(TaxDeductionInputKey.DependentCount, out depVal)))
                 {
                     dependents = depVal;
                 }
@@ -122,8 +122,8 @@ public sealed class CalculateTaxHandler(
         {
             foreach (var input in request.DeductionInputs)
             {
-                if (input.Key.Equals("Dependents", StringComparison.OrdinalIgnoreCase) ||
-                    input.Key.Equals("DependentCount", StringComparison.OrdinalIgnoreCase))
+                if (input.Key.Equals(TaxDeductionInputKey.Dependents, StringComparison.OrdinalIgnoreCase) ||
+                    input.Key.Equals(TaxDeductionInputKey.DependentCount, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -189,7 +189,7 @@ public sealed class CalculateTaxHandler(
         }
 
         PayrollRunId payrollRunId = null;
-        if (request.SourceModule.Equals("Payroll", StringComparison.OrdinalIgnoreCase) && request.SourceReferenceId.HasValue)
+        if (request.SourceModule.Equals(HrSourceModuleCode.Payroll, StringComparison.OrdinalIgnoreCase) && request.SourceReferenceId.HasValue)
         {
             payrollRunId = new PayrollRunId(request.SourceReferenceId.Value);
         }

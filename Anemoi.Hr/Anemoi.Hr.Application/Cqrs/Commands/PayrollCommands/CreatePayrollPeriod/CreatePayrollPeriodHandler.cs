@@ -42,7 +42,7 @@ public sealed class CreatePayrollPeriodHandler(
             EndDate = request.EndDate,
             StandardWorkingDays = request.StandardWorkingDays,
             AttendancePeriodId = request.AttendancePeriodId.HasValue ? new AttendancePeriodId(request.AttendancePeriodId.Value) : null,
-            StatusCode = "Draft",
+            StatusCode = PayrollPeriodStatusCode.Draft,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow,

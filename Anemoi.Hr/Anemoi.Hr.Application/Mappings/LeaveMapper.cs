@@ -41,7 +41,7 @@ public partial class LeaveMapper
             StartDate = command.StartDate,
             EndDate = command.EndDate,
             RequestedDays = command.RequestedDays,
-            StatusCode = "Pending",
+            StatusCode = LeaveRequestStatusCode.Pending,
             Reason = command.Reason,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

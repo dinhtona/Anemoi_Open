@@ -37,7 +37,7 @@ public sealed class CreateAttendanceRecordHandler(
         if (period is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
 
-        if (period.StatusCode == "Locked")
+        if (period.StatusCode == AttendancePeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodLocked);
 
         // Validate work date is within the period

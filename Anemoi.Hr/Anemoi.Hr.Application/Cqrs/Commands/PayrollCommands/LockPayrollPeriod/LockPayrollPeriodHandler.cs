@@ -35,7 +35,7 @@ public sealed class LockPayrollPeriodHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodNotFound);
 
         // 2. Reject if already locked
-        if (period.StatusCode == "Locked")
+        if (period.StatusCode == PayrollPeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
 
         // 3. Validate AttendancePeriodId
@@ -51,12 +51,12 @@ public sealed class LockPayrollPeriodHandler(
         if (attendancePeriod is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
 
-        if (attendancePeriod.StatusCode != "Locked")
+        if (attendancePeriod.StatusCode != AttendancePeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
 
         var now = DateTime.UtcNow;
         var updatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
-        period.StatusCode = "Locked";
+        period.StatusCode = PayrollPeriodStatusCode.Locked;
         period.UpdatedAt = now;
         period.UpdatedBy = updatedBy;
 

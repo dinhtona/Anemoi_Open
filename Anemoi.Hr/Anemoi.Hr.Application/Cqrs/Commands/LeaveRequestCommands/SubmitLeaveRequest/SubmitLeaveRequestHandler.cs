@@ -42,7 +42,7 @@ public sealed class SubmitLeaveRequestHandler(
 
         var isOverlapping = await leaveRequestRepository.ExistByConditionAsync(
             x => x.EmployeeId == request.EmployeeId
-                 && (x.StatusCode == "Pending" || x.StatusCode == "Approved")
+                 && (x.StatusCode == LeaveRequestStatusCode.Pending || x.StatusCode == LeaveRequestStatusCode.Approved)
                  && x.StartDate <= request.EndDate
                  && request.StartDate <= x.EndDate,
             cancellationToken);
@@ -62,10 +62,10 @@ public sealed class SubmitLeaveRequestHandler(
             LeavePolicyId = request.LeavePolicyId,
             LeaveBalanceId = balance.Id,
             LeaveRequestId = leaveRequest.Id,
-            TransactionTypeCode = "PendingReserve",
+            TransactionTypeCode = LeaveBalanceTransactionType.PendingReserve,
             Days = request.RequestedDays,
             BalanceAfterDays = balance.RemainingDays,
-            SourceType = "LeaveRequest",
+            SourceType = LeaveBalanceTransactionType.SourceTypeLeaveRequest,
             SourceId = leaveRequest.Id.Value.ToString(),
             Reason = request.Reason,
             CreatedAt = DateTime.UtcNow
@@ -88,7 +88,7 @@ public sealed class SubmitLeaveRequestHandler(
             balance.LeavePolicyId.Value.ToString(),
             balance.Year,
             balance.RemainingDays,
-            "PendingReserve"), cancellationToken);
+            LeaveBalanceTransactionType.PendingReserve), cancellationToken);
 
         return mapper.ToLeaveRequestIdResponse(leaveRequest);
     }

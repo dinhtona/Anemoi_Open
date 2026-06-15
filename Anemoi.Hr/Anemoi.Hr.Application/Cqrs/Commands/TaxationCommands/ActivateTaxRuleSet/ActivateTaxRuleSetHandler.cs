@@ -39,7 +39,7 @@ public sealed class ActivateTaxRuleSetHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetNotFound);
         }
 
-        if (ruleSet.Status == "Active")
+        if (ruleSet.Status == TaxRuleSetStatusCode.Active)
         {
             return new SuccessResponse(); // Already active
         }
@@ -56,7 +56,7 @@ public sealed class ActivateTaxRuleSetHandler(
 
         // Check for overlaps with other ACTIVE sets
         var activeSets = await ruleSetRepository.GetManyByConditionAsync(
-            x => x.CountryCode == ruleSet.CountryCode && x.TaxType == ruleSet.TaxType && x.Id != ruleSetId && x.Status == "Active",
+            x => x.CountryCode == ruleSet.CountryCode && x.TaxType == ruleSet.TaxType && x.Id != ruleSetId && x.Status == TaxRuleSetStatusCode.Active,
             token: cancellationToken);
 
         var overlaps = activeSets.Any(x =>
@@ -68,7 +68,7 @@ public sealed class ActivateTaxRuleSetHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.TaxRuleSetOverlapWithActive);
         }
 
-        ruleSet.Status = "Active";
+        ruleSet.Status = TaxRuleSetStatusCode.Active;
         ruleSet.UpdatedAt = DateTime.UtcNow;
         ruleSet.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 

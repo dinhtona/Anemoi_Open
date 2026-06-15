@@ -27,18 +27,18 @@ public sealed class RejectLeaveRequestHandler(
         var leaveRequest = await leaveRequestRepository.GetFirstByConditionAsync(x => x.Id == request.Id,
             null, cancellationToken);
         if (leaveRequest is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestNotFound);
-        if (leaveRequest.StatusCode == "Approved")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Approved)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyApproved);
-        if (leaveRequest.StatusCode == "Cancelled")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Cancelled)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyCancelled);
-        if (leaveRequest.StatusCode == "Rejected")
+        if (leaveRequest.StatusCode == LeaveRequestStatusCode.Rejected)
             return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveRequestAlreadyRejected);
 
         var balance = await ReleasePendingAsync(leaveRequest, request.Comment, leaveBalanceRepository,
             leaveTransactionRepository, cancellationToken);
         if (balance is null) return HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceNotFound);
 
-        leaveRequest.StatusCode = "Rejected";
+        leaveRequest.StatusCode = LeaveRequestStatusCode.Rejected;
         leaveRequest.UpdatedAt = DateTime.UtcNow;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -54,7 +54,7 @@ public sealed class RejectLeaveRequestHandler(
             balance.LeavePolicyId.Value.ToString(),
             balance.Year,
             balance.RemainingDays,
-            "PendingRelease"), cancellationToken);
+            LeaveBalanceTransactionType.PendingRelease), cancellationToken);
 
         return None.Value;
     }
@@ -81,10 +81,10 @@ public sealed class RejectLeaveRequestHandler(
             LeavePolicyId = request.LeavePolicyId,
             LeaveBalanceId = balance.Id,
             LeaveRequestId = request.Id,
-            TransactionTypeCode = "PendingRelease",
+            TransactionTypeCode = LeaveBalanceTransactionType.PendingRelease,
             Days = request.RequestedDays,
             BalanceAfterDays = balance.RemainingDays,
-            SourceType = "LeaveRequest",
+            SourceType = LeaveBalanceTransactionType.SourceTypeLeaveRequest,
             SourceId = request.Id.Value.ToString(),
             Reason = reason,
             CreatedAt = DateTime.UtcNow

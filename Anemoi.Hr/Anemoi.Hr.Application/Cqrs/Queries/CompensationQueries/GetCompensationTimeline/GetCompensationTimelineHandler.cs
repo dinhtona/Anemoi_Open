@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +36,8 @@ public sealed class GetCompensationTimelineHandler(
             items.Add(new CompensationTimelineItemResponse
             {
                 Date = salary.EffectiveFrom,
-                EventType = "Salary",
-                Action = "Changed",
+                EventType = PayrollConstants.CompensationTimelineEventSalary,
+                Action = PayrollConstants.CompensationTimelineActionChanged,
                 Description = $"Base salary changed to {salary.BaseSalary:N2} {salary.Currency} ({salary.SalaryType}, Reason: {salary.Reason})",
                 Amount = salary.BaseSalary,
                 Currency = salary.Currency,
@@ -50,9 +51,9 @@ public sealed class GetCompensationTimelineHandler(
             items.Add(new CompensationTimelineItemResponse
             {
                 Date = allowance.EffectiveFrom,
-                EventType = "Allowance",
-                Action = "Assigned",
-                Description = $"Allowance {allowance.AllowanceType?.Code ?? "Unknown"} assigned: {allowance.Amount:N2} {allowance.Currency}",
+                EventType = PayrollConstants.CompensationTimelineEventAllowance,
+                Action = PayrollConstants.CompensationTimelineActionAssigned,
+                Description = $"Allowance {allowance.AllowanceType?.Code ?? PayrollConstants.Unknown} assigned: {allowance.Amount:N2} {allowance.Currency}",
                 Amount = allowance.Amount,
                 Currency = allowance.Currency,
                 CreatedBy = allowance.CreatedBy,
@@ -64,9 +65,9 @@ public sealed class GetCompensationTimelineHandler(
                 items.Add(new CompensationTimelineItemResponse
                 {
                     Date = allowance.EffectiveTo.Value,
-                    EventType = "Allowance",
-                    Action = "Terminated",
-                    Description = $"Allowance {allowance.AllowanceType?.Code ?? "Unknown"} terminated",
+                    EventType = PayrollConstants.CompensationTimelineEventAllowance,
+                    Action = PayrollConstants.CompensationTimelineActionTerminated,
+                    Description = $"Allowance {allowance.AllowanceType?.Code ?? PayrollConstants.Unknown} terminated",
                     Amount = allowance.Amount,
                     Currency = allowance.Currency,
                     CreatedBy = allowance.UpdatedBy,

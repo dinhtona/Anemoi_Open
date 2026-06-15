@@ -40,7 +40,7 @@ public sealed class CreateAttendancePeriodHandler(
             PeriodCode = request.PeriodCode,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            StatusCode = "Draft",
+            StatusCode = AttendancePeriodStatusCode.Draft,
             CreatedAt = DateTime.UtcNow,
             CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             UpdatedAt = DateTime.UtcNow,

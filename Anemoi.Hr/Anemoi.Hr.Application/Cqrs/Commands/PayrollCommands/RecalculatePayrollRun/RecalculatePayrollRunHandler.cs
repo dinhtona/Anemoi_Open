@@ -58,7 +58,7 @@ public sealed class RecalculatePayrollRunHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodNotFound);
 
         // 3. Reject if payroll period is locked (only Draft allowed)
-        if (period.StatusCode != "Draft")
+        if (period.StatusCode != PayrollPeriodStatusCode.Draft)
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodLocked);
 
         // Validate Standard Working Days
@@ -78,7 +78,7 @@ public sealed class RecalculatePayrollRunHandler(
         if (attendancePeriod is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
 
-        if (attendancePeriod.StatusCode != "Locked")
+        if (attendancePeriod.StatusCode != AttendancePeriodStatusCode.Locked)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotLocked);
 
         // 4. Fetch Employee
@@ -195,8 +195,8 @@ public sealed class RecalculatePayrollRunHandler(
                 {
                     Id = new PayrollItemId(IdGenerator.NextGuid()),
                     PayrollRunId = payrollRun.Id,
-                    ItemCode = allowance.AllowanceType?.Code ?? "ALLOWANCE",
-                    ItemName = allowance.AllowanceType?.Name ?? "Allowance",
+                    ItemCode = allowance.AllowanceType?.Code ?? PayrollConstants.AllowanceItemCodeFallback,
+                    ItemName = allowance.AllowanceType?.Name ?? PayrollConstants.AllowanceItemNameFallback,
                     ItemTypeCode = PayrollItemType.Allowance,
                     Amount = allowance.Amount,
                     CurrencyCode = allowance.Currency,

@@ -47,7 +47,7 @@ public sealed class LockAttendancePeriodHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodNotFound);
         }
 
-        if (period.StatusCode == "Locked")
+        if (period.StatusCode == AttendancePeriodStatusCode.Locked)
         {
             LogFailure(HrBusinessErrorCodes.AttendancePeriodAlreadyLocked, request.AttendancePeriodId);
             return HrErrorResponses.Create(HrBusinessErrorCodes.AttendancePeriodAlreadyLocked);
@@ -122,7 +122,7 @@ public sealed class LockAttendancePeriodHandler(
         var originalStatus = period.StatusCode;
         var originalUpdatedAt = period.UpdatedAt;
         var originalUpdatedBy = period.UpdatedBy;
-        period.StatusCode = "Locked";
+        period.StatusCode = AttendancePeriodStatusCode.Locked;
         period.UpdatedAt = now;
         period.UpdatedBy = updatedBy;
 

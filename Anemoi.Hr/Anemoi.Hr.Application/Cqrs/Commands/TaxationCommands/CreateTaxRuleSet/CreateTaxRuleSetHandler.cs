@@ -36,7 +36,7 @@ public sealed class CreateTaxRuleSetHandler(
 
         // Check for overlapping rule sets (only those that are Active or Draft, not Inactive)
         var existingSets = await ruleSetRepository.GetManyByConditionAsync(
-            x => x.CountryCode == countryCode && x.TaxType == taxType && x.Status != "Inactive",
+            x => x.CountryCode == countryCode && x.TaxType == taxType && x.Status != TaxRuleSetStatusCode.Inactive,
             token: cancellationToken);
 
         var overlaps = existingSets.Any(x =>
@@ -59,7 +59,7 @@ public sealed class CreateTaxRuleSetHandler(
             Name = request.Name.Trim(),
             EffectiveFrom = effectiveFrom,
             EffectiveTo = effectiveTo,
-            Status = "Draft",
+            Status = TaxRuleSetStatusCode.Draft,
             Version = maxVersion + 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
