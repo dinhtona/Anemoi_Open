@@ -3,7 +3,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
 using MassTransit;

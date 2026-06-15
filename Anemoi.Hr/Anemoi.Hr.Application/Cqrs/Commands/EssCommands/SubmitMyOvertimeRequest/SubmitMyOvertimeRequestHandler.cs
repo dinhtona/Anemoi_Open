@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Overtime;
@@ -88,7 +89,8 @@ public sealed class SubmitMyOvertimeRequestHandler(
 
         await publishEndpoint.Publish(new OvertimeRequestCreatedIntegrationEvent(
             overtimeRequest.Id.Value.ToString(),
-            overtimeRequest.EmployeeId.Value.ToString()), cancellationToken);
+            overtimeRequest.EmployeeId.Value.ToString(),
+            employee.DirectManagerEmployeeId?.Value.ToString()), cancellationToken);
 
         return new OvertimeRequestIdResponse
         {

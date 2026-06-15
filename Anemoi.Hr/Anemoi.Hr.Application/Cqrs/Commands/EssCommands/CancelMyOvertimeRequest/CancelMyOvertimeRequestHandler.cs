@@ -2,7 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Overtime;

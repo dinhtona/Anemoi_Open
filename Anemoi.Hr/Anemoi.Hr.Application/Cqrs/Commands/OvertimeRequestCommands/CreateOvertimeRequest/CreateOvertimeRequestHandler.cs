@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
@@ -79,7 +80,8 @@ public sealed class CreateOvertimeRequestHandler(
 
         await publishEndpoint.Publish(new OvertimeRequestCreatedIntegrationEvent(
             overtimeRequest.Id.Value.ToString(),
-            overtimeRequest.EmployeeId.Value.ToString()), cancellationToken);
+            overtimeRequest.EmployeeId.Value.ToString(),
+            employee.DirectManagerEmployeeId?.Value.ToString()), cancellationToken);
 
         return mapper.ToOvertimeRequestIdResponse(overtimeRequest);
     }
