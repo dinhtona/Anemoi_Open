@@ -38,8 +38,8 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     [HasPermission(HrPermissions.InsuranceView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<InsuranceRuleSetResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInsuranceRuleSets(
-        [FromQuery] string countryCode,
-        [FromQuery] string insuranceType,
+        [FromQuery] string? countryCode,
+        [FromQuery] string? insuranceType,
         CancellationToken cancellationToken)
     {
         var query = new GetInsuranceRuleSetsQuery(countryCode, insuranceType);
@@ -157,10 +157,10 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     [HasPermission(HrPermissions.InsuranceView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<InsuranceCalculationSnapshotResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInsuranceCalculationSnapshots(
-        [FromQuery] string employeeId,
-        [FromQuery] string insuranceType,
-        [FromQuery] string sourceModule,
-        [FromQuery] string sourceReferenceId,
+        [FromQuery] string? employeeId,
+        [FromQuery] string? insuranceType,
+        [FromQuery] string? sourceModule,
+        [FromQuery] string? sourceReferenceId,
         CancellationToken cancellationToken)
     {
         var query = new GetInsuranceCalculationSnapshotsQuery(employeeId, insuranceType, sourceModule, sourceReferenceId);
@@ -186,8 +186,8 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     public async Task<IActionResult> GetInsuranceContributionReport(
         [FromQuery] DateOnly periodStart,
         [FromQuery] DateOnly periodEnd,
-        [FromQuery] string countryCode,
-        [FromQuery] string insuranceType,
+        [FromQuery] string? countryCode,
+        [FromQuery] string? insuranceType,
         CancellationToken cancellationToken)
     {
         var query = new GetInsuranceContributionReportQuery(periodStart, periodEnd, countryCode, insuranceType);

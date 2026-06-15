@@ -8,5 +8,5 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.InsuranceQueries.GetInsuranceContri
 public sealed record GetInsuranceContributionReportQuery(
     DateOnly PeriodStart,
     DateOnly PeriodEnd,
-    string CountryCode = null,
-    string InsuranceType = null) : IQuery<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;
+    string? CountryCode = null,
+    string? InsuranceType = null) : IQuery<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;

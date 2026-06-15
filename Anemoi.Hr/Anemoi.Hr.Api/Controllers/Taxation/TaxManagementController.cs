@@ -39,8 +39,8 @@ public sealed class TaxManagementController(ISender sender) : ControllerBase
     [HasPermission(HrPermissions.TaxView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<TaxRuleSetResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTaxRuleSets(
-        [FromQuery] string countryCode,
-        [FromQuery] string taxType,
+        [FromQuery] string? countryCode,
+        [FromQuery] string? taxType,
         CancellationToken cancellationToken)
     {
         var query = new GetTaxRuleSetsQuery(countryCode, taxType);
@@ -182,8 +182,8 @@ public sealed class TaxManagementController(ISender sender) : ControllerBase
     [HasPermission(HrPermissions.TaxView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<TaxCalculationSnapshotResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTaxCalculationSnapshots(
-        [FromQuery] string employeeId,
-        [FromQuery] string sourceModule,
+        [FromQuery] string? employeeId,
+        [FromQuery] string? sourceModule,
         [FromQuery] Guid? sourceReferenceId,
         CancellationToken cancellationToken)
     {

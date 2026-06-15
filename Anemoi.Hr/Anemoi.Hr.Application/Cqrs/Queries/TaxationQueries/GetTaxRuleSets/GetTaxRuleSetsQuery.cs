@@ -5,5 +5,5 @@ using System.Collections.Generic;
 namespace Anemoi.Hr.Application.Cqrs.Queries.TaxationQueries.GetTaxRuleSets;
 
 public sealed record GetTaxRuleSetsQuery(
-    string CountryCode = null,
-    string TaxType = null) : IQuery<IReadOnlyCollection<TaxRuleSetResponse>>;
+    string? CountryCode = null,
+    string? TaxType = null) : IQuery<IReadOnlyCollection<TaxRuleSetResponse>>;

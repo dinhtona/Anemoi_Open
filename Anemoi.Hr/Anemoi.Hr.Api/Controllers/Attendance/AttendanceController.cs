@@ -87,8 +87,8 @@ public sealed class AttendanceController(ISender sender) : ControllerBase
     [HasPermission(HrPermissions.AttendanceView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AttendanceRecordResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAttendanceRecords(
-        [FromQuery] AttendancePeriodId attendancePeriodId,
-        [FromQuery] EmployeeId employeeId,
+        [FromQuery] AttendancePeriodId? attendancePeriodId,
+        [FromQuery] EmployeeId? employeeId,
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetAttendanceRecordsQuery(attendancePeriodId, employeeId), cancellationToken);
