@@ -6,7 +6,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveTransactionQueries.GetLeaveTransactions;
 
 public sealed record GetLeaveTransactionsQuery(
-    EmployeeId EmployeeId,
-    LeaveBalanceId LeaveBalanceId,
-    LeaveRequestId LeaveRequestId,
-    string TransactionTypeCode) : GetManyQuery, IQueryPaged<LeaveTransactionResponse>;
+    EmployeeId? EmployeeId,
+    LeaveBalanceId? LeaveBalanceId,
+    LeaveRequestId? LeaveRequestId,
+    string? TransactionTypeCode) : GetManyQuery, IQueryPaged<LeaveTransactionResponse>;

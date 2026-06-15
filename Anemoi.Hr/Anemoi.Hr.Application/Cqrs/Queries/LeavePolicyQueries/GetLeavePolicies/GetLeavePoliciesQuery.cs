@@ -4,5 +4,5 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeavePolicyQueries.GetLeavePolicies;
 
-public sealed record GetLeavePoliciesQuery(string SearchKey, string LeaveTypeCode, bool? IsActive) : GetManyQuery,
+public sealed record GetLeavePoliciesQuery(string? SearchKey, string? LeaveTypeCode, bool? IsActive) : GetManyQuery,
     IQueryPaged<LeavePolicyResponse>;

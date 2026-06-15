@@ -5,5 +5,5 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveBalanceQueries.GetLeaveBalances;
 
-public sealed record GetLeaveBalancesQuery(EmployeeId EmployeeId, int? Year) : GetManyQuery,
+public sealed record GetLeaveBalancesQuery(EmployeeId? EmployeeId, int? Year) : GetManyQuery,
     IQueryPaged<LeaveBalanceResponse>;

@@ -6,7 +6,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveRequestQueries.GetLeaveRequests;
 
 public sealed record GetLeaveRequestsQuery(
-    EmployeeId EmployeeId,
-    string StatusCode,
+    EmployeeId? EmployeeId,
+    string? StatusCode,
     DateOnly? FromDate,
     DateOnly? ToDate) : GetManyQuery, IQueryPaged<LeaveRequestResponse>;

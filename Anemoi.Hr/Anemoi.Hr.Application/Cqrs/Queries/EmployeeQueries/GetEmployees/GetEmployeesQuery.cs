@@ -5,5 +5,5 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployees;
 
-public sealed record GetEmployeesQuery(string SearchKey, DepartmentId DepartmentId, PositionId PositionId)
+public sealed record GetEmployeesQuery(string? SearchKey, DepartmentId? DepartmentId, PositionId? PositionId)
     : GetManyQuery, IQueryPaged<EmployeeResponse>;

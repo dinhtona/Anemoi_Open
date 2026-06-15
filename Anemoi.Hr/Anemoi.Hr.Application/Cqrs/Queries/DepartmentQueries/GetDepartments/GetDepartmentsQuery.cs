@@ -4,5 +4,5 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.DepartmentQueries.GetDepartments;
 
-public sealed record GetDepartmentsQuery(string SearchKey, bool? IsActive)
+public sealed record GetDepartmentsQuery(string? SearchKey, bool? IsActive)
     : GetManyQuery, IQueryPaged<DepartmentResponse>;

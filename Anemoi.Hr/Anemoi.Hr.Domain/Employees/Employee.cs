@@ -21,13 +21,13 @@ public sealed class Employee : ValueObject
     public string GradeCode { get; set; }
     public DepartmentId PrimaryDepartmentId { get; set; }
     public PositionId PrimaryPositionId { get; set; }
-    public EmployeeId DirectManagerEmployeeId { get; set; }
+    public EmployeeId? DirectManagerEmployeeId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
     public Department PrimaryDepartment { get; set; }
     public Position PrimaryPosition { get; set; }
-    public Employee DirectManager { get; set; }
+    public Employee? DirectManager { get; set; }
     public List<Employee> DirectReports { get; set; } = [];
     public List<EmployeeDepartmentHistory> DepartmentHistories { get; set; } = [];
     public List<EmployeePositionHistory> PositionHistories { get; set; } = [];
