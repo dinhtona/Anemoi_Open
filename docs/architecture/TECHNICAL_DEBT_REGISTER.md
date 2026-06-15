@@ -666,6 +666,18 @@ Resolved.
 
 ---
 
+## Phase 22
+
+### Frontend Error Translation System
+
+Resolved:
+- **Centralized Error Parsing**: Consolidated raw/duplicated API error parsing (e.g., `error.response?.data?.code`) into the centralized `extractApiErrorCode()` helper.
+- **Centralized Translation Pipeline**: Routed all user-facing API error notifications through `translateApiError()`, utilizing a root-level `"errors"` block instead of module-specific error namespaces.
+- **Complete Error Code Coverage**: Synced all 231 backend `HR_*` and `VAL_*` codes from `HrBusinessErrorCodes.cs` into `en.json` and `vi.json` catalogs.
+- **Import/Code Cleanup**: Removed unused `isAxiosError` and `ApiError` imports/declarations from 11 frontend components.
+
+---
+
 # Recommended Cleanup Roadmap
 
 ## Immediate Priority (P1)
