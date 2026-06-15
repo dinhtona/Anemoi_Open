@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -56,6 +57,20 @@ public sealed class CreateNotificationHandler(
                 };
             }
 
+            // Deduplication Check
+            if (!string.IsNullOrEmpty(request.DeduplicationKey))
+            {
+                var existing = await sqlRepository.GetFirstByConditionAsync(
+                    x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                    token: cancellationToken);
+
+                if (existing != null)
+                {
+                    logger.Information("Duplicate notification detected via check for DeduplicationKey {DeduplicationKey} for User {UserId}. Skipping creation.", request.DeduplicationKey, request.UserId);
+                    return mapper.ToNotificationResponse(existing);
+                }
+            }
+
             // Create notification record
             var notification = new NotificationHistory
             {
@@ -65,7 +80,18 @@ public sealed class CreateNotificationHandler(
                 Content = request.Content,
                 Category = request.Category,
                 IsRead = false,
-                CreatedTime = DateTime.UtcNow
+                CreatedTime = DateTime.UtcNow,
+                TitleLocalizationKey = request.TitleLocalizationKey,
+                TitleLocalizationArgs = request.TitleLocalizationArgs == null ? null : new List<string>(request.TitleLocalizationArgs),
+                ContentLocalizationKey = request.ContentLocalizationKey,
+                ContentLocalizationArgs = request.ContentLocalizationArgs == null ? null : new List<string>(request.ContentLocalizationArgs),
+                ActionUrl = request.ActionUrl,
+                ActionType = request.ActionType,
+                DeduplicationKey = request.DeduplicationKey,
+                CorrelationId = request.CorrelationId,
+                CausationId = request.CausationId,
+                Type = string.IsNullOrEmpty(request.Type) ? Anemoi.Contract.Notification.Constants.NotificationConstants.Types.Business : request.Type,
+                Severity = string.IsNullOrEmpty(request.Severity) ? Anemoi.Contract.Notification.Constants.NotificationConstants.Severities.Info : request.Severity
             };
 
             var createResult = await sqlRepository.CreateOneAsync(notification, cancellationToken);
@@ -87,22 +113,63 @@ public sealed class CreateNotificationHandler(
                         Title = notification.Title,
                         Content = notification.Content,
                         Category = notification.Category,
-                        CreatedTime = notification.CreatedTime
+                        CreatedTime = notification.CreatedTime,
+                        TitleLocalizationKey = notification.TitleLocalizationKey,
+                        TitleLocalizationArgs = notification.TitleLocalizationArgs,
+                        ContentLocalizationKey = notification.ContentLocalizationKey,
+                        ContentLocalizationArgs = notification.ContentLocalizationArgs,
+                        ActionUrl = notification.ActionUrl,
+                        ActionType = notification.ActionType,
+                        DeduplicationKey = notification.DeduplicationKey,
+                        CorrelationId = notification.CorrelationId,
+                        CausationId = notification.CausationId,
+                        Type = notification.Type,
+                        Severity = notification.Severity
                     }, cancellationToken);
 
                     logger.Information("Successfully created notification {NotificationId} of category {Category} for User {UserId}", notification.Id, notification.Category, request.UserId);
                     return mapper.ToNotificationResponse(notification);
                 },
-                ex =>
+                async ex =>
                 {
+                    // Handle concurrent insert unique key race conditions
+                    if (!string.IsNullOrEmpty(request.DeduplicationKey))
+                    {
+                        var existing = await sqlRepository.GetFirstByConditionAsync(
+                            x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                            token: cancellationToken);
+                        if (existing != null)
+                        {
+                            logger.Information("Recovered from concurrent insert for DeduplicationKey {DeduplicationKey} in SaveChangesAsync.", request.DeduplicationKey);
+                            return mapper.ToNotificationResponse(existing);
+                        }
+                    }
                     logger.Error(ex, "Error occurred while saving new notification for User: {UserId}", request.UserId);
-                    return Task.FromResult<OneOf<NotificationResponse, ErrorDetailResponse>>(
-                        NotificationErrorDetail.NotificationError.CreateFailed().ToErrorDetailResponse());
+                    return NotificationErrorDetail.NotificationError.CreateFailed().ToErrorDetailResponse();
                 }
             );
         }
         catch (Exception ex)
         {
+            if (!string.IsNullOrEmpty(request.DeduplicationKey))
+            {
+                try
+                {
+                    var userGuid = Guid.Parse(request.UserId);
+                    var existing = await sqlRepository.GetFirstByConditionAsync(
+                        x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                        token: cancellationToken);
+                    if (existing != null)
+                    {
+                        logger.Information("Recovered from concurrent exception for DeduplicationKey {DeduplicationKey} for User {UserId}.", request.DeduplicationKey, request.UserId);
+                        return mapper.ToNotificationResponse(existing);
+                    }
+                }
+                catch
+                {
+                    // Ignore nested error to preserve original exception logging
+                }
+            }
             logger.Error(ex, "Error occurred in CreateNotificationHandler for User: {UserId}", request.UserId);
             return NotificationErrorDetail.NotificationError.CreateFailed().ToErrorDetailResponse();
         }

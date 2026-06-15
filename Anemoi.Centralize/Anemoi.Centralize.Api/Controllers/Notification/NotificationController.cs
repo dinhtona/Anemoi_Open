@@ -98,15 +98,6 @@ public sealed class NotificationController(ISender sender) : ControllerBase
         var res = await sender.Send(command, cancellationToken);
         return res.Match<IActionResult>(_ => Ok(), BadRequest);
     }
-
-    [HttpPost]
-    [ProducesResponseType(typeof(NotificationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateNotification([FromBody] CreateNotificationCommand command, CancellationToken cancellationToken)
-    {
-        var res = await sender.Send(command, cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
-    }
 }
+
 

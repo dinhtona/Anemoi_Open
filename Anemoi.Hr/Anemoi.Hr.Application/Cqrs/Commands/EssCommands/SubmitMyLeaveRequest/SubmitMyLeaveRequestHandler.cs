@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
@@ -114,7 +115,8 @@ public sealed class SubmitMyLeaveRequestHandler(
         await publishEndpoint.Publish(new LeaveRequestSubmittedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
-            leaveRequest.LeavePolicyId.Value.ToString()), cancellationToken);
+            leaveRequest.LeavePolicyId.Value.ToString(),
+            leaveRequest.ApproverEmployeeId?.Value.ToString()), cancellationToken);
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),
             balance.LeavePolicyId.Value.ToString(),

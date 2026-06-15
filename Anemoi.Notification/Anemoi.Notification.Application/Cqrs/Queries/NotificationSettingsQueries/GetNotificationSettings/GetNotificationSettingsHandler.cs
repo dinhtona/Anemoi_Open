@@ -41,7 +41,7 @@ public sealed class GetNotificationSettingsHandler(
             models =>
             {
                 var list = models.Select(mapper.ToSettingResponse).ToList();
-                var defaultCategories = new[] { "System", "Workspace", "Task", "Environment" };
+                var defaultCategories = Anemoi.Contract.Notification.Constants.NotificationConstants.Categories.AllowedCategories;
                 foreach (var cat in defaultCategories)
                 {
                     if (!list.Any(x => x.Category.Equals(cat, StringComparison.OrdinalIgnoreCase)))

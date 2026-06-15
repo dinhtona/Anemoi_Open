@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
@@ -49,6 +50,10 @@ public sealed class RejectLeaveRequestHandler(
                 : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
 
+        await publishEndpoint.Publish(new LeaveRequestRejectedIntegrationEvent(
+            leaveRequest.Id.Value.ToString(),
+            leaveRequest.EmployeeId.Value.ToString(),
+            leaveRequest.LeavePolicyId.Value.ToString()), cancellationToken);
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),
             balance.LeavePolicyId.Value.ToString(),

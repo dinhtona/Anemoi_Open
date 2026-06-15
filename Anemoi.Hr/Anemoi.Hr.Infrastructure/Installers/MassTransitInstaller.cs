@@ -17,6 +17,10 @@ public sealed class MassTransitInstaller : IInstaller
             configurator.SetKebabCaseEndpointNameFormatter();
             configurator.AddConsumersFromNamespaceContaining<IHrApplicationAssemblyMarker>();
 
+            var serviceConsumer = BuildingBlock.Infrastructure.HandlerConsumers.ConsumersHelper
+                .CreateDynamicConsumerHandlers<Anemoi.Contract.Hr.IContractHrAssemblyMarker>("HrHandlersConsumer");
+            configurator.AddConsumer(serviceConsumer);
+
             if (masstransitSetting is null)
             {
                 configurator.UsingInMemory((context, bus) => bus.ConfigureEndpoints(context));

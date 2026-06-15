@@ -1,3 +1,4 @@
+using System.Linq;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Pipelines;
 using MediatR;
@@ -13,5 +14,10 @@ public sealed class PipelineInstaller : IInstaller
         services.AddMemoryCache();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TimeMeasuringBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
+
+        if (!services.Any(x => x.ServiceType == typeof(IPipelineBehavior<,>) && x.ImplementationType == typeof(ValidationBehavior<,>)))
+        {
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        }
     }
 }

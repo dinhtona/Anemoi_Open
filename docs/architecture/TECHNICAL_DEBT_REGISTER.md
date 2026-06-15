@@ -719,3 +719,19 @@ COMPLETED WITH ACCEPTED TECH DEBT
 
 TD-PDF-001: Vietnamese accents require embedded Unicode font support.
 TD-STOR-001: Local file storage should be replaced by durable object storage before production multi-instance deployment.
+
+
+# 2026-06-15
+Audit actor fields currently stored as string:
+- ApprovedBy
+- RejectedBy
+- CancelledBy
+
+Recommended:
+- UserId (Guid / Strongly Typed UserId)
+
+Reason:
+- Type safety
+- FK capability
+- Consistency with the rest of the domain model
+- Eliminate Guid -> string conversions

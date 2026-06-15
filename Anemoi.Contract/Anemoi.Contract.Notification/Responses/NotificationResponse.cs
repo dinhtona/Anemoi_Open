@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Anemoi.Contract.Notification.Responses;
 
@@ -12,4 +13,15 @@ public sealed record NotificationResponse
     public bool IsRead { get; init; }
     public DateTime CreatedTime { get; init; }
     public DateTime? ReadTime { get; init; }
+    public string TitleLocalizationKey { get; init; }
+    public List<string>? TitleLocalizationArgs { get; init; }
+    public string ContentLocalizationKey { get; init; }
+    public List<string>? ContentLocalizationArgs { get; init; }
+    public string ActionUrl { get; init; }
+    public string ActionType { get; init; }
+    public string DeduplicationKey { get; init; }
+    public Guid? CorrelationId { get; init; }
+    public Guid? CausationId { get; init; }
+    public string Type { get; init; }
+    public string Severity { get; init; }
 }

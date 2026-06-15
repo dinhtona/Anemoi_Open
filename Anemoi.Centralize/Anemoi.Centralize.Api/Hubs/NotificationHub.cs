@@ -61,6 +61,39 @@ public sealed class NotificationHub(
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }
 
+    public async Task JoinWorkspace(string workspaceId)
+    {
+        if (string.IsNullOrEmpty(workspaceId)) return;
+
+        if (!UserHasWorkspaceClaim(workspaceId))
+        {
+            logger.LogWarning("User {UserId} unauthorized connection attempt to Workspace group: Workspace-{WorkspaceId}", Context.UserIdentifier, workspaceId);
+            throw new HubException(localizer["HubJoinForbidden"].Value);
+        }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"Workspace-{workspaceId}");
+        logger.LogInformation("User {UserId} joined Workspace group: Workspace-{WorkspaceId}", Context.UserIdentifier, workspaceId);
+    }
+
+    public async Task LeaveWorkspace(string workspaceId)
+    {
+        if (string.IsNullOrEmpty(workspaceId)) return;
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Workspace-{workspaceId}");
+        logger.LogInformation("User {UserId} left Workspace group: Workspace-{WorkspaceId}", Context.UserIdentifier, workspaceId);
+    }
+
+    private bool UserHasWorkspaceClaim(string workspaceId)
+    {
+        if (Context.User == null) return false;
+        if (Context.User.IsInRole(SystemRoles.Administrator)) return true;
+
+        var workspaceClaims = Context.User.Claims
+            .Where(x => string.Equals(x.Type, "workspaceId", StringComparison.OrdinalIgnoreCase))
+            .Select(x => x.Value);
+
+        return workspaceClaims.Any(w => string.Equals(w, workspaceId, StringComparison.OrdinalIgnoreCase));
+    }
+
     private bool CanObserveUsers() =>
         Context.User?.HasClaim("applicationPolicyInternal", "Internal") == true &&
         (Context.User.IsInRole(SystemRoles.Administrator) || Context.User.IsInRole(Permissions.UserRead));

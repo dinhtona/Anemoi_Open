@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Anemoi.Notification.Domain\Anemoi.Notification.Domain.csproj" />
       <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Notification\Anemoi.Contract.Notification.csproj" />
+      <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Hr\Anemoi.Contract.Hr.csproj" />
       <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Application\Anemoi.BuildingBlock.Application.csproj" />
     </ItemGroup>
 

@@ -22,7 +22,18 @@ public partial class NotificationMapper
             Category = history.Category,
             IsRead = history.IsRead,
             CreatedTime = history.CreatedTime,
-            ReadTime = history.ReadTime
+            ReadTime = history.ReadTime,
+            TitleLocalizationKey = history.TitleLocalizationKey,
+            TitleLocalizationArgs = history.TitleLocalizationArgs,
+            ContentLocalizationKey = history.ContentLocalizationKey,
+            ContentLocalizationArgs = history.ContentLocalizationArgs,
+            ActionUrl = history.ActionUrl,
+            ActionType = history.ActionType,
+            DeduplicationKey = history.DeduplicationKey,
+            CorrelationId = history.CorrelationId,
+            CausationId = history.CausationId,
+            Type = history.Type,
+            Severity = history.Severity
         };
     }
 

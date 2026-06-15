@@ -27,5 +27,6 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IApplicationPolicyGetter>(sp => sp.GetRequiredService<IApplicationPolicySetter>() as ApplicationPolicyService);
         services.AddScoped<ITokenSetter, TokenService>();
         services.AddScoped<ITokenGetter>(sp => sp.GetRequiredService<ITokenSetter>() as TokenService);
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationRecipientResolver, Services.NotificationRecipientResolver>();
     }
 }
