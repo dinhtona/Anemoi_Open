@@ -11,5 +11,5 @@ public sealed record CancelOnboardingCommand(
     OnboardingInstanceId InstanceId) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string CancelledBy { get; set; }
+    public string? CancelledBy { get; set; }
 }

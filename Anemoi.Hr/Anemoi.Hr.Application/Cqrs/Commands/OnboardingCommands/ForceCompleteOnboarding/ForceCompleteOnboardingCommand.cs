@@ -12,5 +12,5 @@ public sealed record ForceCompleteOnboardingCommand(
     string Reason) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string CompletedBy { get; set; }
+    public string? CompletedBy { get; set; }
 }

@@ -11,5 +11,5 @@ public sealed record SkipOnboardingTaskCommand(
     OnboardingTaskId TaskId) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string SkippedBy { get; set; }
+    public string? SkippedBy { get; set; }
 }

@@ -11,5 +11,5 @@ public sealed record ReopenOnboardingCommand(
     OnboardingInstanceId InstanceId) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string ReopenedBy { get; set; }
+    public string? ReopenedBy { get; set; }
 }

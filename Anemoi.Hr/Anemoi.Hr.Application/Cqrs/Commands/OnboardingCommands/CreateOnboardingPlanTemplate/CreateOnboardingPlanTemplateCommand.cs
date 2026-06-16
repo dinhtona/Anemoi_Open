@@ -10,7 +10,7 @@ public sealed record CreateOnboardingPlanTemplateCommand(
     List<CreateOnboardingTaskTemplateDto> TaskTemplates) : ICommandResult<OnboardingPlanTemplateResponse>
 {
     [JsonIgnore]
-    public string CreatedBy { get; set; }
+    public string? CreatedBy { get; set; }
 }
 
 public sealed record CreateOnboardingTaskTemplateDto(

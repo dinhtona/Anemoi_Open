@@ -13,5 +13,5 @@ public sealed record ReassignOnboardingTaskCommand(
     string? NewUserDisplayName) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string ReassignedBy { get; set; }
+    public string? ReassignedBy { get; set; }
 }

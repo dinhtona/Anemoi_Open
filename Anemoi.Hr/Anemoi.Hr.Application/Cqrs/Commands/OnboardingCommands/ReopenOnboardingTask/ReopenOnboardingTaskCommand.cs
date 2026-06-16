@@ -12,5 +12,5 @@ public sealed record ReopenOnboardingTaskCommand(
     string? Reason) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string ReopenedBy { get; set; }
+    public string? ReopenedBy { get; set; }
 }

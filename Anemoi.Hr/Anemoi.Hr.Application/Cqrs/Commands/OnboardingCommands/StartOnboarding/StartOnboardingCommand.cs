@@ -14,5 +14,5 @@ public sealed record StartOnboardingCommand(
     Dictionary<string, string> RoleMappings) : ICommandResult<OnboardingInstanceResponse>
 {
     [JsonIgnore]
-    public string CreatedBy { get; set; }
+    public string? CreatedBy { get; set; }
 }

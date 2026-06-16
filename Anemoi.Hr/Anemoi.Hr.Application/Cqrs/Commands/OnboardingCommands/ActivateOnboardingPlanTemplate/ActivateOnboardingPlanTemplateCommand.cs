@@ -9,5 +9,5 @@ public sealed record ActivateOnboardingPlanTemplateCommand(
     OnboardingPlanTemplateId Id) : ICommandResult<OnboardingPlanTemplateResponse>
 {
     [JsonIgnore]
-    public string UpdatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
 }
