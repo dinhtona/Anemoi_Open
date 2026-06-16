@@ -272,4 +272,59 @@ public static class HrBusinessErrorCodes
     public const string PayslipEmailSendNotAllowed = "HR_PAYSLIP_EMAIL_SEND_NOT_ALLOWED";
     public const string PayslipEmailSendFailed = "HR_PAYSLIP_EMAIL_SEND_FAILED";
     public const string PayslipActiveDocumentRequired = "HR_PAYSLIP_ACTIVE_DOCUMENT_REQUIRED";
+
+    // Recruitment error codes
+    public const string RequisitionNotFound = "HR_REC_REQUISITION_NOT_FOUND";
+    public const string RequisitionCodeAlreadyExists = "HR_REC_REQUISITION_CODE_ALREADY_EXISTS";
+    public const string RequisitionInvalidStatus = "HR_REC_REQUISITION_INVALID_STATUS";
+    public const string RequisitionClosedCannotModify = "HR_REC_REQUISITION_CLOSED_CANNOT_MODIFY";
+    public const string RequisitionNotApprovedForPosting = "HR_REC_REQUISITION_NOT_APPROVED_FOR_POSTING";
+    public const string RequisitionRejectionReasonRequired = "HR_REC_REQUISITION_REJECTION_REASON_REQUIRED";
+    public const string RequisitionCancellationReasonRequired = "HR_REC_REQUISITION_CANCELLATION_REASON_REQUIRED";
+    public const string RequisitionHeadcountInvalid = "HR_REC_REQUISITION_HEADCOUNT_INVALID";
+    public const string RequisitionDateRangeInvalid = "HR_REC_REQUISITION_DATE_RANGE_INVALID";
+    public const string RequisitionConcurrencyConflict = "HR_REC_REQUISITION_CONCURRENCY_CONFLICT";
+
+    public const string JobPostingNotFound = "HR_REC_POSTING_NOT_FOUND";
+    public const string JobPostingInvalidStatus = "HR_REC_POSTING_INVALID_STATUS";
+    public const string JobPostingDateRangeInvalid = "HR_REC_POSTING_DATE_RANGE_INVALID";
+
+    public const string CandidateNotFound = "HR_REC_CANDIDATE_NOT_FOUND";
+    public const string CandidateEmailAlreadyExists = "HR_REC_CANDIDATE_EMAIL_ALREADY_EXISTS";
+    public const string CandidatePhoneAlreadyExists = "HR_REC_CANDIDATE_PHONE_ALREADY_EXISTS";
+    public const string CandidateBlacklisted = "HR_REC_CANDIDATE_BLACKLISTED";
+    public const string CandidateCodeAlreadyExists = "HR_REC_CANDIDATE_CODE_ALREADY_EXISTS";
+
+    public const string ApplicationNotFound = "HR_REC_APPLICATION_NOT_FOUND";
+    public const string ApplicationDuplicate = "HR_REC_APPLICATION_DUPLICATE";
+    public const string ApplicationInvalidStage = "HR_REC_APPLICATION_INVALID_STAGE";
+    public const string ApplicationAlreadyHired = "HR_REC_APPLICATION_ALREADY_HIRED";
+    public const string ApplicationRejectedCannotInterview = "HR_REC_APPLICATION_REJECTED_CANNOT_INTERVIEW";
+
+    public const string InterviewNotFound = "HR_REC_INTERVIEW_NOT_FOUND";
+    public const string InterviewDurationInvalid = "HR_REC_INTERVIEW_DURATION_INVALID";
+    public const string InterviewerNotFound = "HR_REC_INTERVIEWER_NOT_FOUND";
+
+    public const string HiringDecisionNotFound = "HR_REC_HIRING_DECISION_NOT_FOUND";
+    public const string HiringDecisionAlreadyExists = "HR_REC_HIRING_DECISION_ALREADY_EXISTS";
+    public const string HiringAlreadyConverted = "HR_REC_HIRING_ALREADY_CONVERTED";
+
+    // Validation error codes (Recruitment)
+    public const string ValRequisitionIdRequired = "VAL_REQUISITION_ID_REQUIRED";
+    public const string ValRequisitionCodeRequired = "VAL_REQUISITION_CODE_REQUIRED";
+    public const string ValRequisitionCodeTooLong = "VAL_REQUISITION_CODE_TOO_LONG";
+    public const string ValRequisitionTitleRequired = "VAL_REQUISITION_TITLE_REQUIRED";
+    public const string ValRequisitionHeadcountPositive = "VAL_REQUISITION_HEADCOUNT_POSITIVE";
+    public const string ValRequisitionEmploymentTypeRequired = "VAL_REQUISITION_EMPLOYMENT_TYPE_REQUIRED";
+    public const string ValRequisitionOpenDateRequired = "VAL_REQUISITION_OPEN_DATE_REQUIRED";
+    public const string ValRequisitionTargetHireDateRequired = "VAL_REQUISITION_TARGET_HIRE_DATE_REQUIRED";
+    public const string ValPostingIdRequired = "VAL_POSTING_ID_REQUIRED";
+    public const string ValPostingTitleRequired = "VAL_POSTING_TITLE_REQUIRED";
+    public const string ValCandidateIdRequired = "VAL_CANDIDATE_ID_REQUIRED";
+    public const string ValCandidateNameRequired = "VAL_CANDIDATE_NAME_REQUIRED";
+    public const string ValCandidateEmailRequired = "VAL_CANDIDATE_EMAIL_REQUIRED";
+    public const string ValCandidatePhoneRequired = "VAL_CANDIDATE_PHONE_REQUIRED";
+    public const string ValApplicationIdRequired = "VAL_APPLICATION_ID_REQUIRED";
+    public const string ValInterviewIdRequired = "VAL_INTERVIEW_ID_REQUIRED";
+    public const string ValHiringDecisionIdRequired = "VAL_HIRING_DECISION_ID_REQUIRED";
 }

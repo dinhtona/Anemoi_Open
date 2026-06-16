@@ -13,6 +13,7 @@ using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Reporting;
 using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
+using Anemoi.Hr.Domain.Recruitment;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,6 +69,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<InsuranceCalculationSnapshotItem> InsuranceCalculationSnapshotItems { get; set; }
     public DbSet<InsuranceAuditLog> InsuranceAuditLogs { get; set; }
     public DbSet<EmployeePortalAccess> EmployeePortalAccesses { get; set; }
+    public DbSet<JobRequisition> JobRequisitions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

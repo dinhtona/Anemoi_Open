@@ -113,6 +113,13 @@ public static class Permissions
     public const string HrEssPayrollView = "hr.ess.payroll.view";
     public const string HrEssPayslipView = "hr.ess.payslip.view";
 
+    // Recruitment permissions
+    public const string HrRecruitmentView = "hr.recruitment.view";
+    public const string HrRecruitmentManage = "hr.recruitment.manage";
+    public const string HrRecruitmentInterview = "hr.recruitment.interview";
+    public const string HrRecruitmentHire = "hr.recruitment.hire";
+    public const string HrRecruitmentAnalytics = "hr.recruitment.analytics";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -211,7 +218,12 @@ public static class Permissions
         new(HrEssOvertimeView, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeView"),
         new(HrEssOvertimeCreate, "PermissionGroupHrEss", "PermissionDescriptionHrEssOvertimeCreate"),
         new(HrEssPayrollView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayrollView"),
-        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView")
+        new(HrEssPayslipView, "PermissionGroupHrEss", "PermissionDescriptionHrEssPayslipView"),
+        new(HrRecruitmentView, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentView"),
+        new(HrRecruitmentManage, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentManage"),
+        new(HrRecruitmentInterview, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentInterview"),
+        new(HrRecruitmentHire, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentHire"),
+        new(HrRecruitmentAnalytics, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentAnalytics")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

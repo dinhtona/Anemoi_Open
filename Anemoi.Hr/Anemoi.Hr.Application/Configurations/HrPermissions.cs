@@ -84,6 +84,12 @@ public static class HrPermissions
     public const string InsuranceCalculate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceCalculate;
     public const string InsuranceReport = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrInsuranceReport;
 
+    public const string RecruitmentView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentView;
+    public const string RecruitmentManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentManage;
+    public const string RecruitmentInterview = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentInterview;
+    public const string RecruitmentHire = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentHire;
+    public const string RecruitmentAnalytics = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentAnalytics;
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -165,6 +171,11 @@ public static class HrPermissions
         InsuranceManage,
         InsuranceCalculate,
         InsuranceReport,
+        RecruitmentView,
+        RecruitmentManage,
+        RecruitmentInterview,
+        RecruitmentHire,
+        RecruitmentAnalytics,
         EssProfileView,
         EssLeaveView,
         EssLeaveRequest,
@@ -204,7 +215,9 @@ public static class HrPermissions
             [InsuranceManage] = new(InsuranceManage, "High"),
             [PayslipDocumentGenerate] = new(PayslipDocumentGenerate, "High"),
             [PayslipEmailSend] = new(PayslipEmailSend, "High"),
-            [PayrollReportingExport] = new(PayrollReportingExport, "High")
+            [PayrollReportingExport] = new(PayrollReportingExport, "High"),
+            [RecruitmentManage] = new(RecruitmentManage, "High"),
+            [RecruitmentHire] = new(RecruitmentHire, "High")
         };
 }
 
