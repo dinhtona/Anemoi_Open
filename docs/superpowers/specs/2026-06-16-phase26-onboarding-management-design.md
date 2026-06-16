@@ -36,7 +36,15 @@ OnboardingInstance auto-completes when all tasks are Completed or Skipped. Addit
 
 Each OnboardingTaskTemplate has an `OffsetDays` field (integer). When the instance is created with a `StartDate`, each task's `DueDate` is calculated as `StartDate.AddDays(OffsetDays)`. Negative values represent pre-hire tasks.
 
-### ADR-26-05 — Future Notification Integration Point
+### ADR-26-05 — Template Version Increment Rules
+
+`OnboardingPlanTemplate.Version` follows strict increment rules:
+- `CreateTemplate` → `Version = 1`
+- `UpdateTemplate` (name, description, or task templates changed) → `Version++`
+- `ActivateTemplate` / `DeactivateTemplate` → `Version` is NOT incremented (status change only)
+- `OnboardingInstance.TemplateVersion` stores the template version at snapshot time, preserving which version of the template was used at start.
+
+### ADR-26-06 — Future Notification Integration Point
 
 Phase 26 does NOT implement notification delivery. However, the domain model must publish domain events for future Notification Phase N2 consumption:
 
@@ -47,7 +55,7 @@ Phase 26 does NOT implement notification delivery. However, the domain model mus
 
 Events carry: UserId, TaskId/InstanceId, OccurredAt, TenantId (future).
 
-### ADR-26-06 — Historical Snapshot Includes User Display Name
+### ADR-26-07 — Historical Snapshot Includes User Display Name
 
 `OnboardingTask` stores `AssignedUserDisplayNameSnapshot` in addition to `AssignedUserId`. If a user is renamed later, audit trails preserve the original assignee name. Follows PayrollItem DepartmentNameSnapshot/PositionNameSnapshot pattern (Phase 24).
 
@@ -164,7 +172,7 @@ OnboardingTask:
 
 **Auto-Completion**: When all tasks in an instance are Completed or Skipped, the instance status automatically transitions to Completed.
 
-### Database Constraints
+### Database Constraints & Indexes
 
 **Filtered Unique Index — Active Onboarding Per Employee**:
 ```sql
@@ -173,6 +181,29 @@ ON "Hr"."OnboardingInstances" ("EmployeeId")
 WHERE "Status" IN ('Draft', 'InProgress');
 ```
 Prevents race conditions where StartOnboarding could create duplicate active instances for the same employee.
+
+**Performance Indexes** (added before deployment for query optimization):
+
+```sql
+-- OnboardingInstance queries: filtering by status, date range
+CREATE INDEX IX_OnboardingInstances_Status ON "Hr"."OnboardingInstances" ("Status");
+CREATE INDEX IX_OnboardingInstances_StartDate ON "Hr"."OnboardingInstances" ("StartDate");
+
+-- OnboardingTask queries: My Tasks, Pending Tasks, Task Board, Dashboard
+CREATE INDEX IX_OnboardingTasks_AssignedUserId_Status
+    ON "Hr"."OnboardingTasks" ("AssignedUserId", "Status");
+CREATE INDEX IX_OnboardingTasks_DueDate
+    ON "Hr"."OnboardingTasks" ("DueDate")
+    WHERE "Status" = 'Pending';
+CREATE INDEX IX_OnboardingTasks_InstanceId
+    ON "Hr"."OnboardingTasks" ("InstanceId");
+```
+
+These indexes support the following query patterns:
+- `GetMyOnboardingTasksQuery`: `WHERE AssignedUserId = @userId AND Status = 'Pending'`
+- `GetPendingOnboardingTasksQuery`: `WHERE Status = 'Pending' ORDER BY DueDate`
+- `GetOnboardingDashboardQuery`: aggregation by status and due date
+- `GetOnboardingInstancesQuery`: filtering by Status and StartDate range
 
 ---
 
@@ -284,7 +315,7 @@ All onboarding error codes follow the `HR_ONB_*` pattern:
 |------|-------------|
 | HR_ONB_TEMPLATE_NOT_FOUND | Template not found |
 | HR_ONB_TEMPLATE_INACTIVE | Template is inactive, cannot use |
-| HR_ONB_TEMPLATE_HAS_TASKS | Cannot deactivate template with active instances |
+| HR_ONB_TEMPLATE_IN_USE | Cannot deactivate template with active instances |
 | HR_ONB_INSTANCE_NOT_FOUND | Instance not found |
 | HR_ONB_INSTANCE_INVALID_STATUS | Invalid status transition |
 | HR_ONB_INSTANCE_ALREADY_COMPLETED | Instance already completed |
