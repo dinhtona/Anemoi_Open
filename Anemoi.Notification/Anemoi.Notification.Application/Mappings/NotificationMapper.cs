@@ -56,4 +56,37 @@ public partial class NotificationMapper
             Messages = errorDetail.Messages
         };
     }
+
+    public NotificationPreferenceResponse ToPreferenceResponse(
+        NotificationPreference preference,
+        List<NotificationSubscription> subscriptions)
+    {
+        return new NotificationPreferenceResponse
+        {
+            EnableInApp = preference.EnableInApp,
+            EnableEmail = preference.EnableEmail,
+            Subscriptions = subscriptions.Select(ToSubscriptionResponse).ToList()
+        };
+    }
+
+    public NotificationPreferenceResponse ToDefaultPreferenceResponse(
+        List<NotificationSubscription> subscriptions)
+    {
+        return new NotificationPreferenceResponse
+        {
+            EnableInApp = true,
+            EnableEmail = true,
+            Subscriptions = subscriptions.Select(ToSubscriptionResponse).ToList()
+        };
+    }
+
+    public NotificationSubscriptionResponse ToSubscriptionResponse(
+        NotificationSubscription subscription)
+    {
+        return new NotificationSubscriptionResponse
+        {
+            Category = subscription.Category,
+            IsEnabled = subscription.IsEnabled
+        };
+    }
 }
