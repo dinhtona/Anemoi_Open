@@ -18,7 +18,7 @@ Implement Notification Center UI, user preferences (global channel toggles), not
 
 ```
 NotificationPreference : Entity<NotificationPreferenceId>
-  UserId         Guid
+  UserId         UserId (strongly-typed, not raw Guid)
   EnableInApp    bool  (default true)   // Global master switch for in-app notifications
   EnableEmail    bool  (default true)   // Global master switch for email notifications
                                         // Per-category email preferences may be introduced later
@@ -26,8 +26,8 @@ NotificationPreference : Entity<NotificationPreferenceId>
   UpdatedAt      DateTime
 ```
 
-- Unique index on `(UserId)`
-- New strongly-typed ID: `NotificationPreferenceId(Guid Value)`
+- Unique index on `(UserId.Value)`
+- New strongly-typed ID: `NotificationPreferenceId(Guid Value)` — consistent with other ID types in the system
 
 ### NotificationHistory Hide (Soft-Delete)
 
@@ -36,19 +36,13 @@ NotificationPreference : Entity<NotificationPreferenceId>
 - Domain method named `Hide()` not `Delete()` — semantically this is "hide from user" not "destroy audit data"
 - Existing indexes updated to include `IsHidden`
 
-### NotificationHistory xmin (Concurrency)
-
-- Add `xmin` row version column for optimistic concurrency control
-- Required because MarkRead, Hide, and SignalR refresh can race concurrently
-- EF Core: `builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();`
-
 ## Application Layer — Commands
 
 | Command | Type | Notes |
 |---------|------|-------|
 | `CreateOrUpdateNotificationPreference` | ICommandVoid | Upsert: if exists → update EnableInApp/EnableEmail; if not → create |
 | `HideNotification` | ICommandVoid | Set IsHidden=true, HiddenAt=UtcNow. Checks ownership. Domain: `entity.Hide()`. |
-| `HideAllReadNotifications` | ICommandVoid | Set IsHidden=true for all IsRead==true for user |
+| `HideAllReadNotifications` | ICommandVoid | Bulk update via `ExecuteUpdateAsync(...)` — no foreach/load. Set IsHidden=true for all IsRead==true for user in single SQL round trip. |
 | `MarkNotificationAsRead` | ICommandVoid | Already exists |
 | `MarkAllNotificationsAsRead` | ICommandVoid | Already exists |
 | `UpdateNotificationSettings` | ICommandVoid | Already exists (per-category) |
@@ -82,6 +76,8 @@ New filter properties on `GetNotificationsQuery`:
 - `DateTo` (DateTime?)
 
 Response: `NotificationPagedResponse` wrapping `PaginationResponse<NotificationResponse>` with additional `UnreadCount`.
+
+**Technical debt:** Cursor-based pagination (`cursor` + `pageSize`) would be more efficient for infinite scroll than offset-based (`pageNumber` + `pageSize`), especially when users have 10K+ notifications. Deferred to a future phase if performance profiling shows it's needed.
 
 ### GetMyNotificationPreference Merged Response
 
@@ -117,10 +113,13 @@ In `CreateNotificationHandler`, before creating notification:
 ```csharp
 public interface INotificationPreferenceProvider
 {
-    Task<NotificationPreferenceDto?> GetPreferenceAsync(Guid userId, CancellationToken ct);
-    // Future: Task InvalidateCacheAsync(Guid userId);
+    Task<NotificationPreferenceDto?> GetPreferenceAsync(UserId userId, CancellationToken ct);
+    // Future: Task InvalidateCacheAsync(UserId userId);
 }
 ```
+
+N7 implementation: `DatabaseNotificationPreferenceProvider` (direct DB query, no cache).
+Future N8/N9: `CachedNotificationPreferenceProvider` wrapping DB provider with memory cache.
 
 ## Permissions
 
@@ -159,7 +158,6 @@ All under `api/notification/Notification/`, authenticated via JWT.
 - Alter `NotificationHistories`:
   - Add `IsHidden` bool (default false)
   - Add `HiddenAt` DateTime?
-  - Add `xmin` column (row version, auto-managed by PostgreSQL)
 - New indexes on `NotificationHistories` (add any missing):
   - `(UserId, IsHidden)`
   - `(UserId, CreatedAt DESC)`
@@ -184,6 +182,9 @@ All under `api/notification/Notification/`, authenticated via JWT.
 
 - Already exists as `NotificationBell` component
 - On `ReceiveNotification` SignalR event → use `queryClient.setQueryData()` to **directly append** the new notification into the React Query cache
+- **Duplicate handling:** Check `NotificationId` before appending — if ID already exists in cache, skip. Algorithm: `if (!cacheIds.has(notification.id)) { prepend(notification); }`
+- **Reconnect handling:** On SignalR reconnect, invalidate queries once to catch missed notifications during disconnection
+- **Multi-tab handling:** Each tab independently receives SignalR events — no special handling needed (SignalR broadcasts to all connections)
 - This means **zero network calls** for real-time updates — the SignalR payload is the source of truth
 - Unread count badge updates in real-time via the same cache mutation
 
@@ -240,7 +241,7 @@ Backend → MassTransit → SignalR Hub → NotificationContext
 ### Modified (Backend)
 1. `Anemoi.BuildingBlocks/.../Authorization/Permissions.cs` — add notification permissions
 2. `Anemoi.Notification.Domain/Models/NotificationHistory.cs` — add IsHidden, HiddenAt
-3. `Anemoi.Notification.Infrastructure/DataContext/ModelMapping.cs` — add NotificationPreference config, NotificationHistory indexes + xmin
+3. `Anemoi.Notification.Infrastructure/DataContext/ModelMapping.cs` — add NotificationPreference config, update NotificationHistory indexes with IsHidden
 4. `Anemoi.Notification.Infrastructure/DataContext/NotificationDbContext.cs` — add DbSet<NotificationPreference>
 5. `Anemoi.Notification.Application/Mappings/NotificationMapper.cs` — add preference + hide mapping
 6. `Anemoi.Notification.Application/Cqrs/Commands/NotificationCommands/CreateNotification/CreateNotificationHandler.cs` — add preference check through INotificationPreferenceProvider
@@ -273,7 +274,7 @@ Backend → MassTransit → SignalR Hub → NotificationContext
 - Application: CreateNotificationHandler preference gate tests
 - Integration: Full preference + subscription pipeline
 - Integration: Permission enforcement for new endpoints
-- Integration: Concurrency (xmin row version) handling tests
+- Integration: Bulk HideAllReadNotifications performance test
 - Frontend: Component rendering tests (if available)
 - Build verification: `dotnet build` + TypeScript compilation
 
@@ -293,5 +294,4 @@ Backend → MassTransit → SignalR Hub → NotificationContext
 12. Preferences API returns combined global + category settings (single DTO)
 13. Permissions enforced: notification.view, notification.manage, notification.preference.manage
 14. Hidden notifications excluded from all queries (IsHidden == false)
-15. Optimistic concurrency via xmin for race-prone operations
-16. Build passes, no warnings
+15. Build passes, no warnings
