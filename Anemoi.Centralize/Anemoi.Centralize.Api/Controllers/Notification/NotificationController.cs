@@ -20,6 +20,7 @@ using Anemoi.Contract.Notification.Commands.NotificationSettingsCommands.UpdateN
 using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Contract.Notification.Queries.NotificationPreferenceQueries.GetMyNotificationPreference;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetArchivedNotifications;
+using Anemoi.Contract.Notification.Queries.NotificationQueries.GetActionAudits;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetNotifications;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetUnreadNotificationCount;
 using Anemoi.Contract.Notification.Queries.NotificationSettingsQueries.GetNotificationSettings;
@@ -253,6 +254,31 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     // End existing endpoints
+
+    [HttpGet]
+    [HasPermission(Permissions.NotificationAuditView)]
+    [ProducesResponseType(typeof(PaginationResponse<NotificationActionAuditResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetActionAudits(
+        [FromQuery] Guid? notificationId,
+        [FromQuery] Guid? executedBy,
+        [FromQuery] bool? success,
+        [FromQuery] int page,
+        [FromQuery] int size,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetActionAuditsQuery
+        {
+            NotificationId = notificationId.HasValue ? new NotificationHistoryId(notificationId.Value) : null,
+            ExecutedBy = executedBy,
+            Success = success,
+            PageIndex = page <= 0 ? 1 : page,
+            PageSize = size <= 0 ? 20 : size
+        };
+        var res = await sender.Send(query, cancellationToken);
+        return Ok(res);
+    }
 
     [HttpGet]
     [HasPermission(Permissions.NotificationPreferenceManage)]

@@ -30,6 +30,11 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<Anemoi.Notification.Application.Services.INotificationRecipientResolver, Services.NotificationRecipientResolver>();
         services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.DefaultNotificationActionExecutor>();
         services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.LeaveApprovalNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.LeaveNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.OvertimeNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.PayrollNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.OnboardingNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.RecruitmentNotificationExecutor>();
         services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutorResolver, Anemoi.Notification.Application.Services.NotificationActionExecutorResolver>();
     }
 }

@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Infrastructure.Filters;
 using Anemoi.BuildingBlock.Infrastructure.HandlerConsumers;
+using Anemoi.Contract.Hr;
 using Anemoi.Contract.Notification;
 using Anemoi.Notification.Application;
 using Anemoi.Notification.Infrastructure.DataContext;
@@ -29,6 +30,8 @@ public sealed class MassTransitInstaller : IInstaller
             var serviceConsumer = ConsumersHelper
                 .CreateDynamicConsumerHandlers<INotificationContractAssemblyMarker>("NotificationHandlersConsumer");
             configurator.AddConsumer(serviceConsumer);
+            configurator.AddRequestClient<NotificationActionCommand>();
+
             configurator.UsingRabbitMq((context, bus) =>
             {
                 bus.Host(host, virtualHost, c =>
