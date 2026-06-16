@@ -13,6 +13,7 @@ using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Reporting;
 using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Infrastructure.Persistence;
@@ -71,6 +72,9 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IHrInfrastructureAssemblyMarker).Assembly);
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
         base.OnModelCreating(modelBuilder);
     }
 }

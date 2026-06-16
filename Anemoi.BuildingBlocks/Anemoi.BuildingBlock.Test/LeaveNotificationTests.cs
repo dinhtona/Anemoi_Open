@@ -50,7 +50,7 @@ public sealed class LeaveNotificationTests
             e.Resource == "hr.leave.request" &&
             e.Action == NotificationConstants.DataChangeActions.Create &&
             e.EntityId == leaveRequestId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.Medium &&
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low &&
             e.QueryTags.Contains("hr") &&
             e.QueryTags.Contains("leave") &&
             e.QueryTags.Contains("leave-request")

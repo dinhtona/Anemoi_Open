@@ -30,7 +30,7 @@ public sealed class OvertimeRequestCreatedConsumer(
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "overtime", "overtime-request" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -82,7 +82,7 @@ public sealed class OvertimeRequestApprovedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "overtime", "overtime-request" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -128,7 +128,7 @@ public sealed class OvertimeRequestRejectedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "overtime", "overtime-request" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -174,7 +174,7 @@ public sealed class OvertimeRequestCancelledConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "overtime", "overtime-request" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);

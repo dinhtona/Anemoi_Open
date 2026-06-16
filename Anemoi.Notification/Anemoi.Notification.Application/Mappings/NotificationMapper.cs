@@ -17,6 +17,7 @@ public partial class NotificationMapper
         {
             Id = history.Id.Value.ToString(),
             UserId = history.UserId.ToString(),
+            WorkspaceId = history.WorkspaceId?.ToString(),
             Title = history.Title,
             Content = history.Content,
             Category = history.Category,

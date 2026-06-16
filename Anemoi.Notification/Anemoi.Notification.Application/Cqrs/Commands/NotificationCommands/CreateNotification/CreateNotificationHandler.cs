@@ -76,6 +76,7 @@ public sealed class CreateNotificationHandler(
             {
                 Id = new NotificationHistoryId(IdGenerator.NextGuid()),
                 UserId = userGuid,
+                WorkspaceId = request.WorkspaceId is { } ws ? Guid.Parse(ws) : null,
                 Title = request.Title,
                 Content = request.Content,
                 Category = request.Category,
@@ -110,6 +111,7 @@ public sealed class CreateNotificationHandler(
                     {
                         Id = notification.Id.Value.ToString(),
                         UserId = notification.UserId.ToString(),
+                        WorkspaceId = notification.WorkspaceId?.ToString(),
                         Title = notification.Title,
                         Content = notification.Content,
                         Category = notification.Category,

@@ -43,12 +43,12 @@ public sealed class PayslipNotificationTests
         await consumer.Consume(context);
 
         // Assert
-        // Verify DataChangeOccurred transient invalidation event is emitted with High sensitivity
+        // Verify DataChangeOccurred transient invalidation event is emitted with Low sensitivity
         await _publishEndpoint.Received(1).Publish(Arg.Is<DataChangeOccurredIntegrationEvent>(e =>
             e.Resource == "hr.payslip" &&
             e.Action == NotificationConstants.DataChangeActions.Update &&
             e.EntityId == payslipId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.High &&
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low &&
             e.QueryTags.Contains("hr") &&
             e.QueryTags.Contains("payroll") &&
             e.QueryTags.Contains("payslip")
@@ -84,12 +84,12 @@ public sealed class PayslipNotificationTests
         await consumer.Consume(context);
 
         // Assert
-        // Verify DataChangeOccurred is emitted with High sensitivity
+        // Verify DataChangeOccurred is emitted with Low sensitivity
         await _publishEndpoint.Received(1).Publish(Arg.Is<DataChangeOccurredIntegrationEvent>(e =>
             e.Resource == "hr.payslip" &&
             e.Action == NotificationConstants.DataChangeActions.Update &&
             e.EntityId == payslipId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.High
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low
         ), Arg.Any<CancellationToken>());
 
         // Verify notification is created for correct employee user

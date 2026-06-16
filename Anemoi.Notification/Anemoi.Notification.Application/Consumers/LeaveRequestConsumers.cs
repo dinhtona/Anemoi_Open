@@ -29,8 +29,8 @@ public sealed class LeaveRequestSubmittedConsumer(
             Resource = "hr.leave.request",
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.LeaveRequestId,
-            WorkspaceId = null, // Set to null for this phase
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            WorkspaceId = null,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "leave", "leave-request" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -97,6 +97,7 @@ public sealed class LeaveRequestApprovedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.leave.approved.title",
+            ContentLocalizationKey: "notification.leave.approved.content",
             Category: NotificationConstants.Categories.Leave,
             ActionUrl: "/ess/leave",
             DeduplicationKey: $"leave:{message.LeaveRequestId}:approved:{userId}",
@@ -142,6 +143,7 @@ public sealed class LeaveRequestRejectedConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.leave.rejected.title",
+            ContentLocalizationKey: "notification.leave.rejected.content",
             Category: NotificationConstants.Categories.Leave,
             ActionUrl: "/ess/leave",
             DeduplicationKey: $"leave:{message.LeaveRequestId}:rejected:{userId}",
@@ -187,6 +189,7 @@ public sealed class LeaveRequestCancelledConsumer(
         var command = new CreateNotificationCommand(
             UserId: userId,
             TitleLocalizationKey: "notification.leave.cancelled.title",
+            ContentLocalizationKey: "notification.leave.cancelled.content",
             Category: NotificationConstants.Categories.Leave,
             ActionUrl: "/ess/leave",
             DeduplicationKey: $"leave:{message.LeaveRequestId}:cancelled:{userId}",

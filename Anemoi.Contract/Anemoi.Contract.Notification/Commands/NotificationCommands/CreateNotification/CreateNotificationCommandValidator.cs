@@ -13,6 +13,11 @@ public sealed class CreateNotificationCommandValidator : AbstractValidator<Creat
             .Must(x => Guid.TryParse(x, out _))
             .WithMessage("UserId must be a valid GUID.");
 
+        RuleFor(x => x.WorkspaceId)
+            .Must(x => x is null || Guid.TryParse(x, out _))
+            .When(x => x.WorkspaceId is not null)
+            .WithMessage("WorkspaceId must be a valid GUID when provided.");
+
         RuleFor(x => x.Title)
             .NotEmpty().When(x => string.IsNullOrEmpty(x.TitleLocalizationKey))
             .WithMessage("Title is required when TitleLocalizationKey is not specified.")

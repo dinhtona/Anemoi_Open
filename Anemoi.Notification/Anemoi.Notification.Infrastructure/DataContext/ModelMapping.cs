@@ -18,6 +18,7 @@ public sealed class ModelMapping :
         builder.HasKey(x => x.Id);
         
         builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => x.WorkspaceId);
         builder.HasIndex(x => x.CreatedTime);
 
         builder.Property(x => x.TitleLocalizationArgs)

@@ -49,7 +49,7 @@ public sealed class OvertimeNotificationTests
             e.Resource == "hr.overtime.request" &&
             e.Action == NotificationConstants.DataChangeActions.Create &&
             e.EntityId == overtimeRequestId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.Medium &&
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low &&
             e.QueryTags.Contains("hr") &&
             e.QueryTags.Contains("overtime") &&
             e.QueryTags.Contains("overtime-request")
@@ -116,7 +116,7 @@ public sealed class OvertimeNotificationTests
             e.Resource == "hr.overtime.request" &&
             e.Action == NotificationConstants.DataChangeActions.Update &&
             e.EntityId == overtimeRequestId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.Medium &&
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low &&
             e.QueryTags.Contains("hr") &&
             e.QueryTags.Contains("overtime") &&
             e.QueryTags.Contains("overtime-request")

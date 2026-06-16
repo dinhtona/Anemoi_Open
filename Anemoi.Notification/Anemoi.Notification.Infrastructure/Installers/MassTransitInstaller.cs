@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Infrastructure.Filters;
 using Anemoi.BuildingBlock.Infrastructure.HandlerConsumers;
 using Anemoi.Contract.Notification;
 using Anemoi.Notification.Application;
+using Anemoi.Notification.Infrastructure.DataContext;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,11 @@ public sealed class MassTransitInstaller : IInstaller
         services.AddMassTransit(configurator =>
         {
             configurator.SetKebabCaseEndpointNameFormatter();
+            configurator.AddEntityFrameworkOutbox<NotificationDbContext>(outbox =>
+            {
+                outbox.UsePostgres();
+                outbox.UseBusOutbox();
+            });
             configurator.AddConsumersFromNamespaceContaining<INotificationApplicationAssemblyMarker>();
             var serviceConsumer = ConsumersHelper
                 .CreateDynamicConsumerHandlers<INotificationContractAssemblyMarker>("NotificationHandlersConsumer");

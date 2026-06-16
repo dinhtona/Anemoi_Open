@@ -62,7 +62,7 @@ public sealed class PayrollRunNotificationTests
             e.Resource == "hr.payroll" &&
             e.Action == NotificationConstants.DataChangeActions.Update &&
             e.EntityId == payrollRunId &&
-            e.Sensitivity == NotificationConstants.DataSensitivity.Medium &&
+            e.Sensitivity == NotificationConstants.DataSensitivity.Low &&
             e.QueryTags.Contains("hr") &&
             e.QueryTags.Contains("payroll")
         ), Arg.Any<CancellationToken>());

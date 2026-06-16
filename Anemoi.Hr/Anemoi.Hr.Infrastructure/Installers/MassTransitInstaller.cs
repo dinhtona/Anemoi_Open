@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.Hr.Application;
+using Anemoi.Hr.Infrastructure.Persistence;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,16 @@ public sealed class MassTransitInstaller : IInstaller
         services.AddMassTransit(configurator =>
         {
             configurator.SetKebabCaseEndpointNameFormatter();
+
+            if (masstransitSetting is not null)
+            {
+                configurator.AddEntityFrameworkOutbox<HrDbContext>(outbox =>
+                {
+                    outbox.UsePostgres();
+                    outbox.UseBusOutbox();
+                });
+            }
+
             configurator.AddConsumersFromNamespaceContaining<IHrApplicationAssemblyMarker>();
 
             var serviceConsumer = BuildingBlock.Infrastructure.HandlerConsumers.ConsumersHelper

@@ -30,7 +30,7 @@ public sealed class PayslipPublishedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayslipId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.High,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll", "payslip" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -76,7 +76,7 @@ public sealed class PayslipCancelledConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayslipId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.High,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll", "payslip" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);

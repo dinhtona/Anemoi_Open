@@ -32,7 +32,7 @@ public sealed class PayrollRunSubmittedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -99,7 +99,7 @@ public sealed class PayrollRunApprovedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -166,7 +166,7 @@ public sealed class PayrollRunRejectedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
@@ -233,7 +233,7 @@ public sealed class PayrollRunFinalizedConsumer(
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
-            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
             QueryTags = new List<string> { "hr", "payroll" },
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);

@@ -7,6 +7,7 @@ namespace Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotif
 
 public sealed record CreateNotificationCommand(
     string UserId,
+    string WorkspaceId = null,
     string Title = null,
     string Content = null,
     string Category = null,

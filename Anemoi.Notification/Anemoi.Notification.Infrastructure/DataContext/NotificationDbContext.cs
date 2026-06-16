@@ -1,4 +1,5 @@
 using Anemoi.Notification.Domain.Models;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Notification.Infrastructure.DataContext;
@@ -11,6 +12,9 @@ public sealed class NotificationDbContext(DbContextOptions<NotificationDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(INotificationInfrastructureAssemblyMarker).Assembly);
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
         base.OnModelCreating(modelBuilder);
     }
 }

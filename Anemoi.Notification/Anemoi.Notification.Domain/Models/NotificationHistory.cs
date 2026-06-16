@@ -9,6 +9,7 @@ namespace Anemoi.Notification.Domain.Models;
 public sealed class NotificationHistory : Entity<NotificationHistoryId>
 {
     public Guid UserId { get; set; }
+    public Guid? WorkspaceId { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
     public string Category { get; set; }
