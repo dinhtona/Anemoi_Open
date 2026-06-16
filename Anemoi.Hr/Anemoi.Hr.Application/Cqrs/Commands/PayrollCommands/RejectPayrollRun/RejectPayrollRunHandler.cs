@@ -42,13 +42,13 @@ public sealed class RejectPayrollRunHandler(
         if (!run.Reject(request.RejectedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow, request.RejectionReason))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-
         await publishEndpoint.Publish(new PayrollRunRejectedIntegrationEvent(
             run.Id.Value.ToString(),
             request.RejectedBy ?? PayrollConstants.SystemActor), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToDetailResponse(run);
     }

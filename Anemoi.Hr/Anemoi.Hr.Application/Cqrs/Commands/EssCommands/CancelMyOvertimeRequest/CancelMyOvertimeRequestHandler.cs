@@ -46,6 +46,10 @@ public sealed class CancelMyOvertimeRequestHandler(
 
         overtimeRequest.Cancel(employee.Id.Value.ToString());
 
+        await publishEndpoint.Publish(new OvertimeRequestCancelledIntegrationEvent(
+            overtimeRequest.Id.Value.ToString(),
+            overtimeRequest.EmployeeId.Value.ToString()), cancellationToken);
+
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
         {
@@ -53,10 +57,6 @@ public sealed class CancelMyOvertimeRequestHandler(
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.OvertimeRequestConcurrencyConflict)
                 : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
-
-        await publishEndpoint.Publish(new OvertimeRequestCancelledIntegrationEvent(
-            overtimeRequest.Id.Value.ToString(),
-            overtimeRequest.EmployeeId.Value.ToString()), cancellationToken);
 
         return new SuccessResponse();
     }

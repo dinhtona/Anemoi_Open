@@ -39,13 +39,13 @@ public sealed class FinalizePayrollRunHandler(
         if (!run.FinalizeRun(request.FinalizedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-
         await publishEndpoint.Publish(new PayrollRunFinalizedIntegrationEvent(
             run.Id.Value.ToString(),
             request.FinalizedBy ?? PayrollConstants.SystemActor), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToDetailResponse(run);
     }

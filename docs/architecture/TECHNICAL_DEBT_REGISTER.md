@@ -772,3 +772,41 @@ Reason:
 - FK capability
 - Consistency with the rest of the domain model
 - Eliminate Guid -> string conversions
+
+---
+
+## Phase N6 — Notification Outbox/Inbox Durability Verification & Hardening (2026-06-16)
+
+### Status
+COMPLETED — See also ADR-026 in ARCHITECTURE_DECISIONS.md
+
+### Changes Made
+
+#### Publish Order Hardening
+All 20 HR command handlers + MonthlyLeaveAccrualWorker now call `publishEndpoint.Publish()` **before** `unitOfWork.SaveChangesAsync()`. This ensures that if the bus outbox transport fails to persist an `OutboxMessage`, the exception propagates before domain changes are committed. Previously, events were published after save, risking silent event loss if the outbox save failed.
+
+#### Outbox Configuration Verified
+Both `Anemoi.Hr.Infrastructure` and `Anemoi.Notification.Infrastructure` have confirmed:
+- `AddEntityFrameworkOutbox<TDbContext>` with `UsePostgres()` + `UseBusOutbox()`
+- `InboxState`, `OutboxMessage`, `OutboxState` entity configurations in both DbContexts
+- Unique constraint on `InboxState(MessageId, ConsumerId)` for transport-level dedup
+- Filtered unique index on `NotificationHistory(UserId, DeduplicationKey)` for application-level dedup
+
+#### Consumer Idempotency Confirmed
+- `DeduplicationKey` is mandatory for all 13 business notification consumers
+- `CreateNotificationHandler` has 3-layer dedup: pre-check, post-save concurrent recovery, catch-all recovery
+- Unique index prevents duplicate `NotificationHistory` rows
+- Race-condition fallback returns existing notification
+
+#### Tests Added
+- `NotificationDeduplicationTests.cs` — 4 tests verifying duplicate event consumption produces same DeduplicationKey
+- `NotificationFailureBehaviorTests.cs` — 3 tests verifying failure before commit prevents persistence, successful save publishes event, DataChangeOccurred is never lost
+
+#### Logging Added
+- Empty permission audience warnings added to all 4 PayrollRun consumers
+- Duplicate notification skip/reuse logging already present in CreateNotificationHandler
+
+### Remaining Risks
+1. **Bus outbox uses separate DbContext instances** — MassTransit's `BusOutboxPublishTransport` creates a separate DbContext scope via `IScopedDbContextFactory`. Domain changes and outbox messages are in **separate transactions**, even after the publish-order fix. True transactional outbox would require sharing the same DbContext instance.
+2. **DataChange sensitivity remains Low** — See TD-012. WorkspaceId is not propagated through HR integration events.
+3. **No MassTransit InMemoryTestHarness usage** — Consumer tests use NSubstitute mocks, not real MassTransit transport. Outbox delivery is not integration-tested.

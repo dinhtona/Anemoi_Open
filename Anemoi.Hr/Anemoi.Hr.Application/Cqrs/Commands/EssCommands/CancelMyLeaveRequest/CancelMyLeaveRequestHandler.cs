@@ -94,14 +94,6 @@ public sealed class CancelMyLeaveRequestHandler(
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
-
         await publishEndpoint.Publish(new LeaveRequestCancelledIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
@@ -112,6 +104,14 @@ public sealed class CancelMyLeaveRequestHandler(
             balance.Year,
             balance.RemainingDays,
             transactionType), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+        {
+            return saveResult.AsT1 is DbUpdateConcurrencyException
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+        }
 
         return None.Value;
     }

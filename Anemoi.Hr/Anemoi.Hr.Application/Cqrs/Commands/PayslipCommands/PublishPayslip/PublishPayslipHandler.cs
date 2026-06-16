@@ -38,13 +38,13 @@ public sealed class PublishPayslipHandler(
         if (!payslip.Publish(request.PublishedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayslipInvalidStatus);
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-
         await publishEndpoint.Publish(new PayslipPublishedIntegrationEvent(
             payslip.Id.Value.ToString(),
             payslip.EmployeeId.Value.ToString()), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToResponse(payslip);
     }

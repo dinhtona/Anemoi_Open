@@ -50,6 +50,13 @@ public sealed class AdjustLeaveBalanceHandler(
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
+        await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
+            balance.EmployeeId.Value.ToString(),
+            balance.LeavePolicyId.Value.ToString(),
+            balance.Year,
+            balance.RemainingDays,
+            "Adjustment"), cancellationToken);
+
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
         {
@@ -57,13 +64,6 @@ public sealed class AdjustLeaveBalanceHandler(
                 ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
                 : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
         }
-
-        await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
-            balance.EmployeeId.Value.ToString(),
-            balance.LeavePolicyId.Value.ToString(),
-            balance.Year,
-            balance.RemainingDays,
-            "Adjustment"), cancellationToken);
 
         return None.Value;
     }

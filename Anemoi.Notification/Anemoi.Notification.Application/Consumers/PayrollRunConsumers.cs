@@ -53,6 +53,11 @@ public sealed class PayrollRunSubmittedConsumer(
                 .Distinct()
                 .ToList();
 
+            if (targetUserIds.Count == 0)
+            {
+                logger.Warning("Empty permission audience for PayrollRunSubmitted. No users have permission {Permission}.", targetPermission);
+            }
+
             foreach (var userId in targetUserIds)
             {
                 var command = new CreateNotificationCommand(
@@ -119,6 +124,11 @@ public sealed class PayrollRunApprovedConsumer(
                 .Where(id => !string.IsNullOrEmpty(id) && id != message.ApprovedBy)
                 .Distinct()
                 .ToList();
+
+            if (targetUserIds.Count == 0)
+            {
+                logger.Warning("Empty permission audience for PayrollRunApproved. No users have permission {Permission}.", targetPermission);
+            }
 
             foreach (var userId in targetUserIds)
             {
@@ -187,6 +197,11 @@ public sealed class PayrollRunRejectedConsumer(
                 .Distinct()
                 .ToList();
 
+            if (targetUserIds.Count == 0)
+            {
+                logger.Warning("Empty permission audience for PayrollRunRejected. No users have permission {Permission}.", targetPermission);
+            }
+
             foreach (var userId in targetUserIds)
             {
                 var command = new CreateNotificationCommand(
@@ -253,6 +268,11 @@ public sealed class PayrollRunFinalizedConsumer(
                 .Where(id => !string.IsNullOrEmpty(id) && id != message.FinalizedBy)
                 .Distinct()
                 .ToList();
+
+            if (targetUserIds.Count == 0)
+            {
+                logger.Warning("Empty permission audience for PayrollRunFinalized. No users have permission {Permission}.", targetPermission);
+            }
 
             foreach (var userId in targetUserIds)
             {

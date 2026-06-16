@@ -622,6 +622,49 @@ Do not silently replace approved architecture.
 
 ---
 
+## ADR-025 — Publish Integration Events Before SaveChangesAsync
+
+### Status
+Accepted (Phase N6 — 2026-06-16)
+
+### Context
+HR command handlers published integration events via `IPublishEndpoint.Publish()` **after** `SaveChangesAsync()`. With MassTransit's bus outbox (`UseBusOutbox()`), the outbox transport uses a separate `IScopedDbContextFactory` instance, placing domain changes and outbox messages in separate transactions. If the outbox save failed after the domain save succeeded, events were silently lost.
+
+### Decision
+Move all `Publish()` calls to **before** `SaveChangesAsync()` in every HR command handler that publishes integration events. This ensures:
+- If the bus outbox transport fails to persist the `OutboxMessage`, the exception propagates before domain changes commit.
+- The handler can return an error to the caller, and the client can retry.
+
+### Trade-offs
+- Does NOT achieve true transactional outbox (separate DbContext instances), but closes the window of silent event loss.
+- Minor behavioral change: integration events are now serialized before domain data is committed. In the unlikely event of a save failure after successful publish, the outbox contains an orphaned message that will be delivered. Consumers must be idempotent (they are — see ADR-026).
+
+---
+
+## ADR-026 — Multi-Layer Consumer Idempotency for Notifications
+
+### Status
+Accepted (Phase N6 — 2026-06-16)
+
+### Context
+Integration events published by the HR service (leave submitted/approved/rejected/cancelled, overtime created/approved/rejected/cancelled, payslip published/cancelled, payroll run submitted/approved/rejected/finalized) are consumed by the Notification service to create `NotificationHistory` records. Duplicate delivery of the same event (due to broker retries, consumer crashes, or outbox redelivery) must not create duplicate notifications.
+
+### Decision
+Implement a 3-layer idempotency strategy:
+
+1. **Transport layer (MassTransit Inbox)** — `InboxState` table with unique constraint on `(MessageId, ConsumerId)` prevents the same message from being delivered to the same consumer type twice.
+
+2. **Application layer (deterministic DeduplicationKey)** — Each consumer builds a deterministic dedup key: `{entity_type}:{entity_id}:{action}:{user_id}`. The `CreateNotificationHandler` checks for an existing record with the same `UserId + DeduplicationKey` before inserting.
+
+3. **Database layer (filtered unique index)** — `NotificationHistory` has a filtered unique index on `(UserId, DeduplicationKey)` that prevents duplicate rows at the database level, with application-level recovery for concurrent insert races.
+
+### Trade-offs
+- Slight insert overhead from the dedup pre-check query and index maintenance.
+- `DeduplicationKey` is stored on every `NotificationHistory` row, adding storage cost.
+- The 3-layer defense ensures correctness under all failure modes (broker redelivery, consumer crash-restart, concurrent inserts).
+
+---
+
 # Conclusion
 
 ANEMOI HR prioritizes:

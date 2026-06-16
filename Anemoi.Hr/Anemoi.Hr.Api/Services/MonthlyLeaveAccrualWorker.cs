@@ -110,13 +110,6 @@ public sealed class MonthlyLeaveAccrualWorker(
             }
         }
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-        {
-            logger.LogError("Monthly leave accrual failed for {YearMonth}", yearMonth);
-            return;
-        }
-
         foreach (var employee in activeEmployees)
         {
             var employeeBalances = await balances.GetManyByConditionAsync(
@@ -132,6 +125,13 @@ public sealed class MonthlyLeaveAccrualWorker(
                     balance.RemainingDays,
                     "Accrual"), cancellationToken);
             }
+        }
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+        {
+            logger.LogError("Monthly leave accrual failed for {YearMonth}", yearMonth);
+            return;
         }
     }
 

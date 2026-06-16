@@ -42,14 +42,6 @@ public sealed class RejectLeaveRequestHandler(
         leaveRequest.StatusCode = LeaveRequestStatusCode.Rejected;
         leaveRequest.UpdatedAt = DateTime.UtcNow;
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
-
         await publishEndpoint.Publish(new LeaveRequestRejectedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
@@ -60,6 +52,14 @@ public sealed class RejectLeaveRequestHandler(
             balance.Year,
             balance.RemainingDays,
             LeaveBalanceTransactionType.PendingRelease), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+        {
+            return saveResult.AsT1 is DbUpdateConcurrencyException
+                ? HrErrorResponses.Create(HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict)
+                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+        }
 
         return None.Value;
     }
