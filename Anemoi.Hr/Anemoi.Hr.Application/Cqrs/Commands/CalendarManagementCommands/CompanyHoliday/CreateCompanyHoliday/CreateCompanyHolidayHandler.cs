@@ -38,11 +38,7 @@ public sealed class CreateCompanyHolidayHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.CompanyHolidayConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.CompanyHolidayConcurrencyConflict);
 
         return mapper.ToCompanyHolidayIdResponse(companyHoliday);
     }

@@ -62,7 +62,7 @@ public sealed class CreateInsuranceContributionRuleHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return new CreateInsuranceContributionRuleResponse { InsuranceContributionRuleId = newRule.Id.Value.ToString() };
     }

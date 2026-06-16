@@ -141,6 +141,12 @@ public static class HrBusinessErrorCodes
     public const string CalendarExceptionConcurrencyConflict = "HR_CALENDAR_EXCEPTION_CONCURRENCY_CONFLICT";
 
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
+
+    // Database persistence error codes
+    public const string DbUniqueConstraint = "HR_DB_UNIQUE_CONSTRAINT";
+    public const string DbForeignKeyViolation = "HR_DB_FOREIGN_KEY_VIOLATION";
+    public const string DbCheckViolation = "HR_DB_CHECK_VIOLATION";
+
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 
     // Salary error codes

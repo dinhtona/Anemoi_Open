@@ -48,11 +48,7 @@ public sealed class CreateWorkingCalendarRuleHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.WorkingCalendarRuleConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.WorkingCalendarRuleConcurrencyConflict);
 
         return mapper.ToWorkingCalendarRuleIdResponse(workingCalendarRule);
     }

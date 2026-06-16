@@ -44,7 +44,7 @@ public sealed class PublishPayslipHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return mapper.ToResponse(payslip);
     }

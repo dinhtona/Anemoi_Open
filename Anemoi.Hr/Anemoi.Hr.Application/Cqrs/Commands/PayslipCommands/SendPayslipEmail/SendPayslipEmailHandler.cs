@@ -103,7 +103,7 @@ public sealed class SendPayslipEmailHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         // 7. Step B: Dispatch email and update log
         try
@@ -128,7 +128,7 @@ public sealed class SendPayslipEmailHandler(
         // 8. Step C: Save delivery updates
         saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return mapper.ToResponse(delivery);
     }

@@ -36,11 +36,7 @@ public sealed class DeactivateAllowanceTypeHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTypeConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.AllowanceTypeConcurrencyConflict);
 
         return new DeactivateAllowanceTypeResponse { AllowanceTypeId = allowanceType.Id.Value.ToString() };
     }

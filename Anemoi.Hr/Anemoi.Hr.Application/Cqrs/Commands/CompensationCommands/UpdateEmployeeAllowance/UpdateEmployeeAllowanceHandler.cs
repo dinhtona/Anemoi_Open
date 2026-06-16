@@ -81,12 +81,7 @@ public sealed class UpdateEmployeeAllowanceHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException ||
-                   CompensationPersistenceErrors.IsUniqueConstraintViolation(saveResult.AsT1)
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.AllowanceConcurrencyConflict);
 
         return new UpdateEmployeeAllowanceResponse { EmployeeAllowanceId = allowance.Id.Value.ToString() };
     }

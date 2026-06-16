@@ -145,12 +145,7 @@ public sealed class ChangeSalaryHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException ||
-                   CompensationPersistenceErrors.IsUniqueConstraintViolation(saveResult.AsT1)
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.SalaryConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SalaryConcurrencyConflict);
 
         return new ChangeSalaryResponse
         {

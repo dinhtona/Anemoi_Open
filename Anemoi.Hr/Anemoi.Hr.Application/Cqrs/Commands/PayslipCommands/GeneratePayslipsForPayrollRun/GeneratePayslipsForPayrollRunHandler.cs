@@ -89,7 +89,7 @@ public sealed class GeneratePayslipsForPayrollRunHandler(
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return new List<PayslipResponse> { mapper.ToResponse(payslip) };
     }

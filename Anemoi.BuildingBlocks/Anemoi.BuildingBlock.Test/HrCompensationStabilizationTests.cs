@@ -149,7 +149,7 @@ public sealed class HrCompensationStabilizationTests
     }
 
     [Fact]
-    public async Task ChangeSalary_DuplicateInsertRace_Maps_ToSalaryConcurrencyConflict()
+    public async Task ChangeSalary_DuplicateInsertRace_Maps_ToDbUniqueConstraint()
     {
         var employeeId = new EmployeeId(Guid.NewGuid());
         var handler = new ChangeSalaryHandler(
@@ -173,11 +173,11 @@ public sealed class HrCompensationStabilizationTests
             CancellationToken.None);
 
         Assert.True(result.IsT1);
-        Assert.Equal("HR_SALARY_CONCURRENCY_CONFLICT", result.AsT1.Code);
+        Assert.Equal(HrBusinessErrorCodes.DbUniqueConstraint, result.AsT1.Code);
     }
 
     [Fact]
-    public async Task AssignEmployeeAllowance_DuplicateInsertRace_Maps_ToAllowanceConcurrencyConflict()
+    public async Task AssignEmployeeAllowance_DuplicateInsertRace_Maps_ToDbUniqueConstraint()
     {
         var employeeId = new EmployeeId(Guid.NewGuid());
         var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
@@ -200,7 +200,7 @@ public sealed class HrCompensationStabilizationTests
             CancellationToken.None);
 
         Assert.True(result.IsT1);
-        Assert.Equal("HR_ALLOWANCE_CONCURRENCY_CONFLICT", result.AsT1.Code);
+        Assert.Equal(HrBusinessErrorCodes.DbUniqueConstraint, result.AsT1.Code);
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public sealed class HrCompensationStabilizationTests
     }
 
     [Fact]
-    public async Task UpdateEmployeeAllowance_ConcurrencyConflict_ReturnsError()
+    public async Task UpdateEmployeeAllowance_DuplicateInsertRace_Maps_ToDbUniqueConstraint()
     {
         var employeeId = new EmployeeId(Guid.NewGuid());
         var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
@@ -447,7 +447,7 @@ public sealed class HrCompensationStabilizationTests
             CancellationToken.None);
 
         Assert.True(result.IsT1);
-        Assert.Equal(HrBusinessErrorCodes.AllowanceConcurrencyConflict, result.AsT1.Code);
+        Assert.Equal(HrBusinessErrorCodes.DbUniqueConstraint, result.AsT1.Code);
     }
 
     [Fact]

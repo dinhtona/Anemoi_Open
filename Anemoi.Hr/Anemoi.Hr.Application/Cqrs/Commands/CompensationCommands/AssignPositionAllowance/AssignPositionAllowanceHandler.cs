@@ -59,7 +59,7 @@ public sealed class AssignPositionAllowanceHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return new AssignPositionAllowanceResponse { PositionAllowanceId = newAllowance.Id.Value.ToString() };
     }

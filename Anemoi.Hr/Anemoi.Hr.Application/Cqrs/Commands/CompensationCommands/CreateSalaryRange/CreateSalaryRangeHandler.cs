@@ -64,7 +64,7 @@ public sealed class CreateSalaryRangeHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         
         if (saveResult.IsT1)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
 
         return new CreateSalaryRangeResponse { SalaryRangeId = newRange.Id.Value.ToString() };
     }

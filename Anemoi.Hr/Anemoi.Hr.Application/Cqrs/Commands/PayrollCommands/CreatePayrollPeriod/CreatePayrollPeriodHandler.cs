@@ -53,11 +53,7 @@ public sealed class CreatePayrollPeriodHandler(
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
 
         if (saveResult.IsT1)
-        {
-            return saveResult.AsT1 is DbUpdateConcurrencyException
-                ? HrErrorResponses.Create(HrBusinessErrorCodes.PayrollPeriodConcurrencyConflict)
-                : HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-        }
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.PayrollPeriodConcurrencyConflict);
 
         return mapper.ToResponse(period);
     }
