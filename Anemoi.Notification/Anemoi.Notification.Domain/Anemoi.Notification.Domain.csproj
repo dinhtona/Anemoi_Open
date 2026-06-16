@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Notification.ModelIds\Anemoi.Contract.Notification.ModelIds.csproj"/>
+        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Identity\Anemoi.Contract.Identity.csproj"/>
         <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Domain\Anemoi.BuildingBlock.Domain.csproj"/>
     </ItemGroup>
 

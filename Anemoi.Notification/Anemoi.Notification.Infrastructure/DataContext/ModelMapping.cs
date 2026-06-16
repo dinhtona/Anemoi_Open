@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Notification.Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,8 @@ namespace Anemoi.Notification.Infrastructure.DataContext;
 
 public sealed class ModelMapping :
     IEntityTypeConfiguration<NotificationHistory>,
-    IEntityTypeConfiguration<NotificationSubscription>
+    IEntityTypeConfiguration<NotificationSubscription>,
+    IEntityTypeConfiguration<NotificationPreference>
 {
     public void Configure(EntityTypeBuilder<NotificationHistory> builder)
     {
@@ -20,6 +22,8 @@ public sealed class ModelMapping :
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.WorkspaceId);
         builder.HasIndex(x => x.CreatedTime);
+        builder.HasIndex(x => new { x.UserId, x.IsHidden });
+        builder.HasIndex(x => new { x.UserId, x.CreatedTime });
 
         builder.Property(x => x.TitleLocalizationArgs)
             .HasConversion(
@@ -45,5 +49,17 @@ public sealed class ModelMapping :
         builder.HasKey(x => x.Id);
         
         builder.HasIndex(x => new { x.UserId, x.Category }).IsUnique();
+    }
+
+    public void Configure(EntityTypeBuilder<NotificationPreference> builder)
+    {
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new NotificationPreferenceId(id));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.UserId)
+            .HasConversion(x => x.Value, id => new UserId(id));
+        builder.HasIndex(x => x.UserId).IsUnique();
+        builder.Property(x => x.EnableInApp).HasDefaultValue(true);
+        builder.Property(x => x.EnableEmail).HasDefaultValue(true);
     }
 }

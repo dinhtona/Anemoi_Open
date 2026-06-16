@@ -27,5 +27,13 @@ public sealed class NotificationHistory : Entity<NotificationHistoryId>
     public Guid? CausationId { get; set; }
     public string Type { get; set; } = NotificationConstants.Types.Business;
     public string Severity { get; set; } = NotificationConstants.Severities.Info;
+    public bool IsHidden { get; set; }
+    public DateTime? HiddenAt { get; set; }
+
+    public void Hide()
+    {
+        IsHidden = true;
+        HiddenAt = DateTime.UtcNow;
+    }
 }
 

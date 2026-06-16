@@ -8,6 +8,7 @@ public sealed class NotificationDbContext(DbContextOptions<NotificationDbContext
 {
     public DbSet<NotificationHistory> NotificationHistories { get; set; }
     public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
+    public DbSet<NotificationPreference> NotificationPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
