@@ -51,4 +51,37 @@ public sealed class RecruitmentMapper
         if (reqs is null) return [];
         return reqs.Select(ToResponse).ToList();
     }
+
+    public JobPostingResponse ToResponse(JobPosting posting)
+    {
+        if (posting is null) return null;
+        return new JobPostingResponse
+        {
+            Id = posting.Id.Value.ToString(),
+            JobRequisitionId = posting.JobRequisitionId.Value.ToString(),
+            RequisitionCode = posting.JobRequisition?.RequisitionCode,
+            RequisitionTitle = posting.JobRequisition?.Title,
+            PostingTitle = posting.PostingTitle,
+            PostingDescription = posting.PostingDescription,
+            PublishDate = posting.PublishDate.ToString("yyyy-MM-dd"),
+            ExpiryDate = posting.ExpiryDate.ToString("yyyy-MM-dd"),
+            Status = posting.Status,
+            CreatedAt = posting.CreatedAt,
+            CreatedBy = posting.CreatedBy,
+            UpdatedAt = posting.UpdatedAt,
+            UpdatedBy = posting.UpdatedBy,
+            PublishedAt = posting.PublishedAt,
+            PublishedBy = posting.PublishedBy,
+            ExpiredAt = posting.ExpiredAt,
+            ExpiredBy = posting.ExpiredBy,
+            ClosedAt = posting.ClosedAt,
+            ClosedBy = posting.ClosedBy
+        };
+    }
+
+    public IReadOnlyCollection<JobPostingResponse> ToPostingResponses(IEnumerable<JobPosting> postings)
+    {
+        if (postings is null) return [];
+        return postings.Select(ToResponse).ToList();
+    }
 }

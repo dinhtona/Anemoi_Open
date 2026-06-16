@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Anemoi.Hr.Infrastructure.Configurations;
 
 public sealed class RecruitmentModelMapping :
-    IEntityTypeConfiguration<JobRequisition>
+    IEntityTypeConfiguration<JobRequisition>,
+    IEntityTypeConfiguration<JobPosting>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -64,6 +65,51 @@ public sealed class RecruitmentModelMapping :
             .WithMany()
             .HasForeignKey(x => x.PositionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // PostgreSQL xmin concurrency
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<JobPosting> builder)
+    {
+        builder.ToTable("JobPostings");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new JobPostingId(id));
+
+        builder.Property(x => x.JobRequisitionId)
+            .HasConversion(x => x.Value, id => new JobRequisitionId(id))
+            .IsRequired();
+
+        builder.Property(x => x.PostingTitle).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.PostingDescription).HasMaxLength(4096).IsRequired(false);
+        builder.Property(x => x.PublishDate).IsRequired();
+        builder.Property(x => x.ExpiryDate).IsRequired();
+
+        builder.Property(x => x.Status).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.CreatedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.UpdatedBy).HasMaxLength(128).IsRequired();
+
+        builder.Property(x => x.PublishedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.PublishedAt).IsRequired(false);
+        builder.Property(x => x.ExpiredBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.ExpiredAt).IsRequired(false);
+        builder.Property(x => x.ClosedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.ClosedAt).IsRequired(false);
+
+        // Relationships
+        builder.HasOne(x => x.JobRequisition)
+            .WithMany()
+            .HasForeignKey(x => x.JobRequisitionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Index on JobRequisitionId for lookups
+        builder.HasIndex(x => x.JobRequisitionId);
+
+        // Unique Index on PostingTitle per Requisition (optional safety)
+        builder.HasIndex(x => new { x.JobRequisitionId, x.PostingTitle });
 
         // PostgreSQL xmin concurrency
         builder.Property<uint>("xmin")

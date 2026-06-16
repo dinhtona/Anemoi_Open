@@ -70,6 +70,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<InsuranceAuditLog> InsuranceAuditLogs { get; set; }
     public DbSet<EmployeePortalAccess> EmployeePortalAccesses { get; set; }
     public DbSet<JobRequisition> JobRequisitions { get; set; }
+    public DbSet<JobPosting> JobPostings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
