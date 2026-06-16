@@ -15,7 +15,8 @@ public sealed class RecruitmentModelMapping :
     IEntityTypeConfiguration<CandidateApplication>,
     IEntityTypeConfiguration<CandidateApplicationStageHistory>,
     IEntityTypeConfiguration<InterviewSchedule>,
-    IEntityTypeConfiguration<InterviewFeedback>
+    IEntityTypeConfiguration<InterviewFeedback>,
+    IEntityTypeConfiguration<HiringDecision>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -322,5 +323,37 @@ public sealed class RecruitmentModelMapping :
             .WithMany()
             .HasForeignKey(x => x.InterviewerEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public void Configure(EntityTypeBuilder<HiringDecision> builder)
+    {
+        builder.ToTable("HiringDecisions");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new HiringDecisionId(id));
+
+        builder.Property(x => x.CandidateApplicationId)
+            .HasConversion(x => x.Value, id => new CandidateApplicationId(id))
+            .IsRequired();
+
+        builder.Property(x => x.Decision).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.DecidedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.DecidedAt).IsRequired();
+        builder.Property(x => x.Notes).HasMaxLength(2048).IsRequired(false);
+        builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.CandidateApplicationId).IsUnique();
+        builder.HasIndex(x => x.Decision);
+        builder.HasIndex(x => x.DecidedAt);
+        builder.HasIndex(x => x.DecidedBy);
+
+        builder.HasOne(x => x.CandidateApplication)
+            .WithMany()
+            .HasForeignKey(x => x.CandidateApplicationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 }

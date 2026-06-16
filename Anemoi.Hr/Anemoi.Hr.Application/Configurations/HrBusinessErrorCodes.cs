@@ -315,6 +315,9 @@ public static class HrBusinessErrorCodes
     public const string HiringDecisionNotFound = "HR_REC_HIRING_DECISION_NOT_FOUND";
     public const string HiringDecisionAlreadyExists = "HR_REC_HIRING_DECISION_ALREADY_EXISTS";
     public const string HiringAlreadyConverted = "HR_REC_HIRING_ALREADY_CONVERTED";
+    public const string HireRequiresOfferStage = "HR_REC_HIRE_REQUIRES_OFFER_STAGE";
+    public const string HireRequiresFeedback = "HR_REC_HIRE_REQUIRES_FEEDBACK";
+    public const string OfferRequiresCompletedInterview = "HR_REC_OFFER_REQUIRES_COMPLETED_INTERVIEW";
     public const string CandidateAlreadyLinked = "HR_REC_CANDIDATE_ALREADY_LINKED";
 
     // Validation error codes (Recruitment)

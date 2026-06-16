@@ -214,4 +214,29 @@ public sealed class RecruitmentMapper
         if (interviews is null) return [];
         return interviews.Select(ToResponse).ToList();
     }
+
+    public HiringDecisionResponse ToResponse(HiringDecision decision)
+    {
+        if (decision is null) return null;
+        return new HiringDecisionResponse
+        {
+            Id = decision.Id.Value.ToString(),
+            CandidateApplicationId = decision.CandidateApplicationId.Value.ToString(),
+            CandidateName = decision.CandidateApplication?.Candidate?.FullName,
+            PostingTitle = decision.CandidateApplication?.JobPosting?.PostingTitle,
+            CurrentStage = decision.CandidateApplication?.CurrentStage,
+            Decision = decision.Decision,
+            DecidedBy = decision.DecidedBy,
+            DecidedAt = decision.DecidedAt,
+            Notes = decision.Notes,
+            CreatedAt = decision.CreatedAt
+        };
+    }
+
+    public IReadOnlyCollection<HiringDecisionResponse> ToHiringDecisionResponses(
+        IEnumerable<HiringDecision> decisions)
+    {
+        if (decisions is null) return [];
+        return decisions.Select(ToResponse).ToList();
+    }
 }
