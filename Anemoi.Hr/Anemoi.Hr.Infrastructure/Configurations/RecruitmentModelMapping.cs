@@ -11,7 +11,9 @@ namespace Anemoi.Hr.Infrastructure.Configurations;
 public sealed class RecruitmentModelMapping :
     IEntityTypeConfiguration<JobRequisition>,
     IEntityTypeConfiguration<JobPosting>,
-    IEntityTypeConfiguration<Candidate>
+    IEntityTypeConfiguration<Candidate>,
+    IEntityTypeConfiguration<CandidateApplication>,
+    IEntityTypeConfiguration<CandidateApplicationStageHistory>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -164,5 +166,76 @@ public sealed class RecruitmentModelMapping :
         builder.Property<uint>("xmin")
             .HasColumnName("xmin")
             .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<CandidateApplication> builder)
+    {
+        builder.ToTable("CandidateApplications");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new CandidateApplicationId(id));
+
+        builder.Property(x => x.CandidateId)
+            .HasConversion(x => x.Value, id => new CandidateId(id))
+            .IsRequired();
+
+        builder.Property(x => x.JobPostingId)
+            .HasConversion(x => x.Value, id => new JobPostingId(id))
+            .IsRequired();
+
+        builder.Property(x => x.CurrentStage).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.AppliedAt).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.UpdatedAt).IsRequired();
+
+        // Unique index: one application per candidate per posting
+        builder.HasIndex(x => new { x.CandidateId, x.JobPostingId }).IsUnique();
+
+        // Indexes for search
+        builder.HasIndex(x => x.JobPostingId);
+        builder.HasIndex(x => x.CandidateId);
+        builder.HasIndex(x => x.CurrentStage);
+        builder.HasIndex(x => x.AppliedAt);
+
+        // Relationships
+        builder.HasOne(x => x.Candidate)
+            .WithMany()
+            .HasForeignKey(x => x.CandidateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.JobPosting)
+            .WithMany()
+            .HasForeignKey(x => x.JobPostingId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.StageHistories)
+            .WithOne(x => x.CandidateApplication)
+            .HasForeignKey(x => x.CandidateApplicationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // PostgreSQL xmin concurrency
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<CandidateApplicationStageHistory> builder)
+    {
+        builder.ToTable("CandidateApplicationStageHistories");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new CandidateApplicationStageHistoryId(id));
+
+        builder.Property(x => x.CandidateApplicationId)
+            .HasConversion(x => x.Value, id => new CandidateApplicationId(id))
+            .IsRequired();
+
+        builder.Property(x => x.FromStage).HasMaxLength(64).IsRequired(false);
+        builder.Property(x => x.ToStage).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.ChangedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.ChangedAt).IsRequired();
+        builder.Property(x => x.Note).HasMaxLength(1024).IsRequired(false);
+
+        builder.HasIndex(x => x.CandidateApplicationId);
     }
 }

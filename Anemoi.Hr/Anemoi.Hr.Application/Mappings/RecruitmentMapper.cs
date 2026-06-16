@@ -116,4 +116,53 @@ public sealed class RecruitmentMapper
         if (candidates is null) return [];
         return candidates.Select(ToResponse).ToList();
     }
+
+    public CandidateApplicationResponse ToResponse(CandidateApplication app)
+    {
+        if (app is null) return null;
+        return new CandidateApplicationResponse
+        {
+            Id = app.Id.Value.ToString(),
+            CandidateId = app.CandidateId.Value.ToString(),
+            CandidateName = app.Candidate?.FullName,
+            CandidateEmail = app.Candidate?.Email,
+            JobPostingId = app.JobPostingId.Value.ToString(),
+            PostingTitle = app.JobPosting?.PostingTitle,
+            RequisitionCode = app.JobPosting?.JobRequisition?.RequisitionCode,
+            AppliedAt = app.AppliedAt,
+            CurrentStage = app.CurrentStage,
+            CreatedAt = app.CreatedAt,
+            UpdatedAt = app.UpdatedAt,
+            StageHistories = app.StageHistories?.Select(ToResponse).ToList() ?? []
+        };
+    }
+
+    public CandidateApplicationStageHistoryResponse ToResponse(CandidateApplicationStageHistory h)
+    {
+        if (h is null) return null;
+        return new CandidateApplicationStageHistoryResponse
+        {
+            Id = h.Id.Value.ToString(),
+            CandidateApplicationId = h.CandidateApplicationId.Value.ToString(),
+            FromStage = h.FromStage,
+            ToStage = h.ToStage,
+            ChangedBy = h.ChangedBy,
+            ChangedAt = h.ChangedAt,
+            Note = h.Note
+        };
+    }
+
+    public IReadOnlyCollection<CandidateApplicationResponse> ToApplicationResponses(
+        IEnumerable<CandidateApplication> apps)
+    {
+        if (apps is null) return [];
+        return apps.Select(ToResponse).ToList();
+    }
+
+    public IReadOnlyCollection<CandidateApplicationStageHistoryResponse> ToStageHistoryResponses(
+        IEnumerable<CandidateApplicationStageHistory> history)
+    {
+        if (history is null) return [];
+        return history.Select(ToResponse).ToList();
+    }
 }

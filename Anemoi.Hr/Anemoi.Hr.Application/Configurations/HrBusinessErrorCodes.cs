@@ -298,8 +298,12 @@ public static class HrBusinessErrorCodes
     public const string ApplicationNotFound = "HR_REC_APPLICATION_NOT_FOUND";
     public const string ApplicationDuplicate = "HR_REC_APPLICATION_DUPLICATE";
     public const string ApplicationInvalidStage = "HR_REC_APPLICATION_INVALID_STAGE";
+    public const string ApplicationInvalidStageTransition = "HR_REC_APPLICATION_INVALID_STAGE_TRANSITION";
+    public const string ApplicationTerminalStage = "HR_REC_APPLICATION_TERMINAL_STAGE";
     public const string ApplicationAlreadyHired = "HR_REC_APPLICATION_ALREADY_HIRED";
     public const string ApplicationRejectedCannotInterview = "HR_REC_APPLICATION_REJECTED_CANNOT_INTERVIEW";
+    public const string CandidateNotActive = "HR_REC_CANDIDATE_NOT_ACTIVE";
+    public const string PostingNotPublished = "HR_REC_POSTING_NOT_PUBLISHED";
 
     public const string InterviewNotFound = "HR_REC_INTERVIEW_NOT_FOUND";
     public const string InterviewDurationInvalid = "HR_REC_INTERVIEW_DURATION_INVALID";

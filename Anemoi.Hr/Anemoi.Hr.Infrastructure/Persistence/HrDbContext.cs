@@ -72,6 +72,8 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<JobRequisition> JobRequisitions { get; set; }
     public DbSet<JobPosting> JobPostings { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
+    public DbSet<CandidateApplication> CandidateApplications { get; set; }
+    public DbSet<CandidateApplicationStageHistory> CandidateApplicationStageHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
