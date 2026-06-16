@@ -84,4 +84,36 @@ public sealed class RecruitmentMapper
         if (postings is null) return [];
         return postings.Select(ToResponse).ToList();
     }
+
+    public CandidateResponse ToResponse(Candidate candidate)
+    {
+        if (candidate is null) return null;
+        return new CandidateResponse
+        {
+            Id = candidate.Id.Value.ToString(),
+            CandidateCode = candidate.CandidateCode,
+            FullName = candidate.FullName,
+            Email = candidate.Email,
+            PhoneNumber = candidate.PhoneNumber,
+            DateOfBirth = candidate.DateOfBirth?.ToString("yyyy-MM-dd"),
+            Address = candidate.Address,
+            ResumeUrl = candidate.ResumeUrl,
+            Source = candidate.Source,
+            Status = candidate.Status,
+            Notes = candidate.Notes,
+            EmployeeId = candidate.EmployeeId?.Value.ToString(),
+            ConvertedAt = candidate.ConvertedAt,
+            ConvertedBy = candidate.ConvertedBy,
+            CreatedAt = candidate.CreatedAt,
+            CreatedBy = candidate.CreatedBy,
+            UpdatedAt = candidate.UpdatedAt,
+            UpdatedBy = candidate.UpdatedBy
+        };
+    }
+
+    public IReadOnlyCollection<CandidateResponse> ToCandidateResponses(IEnumerable<Candidate> candidates)
+    {
+        if (candidates is null) return [];
+        return candidates.Select(ToResponse).ToList();
+    }
 }

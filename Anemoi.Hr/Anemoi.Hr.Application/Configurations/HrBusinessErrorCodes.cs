@@ -308,6 +308,7 @@ public static class HrBusinessErrorCodes
     public const string HiringDecisionNotFound = "HR_REC_HIRING_DECISION_NOT_FOUND";
     public const string HiringDecisionAlreadyExists = "HR_REC_HIRING_DECISION_ALREADY_EXISTS";
     public const string HiringAlreadyConverted = "HR_REC_HIRING_ALREADY_CONVERTED";
+    public const string CandidateAlreadyLinked = "HR_REC_CANDIDATE_ALREADY_LINKED";
 
     // Validation error codes (Recruitment)
     public const string ValRequisitionIdRequired = "VAL_REQUISITION_ID_REQUIRED";

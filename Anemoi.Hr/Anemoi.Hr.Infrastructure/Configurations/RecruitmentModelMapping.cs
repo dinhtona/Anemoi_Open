@@ -2,6 +2,7 @@ using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Positions;
+using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +10,8 @@ namespace Anemoi.Hr.Infrastructure.Configurations;
 
 public sealed class RecruitmentModelMapping :
     IEntityTypeConfiguration<JobRequisition>,
-    IEntityTypeConfiguration<JobPosting>
+    IEntityTypeConfiguration<JobPosting>,
+    IEntityTypeConfiguration<Candidate>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -110,6 +112,53 @@ public sealed class RecruitmentModelMapping :
 
         // Unique Index on PostingTitle per Requisition (optional safety)
         builder.HasIndex(x => new { x.JobRequisitionId, x.PostingTitle });
+
+        // PostgreSQL xmin concurrency
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<Candidate> builder)
+    {
+        builder.ToTable("Candidates");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new CandidateId(id));
+
+        builder.Property(x => x.CandidateCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.FullName).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.Email).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.PhoneNumber).HasMaxLength(32).IsRequired(false);
+        builder.Property(x => x.DateOfBirth).IsRequired(false);
+        builder.Property(x => x.Address).HasMaxLength(1024).IsRequired(false);
+        builder.Property(x => x.ResumeUrl).HasMaxLength(2048).IsRequired(false);
+        builder.Property(x => x.Source).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.Status).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.Notes).HasMaxLength(4096).IsRequired(false);
+        builder.Property(x => x.CreatedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.UpdatedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.ConvertedBy).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.ConvertedAt).IsRequired(false);
+
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? new EmployeeId(value.Value) : null)
+            .IsRequired(false);
+
+        // Unique indexes
+        builder.HasIndex(x => x.Email).IsUnique();
+        builder.HasIndex(x => x.CandidateCode).IsUnique();
+        builder.HasIndex(x => x.PhoneNumber)
+            .IsUnique()
+            .HasFilter("\"PhoneNumber\" IS NOT NULL AND \"PhoneNumber\" <> ''");
+
+        // Relationship
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // PostgreSQL xmin concurrency
         builder.Property<uint>("xmin")
