@@ -308,6 +308,9 @@ public static class HrBusinessErrorCodes
     public const string InterviewNotFound = "HR_REC_INTERVIEW_NOT_FOUND";
     public const string InterviewDurationInvalid = "HR_REC_INTERVIEW_DURATION_INVALID";
     public const string InterviewerNotFound = "HR_REC_INTERVIEWER_NOT_FOUND";
+    public const string InterviewAlreadyCompleted = "HR_REC_INTERVIEW_ALREADY_COMPLETED";
+    public const string InterviewFeedbackAlreadyExists = "HR_REC_INTERVIEW_FEEDBACK_EXISTS";
+    public const string InvalidApplicationStage = "HR_REC_INVALID_APPLICATION_STAGE";
 
     public const string HiringDecisionNotFound = "HR_REC_HIRING_DECISION_NOT_FOUND";
     public const string HiringDecisionAlreadyExists = "HR_REC_HIRING_DECISION_ALREADY_EXISTS";

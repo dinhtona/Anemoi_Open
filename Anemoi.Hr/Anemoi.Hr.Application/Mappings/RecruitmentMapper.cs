@@ -165,4 +165,53 @@ public sealed class RecruitmentMapper
         if (history is null) return [];
         return history.Select(ToResponse).ToList();
     }
+
+    public InterviewScheduleResponse ToResponse(InterviewSchedule interview)
+    {
+        if (interview is null) return null;
+        return new InterviewScheduleResponse
+        {
+            Id = interview.Id.Value.ToString(),
+            CandidateApplicationId = interview.CandidateApplicationId.Value.ToString(),
+            CandidateName = interview.CandidateApplication?.Candidate?.FullName,
+            PostingTitle = interview.CandidateApplication?.JobPosting?.PostingTitle,
+            CurrentStage = interview.CandidateApplication?.CurrentStage,
+            InterviewType = interview.InterviewType,
+            ScheduledAt = interview.ScheduledAt,
+            DurationMinutes = interview.DurationMinutes,
+            InterviewerEmployeeId = interview.InterviewerEmployeeId.Value.ToString(),
+            InterviewerName = interview.Interviewer?.FullName,
+            Notes = interview.Notes,
+            Result = interview.Result,
+            CreatedAt = interview.CreatedAt,
+            CreatedBy = interview.CreatedBy,
+            UpdatedAt = interview.UpdatedAt,
+            UpdatedBy = interview.UpdatedBy,
+            Feedbacks = interview.Feedbacks?.Select(ToResponse).ToList() ?? []
+        };
+    }
+
+    public InterviewFeedbackResponse ToResponse(InterviewFeedback feedback)
+    {
+        if (feedback is null) return null;
+        return new InterviewFeedbackResponse
+        {
+            Id = feedback.Id.Value.ToString(),
+            InterviewScheduleId = feedback.InterviewScheduleId.Value.ToString(),
+            InterviewerEmployeeId = feedback.InterviewerEmployeeId.Value.ToString(),
+            InterviewerName = feedback.Interviewer?.FullName,
+            Rating = feedback.Rating,
+            Strengths = feedback.Strengths,
+            Concerns = feedback.Concerns,
+            Recommendation = feedback.Recommendation,
+            CreatedAt = feedback.CreatedAt
+        };
+    }
+
+    public IReadOnlyCollection<InterviewScheduleResponse> ToInterviewResponses(
+        IEnumerable<InterviewSchedule> interviews)
+    {
+        if (interviews is null) return [];
+        return interviews.Select(ToResponse).ToList();
+    }
 }

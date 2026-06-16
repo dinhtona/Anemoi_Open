@@ -13,7 +13,9 @@ public sealed class RecruitmentModelMapping :
     IEntityTypeConfiguration<JobPosting>,
     IEntityTypeConfiguration<Candidate>,
     IEntityTypeConfiguration<CandidateApplication>,
-    IEntityTypeConfiguration<CandidateApplicationStageHistory>
+    IEntityTypeConfiguration<CandidateApplicationStageHistory>,
+    IEntityTypeConfiguration<InterviewSchedule>,
+    IEntityTypeConfiguration<InterviewFeedback>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -237,5 +239,88 @@ public sealed class RecruitmentModelMapping :
         builder.Property(x => x.Note).HasMaxLength(1024).IsRequired(false);
 
         builder.HasIndex(x => x.CandidateApplicationId);
+    }
+
+    public void Configure(EntityTypeBuilder<InterviewSchedule> builder)
+    {
+        builder.ToTable("InterviewSchedules");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new InterviewScheduleId(id));
+
+        builder.Property(x => x.CandidateApplicationId)
+            .HasConversion(x => x.Value, id => new CandidateApplicationId(id))
+            .IsRequired();
+
+        builder.Property(x => x.InterviewType).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.ScheduledAt).IsRequired();
+        builder.Property(x => x.DurationMinutes).IsRequired();
+        builder.Property(x => x.Notes).HasMaxLength(2048).IsRequired(false);
+
+        builder.Property(x => x.Result).HasMaxLength(64).IsRequired();
+
+        builder.Property(x => x.InterviewerEmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .IsRequired();
+
+        builder.Property(x => x.CreatedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.UpdatedBy).HasMaxLength(128).IsRequired();
+
+        builder.HasIndex(x => x.CandidateApplicationId);
+        builder.HasIndex(x => x.ScheduledAt);
+        builder.HasIndex(x => x.InterviewerEmployeeId);
+        builder.HasIndex(x => x.Result);
+
+        builder.HasOne(x => x.CandidateApplication)
+            .WithMany()
+            .HasForeignKey(x => x.CandidateApplicationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Interviewer)
+            .WithMany()
+            .HasForeignKey(x => x.InterviewerEmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.Feedbacks)
+            .WithOne(x => x.InterviewSchedule)
+            .HasForeignKey(x => x.InterviewScheduleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<InterviewFeedback> builder)
+    {
+        builder.ToTable("InterviewFeedbacks");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new InterviewFeedbackId(id));
+
+        builder.Property(x => x.InterviewScheduleId)
+            .HasConversion(x => x.Value, id => new InterviewScheduleId(id))
+            .IsRequired();
+
+        builder.Property(x => x.InterviewerEmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .IsRequired();
+
+        builder.Property(x => x.Rating).IsRequired();
+        builder.Property(x => x.Strengths).HasMaxLength(2048).IsRequired(false);
+        builder.Property(x => x.Concerns).HasMaxLength(2048).IsRequired(false);
+        builder.Property(x => x.Recommendation).HasMaxLength(64).IsRequired();
+
+        builder.HasIndex(x => new { x.InterviewScheduleId, x.InterviewerEmployeeId }).IsUnique();
+
+        builder.HasOne(x => x.InterviewSchedule)
+            .WithMany(x => x.Feedbacks)
+            .HasForeignKey(x => x.InterviewScheduleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Interviewer)
+            .WithMany()
+            .HasForeignKey(x => x.InterviewerEmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
