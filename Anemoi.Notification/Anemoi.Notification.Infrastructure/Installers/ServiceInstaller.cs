@@ -28,5 +28,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ITokenSetter, TokenService>();
         services.AddScoped<ITokenGetter>(sp => sp.GetRequiredService<ITokenSetter>() as TokenService);
         services.AddScoped<Anemoi.Notification.Application.Services.INotificationRecipientResolver, Services.NotificationRecipientResolver>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.DefaultNotificationActionExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutor, Anemoi.Notification.Application.Services.LeaveApprovalNotificationExecutor>();
+        services.AddScoped<Anemoi.Notification.Application.Services.INotificationActionExecutorResolver, Anemoi.Notification.Application.Services.NotificationActionExecutorResolver>();
     }
 }

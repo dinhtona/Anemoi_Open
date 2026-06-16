@@ -69,4 +69,11 @@ public static class NotificationConstants
         public const string Warning = "Warning";
         public const string Error = "Error";
     }
+
+    public static class ActionTypes
+    {
+        public const string Navigate = "Navigate";
+        public const string Command = "Command";
+        public const string ExternalLink = "ExternalLink";
+    }
 }

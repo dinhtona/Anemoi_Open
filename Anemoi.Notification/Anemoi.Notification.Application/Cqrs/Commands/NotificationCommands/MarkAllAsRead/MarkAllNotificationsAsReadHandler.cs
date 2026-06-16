@@ -10,6 +10,7 @@ using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAllAsRead;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Serilog;
 
@@ -17,7 +18,6 @@ namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.Mar
 
 public sealed class MarkAllNotificationsAsReadHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
-    IUnitOfWork unitOfWork,
     ILogger logger)
     : IRequestHandler<MarkAllNotificationsAsReadCommand, OneOf<None, ErrorDetailResponse>>
 {
@@ -27,27 +27,17 @@ public sealed class MarkAllNotificationsAsReadHandler(
         try
         {
             var userGuid = Guid.Parse(request.UserId);
-            var unreadNotifications = await sqlRepository
-                .GetManyByConditionAsync(x => x.UserId == userGuid && !x.IsRead, token: cancellationToken);
+            var now = DateTime.UtcNow;
 
-            if (!unreadNotifications.Any())
-                return None.Value;
+            await sqlRepository.GetQueryable()
+                .Where(x => x.UserId == userGuid && !x.IsRead && !x.IsArchived)
+                .ExecuteUpdateAsync(
+                    setters => setters
+                        .SetProperty(x => x.IsRead, true)
+                        .SetProperty(x => x.ReadTime, now),
+                    cancellationToken);
 
-            foreach (var notification in unreadNotifications)
-            {
-                notification.IsRead = true;
-                notification.ReadTime = DateTime.UtcNow;
-            }
-
-            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-            return saveResult.Match<OneOf<None, ErrorDetailResponse>>(
-                _ => None.Value,
-                ex =>
-                {
-                    logger.Error(ex, "Error occurred while marking all notifications as read for User: {UserId}", request.UserId);
-                    return NotificationErrorDetail.NotificationError.UpdateFailed().ToErrorDetailResponse();
-                }
-            );
+            return None.Value;
         }
         catch (Exception ex)
         {

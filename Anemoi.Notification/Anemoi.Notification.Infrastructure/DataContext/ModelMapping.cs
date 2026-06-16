@@ -11,7 +11,9 @@ namespace Anemoi.Notification.Infrastructure.DataContext;
 public sealed class ModelMapping :
     IEntityTypeConfiguration<NotificationHistory>,
     IEntityTypeConfiguration<NotificationSubscription>,
-    IEntityTypeConfiguration<NotificationPreference>
+    IEntityTypeConfiguration<NotificationPreference>,
+    IEntityTypeConfiguration<NotificationAction>,
+    IEntityTypeConfiguration<NotificationActionAudit>
 {
     public void Configure(EntityTypeBuilder<NotificationHistory> builder)
     {
@@ -24,6 +26,7 @@ public sealed class ModelMapping :
         builder.HasIndex(x => x.CreatedTime);
         builder.HasIndex(x => new { x.UserId, x.IsHidden });
         builder.HasIndex(x => new { x.UserId, x.CreatedTime });
+        builder.HasIndex(x => new { x.UserId, x.IsArchived });
 
         builder.Property(x => x.TitleLocalizationArgs)
             .HasConversion(
@@ -40,6 +43,11 @@ public sealed class ModelMapping :
         builder.HasIndex(x => new { x.UserId, x.DeduplicationKey })
             .IsUnique()
             .HasFilter("\"DeduplicationKey\" IS NOT NULL");
+
+        builder.HasMany(x => x.Actions)
+            .WithOne(x => x.Notification)
+            .HasForeignKey(x => x.NotificationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public void Configure(EntityTypeBuilder<NotificationSubscription> builder)
@@ -61,5 +69,45 @@ public sealed class ModelMapping :
         builder.HasIndex(x => x.UserId).IsUnique();
         builder.Property(x => x.EnableInApp).HasDefaultValue(true);
         builder.Property(x => x.EnableEmail).HasDefaultValue(true);
+    }
+
+    public void Configure(EntityTypeBuilder<NotificationAction> builder)
+    {
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new NotificationActionId(id));
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.NotificationId)
+            .HasConversion(x => x.Value, id => new NotificationHistoryId(id));
+
+        builder.Property(x => x.ActionCode).IsRequired().HasMaxLength(100);
+        builder.Property(x => x.ActionLabel).IsRequired().HasMaxLength(200);
+        builder.Property(x => x.ActionUrl).HasMaxLength(500);
+        builder.Property(x => x.ActionType).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.RequiresConfirmation).HasDefaultValue(false);
+        builder.Property(x => x.SortOrder).HasDefaultValue(0);
+
+        builder.HasIndex(x => x.NotificationId);
+    }
+
+    public void Configure(EntityTypeBuilder<NotificationActionAudit> builder)
+    {
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new NotificationActionAuditId(id));
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.NotificationId)
+            .HasConversion(x => x.Value, id => new NotificationHistoryId(id));
+
+        builder.Property(x => x.ActionId)
+            .HasConversion(x => x.Value, id => new NotificationActionId(id));
+
+        builder.Property(x => x.Result).HasMaxLength(1000);
+        builder.Property(x => x.ClientIp).HasMaxLength(50);
+        builder.Property(x => x.UserAgent).HasMaxLength(500);
+
+        builder.HasIndex(x => x.NotificationId);
+        builder.HasIndex(x => x.ExecutedAt);
+        builder.HasIndex(x => x.ExecutedBy);
     }
 }

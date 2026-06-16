@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Notification.Responses;
@@ -34,7 +36,26 @@ public partial class NotificationMapper
             CorrelationId = history.CorrelationId,
             CausationId = history.CausationId,
             Type = history.Type,
-            Severity = history.Severity
+            Severity = history.Severity,
+            IsHidden = history.IsHidden,
+            IsArchived = history.IsArchived,
+            AggregateType = history.AggregateType,
+            AggregateId = history.AggregateId,
+            WorkflowType = history.WorkflowType,
+            WorkflowState = history.WorkflowState,
+            Actions = history.Actions?.Select(ToNotificationActionResponse).ToList() ?? []
+        };
+    }
+
+    public NotificationActionResponse ToNotificationActionResponse(NotificationAction action)
+    {
+        if (action == null) return null;
+        return new NotificationActionResponse
+        {
+            Id = action.Id.Value.ToString(),
+            Label = action.ActionLabel,
+            ActionType = action.ActionType,
+            RequiresConfirmation = action.RequiresConfirmation
         };
     }
 

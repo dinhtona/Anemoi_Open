@@ -9,6 +9,8 @@ public sealed class NotificationDbContext(DbContextOptions<NotificationDbContext
     public DbSet<NotificationHistory> NotificationHistories { get; set; }
     public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
     public DbSet<NotificationPreference> NotificationPreferences { get; set; }
+    public DbSet<NotificationAction> NotificationActions { get; set; }
+    public DbSet<NotificationActionAudit> NotificationActionAudits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

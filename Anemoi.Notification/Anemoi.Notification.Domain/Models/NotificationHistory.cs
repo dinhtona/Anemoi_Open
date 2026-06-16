@@ -30,10 +30,37 @@ public sealed class NotificationHistory : Entity<NotificationHistoryId>
     public bool IsHidden { get; set; }
     public DateTime? HiddenAt { get; set; }
 
+    // Part 2: Workflow metadata
+    public string AggregateType { get; set; }
+    public string AggregateId { get; set; }
+    public string WorkflowType { get; set; }
+    public string WorkflowState { get; set; }
+
+    // Part 5: Archive support
+    public bool IsArchived { get; set; }
+    public DateTime? ArchivedAt { get; set; }
+    public Guid? ArchivedBy { get; set; }
+
+    // Part 1: Notification actions
+    public ICollection<NotificationAction> Actions { get; set; } = new List<NotificationAction>();
+
     public void Hide()
     {
         IsHidden = true;
         HiddenAt = DateTime.UtcNow;
     }
-}
 
+    public void Archive(Guid archivedBy)
+    {
+        IsArchived = true;
+        ArchivedAt = DateTime.UtcNow;
+        ArchivedBy = archivedBy;
+    }
+
+    public void Unarchive()
+    {
+        IsArchived = false;
+        ArchivedAt = null;
+        ArchivedBy = null;
+    }
+}

@@ -18,6 +18,6 @@ public sealed class GetUnreadNotificationCountHandler(
     {
         var targetUserGuid = Guid.Parse(query.UserId);
         return fromFlow
-            .WithFilter(x => x.UserId == targetUserGuid && !x.IsRead);
+            .WithFilter(x => x.UserId == targetUserGuid && !x.IsRead && !x.IsArchived);
     }
 }

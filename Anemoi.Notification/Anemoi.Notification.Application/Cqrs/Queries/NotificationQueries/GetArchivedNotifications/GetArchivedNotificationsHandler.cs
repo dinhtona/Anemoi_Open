@@ -8,23 +8,23 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
-using Anemoi.Contract.Notification.Queries.NotificationQueries.GetNotifications;
+using Anemoi.Contract.Notification.Queries.NotificationQueries.GetArchivedNotifications;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Application.Mappings;
 using Anemoi.Notification.Domain.Models;
 using OneOf;
 using Serilog;
 
-namespace Anemoi.Notification.Application.Cqrs.Queries.NotificationQueries.GetNotifications;
+namespace Anemoi.Notification.Application.Cqrs.Queries.NotificationQueries.GetArchivedNotifications;
 
-public sealed class GetNotificationsHandler(
+public sealed class GetArchivedNotificationsHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
     NotificationMapper mapper,
     ILogger logger)
-    : EfQueryPaginationHandler<NotificationHistory, GetNotificationsQuery, NotificationResponse>(sqlRepository, logger)
+    : EfQueryPaginationHandler<NotificationHistory, GetArchivedNotificationsQuery, NotificationResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<NotificationHistory, NotificationResponse> BuildQueryFlow(
-        IQueryListFilter<NotificationHistory, NotificationResponse> fromFlow, GetNotificationsQuery query)
+        IQueryListFilter<NotificationHistory, NotificationResponse> fromFlow, GetArchivedNotificationsQuery query)
     {
         var targetUserGuid = Guid.Parse(query.UserId);
         var filter = BuildFilterExpression(targetUserGuid, query);
@@ -37,48 +37,13 @@ public sealed class GetNotificationsHandler(
     }
 
     private static Expression<Func<NotificationHistory, bool>> BuildFilterExpression(
-        Guid userId, GetNotificationsQuery query)
+        Guid userId, GetArchivedNotificationsQuery query)
     {
         Expression<Func<NotificationHistory, bool>> filter = x =>
-            x.UserId == userId && !x.IsArchived;
+            x.UserId == userId && x.IsArchived;
 
         var param = filter.Parameters[0];
 
-        var isHiddenFilter = query.StatusFilter?.Equals("Hidden", StringComparison.OrdinalIgnoreCase) == true;
-        if (isHiddenFilter)
-        {
-            filter = Expression.Lambda<Func<NotificationHistory, bool>>(
-                Expression.AndAlso(filter.Body,
-                    Expression.Equal(
-                        Expression.Property(param, "IsHidden"),
-                        Expression.Constant(true))),
-                param);
-        }
-        else
-        {
-            filter = Expression.Lambda<Func<NotificationHistory, bool>>(
-                Expression.AndAlso(filter.Body,
-                    Expression.Equal(
-                        Expression.Property(param, "IsHidden"),
-                        Expression.Constant(false))),
-                param);
-        }
-
-        // Status filter (Read/Unread)
-        if (!string.IsNullOrEmpty(query.StatusFilter) &&
-            !query.StatusFilter.Equals("All", StringComparison.OrdinalIgnoreCase) &&
-            !isHiddenFilter)
-        {
-            var isRead = query.StatusFilter.Equals("Read", StringComparison.OrdinalIgnoreCase);
-            filter = Expression.Lambda<Func<NotificationHistory, bool>>(
-                Expression.AndAlso(filter.Body,
-                    Expression.Equal(
-                        Expression.Property(param, "IsRead"),
-                        Expression.Constant(isRead))),
-                param);
-        }
-
-        // Category filter
         if (!string.IsNullOrEmpty(query.Category))
         {
             filter = Expression.Lambda<Func<NotificationHistory, bool>>(
@@ -89,7 +54,6 @@ public sealed class GetNotificationsHandler(
                 param);
         }
 
-        // Severity filter
         if (!string.IsNullOrEmpty(query.Severity))
         {
             filter = Expression.Lambda<Func<NotificationHistory, bool>>(
@@ -100,7 +64,6 @@ public sealed class GetNotificationsHandler(
                 param);
         }
 
-        // Keyword search
         if (!string.IsNullOrEmpty(query.Keyword))
         {
             var keyword = query.Keyword.ToLower();
@@ -116,7 +79,6 @@ public sealed class GetNotificationsHandler(
                 param);
         }
 
-        // Date range
         if (query.DateFrom.HasValue)
         {
             filter = Expression.Lambda<Func<NotificationHistory, bool>>(
@@ -141,7 +103,7 @@ public sealed class GetNotificationsHandler(
     }
 
     protected override Task<PaginationResponse<NotificationResponse>> MapToResultAsync(
-        GetNotificationsQuery query,
+        GetArchivedNotificationsQuery query,
         OneOf<List<NotificationHistory>, List<NotificationResponse>> modelsOrResponses,
         long totalRecord)
     {
