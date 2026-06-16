@@ -16,11 +16,13 @@
     </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="FluentAssertions" Version="7.2.2" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Anemoi.Hr.Domain\Anemoi.Hr.Domain.csproj" />
     <ProjectReference Include="..\Anemoi.Hr.ModelIds\Anemoi.Hr.ModelIds.csproj" />
+    <ProjectReference Include="..\Anemoi.Hr.Application\Anemoi.Hr.Application.csproj" />
   </ItemGroup>
 
 </Project>

@@ -120,6 +120,12 @@ public static class Permissions
     public const string HrRecruitmentHire = "hr.recruitment.hire";
     public const string HrRecruitmentAnalytics = "hr.recruitment.analytics";
 
+    // Onboarding permissions
+    public const string HrOnboardingView = "hr.onboarding.view";
+    public const string HrOnboardingManage = "hr.onboarding.manage";
+    public const string HrOnboardingTaskComplete = "hr.onboarding.task.complete";
+    public const string HrOnboardingTaskManage = "hr.onboarding.task.manage";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -223,7 +229,11 @@ public static class Permissions
         new(HrRecruitmentManage, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentManage"),
         new(HrRecruitmentInterview, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentInterview"),
         new(HrRecruitmentHire, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentHire"),
-        new(HrRecruitmentAnalytics, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentAnalytics")
+        new(HrRecruitmentAnalytics, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentAnalytics"),
+        new(HrOnboardingView, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingView"),
+        new(HrOnboardingManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingManage"),
+        new(HrOnboardingTaskComplete, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskComplete"),
+        new(HrOnboardingTaskManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskManage")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();

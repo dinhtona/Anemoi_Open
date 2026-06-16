@@ -252,6 +252,8 @@ public static class HrBusinessErrorCodes
     public const string ValWorkedHoursOutOfRange = "VAL_WORKED_HOURS_OUT_OF_RANGE";
     public const string ValWorkDateOutOfPeriod = "VAL_WORK_DATE_OUT_OF_PERIOD";
     public const string ValWorkDateRequired = "VAL_WORK_DATE_REQUIRED";
+    public const string ValNameRequired = "VAL_NAME_REQUIRED";
+    public const string ValTitleRequired = "VAL_TITLE_REQUIRED";
 
     // Validation error codes (HR-specific)
     public const string PayslipIdRequired = "VAL_PAYSLIP_ID_REQUIRED";
@@ -342,4 +344,31 @@ public static class HrBusinessErrorCodes
     public const string ValApplicationIdRequired = "VAL_APPLICATION_ID_REQUIRED";
     public const string ValInterviewIdRequired = "VAL_INTERVIEW_ID_REQUIRED";
     public const string ValHiringDecisionIdRequired = "VAL_HIRING_DECISION_ID_REQUIRED";
+
+    // Validation error codes (Onboarding)
+    public const string ValTemplateIdRequired = "VAL_TEMPLATE_ID_REQUIRED";
+    public const string ValTaskIdRequired = "VAL_TASK_ID_REQUIRED";
+    public const string ValInstanceIdRequired = "VAL_INSTANCE_ID_REQUIRED";
+    public const string ValNewUserIdRequired = "VAL_NEW_USER_ID_REQUIRED";
+    public const string ValReasonRequired = "VAL_REASON_REQUIRED";
+
+    // Onboarding error codes
+    public const string HrOnboardingTemplateNotFound = "HR_ONB_TEMPLATE_NOT_FOUND";
+    public const string HrOnboardingTemplateInactive = "HR_ONB_TEMPLATE_INACTIVE";
+    public const string HrOnboardingTemplateInUse = "HR_ONB_TEMPLATE_IN_USE";
+    public const string HrOnboardingInstanceNotFound = "HR_ONB_INSTANCE_NOT_FOUND";
+    public const string HrOnboardingInstanceInvalidStatus = "HR_ONB_INSTANCE_INVALID_STATUS";
+    public const string HrOnboardingInstanceAlreadyCompleted = "HR_ONB_INSTANCE_ALREADY_COMPLETED";
+    public const string HrOnboardingInstanceAlreadyCancelled = "HR_ONB_INSTANCE_ALREADY_CANCELLED";
+    public const string HrOnboardingInstanceNotInProgress = "HR_ONB_INSTANCE_NOT_IN_PROGRESS";
+    public const string HrOnboardingInstanceForceCompleteRequiresReason = "HR_ONB_INSTANCE_FORCE_COMPLETE_REQUIRES_REASON";
+    public const string HrOnboardingTaskNotFound = "HR_ONB_TASK_NOT_FOUND";
+    public const string HrOnboardingTaskInvalidStatus = "HR_ONB_TASK_INVALID_STATUS";
+    public const string HrOnboardingTaskAlreadyCompleted = "HR_ONB_TASK_ALREADY_COMPLETED";
+    public const string HrOnboardingTaskAlreadySkipped = "HR_ONB_TASK_ALREADY_SKIPPED";
+    public const string HrOnboardingEmployeeAlreadyOnboarding = "HR_ONB_EMPLOYEE_ALREADY_ONBOARDING";
+    public const string HrOnboardingEmployeeNotFound = "HR_ONB_EMPLOYEE_NOT_FOUND";
+    public const string HrOnboardingResolveRoleMissing = "HR_ONB_RESOLVE_ROLE_MISSING";
+    public const string HrOnboardingTemplateHasNoTasks = "HR_ONB_TEMPLATE_HAS_NO_TASKS";
+    public const string HrOnboardingTaskAlreadyReopened = "HR_ONB_TASK_ALREADY_REOPENED";
 }

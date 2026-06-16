@@ -844,3 +844,10 @@ Both `Anemoi.Hr.Infrastructure` and `Anemoi.Notification.Infrastructure` have co
 1. **Bus outbox uses separate DbContext instances** — MassTransit's `BusOutboxPublishTransport` creates a separate DbContext scope via `IScopedDbContextFactory`. Domain changes and outbox messages are in **separate transactions**, even after the publish-order fix. True transactional outbox would require sharing the same DbContext instance.
 2. **DataChange sensitivity remains Low** — See TD-012. WorkspaceId is not propagated through HR integration events.
 3. **No MassTransit InMemoryTestHarness usage** — Consumer tests use NSubstitute mocks, not real MassTransit transport. Outbox delivery is not integration-tested.
+
+---
+## Phase 26
+1. TD-013 — Onboarding assignee display name resolution should use user lookup service instead of userId fallback.
+Severity: Low
+Fix timing: Future notification/user profile integration phase.
+---

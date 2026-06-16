@@ -14,6 +14,7 @@ using Anemoi.Hr.Domain.Reporting;
 using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
 using Anemoi.Hr.Domain.Recruitment;
+using Anemoi.Hr.Domain.Onboarding;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,6 +78,8 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<InterviewSchedule> InterviewSchedules { get; set; }
     public DbSet<InterviewFeedback> InterviewFeedbacks { get; set; }
     public DbSet<HiringDecision> HiringDecisions { get; set; }
+    public DbSet<OnboardingPlanTemplate> OnboardingPlanTemplates => Set<OnboardingPlanTemplate>();
+    public DbSet<OnboardingInstance> OnboardingInstances => Set<OnboardingInstance>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -90,6 +90,11 @@ public static class HrPermissions
     public const string RecruitmentHire = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentHire;
     public const string RecruitmentAnalytics = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrRecruitmentAnalytics;
 
+    public const string OnboardingView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingView;
+    public const string OnboardingManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingManage;
+    public const string OnboardingTaskComplete = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingTaskComplete;
+    public const string OnboardingTaskManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingTaskManage;
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -176,6 +181,10 @@ public static class HrPermissions
         RecruitmentInterview,
         RecruitmentHire,
         RecruitmentAnalytics,
+        OnboardingView,
+        OnboardingManage,
+        OnboardingTaskComplete,
+        OnboardingTaskManage,
         EssProfileView,
         EssLeaveView,
         EssLeaveRequest,
@@ -217,7 +226,9 @@ public static class HrPermissions
             [PayslipEmailSend] = new(PayslipEmailSend, "High"),
             [PayrollReportingExport] = new(PayrollReportingExport, "High"),
             [RecruitmentManage] = new(RecruitmentManage, "High"),
-            [RecruitmentHire] = new(RecruitmentHire, "High")
+            [RecruitmentHire] = new(RecruitmentHire, "High"),
+            [OnboardingManage] = new(OnboardingManage, "High"),
+            [OnboardingTaskManage] = new(OnboardingTaskManage, "High")
         };
 }
 
