@@ -18,7 +18,6 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CreateHireDeci
 
 public sealed class CreateHireDecisionHandler(
     ISqlRepository<CandidateApplication> applicationRepository,
-    ISqlRepository<InterviewSchedule> interviewRepository,
     ISqlRepository<InterviewFeedback> feedbackRepository,
     ISqlRepository<HiringDecision> decisionRepository,
     IUnitOfWork unitOfWork,

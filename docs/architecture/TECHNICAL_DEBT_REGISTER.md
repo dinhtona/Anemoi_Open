@@ -775,6 +775,40 @@ Reason:
 
 ---
 
+## TD-025-01 — Hardcoded GradeCode "G1" in Candidate-to-Employee Conversion
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Context
+
+`ConvertCandidateToEmployeeHandler.cs` always sets `GradeCode = "G1"` for every converted employee, regardless of their position/grade.
+
+### Risk
+
+- Payroll calculations use GradeCode for salary range validation.
+- Compensation reports will be wrong for converted employees.
+- Without correct grade, payroll runs for converted employees will produce incorrect results.
+
+### Recommended Fix
+
+Choose one:
+
+1. **Add `GradeCode` to `ConvertCandidateToEmployeeCommand`** — simplest, gives conversion operator full control.
+2. **Derive `GradeCode` from PositionId** — requires grade-to-position mapping configuration.
+3. **Introduce default grade mapping per position** — most robust but most work.
+
+### Suggested Target
+
+Before running payroll for any converted employee. Requires explicit architectural decision before implementation.
+
+---
+
 ## Phase N6 — Notification Outbox/Inbox Durability Verification & Hardening (2026-06-16)
 
 ### Status

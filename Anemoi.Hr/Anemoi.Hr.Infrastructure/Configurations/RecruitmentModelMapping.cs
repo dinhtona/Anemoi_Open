@@ -240,6 +240,10 @@ public sealed class RecruitmentModelMapping :
         builder.Property(x => x.Note).HasMaxLength(1024).IsRequired(false);
 
         builder.HasIndex(x => x.CandidateApplicationId);
+
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<InterviewSchedule> builder)
@@ -323,6 +327,10 @@ public sealed class RecruitmentModelMapping :
             .WithMany()
             .HasForeignKey(x => x.InterviewerEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
     }
 
     public void Configure(EntityTypeBuilder<HiringDecision> builder)

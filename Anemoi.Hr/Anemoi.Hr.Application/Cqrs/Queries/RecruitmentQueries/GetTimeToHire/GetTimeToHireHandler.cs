@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetTimeToHire;
 
 public sealed class GetTimeToHireHandler(
-    ISqlRepository<CandidateApplication> applicationRepository,
     ISqlRepository<HiringDecision> decisionRepository)
     : IQueryHandler<GetTimeToHireQuery, TimeToHireResponse>
 {

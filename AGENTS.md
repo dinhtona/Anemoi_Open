@@ -150,6 +150,8 @@ docker-compose up -d --build
 - Services run Dockerized via docker-compose
 
 ## Git
-- Current active branch state includes Phase 15 (Payroll Reporting/Export MVP)
+- Current active branch state: Phase 25 complete (Recruitment Management)
 - Commit convention: "Phase N - [description]"
 - Feature implementation references: `FeatureImplementationTemplate.md`
+
+
