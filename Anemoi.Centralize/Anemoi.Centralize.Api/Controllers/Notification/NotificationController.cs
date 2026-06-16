@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.HideAllReadNotifications;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.HideNotification;
@@ -31,8 +33,10 @@ namespace Anemoi.Centralize.Api.Controllers.Notification;
 public sealed class NotificationController(ISender sender) : ControllerBase
 {
     [HttpGet]
+    [HasPermission(Permissions.NotificationView)]
     [ProducesResponseType(typeof(PaginationResponse<NotificationResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetNotifications([FromQuery] int page, [FromQuery] int size, CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -46,8 +50,10 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Permissions.NotificationView)]
     [ProducesResponseType(typeof(CountingResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetUnreadCount(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -57,8 +63,10 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Permissions.NotificationView)]
     [ProducesResponseType(typeof(CollectionResponse<NotificationSettingResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetSettings(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -68,9 +76,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(Permissions.NotificationManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdateSettings([FromBody] List<NotificationSettingResponse> settings, CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -80,9 +90,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPost("{id}")]
+    [HasPermission(Permissions.NotificationManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> MarkAsRead(Guid id, CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -92,9 +104,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(Permissions.NotificationManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -104,9 +118,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPost("{id}")]
+    [HasPermission(Permissions.NotificationManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Hide(Guid id, CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -116,9 +132,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
+    [HasPermission(Permissions.NotificationManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> HideAllRead(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -128,8 +146,10 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [HasPermission(Permissions.NotificationPreferenceManage)]
     [ProducesResponseType(typeof(NotificationPreferenceResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetPreferences(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
@@ -139,9 +159,11 @@ public sealed class NotificationController(ISender sender) : ControllerBase
     }
 
     [HttpPut]
+    [HasPermission(Permissions.NotificationPreferenceManage)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdatePreferences(
         [FromBody] CreateOrUpdateNotificationPreferenceCommand command,
         CancellationToken cancellationToken)

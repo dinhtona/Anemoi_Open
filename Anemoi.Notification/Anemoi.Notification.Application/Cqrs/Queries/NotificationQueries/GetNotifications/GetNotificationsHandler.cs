@@ -40,13 +40,34 @@ public sealed class GetNotificationsHandler(
         Guid userId, GetNotificationsQuery query)
     {
         Expression<Func<NotificationHistory, bool>> filter = x =>
-            x.UserId == userId && !x.IsHidden;
+            x.UserId == userId;
 
         var param = filter.Parameters[0];
 
-        // Status filter
+        var isHiddenFilter = query.StatusFilter?.Equals("Hidden", StringComparison.OrdinalIgnoreCase) == true;
+        if (isHiddenFilter)
+        {
+            filter = Expression.Lambda<Func<NotificationHistory, bool>>(
+                Expression.AndAlso(filter.Body,
+                    Expression.Equal(
+                        Expression.Property(param, "IsHidden"),
+                        Expression.Constant(true))),
+                param);
+        }
+        else
+        {
+            filter = Expression.Lambda<Func<NotificationHistory, bool>>(
+                Expression.AndAlso(filter.Body,
+                    Expression.Equal(
+                        Expression.Property(param, "IsHidden"),
+                        Expression.Constant(false))),
+                param);
+        }
+
+        // Status filter (Read/Unread)
         if (!string.IsNullOrEmpty(query.StatusFilter) &&
-            !query.StatusFilter.Equals("All", StringComparison.OrdinalIgnoreCase))
+            !query.StatusFilter.Equals("All", StringComparison.OrdinalIgnoreCase) &&
+            !isHiddenFilter)
         {
             var isRead = query.StatusFilter.Equals("Read", StringComparison.OrdinalIgnoreCase);
             filter = Expression.Lambda<Func<NotificationHistory, bool>>(
