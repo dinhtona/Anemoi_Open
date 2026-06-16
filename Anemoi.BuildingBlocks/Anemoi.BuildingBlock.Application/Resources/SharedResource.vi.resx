@@ -280,4 +280,8 @@
   <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>Xem phiếu lương cá nhân qua ESS.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>Xem các báo cáo lương nâng cao.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Xuất các báo cáo lương nâng cao ra file CSV.</value></data>
+  <data name="PermissionGroupNotifications" xml:space="preserve"><value>Thông báo</value></data>
+  <data name="PermissionDescriptionNotificationView" xml:space="preserve"><value>Xem thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Quản lý thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Quản lý tùy chọn thông báo.</value></data>
 </root>

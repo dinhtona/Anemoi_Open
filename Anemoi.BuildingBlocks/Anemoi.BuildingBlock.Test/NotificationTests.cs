@@ -157,10 +157,11 @@ public class NotificationTests
         var notificationsList = new List<NotificationHistory> { existingNotification };
         var repo = new FakeRepository<NotificationHistory>(notificationsList);
         var subRepo = new FakeRepository<NotificationSubscription>([]);
+        var preferenceRepo = new FakeRepository<NotificationPreference>([]);
         var unitOfWork = new FakeUnitOfWork();
         var mockPublisher = new MockPublishEndpoint();
 
-        var handler = new CreateNotificationHandler(repo, subRepo, unitOfWork, mockPublisher, Mapper, Logger);
+        var handler = new CreateNotificationHandler(repo, subRepo, preferenceRepo, unitOfWork, mockPublisher, Mapper, Logger);
 
         var command = new CreateNotificationCommand(
             UserId: targetUserId.ToString(),
@@ -190,13 +191,14 @@ public class NotificationTests
 
         var notificationsList = new List<NotificationHistory>();
         var subRepo = new FakeRepository<NotificationSubscription>([]);
+        var preferenceRepo = new FakeRepository<NotificationPreference>([]);
         
         // Setup repository that returns the notification once it's created concurrently
         var repo = new FakeRepositoryWithConcurrentFallback<NotificationHistory>(notificationsList, dupKey, targetUserId);
         var unitOfWork = new FakeUnitOfWorkWithException(); // Throws on SaveChanges
         var mockPublisher = new MockPublishEndpoint();
 
-        var handler = new CreateNotificationHandler(repo, subRepo, unitOfWork, mockPublisher, Mapper, Logger);
+        var handler = new CreateNotificationHandler(repo, subRepo, preferenceRepo, unitOfWork, mockPublisher, Mapper, Logger);
 
         var command = new CreateNotificationCommand(
             UserId: targetUserId.ToString(),

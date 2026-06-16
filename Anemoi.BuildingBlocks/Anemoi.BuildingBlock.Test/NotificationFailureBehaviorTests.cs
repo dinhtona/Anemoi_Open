@@ -44,10 +44,11 @@ public sealed class NotificationFailureBehaviorTests
         var userId = Guid.NewGuid();
         var subRepo = new FakeRepository<NotificationSubscription>([]);
         var repo = new FakeRepository<NotificationHistory>([]);
+        var preferenceRepo = new FakeRepository<NotificationPreference>([]);
         var unitOfWork = new FakeUnitOfWorkThatFails();
         var mockPublisher = new MockPublishEndpoint();
 
-        var handler = new CreateNotificationHandler(repo, subRepo, unitOfWork, mockPublisher, Mapper, Logger);
+        var handler = new CreateNotificationHandler(repo, subRepo, preferenceRepo, unitOfWork, mockPublisher, Mapper, Logger);
 
         var command = new CreateNotificationCommand(
             UserId: userId.ToString(),
@@ -77,10 +78,11 @@ public sealed class NotificationFailureBehaviorTests
         var notificationsList = new List<NotificationHistory>();
         var subRepo = new FakeRepository<NotificationSubscription>([]);
         var repo = new FakeRepository<NotificationHistory>(notificationsList);
+        var preferenceRepo = new FakeRepository<NotificationPreference>([]);
         var unitOfWork = new FakeSuccessfulUnitOfWork();
         var mockPublisher = new MockPublishEndpoint();
 
-        var handler = new CreateNotificationHandler(repo, subRepo, unitOfWork, mockPublisher, Mapper, Logger);
+        var handler = new CreateNotificationHandler(repo, subRepo, preferenceRepo, unitOfWork, mockPublisher, Mapper, Logger);
 
         var command = new CreateNotificationCommand(
             UserId: userId.ToString(),
