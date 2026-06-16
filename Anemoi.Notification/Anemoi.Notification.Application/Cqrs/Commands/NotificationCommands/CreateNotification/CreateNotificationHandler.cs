@@ -9,6 +9,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Application.Mappings;
@@ -23,6 +24,7 @@ namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.Cre
 public sealed class CreateNotificationHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
     ISqlRepository<NotificationSubscription> subscriptionRepository,
+    ISqlRepository<NotificationPreference> preferenceRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
     NotificationMapper mapper,
@@ -36,6 +38,26 @@ public sealed class CreateNotificationHandler(
         {
             var userGuid = Guid.Parse(request.UserId);
             
+            // Check global in-app preference
+            var preference = await preferenceRepository.GetFirstByConditionAsync(
+                x => x.UserId == new UserId(userGuid), token: cancellationToken);
+            if (preference != null && !preference.EnableInApp)
+            {
+                logger.Information(
+                    "In-app notifications disabled for User {UserId}. Skipping creation.",
+                    request.UserId);
+                return new NotificationResponse
+                {
+                    Id = Guid.Empty.ToString(),
+                    UserId = request.UserId,
+                    Title = request.Title,
+                    Content = request.Content,
+                    Category = request.Category,
+                    IsRead = true,
+                    CreatedTime = DateTime.UtcNow
+                };
+            }
+
             // Check if user has disabled this category
             var subscription = await subscriptionRepository.GetFirstByConditionAsync(
                 x => x.UserId == userGuid && x.Category == request.Category,

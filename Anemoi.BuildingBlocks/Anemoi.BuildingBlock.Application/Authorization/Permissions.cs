@@ -126,6 +126,11 @@ public static class Permissions
     public const string HrOnboardingTaskComplete = "hr.onboarding.task.complete";
     public const string HrOnboardingTaskManage = "hr.onboarding.task.manage";
 
+    // Notification permissions
+    public const string NotificationView = "notification.view";
+    public const string NotificationManage = "notification.manage";
+    public const string NotificationPreferenceManage = "notification.preference.manage";
+
     public static readonly IReadOnlyList<Definition> Definitions =
     [
         new(UserRead, "PermissionGroupUsers", "PermissionDescriptionUserRead"),
@@ -233,7 +238,10 @@ public static class Permissions
         new(HrOnboardingView, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingView"),
         new(HrOnboardingManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingManage"),
         new(HrOnboardingTaskComplete, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskComplete"),
-        new(HrOnboardingTaskManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskManage")
+        new(HrOnboardingTaskManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskManage"),
+        new(NotificationView, "PermissionGroupNotifications", "PermissionDescriptionNotificationView"),
+        new(NotificationManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationManage"),
+        new(NotificationPreferenceManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationPreferenceManage")
     ];
 
     public static readonly IReadOnlyList<string> All = Definitions.Select(x => x.Key).ToList();
