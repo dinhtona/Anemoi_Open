@@ -586,9 +586,46 @@ Next Optimization Sprint
 
 ---
 
-# Historical Debt Resolved
+---
 
-The following items were discovered during implementation and later resolved.
+## TD-012 — DataChange Sensitivity Set to Low (No Workspace Context)
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — Temporary fix, revisit in multi-tenant production phase.
+
+### Context
+
+Phase N5.5 (Notification Platform Hardening) fixed a critical bug where all `DataChangeOccurredIntegrationEvent` events were silently dropped by the Centralize Gateway's `DataChangeOccurredIntegrationEventConsumer` because they used `WorkspaceId = null` with `Sensitivity = Medium/High`. The consumer drops any non-Low event without a workspace scope.
+
+The fix changed all publishers (Leave, Overtime, Payroll, Payslip consumers) to use `Sensitivity = Low`, which causes the consumer to broadcast to `Clients.All`.
+
+### Risk
+
+- `Sensitivity = Low` with `Clients.All` broadcasts cache invalidation events to every connected client, regardless of workspace membership.
+- Events contain only `Resource`, `EntityId`, `Action`, `QueryTags`, `OccurredAt` — no PII, salary, leave reason, or sensitive data — but the broadcast scope is still wider than ideal.
+- In a multi-tenant production deployment, tenant A clients receive data-change signals for tenant B resources.
+
+### Recommended Fix
+
+1. Propagate `WorkspaceId` through all consumer pipelines (requires workspace context in HR integration events).
+2. Restore `Sensitivity = Medium` (or `High` where appropriate) for workspace-scoped events.
+3. `DataChangeOccurredIntegrationEventConsumer` already correctly routes workspace-scoped events to `Workspace-{WorkspaceId}` SignalR groups.
+4. Audit all `JoinWorkspace` calls on the frontend to ensure clients join the correct workspace groups.
+
+### Suggested Target
+
+Multi-tenant Production Hardening Phase
+
+---
 
 ---
 
