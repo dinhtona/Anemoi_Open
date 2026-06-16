@@ -5,6 +5,7 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ArchiveCandidate;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.BlacklistCandidate;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ChangeCandidateSource;
+using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ConvertCandidateToEmployee;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CreateCandidate;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ReactivateCandidate;
 using Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.UpdateCandidate;
@@ -113,5 +114,16 @@ public sealed class RecruitmentCandidatesController(ISender sender) : Controller
         CancellationToken cancellationToken)
     {
         return await sender.Send(query, cancellationToken);
+    }
+
+    [HttpPost]
+    [HasPermission(HrPermissions.RecruitmentHire)]
+    [ProducesResponseType(typeof(CandidateConversionResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ConvertCandidateToEmployee(
+        [FromBody] ConvertCandidateToEmployeeCommand command,
+        CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(command with { ConvertedBy = HttpContext.GetUserId() }, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

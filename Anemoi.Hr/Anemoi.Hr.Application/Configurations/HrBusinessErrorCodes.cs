@@ -316,6 +316,10 @@ public static class HrBusinessErrorCodes
     public const string HiringDecisionAlreadyExists = "HR_REC_HIRING_DECISION_ALREADY_EXISTS";
     public const string HiringAlreadyConverted = "HR_REC_HIRING_ALREADY_CONVERTED";
     public const string HireRequiresOfferStage = "HR_REC_HIRE_REQUIRES_OFFER_STAGE";
+    public const string ConversionRequiresHireDecision = "HR_REC_CONVERSION_REQUIRES_HIRE_DECISION";
+    public const string ConversionRequiresHiredStage = "HR_REC_CONVERSION_REQUIRES_HIRED_STAGE";
+    public const string ConversionInvalidCandidateStatus = "HR_REC_CONVERSION_INVALID_CANDIDATE_STATUS";
+    public const string ConversionEmployeeCreationFailed = "HR_REC_CONVERSION_EMPLOYEE_CREATION_FAILED";
     public const string HireRequiresFeedback = "HR_REC_HIRE_REQUIRES_FEEDBACK";
     public const string OfferRequiresCompletedInterview = "HR_REC_OFFER_REQUIRES_COMPLETED_INTERVIEW";
     public const string CandidateAlreadyLinked = "HR_REC_CANDIDATE_ALREADY_LINKED";

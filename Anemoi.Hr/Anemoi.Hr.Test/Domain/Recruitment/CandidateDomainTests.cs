@@ -144,6 +144,19 @@ public class CandidateDomainTests
     }
 
     [Fact]
+    public void LinkEmployee_ShouldSetConvertedMetadata()
+    {
+        var candidate = CreateActiveCandidate();
+        var employeeId = new EmployeeId(Guid.NewGuid());
+        var now = DateTime.UtcNow;
+        var result = candidate.LinkEmployee(employeeId, "admin1", now);
+        result.Should().BeTrue();
+        candidate.EmployeeId.Should().Be(employeeId);
+        candidate.ConvertedBy.Should().Be("admin1");
+        candidate.ConvertedAt.Should().BeCloseTo(now, TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
     public void ChangeSource_ShouldUpdate()
     {
         var candidate = CreateActiveCandidate();
