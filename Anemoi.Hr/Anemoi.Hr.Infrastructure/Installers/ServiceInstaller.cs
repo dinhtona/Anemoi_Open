@@ -6,6 +6,7 @@ using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.CancelLeaveReques
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
+using Anemoi.Hr.Application.Services;
 using Anemoi.Hr.Infrastructure.Reporting;
 using Anemoi.Hr.Infrastructure.Services;
 using Anemoi.Hr.Domain;
@@ -19,6 +20,11 @@ public sealed class ServiceInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<INotificationActionHandler, LeaveNotificationActionHandler>();
+        services.AddScoped<INotificationActionHandler, OvertimeNotificationActionHandler>();
+        services.AddScoped<INotificationActionHandler, PayrollNotificationActionHandler>();
+        services.AddScoped<INotificationActionHandler, OnboardingNotificationActionHandler>();
+        services.AddScoped<INotificationActionHandlerRegistry, NotificationActionHandlerRegistry>();
         services.AddScoped<LeaveMapper>();
         services.AddScoped<EmployeeMapper>();
         services.AddScoped<EmployeeContractMapper>();
