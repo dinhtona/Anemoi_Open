@@ -1,0 +1,65 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.Hr.Application.Abstractions;
+using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Domain.Workflow;
+using Anemoi.Hr.ModelIds.ModelIds;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
+
+namespace Anemoi.Hr.Application.Services;
+
+public sealed class WorkflowBuilder(
+    ISqlRepository<WorkflowDefinition> definitionRepository,
+    IWorkflowHierarchyResolver hierarchyResolver)
+    : IWorkflowBuilder
+{
+    public async Task<OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>> BuildAsync(
+        string entityType, EmployeeId requesterEmployeeId, string startedBy, CancellationToken ct)
+    {
+        var definition = await definitionRepository.GetQueryable()
+            .Include(d => d.Steps)
+            .Where(d => d.TargetEntityType == entityType && d.IsActive)
+            .FirstOrDefaultAsync(ct);
+
+        if (definition is not null)
+        {
+            var sortedSteps = definition.Steps.OrderBy(s => s.Sequence).ToList();
+            return BuildFromDefinition(sortedSteps);
+        }
+
+        if (WorkflowConstants.DefaultPolicy.RequiresDefinition(entityType))
+            return new WorkflowBuildError("HR_WF_DEF_REQUIRES_DEFINITION");
+
+        return await BuildFromHierarchyAsync(entityType, requesterEmployeeId, ct);
+    }
+
+    private static OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError> BuildFromDefinition(
+        List<WorkflowDefinitionStep> steps)
+    {
+        var result = steps.Select(s =>
+        {
+            var stepId = new WorkflowInstanceStepId(IdGenerator.NextGuid());
+            return WorkflowInstanceStep.Create(stepId, default, s.Sequence,
+                s.ApproverType, s.ApproverValue, null);
+        }).ToList();
+        return OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>.FromT0(result);
+    }
+
+    private async Task<OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>> BuildFromHierarchyAsync(
+        string entityType, EmployeeId requesterEmployeeId, CancellationToken ct)
+    {
+        var hierarchy = await hierarchyResolver.ResolveHierarchyAsync(requesterEmployeeId, ct);
+        var maxSteps = WorkflowConstants.DefaultPolicy.GetStepCount(entityType);
+        var selected = hierarchy.Take(maxSteps).ToList();
+
+        var result = selected.Select(s =>
+        {
+            var stepId = new WorkflowInstanceStepId(IdGenerator.NextGuid());
+            return WorkflowInstanceStep.Create(stepId, default, s.StepOrder,
+                ApproverType.SpecificUser, null,
+                s.ApproverUserId?.Value.ToString());
+        }).ToList();
+        return OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>.FromT0(result);
+    }
+}
