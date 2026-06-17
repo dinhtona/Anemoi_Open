@@ -1,3 +1,5 @@
+using Anemoi.BuildingBlock.Domain;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +20,19 @@ public sealed class WorkflowInstanceModelMapping : IEntityTypeConfiguration<Work
 
         builder.Property(x => x.WorkflowDefinitionId)
             .HasConversion(x => x.Value, id => new WorkflowDefinitionId(id))
-            .HasColumnType("uuid").IsRequired();
+            .HasColumnType("uuid").IsRequired(false);
 
         builder.Property(x => x.EntityType).HasMaxLength(100).IsRequired();
         builder.Property(x => x.EntityId).HasMaxLength(100).IsRequired();
         builder.Property(x => x.CurrentStep).IsRequired();
         builder.Property(x => x.Status).HasMaxLength(50).IsRequired();
         builder.Property(x => x.StartedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.RequesterEmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .IsRequired(false);
+        builder.Property(x => x.RequesterUserId)
+            .HasConversion(x => x.Value, id => new UserId(id))
+            .HasMaxLength(128).IsRequired(false);
         builder.Property(x => x.StartedAt).IsRequired();
         builder.Property(x => x.CompletedAt).IsRequired(false);
 

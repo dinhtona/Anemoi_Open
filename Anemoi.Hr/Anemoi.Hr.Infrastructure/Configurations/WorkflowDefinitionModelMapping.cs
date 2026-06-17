@@ -20,6 +20,8 @@ public sealed class WorkflowDefinitionModelMapping : IEntityTypeConfiguration<Wo
         builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(1000).IsRequired(false);
         builder.Property(x => x.WorkflowTypeCode).HasMaxLength(50).IsRequired();
+        builder.Property(x => x.TargetEntityType).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.Version).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.UpdatedAt).IsRequired();
@@ -31,6 +33,7 @@ public sealed class WorkflowDefinitionModelMapping : IEntityTypeConfiguration<Wo
         builder.HasIndex(x => x.Code).IsUnique();
         builder.HasIndex(x => x.WorkflowTypeCode);
         builder.HasIndex(x => x.IsActive);
+        builder.HasIndex(x => new { x.TargetEntityType, x.IsActive });
 
         builder.HasMany(x => x.Steps)
             .WithOne()
