@@ -383,4 +383,26 @@ public static class HrBusinessErrorCodes
     public const string HrOnboardingResolveRoleMissing = "HR_ONB_RESOLVE_ROLE_MISSING";
     public const string HrOnboardingTemplateHasNoTasks = "HR_ONB_TEMPLATE_HAS_NO_TASKS";
     public const string HrOnboardingTaskAlreadyReopened = "HR_ONB_TASK_ALREADY_REOPENED";
+
+    // Workflow Definition
+    public const string WorkflowDefinitionNotFound = "HR_WF_DEF_NOT_FOUND";
+    public const string WorkflowDefinitionNoSteps = "HR_WF_DEF_NO_STEPS";
+    public const string WorkflowDefinitionAlreadyActive = "HR_WF_DEF_ALREADY_ACTIVE";
+    public const string WorkflowDefinitionAlreadyInactive = "HR_WF_DEF_ALREADY_INACTIVE";
+    public const string WorkflowDefinitionActiveCannotUpdate = "HR_WF_DEF_ACTIVE_CANNOT_UPDATE";
+
+    // Workflow Instance
+    public const string WorkflowInstanceNotFound = "HR_WF_INSTANCE_NOT_FOUND";
+    public const string WorkflowInstanceInvalidStatus = "HR_WF_INSTANCE_INVALID_STATUS";
+    public const string WorkflowInstanceStepNotFound = "HR_WF_INSTANCE_STEP_NOT_FOUND";
+    public const string WorkflowInstanceAlreadyCompleted = "HR_WF_INSTANCE_ALREADY_COMPLETED";
+    public const string WorkflowInstanceNotApprover = "HR_WF_INSTANCE_NOT_APPROVER";
+
+    // Validation
+    public const string ValWorkflowDefinitionIdRequired = "VAL_WF_DEF_ID_REQUIRED";
+    public const string ValWorkflowInstanceIdRequired = "VAL_WF_INSTANCE_ID_REQUIRED";
+    public const string ValWorkflowCodeRequired = "VAL_WF_CODE_REQUIRED";
+    public const string ValWorkflowNameRequired = "VAL_WF_NAME_REQUIRED";
+    public const string ValWorkflowStepSequenceInvalid = "VAL_WF_STEP_SEQUENCE_INVALID";
+    public const string ValWorkflowApproverTypeRequired = "VAL_WF_APPROVER_TYPE_REQUIRED";
 }

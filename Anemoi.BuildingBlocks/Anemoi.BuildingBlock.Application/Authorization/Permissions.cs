@@ -131,6 +131,11 @@ public static class Permissions
     public const string HrOnboardingTaskComplete = "hr.onboarding.task.complete";
     public const string HrOnboardingTaskManage = "hr.onboarding.task.manage";
 
+    // Workflow permissions
+    public const string HrWorkflowView = "hr.workflow.view";
+    public const string HrWorkflowManage = "hr.workflow.manage";
+    public const string HrWorkflowExecute = "hr.workflow.execute";
+
     // Notification permissions
     public const string NotificationView = "notification.view";
     public const string NotificationManage = "notification.manage";
@@ -252,6 +257,9 @@ public static class Permissions
         new(HrOnboardingManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingManage"),
         new(HrOnboardingTaskComplete, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskComplete"),
         new(HrOnboardingTaskManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskManage"),
+        new(HrWorkflowView, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowView"),
+        new(HrWorkflowManage, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowManage"),
+        new(HrWorkflowExecute, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowExecute"),
         new(NotificationView, "PermissionGroupNotifications", "PermissionDescriptionNotificationView"),
         new(NotificationManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationManage"),
         new(NotificationPreferenceManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationPreferenceManage"),

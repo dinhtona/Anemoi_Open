@@ -37,6 +37,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<TaxationMapper>();
         services.AddScoped<InsuranceMapper>();
         services.AddScoped<EssMapper>();
+        services.AddScoped<WorkflowMapper>();
+        services.AddScoped<IUserRolePermissionService, UserRolePermissionService>();
         services.AddScoped<PayrollReportExportService>();
         services.AddScoped<IReportExporter, CsvReportExporter>();
         services.AddScoped<IPayslipDocumentStorage, LocalPayslipDocumentStorage>();

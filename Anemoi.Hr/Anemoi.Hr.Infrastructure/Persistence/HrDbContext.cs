@@ -15,6 +15,7 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.Domain.Onboarding;
+using Anemoi.Hr.Domain.Workflow;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
@@ -80,6 +81,11 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<HiringDecision> HiringDecisions { get; set; }
     public DbSet<OnboardingPlanTemplate> OnboardingPlanTemplates => Set<OnboardingPlanTemplate>();
     public DbSet<OnboardingInstance> OnboardingInstances => Set<OnboardingInstance>();
+    public DbSet<WorkflowDefinition> WorkflowDefinitions { get; set; }
+    public DbSet<WorkflowDefinitionStep> WorkflowDefinitionSteps { get; set; }
+    public DbSet<WorkflowInstance> WorkflowInstances { get; set; }
+    public DbSet<WorkflowInstanceStep> WorkflowInstanceSteps { get; set; }
+    public DbSet<WorkflowHistory> WorkflowHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

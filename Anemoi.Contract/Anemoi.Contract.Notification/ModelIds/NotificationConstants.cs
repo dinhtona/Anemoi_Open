@@ -15,6 +15,7 @@ public static class NotificationConstants
         public const string Overtime = "Overtime";
         public const string Payroll = "Payroll";
         public const string Recruitment = "Recruitment";
+        public const string Workflow = "Workflow";
 
         public static readonly HashSet<string> AllowedCategories = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -25,7 +26,8 @@ public static class NotificationConstants
             Leave,
             Overtime,
             Payroll,
-            Recruitment
+            Recruitment,
+            Workflow
         };
     }
 

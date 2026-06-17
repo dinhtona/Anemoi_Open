@@ -100,6 +100,10 @@ public static class HrPermissions
     public const string OnboardingTaskComplete = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingTaskComplete;
     public const string OnboardingTaskManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrOnboardingTaskManage;
 
+    public const string WorkflowView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowView;
+    public const string WorkflowManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowManage;
+    public const string WorkflowExecute = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowExecute;
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -195,6 +199,9 @@ public static class HrPermissions
         OnboardingManage,
         OnboardingTaskComplete,
         OnboardingTaskManage,
+        WorkflowView,
+        WorkflowManage,
+        WorkflowExecute,
         EssProfileView,
         EssLeaveView,
         EssLeaveRequest,
