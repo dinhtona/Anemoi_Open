@@ -33,7 +33,9 @@ public sealed class WorkflowDefinitionModelMapping : IEntityTypeConfiguration<Wo
         builder.HasIndex(x => x.Code).IsUnique();
         builder.HasIndex(x => x.WorkflowTypeCode);
         builder.HasIndex(x => x.IsActive);
-        builder.HasIndex(x => new { x.TargetEntityType, x.IsActive });
+        builder.HasIndex(x => x.TargetEntityType)
+            .IsUnique()
+            .HasFilter("\"IsActive\" = true");
 
         builder.HasMany(x => x.Steps)
             .WithOne()

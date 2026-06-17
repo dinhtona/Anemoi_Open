@@ -115,10 +115,10 @@ Anemoi.Hr/Anemoi.Hr.Test/
 
 ## Pre-Flight Checks (Read Before Implementing)
 
-### P1: No `IdGenerator` in Domain (TD-001)
-Domain entities must NOT generate IDs. If `WorkflowInstance.Approve()` currently uses `new WorkflowHistoryId(IdGenerator.NextGuid())`, verify whether TD-001 resolved this. If the existing codebase already passes IDs from application layer (check how other domain entities handle `HistoryId`), follow that pattern — the caller supplies the ID, the domain method receives it as a parameter.
+### P1: No `IdGenerator` in Domain (TD-001) — CHECKED
+**Pre-Flight result:** Existing `WorkflowInstance.Approve()` uses `Guid.NewGuid()`, NOT `IdGenerator`. The proposed `IdGenerator.NextGuid()` in the plan's Task 3 code sample must be changed to `Guid.NewGuid()` to match the existing pattern. Do NOT introduce `IdGenerator` into the Domain layer.
 
-If the existing `WorkflowInstance.Approve()` already uses `IdGenerator` and the codebase hasn't refactored this, leave it as-is for Phase 29 consistency. File a separate tech debt item.
+If `IdGenerator` is an application-layer helper (check `BuildingBlock.Application.Helpers`), keep it in Application services only — never in Domain entities.
 
 ### P2: No Exception-Based Control Flow in `WorkflowBuilder`
 `WorkflowBuilder.BuildAsync()` must NOT throw `InvalidOperationException` when a definition is required but not found. Use a return type instead:
@@ -380,7 +380,7 @@ public WorkflowHistory Reject(string performedBy, string? comment)
 }
 ```
 
-Add `using Anemoi.BuildingBlock.Application.Helpers;` for `IdGenerator`.
+**P1 Compliance:** Use `Guid.NewGuid()` directly — same as existing `WorkflowInstance.cs`. Do NOT add `using Anemoi.BuildingBlock.Application.Helpers` (keep domain free of application layer dependencies).
 
 - [ ] **Step 3: Verify build**
 
@@ -1092,7 +1092,7 @@ public sealed class OvertimeWorkflowStatusUpdater(
 
 - [ ] **Step 3: PayrollWorkflowStatusUpdater**
 
-**Note:** Verify `PayrollRun` has `Approve()` and `Reject()` methods. Current aggregate status flow: `Calculated` → `SubmittedForApproval` → `Approved` → `Finalized`. Workflow moves `SubmittedForApproval` → `Approved`. `Finalize()` is NOT part of workflow — handled separately.
+**Pre-Flight P3 confirmed:** `PayrollRun` has `Approve(string actor, DateTime now)` and `Reject(string actor, DateTime now, string reason)`. Current aggregate status flow: `Calculated` → `SubmittedForApproval` → `Approved` → `Finalized`. Workflow moves `SubmittedForApproval` → `Approved`. `Finalize()` is NOT part of workflow — handled separately.
 
 ```csharp
 using Anemoi.BuildingBlock.Application.Abstractions;
@@ -1117,7 +1117,7 @@ public sealed class PayrollWorkflowStatusUpdater(
         var payroll = await payrollRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (payroll is null) return;
-        payroll.Approve();
+        payroll.Approve(performedBy, DateTime.UtcNow);
     }
 
     public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
@@ -1126,7 +1126,7 @@ public sealed class PayrollWorkflowStatusUpdater(
         var payroll = await payrollRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (payroll is null) return;
-        payroll.Reject();
+        payroll.Reject(performedBy, DateTime.UtcNow, reason ?? string.Empty);
     }
 }
 ```
