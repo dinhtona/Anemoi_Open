@@ -9,6 +9,8 @@ namespace Anemoi.Hr.Test.Domain.Workflow;
 
 public sealed class WorkflowInstanceTests
 {
+    private static WorkflowHistoryId HistoryId() => new(Guid.NewGuid());
+
     private static (WorkflowInstance Instance, WorkflowInstanceId Id) CreatePendingInstance(int stepCount = 1)
     {
         var defId = new WorkflowDefinitionId(Guid.NewGuid());
@@ -52,7 +54,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.Status.Should().Be(WorkflowStatusCode.Approved);
         instance.CurrentStep.Should().Be(1);
@@ -65,7 +67,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(3);
 
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.Status.Should().Be(WorkflowStatusCode.Pending);
         instance.CurrentStep.Should().Be(2);
@@ -76,9 +78,9 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(3);
 
-        instance.Approve("user-1", null);
-        instance.Approve("user-1", null);
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.Status.Should().Be(WorkflowStatusCode.Approved);
         instance.CompletedAt.Should().NotBeNull();
@@ -90,7 +92,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(3);
 
-        instance.Reject("user-1", "Not approved");
+        instance.Reject(HistoryId(), "user-1", "Not approved");
 
         instance.Status.Should().Be(WorkflowStatusCode.Rejected);
         instance.CompletedAt.Should().NotBeNull();
@@ -102,7 +104,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        var history = instance.Reject("user-1", "Not good enough");
+        var history = instance.Reject(HistoryId(), "user-1", "Not good enough");
 
         history.Should().NotBeNull();
         history.Action.Should().Be("Reject");
@@ -115,7 +117,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(2);
 
-        instance.Cancel("requester-1");
+        instance.Cancel(HistoryId(), "requester-1");
 
         instance.Status.Should().Be(WorkflowStatusCode.Cancelled);
         instance.CompletedAt.Should().NotBeNull();
@@ -126,9 +128,9 @@ public sealed class WorkflowInstanceTests
     public void Cancel_AlreadyApproved_ShouldThrow()
     {
         var (instance, _) = CreatePendingInstance(1);
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
-        Action act = () => instance.Cancel("requester-1");
+        Action act = () => instance.Cancel(HistoryId(), "requester-1");
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -136,9 +138,9 @@ public sealed class WorkflowInstanceTests
     public void Cancel_AlreadyRejected_ShouldThrow()
     {
         var (instance, _) = CreatePendingInstance(1);
-        instance.Reject("user-1", null);
+        instance.Reject(HistoryId(), "user-1", null);
 
-        Action act = () => instance.Cancel("requester-1");
+        Action act = () => instance.Cancel(HistoryId(), "requester-1");
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -147,7 +149,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(2);
 
-        instance.ReturnForRevision("user-1", "Please revise");
+        instance.ReturnForRevision(HistoryId(), "user-1", "Please revise");
 
         instance.Status.Should().Be(WorkflowStatusCode.Returned);
         instance.CompletedAt.Should().NotBeNull();
@@ -158,7 +160,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(3);
 
-        instance.ReturnForRevision("user-1", "Please revise");
+        instance.ReturnForRevision(HistoryId(), "user-1", "Please revise");
 
         instance.Steps.Should().AllSatisfy(s => s.Status.Should().Be(WorkflowStepStatusCode.Cancelled));
     }
@@ -168,7 +170,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        var history = instance.Approve("user-1", "Looks good");
+        var history = instance.Approve(HistoryId(), "user-1", "Looks good");
 
         history.Should().NotBeNull();
         history.Action.Should().Be("Approve");
@@ -253,9 +255,9 @@ public sealed class WorkflowInstanceTests
     public void Approve_OnCompletedInstance_ShouldThrow()
     {
         var (instance, _) = CreatePendingInstance(1);
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
-        Action act = () => instance.Approve("user-1", null);
+        Action act = () => instance.Approve(HistoryId(), "user-1", null);
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -263,9 +265,9 @@ public sealed class WorkflowInstanceTests
     public void Reject_OnCompletedInstance_ShouldThrow()
     {
         var (instance, _) = CreatePendingInstance(1);
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
-        Action act = () => instance.Reject("user-1", null);
+        Action act = () => instance.Reject(HistoryId(), "user-1", null);
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -274,8 +276,8 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(2);
 
-        instance.Approve("user-1", "Step 1 ok");
-        instance.Approve("user-1", "Step 2 ok");
+        instance.Approve(HistoryId(), "user-1", "Step 1 ok");
+        instance.Approve(HistoryId(), "user-1", "Step 2 ok");
 
         instance.Histories.Should().HaveCount(2);
         instance.Histories.ElementAt(0).Action.Should().Be("Approve");
@@ -296,7 +298,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Approve("user-1", "Approved with conditions");
+        instance.Approve(HistoryId(), "user-1", "Approved with conditions");
 
         instance.Steps.First().Comment.Should().Be("Approved with conditions");
     }
@@ -306,7 +308,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Reject("user-1", "Missing documentation");
+        instance.Reject(HistoryId(), "user-1", "Missing documentation");
 
         instance.Steps.First().Comment.Should().Be("Missing documentation");
         instance.Steps.First().RejectedAt.Should().NotBeNull();
@@ -317,7 +319,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.Steps.First().ApprovedAt.Should().NotBeNull();
     }
@@ -327,7 +329,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.DomainEvents.Should().ContainSingle(e =>
             e is WorkflowInstanceApprovedDomainEvent);
@@ -342,7 +344,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(3);
 
-        instance.Approve("user-1", null);
+        instance.Approve(HistoryId(), "user-1", null);
 
         instance.DomainEvents.Should().BeEmpty();
     }
@@ -352,7 +354,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        instance.Reject("user-1", "Not approved");
+        instance.Reject(HistoryId(), "user-1", "Not approved");
 
         instance.DomainEvents.Should().ContainSingle(e =>
             e is WorkflowInstanceRejectedDomainEvent);

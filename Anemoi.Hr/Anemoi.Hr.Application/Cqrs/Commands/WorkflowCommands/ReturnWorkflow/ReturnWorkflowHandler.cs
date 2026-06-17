@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
@@ -36,7 +37,8 @@ public sealed class ReturnWorkflowHandler(
 
         try
         {
-            var history = instance.ReturnForRevision(request.PerformedBy, request.Comment);
+            var historyId = new WorkflowHistoryId(IdGenerator.NextGuid());
+            var history = instance.ReturnForRevision(historyId, request.PerformedBy, request.Comment);
 
             var historyCreateResult = await historyRepository.CreateOneAsync(history, cancellationToken);
             if (historyCreateResult.TryPickT1(out var exception, out _))

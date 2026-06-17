@@ -56,7 +56,8 @@ public sealed class WorkflowEngine(
             if (!instance.IsCurrentStepApprover(performedBy.Value.ToString(), _ => false, _ => false))
                 return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowInstanceNotApprover);
 
-            var history = instance.Approve(performedBy.Value.ToString(), comment);
+            var historyId = new WorkflowHistoryId(IdGenerator.NextGuid());
+            var history = instance.Approve(historyId, performedBy.Value.ToString(), comment);
             await historyRepository.CreateOneAsync(history, ct);
         }
         catch (InvalidOperationException)
@@ -80,7 +81,8 @@ public sealed class WorkflowEngine(
             if (!instance.IsCurrentStepApprover(performedBy.Value.ToString(), _ => false, _ => false))
                 return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowInstanceNotApprover);
 
-            var history = instance.Reject(performedBy.Value.ToString(), comment);
+            var historyId = new WorkflowHistoryId(IdGenerator.NextGuid());
+            var history = instance.Reject(historyId, performedBy.Value.ToString(), comment);
             await historyRepository.CreateOneAsync(history, ct);
         }
         catch (InvalidOperationException)
@@ -101,7 +103,8 @@ public sealed class WorkflowEngine(
 
         try
         {
-            var history = instance.Cancel(performedBy.Value.ToString());
+            var historyId = new WorkflowHistoryId(IdGenerator.NextGuid());
+            var history = instance.Cancel(historyId, performedBy.Value.ToString());
             await historyRepository.CreateOneAsync(history, ct);
         }
         catch (InvalidOperationException)
