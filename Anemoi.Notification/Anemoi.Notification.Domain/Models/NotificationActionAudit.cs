@@ -6,12 +6,12 @@ namespace Anemoi.Notification.Domain.Models;
 
 public sealed class NotificationActionAudit : Entity<NotificationActionAuditId>
 {
-    public NotificationHistoryId NotificationId { get; set; }
-    public NotificationActionId ActionId { get; set; }
-    public Guid ExecutedBy { get; set; }
-    public DateTime ExecutedAt { get; set; }
-    public bool Success { get; set; }
-    public string Result { get; set; }
-    public string ClientIp { get; set; }
-    public string UserAgent { get; set; }
+    public NotificationHistoryId NotificationId { get; init; }
+    public NotificationActionId ActionId { get; init; }
+    public Guid ExecutedBy { get; init; }
+    public DateTime ExecutedAt { get; init; }
+    public bool Success { get; init; }
+    public string Result { get; init; }
+    public string ClientIp { get; init; }
+    public string UserAgent { get; init; }
 }

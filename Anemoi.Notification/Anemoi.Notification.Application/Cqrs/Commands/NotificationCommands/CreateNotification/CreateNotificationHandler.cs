@@ -102,7 +102,6 @@ public sealed class CreateNotificationHandler(
                 Title = request.Title,
                 Content = request.Content,
                 Category = request.Category,
-                IsRead = false,
                 CreatedTime = DateTime.UtcNow,
                 TitleLocalizationKey = request.TitleLocalizationKey,
                 TitleLocalizationArgs = request.TitleLocalizationArgs == null ? null : new List<string>(request.TitleLocalizationArgs),

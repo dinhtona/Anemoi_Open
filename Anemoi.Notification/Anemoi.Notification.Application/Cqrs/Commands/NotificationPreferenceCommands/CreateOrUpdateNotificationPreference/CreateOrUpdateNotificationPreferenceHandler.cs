@@ -35,9 +35,7 @@ public sealed class CreateOrUpdateNotificationPreferenceHandler(
 
             if (existing != null)
             {
-                existing.EnableInApp = request.EnableInApp;
-                existing.EnableEmail = request.EnableEmail;
-                existing.UpdatedAt = DateTime.UtcNow;
+                existing.Update(request.EnableInApp, request.EnableEmail);
             }
             else
             {
@@ -45,11 +43,9 @@ public sealed class CreateOrUpdateNotificationPreferenceHandler(
                 {
                     Id = new NotificationPreferenceId(IdGenerator.NextGuid()),
                     UserId = userId,
-                    EnableInApp = request.EnableInApp,
-                    EnableEmail = request.EnableEmail,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow
                 };
+                preference.Update(request.EnableInApp, request.EnableEmail);
                 var createResult = await sqlRepository.CreateOneAsync(preference, cancellationToken);
                 var isFailed = createResult.Match(_ => false, _ => true);
                 if (isFailed)

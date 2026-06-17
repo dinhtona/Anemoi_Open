@@ -27,8 +27,7 @@ public sealed class MarkNotificationAsReadHandler(
             .WithCondition(_ => None.Value)
             .WithModify(history =>
             {
-                history.IsRead = true;
-                history.ReadTime = DateTime.UtcNow;
+                history.MarkAsRead();
             })
             .WithErrorIfNull(NotificationErrorDetail.NotificationError.NotFound())
             .WithErrorIfSaveChange(NotificationErrorDetail.NotificationError.UpdateFailed());

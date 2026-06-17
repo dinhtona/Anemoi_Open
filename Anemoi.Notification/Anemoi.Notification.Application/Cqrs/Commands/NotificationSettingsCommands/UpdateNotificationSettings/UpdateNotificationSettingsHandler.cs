@@ -40,19 +40,18 @@ public sealed class UpdateNotificationSettingsHandler(
                 var existing = existingSettings.FirstOrDefault(x => x.Category.Equals(setting.Category, StringComparison.OrdinalIgnoreCase));
                 if (existing != null)
                 {
-                    existing.IsEnabled = setting.IsEnabled;
-                    existing.UpdatedTime = DateTime.UtcNow;
+                    existing.SetEnabled(setting.IsEnabled);
                 }
                 else
                 {
-                    toCreate.Add(new NotificationSubscription
+                    var sub = new NotificationSubscription
                     {
                         Id = new NotificationSubscriptionId(IdGenerator.NextGuid()),
                         UserId = userGuid,
-                        Category = setting.Category,
-                        IsEnabled = setting.IsEnabled,
-                        UpdatedTime = DateTime.UtcNow
-                    });
+                        Category = setting.Category
+                    };
+                    sub.SetEnabled(setting.IsEnabled);
+                    toCreate.Add(sub);
                 }
             }
 

@@ -250,10 +250,11 @@ public class NotificationTests
 
         var notifications = new List<NotificationHistory>
         {
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, IsRead = false, CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, IsRead = true, CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = Guid.NewGuid(), IsRead = false, CreatedTime = DateTime.UtcNow }
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = Guid.NewGuid(), CreatedTime = DateTime.UtcNow }
         };
+        notifications[1].MarkAsRead();
 
         var repo = new FakeRepository<NotificationHistory>(notifications);
         var handler = new GetUnreadNotificationCountHandler(repo, Logger);
@@ -273,7 +274,6 @@ public class NotificationTests
         {
             Id = new NotificationHistoryId(notificationId),
             UserId = userId,
-            IsRead = false,
             CreatedTime = DateTime.UtcNow
         };
 
