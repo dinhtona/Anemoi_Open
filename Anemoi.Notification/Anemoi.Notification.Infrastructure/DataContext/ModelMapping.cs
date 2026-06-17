@@ -46,6 +46,9 @@ public sealed class ModelMapping :
             .IsUnique()
             .HasFilter("\"DeduplicationKey\" IS NOT NULL");
 
+        builder.Navigation(x => x.Actions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasMany(x => x.Actions)
             .WithOne(x => x.Notification)
             .HasForeignKey(x => x.NotificationId)

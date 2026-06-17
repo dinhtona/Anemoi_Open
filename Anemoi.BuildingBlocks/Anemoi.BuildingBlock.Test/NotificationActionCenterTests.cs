@@ -9,6 +9,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
 using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Centralize.Api.Controllers.Notification;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ArchiveAllReadNotifications;
@@ -237,20 +238,17 @@ public class NotificationActionCenterTests
         };
     }
 
-    private static NotificationAction CreateTestAction(NotificationHistoryId notificationId, string actionCode = "TestAction", string actionType = "Navigate")
+    private static NotificationAction CreateTestAction(NotificationHistory notification, string actionCode = "TestAction", string actionType = "Navigate")
     {
-        return new NotificationAction
-        {
-            Id = new NotificationActionId(Guid.NewGuid()),
-            NotificationId = notificationId,
-            ActionCode = actionCode,
-            ActionLabel = "Test Action",
-            ActionUrl = "/test",
-            ActionType = actionType,
-            RequiresConfirmation = false,
-            SortOrder = 0,
-            CreatedAt = DateTime.UtcNow
-        };
+        return notification.AddAction(
+            new NotificationActionId(IdGenerator.NextGuid()),
+            actionCode,
+            "Test Action",
+            actionType,
+            "/test",
+            false,
+            0
+        );
     }
 
     [Fact]
@@ -342,8 +340,7 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
-        var action = CreateTestAction(notification.Id);
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -369,8 +366,7 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
-        var action = CreateTestAction(notification.Id);
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -420,8 +416,7 @@ public class NotificationActionCenterTests
         var ownerId = Guid.NewGuid();
         var otherUserId = Guid.NewGuid();
         var notification = CreateTestNotification(ownerId);
-        var action = CreateTestAction(notification.Id);
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -443,8 +438,7 @@ public class NotificationActionCenterTests
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
         notification.Hide();
-        var action = CreateTestAction(notification.Id);
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -466,8 +460,7 @@ public class NotificationActionCenterTests
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
         notification.Archive(userId);
-        var action = CreateTestAction(notification.Id);
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -507,8 +500,7 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
-        var action = CreateTestAction(notification.Id, "NonExistentExecutor");
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification, "NonExistentExecutor");
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -529,8 +521,7 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
-        var action = CreateTestAction(notification.Id, "FailingAction");
-        notification.Actions.Add(action);
+        var action = CreateTestAction(notification, "FailingAction");
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
         var actionRepo = new FakeRepository<NotificationAction>([action]);
@@ -591,8 +582,7 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var history = CreateTestNotification(userId);
-        var action = CreateTestAction(history.Id);
-        history.Actions.Add(action);
+        var action = CreateTestAction(history);
 
         var response = Mapper.ToNotificationResponse(history);
 
@@ -633,7 +623,7 @@ public class NotificationActionCenterTests
     public async Task DefaultNotificationActionExecutor_ShouldReturnNavigateResult()
     {
         var notification = CreateTestNotification(Guid.NewGuid());
-        var action = CreateTestAction(notification.Id, "*", "Navigate");
+        var action = CreateTestAction(notification, "*", "Navigate");
         var executor = new DefaultNotificationActionExecutor();
 
         var result = await executor.ExecuteAsync(notification, action, CancellationToken.None);
@@ -649,7 +639,7 @@ public class NotificationActionCenterTests
     public async Task DefaultNotificationActionExecutor_ShouldReturnNullTargetForCommand()
     {
         var notification = CreateTestNotification(Guid.NewGuid());
-        var action = CreateTestAction(notification.Id, "*", "Command");
+        var action = CreateTestAction(notification, "*", "Command");
         var executor = new DefaultNotificationActionExecutor();
 
         var result = await executor.ExecuteAsync(notification, action, CancellationToken.None);
@@ -663,7 +653,7 @@ public class NotificationActionCenterTests
     public async Task LeaveApprovalNotificationExecutor_ShouldReturnLeaveRequestUrl()
     {
         var notification = CreateTestNotification(Guid.NewGuid(), aggregateId: "leave-request-123");
-        var action = CreateTestAction(notification.Id, "LeaveApproval", "Navigate");
+        var action = CreateTestAction(notification, "LeaveApproval", "Navigate");
         var executor = new LeaveApprovalNotificationExecutor();
 
         var result = await executor.ExecuteAsync(notification, action, CancellationToken.None);

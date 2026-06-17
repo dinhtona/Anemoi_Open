@@ -43,7 +43,34 @@ public sealed class NotificationHistory : Entity<NotificationHistoryId>
     public Guid? ArchivedBy { get; private set; }
 
     // Part 1: Notification actions
-    public ICollection<NotificationAction> Actions { get; init; } = new List<NotificationAction>();
+    private readonly List<NotificationAction> _actions = [];
+
+    public IReadOnlyCollection<NotificationAction> Actions => _actions.AsReadOnly();
+
+    public NotificationAction AddAction(
+        NotificationActionId id,
+        string actionCode,
+        string actionLabel,
+        string actionType,
+        string? actionUrl = null,
+        bool requiresConfirmation = false,
+        int sortOrder = 0)
+    {
+        var action = new NotificationAction
+        {
+            Id = id,
+            NotificationId = Id,
+            ActionCode = actionCode,
+            ActionLabel = actionLabel,
+            ActionUrl = actionUrl,
+            ActionType = actionType,
+            RequiresConfirmation = requiresConfirmation,
+            SortOrder = sortOrder,
+            CreatedAt = DateTime.UtcNow
+        };
+        _actions.Add(action);
+        return action;
+    }
 
     public void MarkAsRead()
     {
