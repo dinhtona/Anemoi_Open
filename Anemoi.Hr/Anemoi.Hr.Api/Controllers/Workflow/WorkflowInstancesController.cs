@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Cqrs.Commands.WorkflowCommands.ApproveWorkflowStep;
 using Anemoi.Hr.Application.Cqrs.Commands.WorkflowCommands.CancelWorkflow;
 using Anemoi.Hr.Application.Cqrs.Commands.WorkflowCommands.RejectWorkflowStep;
@@ -11,6 +12,7 @@ using Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetWorkflowInstances;
 using Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetPendingApprovals;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.ModelIds.ModelIds;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +24,9 @@ namespace Anemoi.Hr.Api.Controllers.Workflow;
 [Route("api/hr/workflows/[controller]/[action]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
-public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
+public sealed class WorkflowInstancesController(
+    ISender sender,
+    IWorkflowEngine workflowEngine) : ControllerBase
 {
     [HttpPost]
     [HasPermission(HrPermissions.WorkflowManage)]
@@ -35,7 +39,7 @@ public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowExecute)]
+    [HasPermission(HrPermissions.WorkflowApprove)]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> ApproveWorkflowStep(
         [FromBody] ApproveWorkflowStepCommand command, CancellationToken cancellationToken)
@@ -45,7 +49,7 @@ public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowExecute)]
+    [HasPermission(HrPermissions.WorkflowApprove)]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> RejectWorkflowStep(
         [FromBody] RejectWorkflowStepCommand command, CancellationToken cancellationToken)
@@ -55,7 +59,7 @@ public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowExecute)]
+    [HasPermission(HrPermissions.WorkflowApprove)]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelWorkflow(
         [FromBody] CancelWorkflowCommand command, CancellationToken cancellationToken)
@@ -65,7 +69,7 @@ public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowExecute)]
+    [HasPermission(HrPermissions.WorkflowApprove)]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReturnWorkflow(
         [FromBody] ReturnWorkflowCommand command, CancellationToken cancellationToken)
@@ -94,11 +98,22 @@ public sealed class WorkflowInstancesController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
-    [HasPermission(HrPermissions.WorkflowExecute)]
+    [HasPermission(HrPermissions.WorkflowApprove)]
     [ProducesResponseType(typeof(PaginationResponse<WorkflowInstanceResponse>), StatusCodes.Status200OK)]
     public async Task<PaginationResponse<WorkflowInstanceResponse>> GetPendingApprovals(
         [FromQuery] GetPendingApprovalsQuery query, CancellationToken cancellationToken)
     {
         return await sender.Send(query with { UserId = HttpContext.GetUserId() }, cancellationToken);
+    }
+
+    [HttpGet("{id}/approvers")]
+    [HasPermission(HrPermissions.WorkflowApprove)]
+    [ProducesResponseType(typeof(IReadOnlyList<string>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentApprovers(
+        [FromRoute] string id, CancellationToken cancellationToken)
+    {
+        var approvers = await workflowEngine.GetCurrentApproversAsync(
+            new WorkflowInstanceId(Guid.Parse(id)), cancellationToken);
+        return Ok(approvers.Select(a => a.Value.ToString()).ToList());
     }
 }

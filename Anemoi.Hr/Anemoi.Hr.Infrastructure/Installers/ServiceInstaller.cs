@@ -7,10 +7,14 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Services;
+using Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
+using Anemoi.Hr.Application.Cqrs.Events;
+using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.Infrastructure.Reporting;
 using Anemoi.Hr.Infrastructure.Services;
 using Anemoi.Hr.Domain;
 using Anemoi.Hr.Infrastructure.Persistence;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -57,6 +61,15 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ApproveLeaveRequestHandler>();
         services.AddScoped<CancelLeaveRequestHandler>();
         services.AddScoped<Anemoi.Hr.Application.Abstractions.IEmployeeGradeLookup, Anemoi.Hr.Application.Services.EmployeeGradeLookup>();
+        services.AddScoped<IWorkflowEngine, WorkflowEngine>();
+        services.AddScoped<IWorkflowHierarchyResolver, WorkflowHierarchyResolver>();
+        services.AddScoped<IWorkflowBuilder, WorkflowBuilder>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, LeaveWorkflowStatusUpdater>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, OvertimeWorkflowStatusUpdater>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, PayrollWorkflowStatusUpdater>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, RecruitmentWorkflowStatusUpdater>();
+        services.AddScoped<INotificationHandler<WorkflowInstanceApprovedDomainEvent>, WorkflowInstanceApprovedHandler>();
+        services.AddScoped<INotificationHandler<WorkflowInstanceRejectedDomainEvent>, WorkflowInstanceRejectedHandler>();
         services.AddEfRepositoriesAsScope<HrDbContext>(typeof(IHrDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<HrDbContext>();
     }

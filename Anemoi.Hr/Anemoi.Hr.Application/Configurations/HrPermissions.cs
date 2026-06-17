@@ -103,6 +103,7 @@ public static class HrPermissions
     public const string WorkflowView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowView;
     public const string WorkflowManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowManage;
     public const string WorkflowExecute = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowExecute;
+    public const string WorkflowApprove = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowApprove;
 
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
@@ -202,6 +203,7 @@ public static class HrPermissions
         WorkflowView,
         WorkflowManage,
         WorkflowExecute,
+        WorkflowApprove,
         EssProfileView,
         EssLeaveView,
         EssLeaveRequest,
@@ -248,7 +250,8 @@ public static class HrPermissions
             [RecruitmentRequestApprove] = new(RecruitmentRequestApprove, "High"),
             [RecruitmentRequestManage] = new(RecruitmentRequestManage, "High"),
             [OnboardingManage] = new(OnboardingManage, "High"),
-            [OnboardingTaskManage] = new(OnboardingTaskManage, "High")
+            [OnboardingTaskManage] = new(OnboardingTaskManage, "High"),
+            [WorkflowApprove] = new(WorkflowApprove, "High")
         };
 }
 

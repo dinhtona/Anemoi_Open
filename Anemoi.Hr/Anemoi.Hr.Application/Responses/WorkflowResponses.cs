@@ -2,7 +2,7 @@ namespace Anemoi.Hr.Application.Responses;
 
 public sealed record WorkflowDefinitionResponse(
     string Id, string Code, string Name, string? Description,
-    string WorkflowTypeCode, bool IsActive,
+    string WorkflowTypeCode, string TargetEntityType, int Version, bool IsActive,
     IReadOnlyCollection<WorkflowDefinitionStepResponse> Steps,
     DateTime CreatedAt, DateTime UpdatedAt);
 
@@ -11,9 +11,10 @@ public sealed record WorkflowDefinitionStepResponse(
     string ApproverType, string? ApproverValue, bool IsRequired);
 
 public sealed record WorkflowInstanceResponse(
-    string Id, string WorkflowDefinitionId, string WorkflowDefinitionName,
+    string Id, string? WorkflowDefinitionId, string WorkflowDefinitionName,
     string EntityType, string EntityId, int CurrentStep,
-    string Status, string StartedBy, DateTime StartedAt, DateTime? CompletedAt,
+    string Status, string StartedBy, string RequesterEmployeeId, string RequesterUserId,
+    DateTime StartedAt, DateTime? CompletedAt,
     IReadOnlyCollection<WorkflowInstanceStepResponse> Steps,
     IReadOnlyCollection<WorkflowHistoryResponse> Histories);
 
