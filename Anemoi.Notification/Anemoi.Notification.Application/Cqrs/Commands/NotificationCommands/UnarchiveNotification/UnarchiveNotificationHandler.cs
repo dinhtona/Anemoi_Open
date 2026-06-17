@@ -5,6 +5,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.UnarchiveNotification;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
@@ -26,10 +27,10 @@ public sealed class UnarchiveNotificationHandler(
     {
         try
         {
-            var userGuid = Guid.Parse(request.UserId);
+            var userId = new UserId(Guid.Parse(request.UserId));
             var notification = await sqlRepository
                 .GetFirstByConditionAsync(
-                    x => x.Id == request.Id && x.UserId == userGuid,
+                    x => x.Id == request.Id && x.UserId == userId,
                     token: cancellationToken);
 
             if (notification == null)

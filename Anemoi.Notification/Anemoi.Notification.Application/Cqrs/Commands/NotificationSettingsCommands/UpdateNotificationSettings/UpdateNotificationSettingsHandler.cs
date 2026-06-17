@@ -8,6 +8,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationSettingsCommands.UpdateNotificationSettings;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Contract.Notification.ModelIds;
@@ -29,9 +30,9 @@ public sealed class UpdateNotificationSettingsHandler(
     {
         try
         {
-            var userGuid = Guid.Parse(request.UserId);
+            var userId = new UserId(Guid.Parse(request.UserId));
             var existingSettings = await sqlRepository
-                .GetManyByConditionAsync(x => x.UserId == userGuid, token: cancellationToken);
+                .GetManyByConditionAsync(x => x.UserId == userId, token: cancellationToken);
 
             var toCreate = new List<NotificationSubscription>();
 
@@ -47,7 +48,7 @@ public sealed class UpdateNotificationSettingsHandler(
                     var sub = new NotificationSubscription
                     {
                         Id = new NotificationSubscriptionId(IdGenerator.NextGuid()),
-                        UserId = userGuid,
+                        UserId = userId,
                         Category = setting.Category
                     };
                     sub.SetEnabled(setting.IsEnabled);

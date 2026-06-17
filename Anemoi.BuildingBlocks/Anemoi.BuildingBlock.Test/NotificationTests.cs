@@ -17,6 +17,7 @@ using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAllAsRead;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAsRead;
 using Anemoi.Contract.Notification.Commands.NotificationSettingsCommands.UpdateNotificationSettings;
 using Anemoi.Contract.Notification.Constants;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetNotifications;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetUnreadNotificationCount;
@@ -146,7 +147,7 @@ public class NotificationTests
         var existingNotification = new NotificationHistory
         {
             Id = new NotificationHistoryId(Guid.NewGuid()),
-            UserId = targetUserId,
+            UserId = new UserId(targetUserId),
             Title = "Original T",
             Content = "Original C",
             Category = "System",
@@ -186,7 +187,7 @@ public class NotificationTests
     [Fact]
     public async Task CreateNotificationHandler_ShouldRecoverOnConcurrentException()
     {
-        var targetUserId = Guid.NewGuid();
+        var targetUserId = new UserId(Guid.NewGuid());
         var dupKey = "concurrent-dedup-key";
 
         var notificationsList = new List<NotificationHistory>();
@@ -224,9 +225,9 @@ public class NotificationTests
 
         var notifications = new List<NotificationHistory>
         {
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, Title = "T1", Content = "C1", Category = "System", CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, Title = "T2", Content = "C2", Category = "Workspace", CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = otherUserId, Title = "T3", Content = "C3", Category = "System", CreatedTime = DateTime.UtcNow }
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(targetUserId), Title = "T1", Content = "C1", Category = "System", CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(targetUserId), Title = "T2", Content = "C2", Category = "Workspace", CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(otherUserId), Title = "T3", Content = "C3", Category = "System", CreatedTime = DateTime.UtcNow }
         };
 
         var repo = new FakeRepository<NotificationHistory>(notifications);
@@ -250,9 +251,9 @@ public class NotificationTests
 
         var notifications = new List<NotificationHistory>
         {
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = targetUserId, CreatedTime = DateTime.UtcNow },
-            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = Guid.NewGuid(), CreatedTime = DateTime.UtcNow }
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(targetUserId), CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(targetUserId), CreatedTime = DateTime.UtcNow },
+            new() { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = new UserId(Guid.NewGuid()), CreatedTime = DateTime.UtcNow }
         };
         notifications[1].MarkAsRead();
 
@@ -273,7 +274,7 @@ public class NotificationTests
         var notification = new NotificationHistory
         {
             Id = new NotificationHistoryId(notificationId),
-            UserId = userId,
+            UserId = new UserId(userId),
             CreatedTime = DateTime.UtcNow
         };
 
@@ -310,11 +311,11 @@ public class NotificationTests
         Assert.True(result.IsT0);
         Assert.True(unitOfWork.SavedChanges);
         
-        var systemSubscription = await repo.GetFirstByConditionAsync(x => x.UserId == userId && x.Category == "System");
+        var systemSubscription = await repo.GetFirstByConditionAsync(x => x.UserId == new UserId(userId) && x.Category == "System");
         Assert.NotNull(systemSubscription);
         Assert.False(systemSubscription.IsEnabled);
 
-        var workspaceSubscription = await repo.GetFirstByConditionAsync(x => x.UserId == userId && x.Category == "Workspace");
+        var workspaceSubscription = await repo.GetFirstByConditionAsync(x => x.UserId == new UserId(userId) && x.Category == "Workspace");
         Assert.NotNull(workspaceSubscription);
         Assert.True(workspaceSubscription.IsEnabled);
     }
@@ -423,7 +424,7 @@ public class NotificationTests
         public Task<OneOf<None, Exception>> UpdateManyAsync(List<T> items, CancellationToken token = default) => throw new NotSupportedException();
     }
 
-    private sealed class FakeRepositoryWithConcurrentFallback<T>(List<T> initialItems, string dupKey, Guid targetUserId)
+    private sealed class FakeRepositoryWithConcurrentFallback<T>(List<T> initialItems, string dupKey, UserId targetUserId)
         : FakeRepository<T>(initialItems) where T : class
     {
         public override Task<T> GetFirstByConditionAsync(

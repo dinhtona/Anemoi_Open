@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ArchiveSelectedNotifications;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
@@ -27,17 +28,17 @@ public sealed class ArchiveSelectedNotificationsHandler(
     {
         try
         {
-            var userGuid = Guid.Parse(request.UserId);
+            var userId = new UserId(Guid.Parse(request.UserId));
             var ids = request.NotificationIds.Select(x => x.Value).ToList();
             var now = DateTime.UtcNow;
 
             await sqlRepository.GetQueryable()
-                .Where(x => x.UserId == userGuid && ids.Contains(x.Id.Value) && !x.IsArchived)
+                .Where(x => x.UserId == userId && ids.Contains(x.Id.Value) && !x.IsArchived)
                 .ExecuteUpdateAsync(
                     setters => setters
                         .SetProperty(x => x.IsArchived, true)
                         .SetProperty(x => x.ArchivedAt, now)
-                        .SetProperty(x => x.ArchivedBy, userGuid),
+                        .SetProperty(x => x.ArchivedBy, userId.Value),
                     cancellationToken);
 
             return None.Value;

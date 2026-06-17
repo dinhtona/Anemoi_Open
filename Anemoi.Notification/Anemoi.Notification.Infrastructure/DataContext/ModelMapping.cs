@@ -20,6 +20,8 @@ public sealed class ModelMapping :
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new NotificationHistoryId(id));
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.UserId)
+            .HasConversion(x => x.Value, id => new UserId(id));
         
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.WorkspaceId);
@@ -55,6 +57,8 @@ public sealed class ModelMapping :
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new NotificationSubscriptionId(id));
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.UserId)
+            .HasConversion(x => x.Value, id => new UserId(id));
         
         builder.HasIndex(x => new { x.UserId, x.Category }).IsUnique();
     }
@@ -95,6 +99,8 @@ public sealed class ModelMapping :
         builder.Property(x => x.Id)
             .HasConversion(x => x.Value, id => new NotificationActionAuditId(id));
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.ExecutedBy)
+            .HasConversion(x => x.Value, id => new UserId(id));
 
         builder.Property(x => x.NotificationId)
             .HasConversion(x => x.Value, id => new NotificationHistoryId(id));

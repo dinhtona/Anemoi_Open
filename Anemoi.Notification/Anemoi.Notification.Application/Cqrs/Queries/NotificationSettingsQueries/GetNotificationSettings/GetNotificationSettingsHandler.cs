@@ -1,18 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Queries.NotificationSettingsQueries.GetNotificationSettings;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Application.Mappings;
 using Anemoi.Notification.Domain.Models;
 using OneOf;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Anemoi.Notification.Application.Cqrs.Queries.NotificationSettingsQueries.GetNotificationSettings;
 
@@ -25,9 +26,9 @@ public sealed class GetNotificationSettingsHandler(
     protected override IQueryListFlowBuilder<NotificationSubscription, NotificationSettingResponse> BuildQueryFlow(
         IQueryListFilter<NotificationSubscription, NotificationSettingResponse> fromFlow, GetNotificationSettingsQuery query)
     {
-        var targetUserGuid = Guid.Parse(query.UserId);
+        var targetUserId = new UserId(Guid.Parse(query.UserId));
         return fromFlow
-            .WithFilter(x => x.UserId == targetUserGuid)
+            .WithFilter(x => x.UserId == targetUserId)
             .WithSpecialAction(a => a)
             .WithSortFieldWhenNotSet(a => a.Category)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);

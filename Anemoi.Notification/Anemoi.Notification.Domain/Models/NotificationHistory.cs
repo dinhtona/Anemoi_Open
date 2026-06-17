@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Anemoi.BuildingBlock.Domain;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Contract.Notification.Constants;
 
@@ -8,7 +9,7 @@ namespace Anemoi.Notification.Domain.Models;
 
 public sealed class NotificationHistory : Entity<NotificationHistoryId>
 {
-    public Guid UserId { get; init; }
+    public UserId UserId { get; init; }
     public Guid? WorkspaceId { get; init; }
     public string Title { get; init; }
     public string Content { get; init; }

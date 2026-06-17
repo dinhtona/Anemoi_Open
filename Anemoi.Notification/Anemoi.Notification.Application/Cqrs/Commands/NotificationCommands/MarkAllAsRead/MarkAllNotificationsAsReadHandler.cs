@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.MarkAllAsRead;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
@@ -26,11 +27,11 @@ public sealed class MarkAllNotificationsAsReadHandler(
     {
         try
         {
-            var userGuid = Guid.Parse(request.UserId);
+            var userId = new UserId(Guid.Parse(request.UserId));
             var now = DateTime.UtcNow;
 
             await sqlRepository.GetQueryable()
-                .Where(x => x.UserId == userGuid && !x.IsRead && !x.IsArchived)
+                .Where(x => x.UserId == userId && !x.IsRead && !x.IsArchived)
                 .ExecuteUpdateAsync(
                     setters => setters
                         .SetProperty(x => x.IsRead, true)

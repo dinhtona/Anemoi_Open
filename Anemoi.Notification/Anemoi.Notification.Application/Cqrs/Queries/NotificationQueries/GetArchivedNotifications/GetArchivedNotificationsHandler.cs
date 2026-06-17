@@ -8,6 +8,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetArchivedNotifications;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Application.Mappings;
@@ -26,8 +27,8 @@ public sealed class GetArchivedNotificationsHandler(
     protected override IQueryListFlowBuilder<NotificationHistory, NotificationResponse> BuildQueryFlow(
         IQueryListFilter<NotificationHistory, NotificationResponse> fromFlow, GetArchivedNotificationsQuery query)
     {
-        var targetUserGuid = Guid.Parse(query.UserId);
-        var filter = BuildFilterExpression(targetUserGuid, query);
+        var targetUserId = new UserId(Guid.Parse(query.UserId));
+        var filter = BuildFilterExpression(targetUserId, query);
 
         return fromFlow
             .WithFilter(filter)
@@ -37,7 +38,7 @@ public sealed class GetArchivedNotificationsHandler(
     }
 
     private static Expression<Func<NotificationHistory, bool>> BuildFilterExpression(
-        Guid userId, GetArchivedNotificationsQuery query)
+        UserId userId, GetArchivedNotificationsQuery query)
     {
         Expression<Func<NotificationHistory, bool>> filter = x =>
             x.UserId == userId && x.IsArchived;

@@ -10,6 +10,7 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
 using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Centralize.Api.Controllers.Notification;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ArchiveAllReadNotifications;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ArchiveNotification;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ArchiveSelectedNotifications;
@@ -224,7 +225,7 @@ public class NotificationActionCenterTests
         return new NotificationHistory
         {
             Id = new NotificationHistoryId(notificationId ?? Guid.NewGuid()),
-            UserId = userId,
+            UserId = new UserId(userId),
             Title = "Test Notification",
             Content = "Test Content",
             Category = "System",
@@ -388,7 +389,7 @@ public class NotificationActionCenterTests
         var audit = auditItems[0];
         Assert.Equal(notification.Id.Value, audit.NotificationId.Value);
         Assert.Equal(action.Id.Value, audit.ActionId.Value);
-        Assert.Equal(userId, audit.ExecutedBy);
+        Assert.Equal(new UserId(userId), audit.ExecutedBy);
         Assert.True(audit.Success);
         Assert.Equal("192.168.1.1", audit.ClientIp);
         Assert.Equal("Mozilla/5.0", audit.UserAgent);
@@ -547,7 +548,7 @@ public class NotificationActionCenterTests
         Assert.Single(auditItems);
         var audit = auditItems[0];
         Assert.False(audit.Success);
-        Assert.Equal(userId, audit.ExecutedBy);
+        Assert.Equal(new UserId(userId), audit.ExecutedBy);
     }
 
     [Fact]
@@ -609,7 +610,7 @@ public class NotificationActionCenterTests
         var history = new NotificationHistory
         {
             Id = new NotificationHistoryId(Guid.NewGuid()),
-            UserId = userId,
+            UserId = new UserId(userId),
             Title = "Test",
             Content = "Test",
             Category = "Leave",

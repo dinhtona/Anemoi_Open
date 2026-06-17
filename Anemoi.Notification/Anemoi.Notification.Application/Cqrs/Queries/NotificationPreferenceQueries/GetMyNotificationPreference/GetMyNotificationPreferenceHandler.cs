@@ -29,13 +29,12 @@ public sealed class GetMyNotificationPreferenceHandler(
         try
         {
             var userId = new UserId(Guid.Parse(request.UserId));
-            var userGuid = userId.Value;
 
             var preference = await preferenceRepository
                 .GetFirstByConditionAsync(x => x.UserId == userId, token: cancellationToken);
 
             var subscriptions = (await subscriptionRepository
-                .GetManyByConditionAsync(x => x.UserId == userGuid, token: cancellationToken))
+                .GetManyByConditionAsync(x => x.UserId == userId, token: cancellationToken))
                 .ToList();
 
             if (preference != null)

@@ -5,6 +5,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.HideNotification;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
@@ -28,7 +29,7 @@ public sealed class HideNotificationHandler(
         {
             var notification = await sqlRepository
                 .GetFirstByConditionAsync(
-                    x => x.Id == request.Id && x.UserId == Guid.Parse(request.UserId),
+                    x => x.Id == request.Id && x.UserId == new UserId(Guid.Parse(request.UserId)),
                     token: cancellationToken);
 
             if (notification == null)

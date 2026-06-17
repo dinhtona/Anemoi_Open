@@ -5,6 +5,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ExecuteNotificationAction;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Application.Services;
@@ -40,8 +41,8 @@ public sealed class ExecuteNotificationActionHandler(
             if (notification == null)
                 return NotificationErrorDetail.ActionError.NotificationNotFound().ToErrorDetailResponse();
 
-            var userGuid = Guid.Parse(request.UserId);
-            if (notification.UserId != userGuid)
+            var userId = new UserId(Guid.Parse(request.UserId));
+            if (notification.UserId != userId)
                 return NotificationErrorDetail.ActionError.OwnershipMismatch().ToErrorDetailResponse();
 
             if (notification.IsHidden)
@@ -72,7 +73,7 @@ public sealed class ExecuteNotificationActionHandler(
                         Id = new(Guid.NewGuid()),
                         NotificationId = request.NotificationId,
                         ActionId = request.ActionId,
-                        ExecutedBy = userGuid,
+                        ExecutedBy = userId,
                         ExecutedAt = DateTime.UtcNow,
                         Success = result.Success,
                         Result = result.Message,
@@ -103,7 +104,7 @@ public sealed class ExecuteNotificationActionHandler(
                         Id = new(Guid.NewGuid()),
                         NotificationId = request.NotificationId,
                         ActionId = request.ActionId,
-                        ExecutedBy = userGuid,
+                        ExecutedBy = userId,
                         ExecutedAt = DateTime.UtcNow,
                         Success = false,
                         Result = string.Join("; ", error.Messages ?? []),

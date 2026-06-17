@@ -60,7 +60,7 @@ public sealed class CreateNotificationHandler(
 
             // Check if user has disabled this category
             var subscription = await subscriptionRepository.GetFirstByConditionAsync(
-                x => x.UserId == userGuid && x.Category == request.Category,
+                x => x.UserId == new UserId(userGuid) && x.Category == request.Category,
                 token: cancellationToken);
 
             if (subscription != null && !subscription.IsEnabled)
@@ -83,7 +83,7 @@ public sealed class CreateNotificationHandler(
             if (!string.IsNullOrEmpty(request.DeduplicationKey))
             {
                 var existing = await sqlRepository.GetFirstByConditionAsync(
-                    x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                    x => x.UserId == new UserId(userGuid) && x.DeduplicationKey == request.DeduplicationKey,
                     token: cancellationToken);
 
                 if (existing != null)
@@ -97,7 +97,7 @@ public sealed class CreateNotificationHandler(
             var notification = new NotificationHistory
             {
                 Id = new NotificationHistoryId(IdGenerator.NextGuid()),
-                UserId = userGuid,
+                UserId = new UserId(userGuid),
                 WorkspaceId = request.WorkspaceId is { } ws ? Guid.Parse(ws) : null,
                 Title = request.Title,
                 Content = request.Content,
@@ -159,7 +159,7 @@ public sealed class CreateNotificationHandler(
                     if (!string.IsNullOrEmpty(request.DeduplicationKey))
                     {
                         var existing = await sqlRepository.GetFirstByConditionAsync(
-                            x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                            x => x.UserId == new UserId(userGuid) && x.DeduplicationKey == request.DeduplicationKey,
                             token: cancellationToken);
                         if (existing != null)
                         {
@@ -180,7 +180,7 @@ public sealed class CreateNotificationHandler(
                 {
                     var userGuid = Guid.Parse(request.UserId);
                     var existing = await sqlRepository.GetFirstByConditionAsync(
-                        x => x.UserId == userGuid && x.DeduplicationKey == request.DeduplicationKey,
+                        x => x.UserId == new UserId(userGuid) && x.DeduplicationKey == request.DeduplicationKey,
                         token: cancellationToken);
                     if (existing != null)
                     {

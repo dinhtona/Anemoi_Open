@@ -9,6 +9,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Queries.NotificationQueries.GetActionAudits;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Domain.Models;
@@ -58,7 +59,7 @@ public sealed class GetActionAuditsHandler(
                 Expression.AndAlso(filter.Body,
                     Expression.Equal(
                         Expression.Property(param, "ExecutedBy"),
-                        Expression.Constant(query.ExecutedBy.Value))),
+                        Expression.Constant(new UserId(query.ExecutedBy.Value)))),
                 param);
         }
 

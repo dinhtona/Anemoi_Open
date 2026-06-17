@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.HideAllReadNotifications;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Domain.Models;
@@ -27,11 +28,11 @@ public sealed class HideAllReadNotificationsHandler(
     {
         try
         {
-            var userGuid = Guid.Parse(request.UserId);
+            var userId = new UserId(Guid.Parse(request.UserId));
             var now = DateTime.UtcNow;
 
             await sqlRepository.GetQueryable()
-                .Where(x => x.UserId == userGuid && x.IsRead && !x.IsHidden)
+                .Where(x => x.UserId == userId && x.IsRead && !x.IsHidden)
                 .ExecuteUpdateAsync(
                     setters => setters
                         .SetProperty(x => x.IsHidden, true)
