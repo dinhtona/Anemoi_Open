@@ -21,7 +21,8 @@ public sealed class ModelMapping :
             .HasConversion(x => x.Value, id => new NotificationHistoryId(id));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.UserId)
-            .HasConversion(x => x.Value, id => new UserId(id));
+            .HasConversion(x => x.Value, id => new UserId(id))
+            .IsRequired();
         
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.WorkspaceId);
@@ -61,7 +62,8 @@ public sealed class ModelMapping :
             .HasConversion(x => x.Value, id => new NotificationSubscriptionId(id));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.UserId)
-            .HasConversion(x => x.Value, id => new UserId(id));
+            .HasConversion(x => x.Value, id => new UserId(id))
+            .IsRequired();
         
         builder.HasIndex(x => new { x.UserId, x.Category }).IsUnique();
     }
@@ -72,7 +74,8 @@ public sealed class ModelMapping :
             .HasConversion(x => x.Value, id => new NotificationPreferenceId(id));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.UserId)
-            .HasConversion(x => x.Value, id => new UserId(id));
+            .HasConversion(x => x.Value, id => new UserId(id))
+            .IsRequired();
         builder.HasIndex(x => x.UserId).IsUnique();
         builder.Property(x => x.EnableInApp).HasDefaultValue(true);
         builder.Property(x => x.EnableEmail).HasDefaultValue(true);
@@ -103,7 +106,8 @@ public sealed class ModelMapping :
             .HasConversion(x => x.Value, id => new NotificationActionAuditId(id));
         builder.HasKey(x => x.Id);
         builder.Property(x => x.ExecutedBy)
-            .HasConversion(x => x.Value, id => new UserId(id));
+            .HasConversion(x => x.Value, id => new UserId(id))
+            .IsRequired();
 
         builder.Property(x => x.NotificationId)
             .HasConversion(x => x.Value, id => new NotificationHistoryId(id));

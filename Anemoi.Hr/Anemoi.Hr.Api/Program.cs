@@ -1,5 +1,6 @@
 using System.Reflection;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
+using Anemoi.BuildingBlock.Infrastructure.GeneralMiddlewares;
 using Anemoi.Hr.Api.Services;
 using Anemoi.Hr.Infrastructure;
 using Anemoi.Hr.Infrastructure.SeedData;
@@ -73,6 +74,7 @@ builder.Host.ConfigureServices((context, services) =>
             }
         };
     });
+    services.AddLocalization();
     services.AddHostedService<MonthlyLeaveAccrualWorker>();
     services.AddHostedService<DepartmentTransferWorker>();
     services.AddHostedService<ContractExpirationWorker>();
@@ -91,6 +93,7 @@ app.UseRequestLocalization(localizationOptions);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();
 
 await Anemoi.BuildingBlock.Infrastructure.RunSqlMigration.MigrationDatabase.MigrationDatabaseAsync<Anemoi.Hr.Infrastructure.Persistence.HrDbContext>(app);
