@@ -384,6 +384,11 @@ public static class HrBusinessErrorCodes
     public const string HrOnboardingTemplateHasNoTasks = "HR_ONB_TEMPLATE_HAS_NO_TASKS";
     public const string HrOnboardingTaskAlreadyReopened = "HR_ONB_TASK_ALREADY_REOPENED";
 
+    // Workflow errors
+    public const string WorkflowDefinitionRequiresDefinition = "HR_WF_DEF_REQUIRES_DEFINITION";
+    public const string WorkflowHierarchyResolutionFailed = "HR_WF_HIERARCHY_RESOLUTION_FAILED";
+    public const string WorkflowUniqueActiveConstraint = "HR_WF_UNIQUE_ACTIVE_CONSTRAINT";
+
     // Workflow Definition
     public const string WorkflowDefinitionNotFound = "HR_WF_DEF_NOT_FOUND";
     public const string WorkflowDefinitionNoSteps = "HR_WF_DEF_NO_STEPS";
