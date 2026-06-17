@@ -12,7 +12,7 @@ namespace Anemoi.Notification.Application.Services;
 public sealed class LeaveNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => "Leave";
+    public string ActionCode => NotificationWorkflowConstants.TargetServices.Leave;
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ public sealed class LeaveNotificationExecutor(IRequestClient<NotificationActionC
         try
         {
             var cmd = new NotificationActionCommand(
-                "Leave", action.ActionCode, notification.AggregateId,
+                NotificationWorkflowConstants.TargetServices.Leave, action.ActionCode, notification.AggregateId,
                 notification.UserId.ToString(), null);
 
             var response = await requestClient.GetResponse<NotificationActionResult>(cmd, ct);
@@ -50,7 +50,7 @@ public sealed class LeaveNotificationExecutor(IRequestClient<NotificationActionC
 public sealed class OvertimeNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => "Overtime";
+    public string ActionCode => NotificationWorkflowConstants.TargetServices.Overtime;
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -64,7 +64,7 @@ public sealed class OvertimeNotificationExecutor(IRequestClient<NotificationActi
         try
         {
             var cmd = new NotificationActionCommand(
-                "Overtime", action.ActionCode, notification.AggregateId,
+                NotificationWorkflowConstants.TargetServices.Overtime, action.ActionCode, notification.AggregateId,
                 notification.UserId.ToString(), null);
 
             var response = await requestClient.GetResponse<NotificationActionResult>(cmd, cancellationToken);
@@ -82,7 +82,7 @@ public sealed class OvertimeNotificationExecutor(IRequestClient<NotificationActi
 public sealed class PayrollNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => "Payroll";
+    public string ActionCode => NotificationWorkflowConstants.TargetServices.Payroll;
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -96,7 +96,7 @@ public sealed class PayrollNotificationExecutor(IRequestClient<NotificationActio
         try
         {
             var cmd = new NotificationActionCommand(
-                "Payroll", action.ActionCode, notification.AggregateId,
+                NotificationWorkflowConstants.TargetServices.Payroll, action.ActionCode, notification.AggregateId,
                 notification.UserId.ToString(), null);
 
             var response = await requestClient.GetResponse<NotificationActionResult>(cmd, cancellationToken);
@@ -114,7 +114,7 @@ public sealed class PayrollNotificationExecutor(IRequestClient<NotificationActio
 public sealed class OnboardingNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => "Onboarding";
+    public string ActionCode => NotificationWorkflowConstants.TargetServices.Onboarding;
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -128,7 +128,7 @@ public sealed class OnboardingNotificationExecutor(IRequestClient<NotificationAc
         try
         {
             var cmd = new NotificationActionCommand(
-                "Onboarding", action.ActionCode, notification.AggregateId,
+                NotificationWorkflowConstants.TargetServices.Onboarding, action.ActionCode, notification.AggregateId,
                 notification.UserId.ToString(), null);
 
             var response = await requestClient.GetResponse<NotificationActionResult>(cmd, cancellationToken);
@@ -145,7 +145,7 @@ public sealed class OnboardingNotificationExecutor(IRequestClient<NotificationAc
 
 public sealed class RecruitmentNotificationExecutor : INotificationActionExecutor
 {
-    public string ActionCode => "Recruitment";
+    public string ActionCode => NotificationWorkflowConstants.TargetServices.Recruitment;
 
     public Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)

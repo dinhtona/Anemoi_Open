@@ -30,11 +30,11 @@ public sealed class NotificationActionCommandConsumer(
         {
             var result = cmd.TargetService switch
             {
-                "Leave" => await HandleLeaveAction(cmd),
-                "Overtime" => await HandleOvertimeAction(cmd),
-                "Payroll" => await HandlePayrollAction(cmd),
-                "Onboarding" => await HandleOnboardingAction(cmd),
-                "Recruitment" => new NotificationActionResult(true, "Navigating to recruitment request"),
+                NotificationWorkflowConstants.TargetServices.Leave => await HandleLeaveAction(cmd),
+                NotificationWorkflowConstants.TargetServices.Overtime => await HandleOvertimeAction(cmd),
+                NotificationWorkflowConstants.TargetServices.Payroll => await HandlePayrollAction(cmd),
+                NotificationWorkflowConstants.TargetServices.Onboarding => await HandleOnboardingAction(cmd),
+                NotificationWorkflowConstants.TargetServices.Recruitment => new NotificationActionResult(true, "Navigating to recruitment request"),
                 _ => new NotificationActionResult(false, $"Unknown target service: {cmd.TargetService}")
             };
 
@@ -56,13 +56,13 @@ public sealed class NotificationActionCommandConsumer(
 
         return cmd.ActionCode switch
         {
-            "ViewLeaveRequest" => new NotificationActionResult(true, "Navigating to leave request"),
-            "ApproveLeaveRequest" => await SendVoid(
+            NotificationWorkflowConstants.ActionCodes.ViewLeaveRequest => new NotificationActionResult(true, "Navigating to leave request"),
+            NotificationWorkflowConstants.ActionCodes.ApproveLeaveRequest => await SendVoid(
                 new ApproveLeaveRequestCommand(
                     new LeaveRequestId(leaveRequestId),
                     new EmployeeId(employeeId),
                     cmd.Comment ?? "")),
-            "RejectLeaveRequest" => await SendVoid(
+            NotificationWorkflowConstants.ActionCodes.RejectLeaveRequest => await SendVoid(
                 new RejectLeaveRequestCommand(
                     new LeaveRequestId(leaveRequestId),
                     new EmployeeId(employeeId),
@@ -78,12 +78,12 @@ public sealed class NotificationActionCommandConsumer(
 
         return cmd.ActionCode switch
         {
-            "ViewOvertimeRequest" => new NotificationActionResult(true, "Navigating to overtime request"),
-            "ApproveOvertimeRequest" => await SendResult(
+            NotificationWorkflowConstants.ActionCodes.ViewOvertimeRequest => new NotificationActionResult(true, "Navigating to overtime request"),
+            NotificationWorkflowConstants.ActionCodes.ApproveOvertimeRequest => await SendResult(
                 new ApproveOvertimeRequestCommand(
                     new OvertimeRequestId(overtimeId),
                     cmd.UserId)),
-            "RejectOvertimeRequest" => await SendResult(
+            NotificationWorkflowConstants.ActionCodes.RejectOvertimeRequest => await SendResult(
                 new RejectOvertimeRequestCommand(
                     new OvertimeRequestId(overtimeId),
                     cmd.UserId,
@@ -105,9 +105,9 @@ public sealed class NotificationActionCommandConsumer(
 
         return cmd.ActionCode switch
         {
-            "ViewPayrollRun" => new NotificationActionResult(true, "Navigating to payroll run"),
-            "ApprovePayrollRun" => await SendResult<PayrollRunDetailResponse>(approveCmd),
-            "RejectPayrollRun" => await SendResult<PayrollRunDetailResponse>(rejectCmd),
+            NotificationWorkflowConstants.ActionCodes.ViewPayrollRun => new NotificationActionResult(true, "Navigating to payroll run"),
+            NotificationWorkflowConstants.ActionCodes.ApprovePayrollRun => await SendResult<PayrollRunDetailResponse>(approveCmd),
+            NotificationWorkflowConstants.ActionCodes.RejectPayrollRun => await SendResult<PayrollRunDetailResponse>(rejectCmd),
             _ => new NotificationActionResult(false, $"Unknown payroll action: {cmd.ActionCode}")
         };
     }
@@ -124,8 +124,8 @@ public sealed class NotificationActionCommandConsumer(
 
         return cmd.ActionCode switch
         {
-            "ViewOnboardingTask" => new NotificationActionResult(true, "Navigating to onboarding task"),
-            "CompleteOnboardingTask" => await SendResult<OnboardingInstanceResponse>(completeCmd),
+            NotificationWorkflowConstants.ActionCodes.ViewOnboardingTask => new NotificationActionResult(true, "Navigating to onboarding task"),
+            NotificationWorkflowConstants.ActionCodes.CompleteOnboardingTask => await SendResult<OnboardingInstanceResponse>(completeCmd),
             _ => new NotificationActionResult(false, $"Unknown onboarding action: {cmd.ActionCode}"
             )
         };
