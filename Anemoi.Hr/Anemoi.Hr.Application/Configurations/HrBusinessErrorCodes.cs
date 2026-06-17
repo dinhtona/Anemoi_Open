@@ -286,6 +286,13 @@ public static class HrBusinessErrorCodes
     public const string RequisitionHeadcountInvalid = "HR_REC_REQUISITION_HEADCOUNT_INVALID";
     public const string RequisitionDateRangeInvalid = "HR_REC_REQUISITION_DATE_RANGE_INVALID";
     public const string RequisitionConcurrencyConflict = "HR_REC_REQUISITION_CONCURRENCY_CONFLICT";
+    public const string RecruitmentRequestNotFound = "HR_REC_REQUEST_NOT_FOUND";
+    public const string RecruitmentRequestInvalidStatus = "HR_REC_REQUEST_INVALID_STATUS";
+    public const string RecruitmentRequestHeadcountInvalid = "HR_REC_REQUEST_HEADCOUNT_INVALID";
+    public const string RecruitmentRequestAlreadySubmitted = "HR_REC_REQUEST_ALREADY_SUBMITTED";
+    public const string RecruitmentRequestNotApproved = "HR_REC_REQUEST_NOT_APPROVED";
+    public const string RecruitmentOpeningNotFound = "HR_REC_OPENING_NOT_FOUND";
+    public const string RecruitmentOpeningExceedsPlanned = "HR_REC_OPENING_EXCEEDS_PLANNED";
 
     public const string JobPostingNotFound = "HR_REC_POSTING_NOT_FOUND";
     public const string JobPostingInvalidStatus = "HR_REC_POSTING_INVALID_STATUS";
@@ -344,6 +351,11 @@ public static class HrBusinessErrorCodes
     public const string ValApplicationIdRequired = "VAL_APPLICATION_ID_REQUIRED";
     public const string ValInterviewIdRequired = "VAL_INTERVIEW_ID_REQUIRED";
     public const string ValHiringDecisionIdRequired = "VAL_HIRING_DECISION_ID_REQUIRED";
+    public const string ValRecruitmentRequestIdRequired = "VAL_RECRUITMENT_REQUEST_ID_REQUIRED";
+    public const string ValRecruitmentRequestDepartmentRequired = "VAL_RECRUITMENT_REQUEST_DEPARTMENT_REQUIRED";
+    public const string ValRecruitmentRequestPositionRequired = "VAL_RECRUITMENT_REQUEST_POSITION_REQUIRED";
+    public const string ValRecruitmentRequestHeadcountPositive = "VAL_RECRUITMENT_REQUEST_HEADCOUNT_POSITIVE";
+    public const string ValRecruitmentRequestPriorityRequired = "VAL_RECRUITMENT_REQUEST_PRIORITY_REQUIRED";
 
     // Validation error codes (Onboarding)
     public const string ValTemplateIdRequired = "VAL_TEMPLATE_ID_REQUIRED";

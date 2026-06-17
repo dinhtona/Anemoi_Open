@@ -119,6 +119,11 @@ public static class Permissions
     public const string HrRecruitmentInterview = "hr.recruitment.interview";
     public const string HrRecruitmentHire = "hr.recruitment.hire";
     public const string HrRecruitmentAnalytics = "hr.recruitment.analytics";
+    public const string HrRecruitmentRequestView = "hr.recruitment.request.view";
+    public const string HrRecruitmentRequestCreate = "hr.recruitment.request.create";
+    public const string HrRecruitmentRequestSubmit = "hr.recruitment.request.submit";
+    public const string HrRecruitmentRequestApprove = "hr.recruitment.request.approve";
+    public const string HrRecruitmentRequestManage = "hr.recruitment.request.manage";
 
     // Onboarding permissions
     public const string HrOnboardingView = "hr.onboarding.view";
@@ -238,6 +243,11 @@ public static class Permissions
         new(HrRecruitmentInterview, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentInterview"),
         new(HrRecruitmentHire, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentHire"),
         new(HrRecruitmentAnalytics, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentAnalytics"),
+        new(HrRecruitmentRequestView, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentRequestView"),
+        new(HrRecruitmentRequestCreate, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentRequestCreate"),
+        new(HrRecruitmentRequestSubmit, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentRequestSubmit"),
+        new(HrRecruitmentRequestApprove, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentRequestApprove"),
+        new(HrRecruitmentRequestManage, "PermissionGroupHrRecruitment", "PermissionDescriptionHrRecruitmentRequestManage"),
         new(HrOnboardingView, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingView"),
         new(HrOnboardingManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingManage"),
         new(HrOnboardingTaskComplete, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskComplete"),

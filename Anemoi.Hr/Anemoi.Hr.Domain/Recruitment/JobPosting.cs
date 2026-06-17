@@ -9,6 +9,7 @@ public sealed class JobPosting : ValueObject
 {
     public JobPostingId Id { get; set; }
     public JobRequisitionId JobRequisitionId { get; set; }
+    public RecruitmentOpeningId? RecruitmentOpeningId { get; set; }
     public string PostingTitle { get; set; }
     public string PostingDescription { get; set; }
     public DateOnly PublishDate { get; set; }
@@ -27,6 +28,7 @@ public sealed class JobPosting : ValueObject
 
     // Navigation
     public JobRequisition JobRequisition { get; set; }
+    public RecruitmentOpening RecruitmentOpening { get; set; }
 
     public bool UpdateDetails(string title, string description, DateOnly publishDate, DateOnly expiryDate)
     {

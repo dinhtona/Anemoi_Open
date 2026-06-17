@@ -16,7 +16,10 @@ public sealed class RecruitmentModelMapping :
     IEntityTypeConfiguration<CandidateApplicationStageHistory>,
     IEntityTypeConfiguration<InterviewSchedule>,
     IEntityTypeConfiguration<InterviewFeedback>,
-    IEntityTypeConfiguration<HiringDecision>
+    IEntityTypeConfiguration<HiringDecision>,
+    IEntityTypeConfiguration<RecruitmentRequest>,
+    IEntityTypeConfiguration<RecruitmentRequestHistory>,
+    IEntityTypeConfiguration<RecruitmentOpening>
 {
     public void Configure(EntityTypeBuilder<JobRequisition> builder)
     {
@@ -111,6 +114,15 @@ public sealed class RecruitmentModelMapping :
             .WithMany()
             .HasForeignKey(x => x.JobRequisitionId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(x => x.RecruitmentOpeningId)
+            .HasConversion(x => x.Value, id => new RecruitmentOpeningId(id))
+            .IsRequired(false);
+
+        builder.HasOne(x => x.RecruitmentOpening)
+            .WithMany()
+            .HasForeignKey(x => x.RecruitmentOpeningId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // Index on JobRequisitionId for lookups
         builder.HasIndex(x => x.JobRequisitionId);
@@ -363,5 +375,103 @@ public sealed class RecruitmentModelMapping :
         builder.Property<uint>("xmin")
             .HasColumnName("xmin")
             .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<RecruitmentRequest> builder)
+    {
+        builder.ToTable("RecruitmentRequests");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new RecruitmentRequestId(id));
+        builder.Property(x => x.RequestNumber).HasMaxLength(32).IsRequired();
+        builder.Property(x => x.RequestedHeadcount).IsRequired();
+        builder.Property(x => x.Reason).HasMaxLength(2000);
+        builder.Property(x => x.PriorityCode).HasMaxLength(32).IsRequired();
+        builder.Property(x => x.RequestedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.RequestedAt).IsRequired();
+        builder.Property(x => x.Status).HasMaxLength(32).IsRequired();
+        builder.Property(x => x.ApprovedBy).HasMaxLength(128);
+        builder.Property(x => x.RejectedBy).HasMaxLength(128);
+        builder.Property(x => x.Comment).HasMaxLength(2000);
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.UpdatedAt).IsRequired();
+
+        builder.Property(x => x.DepartmentId)
+            .HasConversion(x => x.Value, id => new DepartmentId(id))
+            .IsRequired();
+        builder.Property(x => x.PositionId)
+            .HasConversion(x => x.Value, id => new PositionId(id))
+            .IsRequired();
+
+        builder.HasOne(x => x.Department)
+            .WithMany()
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.Position)
+            .WithMany()
+            .HasForeignKey(x => x.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.Histories)
+            .WithOne(x => x.RecruitmentRequest)
+            .HasForeignKey(x => x.RecruitmentRequestId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.RequestNumber).IsUnique();
+        builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => x.DepartmentId);
+        builder.HasIndex(x => x.PositionId);
+        builder.HasIndex(x => x.RequestedAt);
+
+        builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<RecruitmentRequestHistory> builder)
+    {
+        builder.ToTable("RecruitmentRequestHistories");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new RecruitmentRequestHistoryId(id));
+        builder.Property(x => x.ActionCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.OldStatus).HasMaxLength(32);
+        builder.Property(x => x.NewStatus).HasMaxLength(32).IsRequired();
+        builder.Property(x => x.Comment).HasMaxLength(2000);
+        builder.Property(x => x.PerformedBy).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.PerformedAt).IsRequired();
+
+        builder.Property(x => x.RecruitmentRequestId)
+            .HasConversion(x => x.Value, id => new RecruitmentRequestId(id))
+            .IsRequired();
+
+        builder.HasIndex(x => x.RecruitmentRequestId);
+        builder.HasIndex(x => x.PerformedAt);
+    }
+
+    public void Configure(EntityTypeBuilder<RecruitmentOpening> builder)
+    {
+        builder.ToTable("RecruitmentOpenings");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new RecruitmentOpeningId(id));
+        builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.PlannedHeadcount).IsRequired();
+        builder.Property(x => x.FilledHeadcount).IsRequired();
+        builder.Property(x => x.Status).HasMaxLength(32).IsRequired();
+        builder.Property(x => x.OpenedAt).IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.UpdatedAt).IsRequired();
+
+        builder.Property(x => x.RecruitmentRequestId)
+            .HasConversion(x => x.Value, id => new RecruitmentRequestId(id))
+            .IsRequired();
+
+        builder.HasOne(x => x.RecruitmentRequest)
+            .WithMany()
+            .HasForeignKey(x => x.RecruitmentRequestId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.RecruitmentRequestId);
+
+        builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
     }
 }

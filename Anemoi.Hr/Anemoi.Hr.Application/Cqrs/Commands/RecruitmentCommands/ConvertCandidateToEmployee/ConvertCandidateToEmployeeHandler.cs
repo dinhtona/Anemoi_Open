@@ -22,6 +22,7 @@ public sealed class ConvertCandidateToEmployeeHandler(
     ISqlRepository<CandidateApplication> applicationRepository,
     ISqlRepository<HiringDecision> decisionRepository,
     ISqlRepository<Employee> employeeRepository,
+    ISqlRepository<RecruitmentOpening> openingRepository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<ConvertCandidateToEmployeeCommand, OneOf<CandidateConversionResponse, ErrorDetailResponse>>
 {
@@ -64,9 +65,11 @@ public sealed class ConvertCandidateToEmployeeHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.ConversionRequiresHireDecision);
 
         // Verify application is in Hired stage
-        var application = await applicationRepository.GetFirstByConditionAsync(
-            x => x.CandidateId == request.CandidateId && x.CurrentStage == CandidateApplicationStageCode.Hired,
-            token: cancellationToken);
+        var application = await applicationRepository.GetQueryable()
+            .Include(a => a.JobPosting)
+            .FirstOrDefaultAsync(
+                x => x.CandidateId == request.CandidateId && x.CurrentStage == CandidateApplicationStageCode.Hired,
+                cancellationToken);
         if (application is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ConversionRequiresHiredStage);
 
@@ -96,6 +99,17 @@ public sealed class ConvertCandidateToEmployeeHandler(
 
         // Link candidate to employee
         candidate.LinkEmployee(employeeId, request.ConvertedBy, now);
+
+        // Sync RecruitmentOpening FilledHeadcount
+        if (application?.JobPosting?.RecruitmentOpeningId is not null)
+        {
+            var opening = await openingRepository.GetFirstByConditionAsync(
+                x => x.Id == application.JobPosting.RecruitmentOpeningId, token: cancellationToken);
+            if (opening is not null)
+            {
+                opening.MarkFilled(1);
+            }
+        }
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.TryPickT1(out var saveException, out _))

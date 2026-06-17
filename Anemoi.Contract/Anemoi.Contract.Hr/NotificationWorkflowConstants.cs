@@ -31,5 +31,8 @@ public static class NotificationWorkflowConstants
         // Onboarding
         public const string ViewOnboardingTask = "ViewOnboardingTask";
         public const string CompleteOnboardingTask = "CompleteOnboardingTask";
+
+        // Recruitment
+        public const string ViewRecruitmentRequest = "ViewRecruitmentRequest";
     }
 }

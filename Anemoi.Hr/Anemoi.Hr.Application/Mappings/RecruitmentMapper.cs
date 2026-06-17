@@ -239,4 +239,80 @@ public sealed class RecruitmentMapper
         if (decisions is null) return [];
         return decisions.Select(ToResponse).ToList();
     }
+
+    public RecruitmentRequestResponse ToResponse(RecruitmentRequest req)
+    {
+        if (req is null) return null;
+        return new RecruitmentRequestResponse(
+            Id: req.Id.Value.ToString(),
+            RequestNumber: req.RequestNumber,
+            DepartmentId: req.DepartmentId.Value.ToString(),
+            DepartmentName: req.Department?.Name,
+            PositionId: req.PositionId.Value.ToString(),
+            PositionName: req.Position?.Name,
+            RequestedHeadcount: req.RequestedHeadcount,
+            Reason: req.Reason,
+            PriorityCode: req.PriorityCode,
+            RequestedBy: req.RequestedBy,
+            RequestedAt: req.RequestedAt,
+            Status: req.Status,
+            ApprovedBy: req.ApprovedBy,
+            ApprovedAt: req.ApprovedAt,
+            RejectedBy: req.RejectedBy,
+            RejectedAt: req.RejectedAt,
+            Comment: req.Comment,
+            CreatedAt: req.CreatedAt,
+            UpdatedAt: req.UpdatedAt
+        );
+    }
+
+    public IReadOnlyCollection<RecruitmentRequestResponse> ToResponses(IEnumerable<RecruitmentRequest> reqs)
+    {
+        if (reqs is null) return [];
+        return reqs.Select(ToResponse).ToList();
+    }
+
+    public RecruitmentRequestHistoryResponse ToResponse(RecruitmentRequestHistory h)
+    {
+        if (h is null) return null;
+        return new RecruitmentRequestHistoryResponse(
+            Id: h.Id.Value.ToString(),
+            RecruitmentRequestId: h.RecruitmentRequestId.Value.ToString(),
+            ActionCode: h.ActionCode,
+            OldStatus: h.OldStatus,
+            NewStatus: h.NewStatus,
+            Comment: h.Comment,
+            PerformedBy: h.PerformedBy,
+            PerformedAt: h.PerformedAt
+        );
+    }
+
+    public IReadOnlyCollection<RecruitmentRequestHistoryResponse> ToHistoryResponses(
+        IEnumerable<RecruitmentRequestHistory> history)
+    {
+        if (history is null) return [];
+        return history.Select(ToResponse).ToList();
+    }
+
+    public RecruitmentOpeningResponse ToResponse(RecruitmentOpening opening)
+    {
+        if (opening is null) return null;
+        return new RecruitmentOpeningResponse(
+            Id: opening.Id.Value.ToString(),
+            RecruitmentRequestId: opening.RecruitmentRequestId.Value.ToString(),
+            Code: opening.Code,
+            PlannedHeadcount: opening.PlannedHeadcount,
+            FilledHeadcount: opening.FilledHeadcount,
+            RemainingHeadcount: opening.RemainingHeadcount,
+            Status: opening.Status,
+            OpenedAt: opening.OpenedAt
+        );
+    }
+
+    public IReadOnlyCollection<RecruitmentOpeningResponse> ToOpeningResponses(
+        IEnumerable<RecruitmentOpening> openings)
+    {
+        if (openings is null) return [];
+        return openings.Select(ToResponse).ToList();
+    }
 }

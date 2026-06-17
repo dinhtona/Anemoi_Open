@@ -4,6 +4,7 @@ using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetApplicationsBySta
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetCandidateSourceEffectiveness;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetHiringByDepartment;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentAnalyticsDashboard;
+using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentDashboardWidgets;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentOverview;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetTimeToHire;
 using Anemoi.Hr.Application.Responses;
@@ -82,5 +83,14 @@ public sealed class RecruitmentAnalyticsController(ISender sender) : ControllerB
         CancellationToken cancellationToken)
     {
         return await sender.Send(new GetRecruitmentAnalyticsDashboardQuery(fromDate, toDate), cancellationToken);
+    }
+
+    [HttpGet("widgets")]
+    [HasPermission(HrPermissions.RecruitmentAnalytics)]
+    [ProducesResponseType(typeof(RecruitmentDashboardWidgetsResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDashboardWidgets(CancellationToken cancellationToken)
+    {
+        var res = await sender.Send(new GetRecruitmentDashboardWidgetsQuery(), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }
