@@ -24,6 +24,18 @@ public sealed class LeaveRequest : ValueObject
     public LeavePolicy LeavePolicy { get; set; }
     public List<LeaveTransaction> LeaveTransactions { get; set; } = [];
 
+    public void MarkWorkflowApproved(string approverId)
+    {
+        StatusCode = LeaveRequestStatusCode.Approved;
+        ApproverEmployeeId = new EmployeeId(Guid.Parse(approverId));
+    }
+
+    public void MarkWorkflowRejected(string approverId, string? reason)
+    {
+        StatusCode = LeaveRequestStatusCode.Rejected;
+        ApproverEmployeeId = new EmployeeId(Guid.Parse(approverId));
+    }
+
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Id;
