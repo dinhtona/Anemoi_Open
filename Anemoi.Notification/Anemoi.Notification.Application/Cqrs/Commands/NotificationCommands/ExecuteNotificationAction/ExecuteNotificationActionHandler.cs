@@ -21,7 +21,6 @@ namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.Exe
 
 public sealed class ExecuteNotificationActionHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
-    ISqlRepository<NotificationAction> actionRepository,
     ISqlRepository<NotificationActionAudit> auditRepository,
     INotificationActionExecutorResolver executorResolver,
     IUnitOfWork unitOfWork,
@@ -53,10 +52,7 @@ public sealed class ExecuteNotificationActionHandler(
             if (notification.IsArchived)
                 return NotificationErrorDetail.ActionError.NotificationArchived().ToErrorDetailResponse();
 
-            var action = await actionRepository
-                .GetFirstByConditionAsync(
-                    x => x.Id == request.ActionId && x.NotificationId == request.NotificationId,
-                    token: cancellationToken);
+            var action = notification.Actions.FirstOrDefault(a => a.Id == request.ActionId);
 
             if (action == null)
                 return NotificationErrorDetail.ActionError.ActionNotFound().ToErrorDetailResponse();

@@ -43,6 +43,7 @@ public sealed class ModelMapping :
                 v => string.IsNullOrEmpty(v) ? null : JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null))
             .HasColumnType("text");
 
+        builder.HasIndex(x => x.CorrelationId);
         builder.HasIndex(x => new { x.UserId, x.DeduplicationKey })
             .IsUnique()
             .HasFilter("\"DeduplicationKey\" IS NOT NULL");

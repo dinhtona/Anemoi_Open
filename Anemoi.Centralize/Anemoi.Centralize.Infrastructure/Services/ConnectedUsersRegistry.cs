@@ -24,6 +24,12 @@ public sealed class ConnectedUsersRegistry : IConnectedUsersRegistry
 
     public IReadOnlyCollection<string> GetActiveUserIds()
     {
-        return _connectedUsers.Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key).ToList();
+        var entries = _connectedUsers.ToArray();
+        foreach (var kvp in entries)
+        {
+            if (kvp.Value <= 0)
+                _connectedUsers.TryRemove(kvp.Key, out _);
+        }
+        return entries.Where(kvp => kvp.Value > 0).Select(kvp => kvp.Key).ToList();
     }
 }

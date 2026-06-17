@@ -343,11 +343,10 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "127.0.0.1", "TestAgent");
@@ -369,12 +368,11 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditItems = new List<NotificationActionAudit>();
         var auditRepo = new FakeRepository<NotificationActionAudit>(auditItems);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "192.168.1.1", "Mozilla/5.0");
@@ -396,11 +394,10 @@ public class NotificationActionCenterTests
     {
         var userId = Guid.NewGuid();
         var notifRepo = new FakeRepository<NotificationHistory>([]);
-        var actionRepo = new FakeRepository<NotificationAction>([]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             new NotificationHistoryId(Guid.NewGuid()), new NotificationActionId(Guid.NewGuid()),
@@ -419,11 +416,10 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, otherUserId.ToString(), "127.0.0.1", "TestAgent");
@@ -441,11 +437,10 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "127.0.0.1", "TestAgent");
@@ -463,11 +458,10 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification);
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "127.0.0.1", "TestAgent");
@@ -482,11 +476,10 @@ public class NotificationActionCenterTests
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, new NotificationActionId(Guid.NewGuid()), userId.ToString(), "127.0.0.1", "TestAgent");
@@ -503,11 +496,10 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification, "NonExistentExecutor");
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(); // No executors registered
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "127.0.0.1", "TestAgent");
@@ -524,12 +516,11 @@ public class NotificationActionCenterTests
         var action = CreateTestAction(notification, "FailingAction");
 
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-        var actionRepo = new FakeRepository<NotificationAction>([action]);
         var auditItems = new List<NotificationActionAudit>();
         var auditRepo = new FakeRepository<NotificationActionAudit>(auditItems);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockFailingExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, action.Id, userId.ToString(), "10.0.0.1", "TestAgent");
@@ -733,13 +724,10 @@ public class NotificationActionCenterTests
         var userId = Guid.NewGuid();
         var notification = CreateTestNotification(userId);
         var notifRepo = new FakeRepository<NotificationHistory>([notification]);
-
-        // Action repo is empty - the action doesn't exist
-        var actionRepo = new FakeRepository<NotificationAction>([]);
         var auditRepo = new FakeRepository<NotificationActionAudit>([]);
         var unitOfWork = new FakeUnitOfWork();
         var resolver = CreateResolver(new MockSuccessExecutor());
-        var handler = new ExecuteNotificationActionHandler(notifRepo, actionRepo, auditRepo, resolver, unitOfWork, Logger);
+        var handler = new ExecuteNotificationActionHandler(notifRepo, auditRepo, resolver, unitOfWork, Logger);
 
         var command = new ExecuteNotificationActionCommand(
             notification.Id, new NotificationActionId(Guid.NewGuid()), userId.ToString(), "127.0.0.1", "TestAgent");

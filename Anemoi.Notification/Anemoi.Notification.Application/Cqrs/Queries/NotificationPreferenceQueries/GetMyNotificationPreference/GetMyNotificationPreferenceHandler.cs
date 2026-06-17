@@ -3,8 +3,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Contract.Notification.Errors;
 using Anemoi.Contract.Notification.Queries.NotificationPreferenceQueries.GetMyNotificationPreference;
 using Anemoi.Contract.Notification.Responses;
 using Anemoi.Notification.Application.Mappings;
@@ -33,9 +35,8 @@ public sealed class GetMyNotificationPreferenceHandler(
             var preference = await preferenceRepository
                 .GetFirstByConditionAsync(x => x.UserId == userId, token: cancellationToken);
 
-            var subscriptions = (await subscriptionRepository
-                .GetManyByConditionAsync(x => x.UserId == userId, token: cancellationToken))
-                .ToList();
+            var subscriptions = await subscriptionRepository
+                .GetManyByConditionAsync(x => x.UserId == userId, token: cancellationToken);
 
             if (preference != null)
                 return mapper.ToPreferenceResponse(preference, subscriptions);
@@ -45,12 +46,7 @@ public sealed class GetMyNotificationPreferenceHandler(
         catch (Exception ex)
         {
             logger.Error(ex, "Error in GetMyNotificationPreferenceHandler for User: {UserId}", request.UserId);
-            return new NotificationPreferenceResponse
-            {
-                EnableInApp = true,
-                EnableEmail = true,
-                Subscriptions = []
-            };
+            return NotificationErrorDetail.PreferenceError.SaveFailed().ToErrorDetailResponse();
         }
     }
 }
