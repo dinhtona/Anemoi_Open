@@ -3,9 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Contract.Notification.ModelIds;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.ExecuteNotificationAction;
 using Anemoi.Contract.Notification.Errors;
 using Anemoi.Notification.Application.Services;
@@ -70,7 +72,7 @@ public sealed class ExecuteNotificationActionHandler(
                 {
                     var audit = new NotificationActionAudit
                     {
-                        Id = new(Guid.NewGuid()),
+                        Id = new NotificationActionAuditId(IdGenerator.NextGuid()),
                         NotificationId = request.NotificationId,
                         ActionId = request.ActionId,
                         ExecutedBy = userId,
@@ -101,7 +103,7 @@ public sealed class ExecuteNotificationActionHandler(
                 {
                     var audit = new NotificationActionAudit
                     {
-                        Id = new(Guid.NewGuid()),
+                        Id = new NotificationActionAuditId(IdGenerator.NextGuid()),
                         NotificationId = request.NotificationId,
                         ActionId = request.ActionId,
                         ExecutedBy = userId,
