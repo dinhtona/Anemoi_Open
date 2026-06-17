@@ -11,6 +11,8 @@ public sealed class WorkflowDefinition : Entity<WorkflowDefinitionId>
     public string Name { get; private set; }
     public string? Description { get; private set; }
     public string WorkflowTypeCode { get; private set; }
+    public string TargetEntityType { get; private set; }
+    public int Version { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -24,13 +26,17 @@ public sealed class WorkflowDefinition : Entity<WorkflowDefinitionId>
         string name,
         string? description,
         string workflowTypeCode,
+        string targetEntityType,
+        int version,
         List<WorkflowDefinitionStep> steps)
     {
         Id = id;
         Code = code;
         Name = name;
-        Description = description;
+        Description =description;
         WorkflowTypeCode = workflowTypeCode;
+        TargetEntityType = targetEntityType;
+        Version = version;
         IsActive = false;
         var now = DateTime.UtcNow;
         CreatedAt = now;
@@ -44,9 +50,11 @@ public sealed class WorkflowDefinition : Entity<WorkflowDefinitionId>
         string name,
         string? description,
         string workflowTypeCode,
+        string targetEntityType,
+        int version,
         List<WorkflowDefinitionStep> steps)
     {
-        return new WorkflowDefinition(id, code, name, description, workflowTypeCode, steps);
+        return new WorkflowDefinition(id, code, name, description, workflowTypeCode, targetEntityType, version, steps);
     }
 
     public void Activate()

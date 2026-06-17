@@ -14,7 +14,7 @@ public sealed class WorkflowDefinitionTests
             new WorkflowDefinitionStepId(Guid.NewGuid()), id, 1,
             ApproverType.Role, "HR_Manager", true);
         var def = WorkflowDefinition.Create(id, "REQ-001", "Test Workflow", null,
-            WorkflowTypeCode.Approval, [step]);
+            WorkflowTypeCode.Approval, "TestEntity", 1, [step]);
         return (def, id);
     }
 
@@ -47,7 +47,7 @@ public sealed class WorkflowDefinitionTests
     {
         var id = new WorkflowDefinitionId(Guid.NewGuid());
         var def = WorkflowDefinition.Create(id, "TST", "Test", null,
-            WorkflowTypeCode.Approval, []);
+            WorkflowTypeCode.Approval, string.Empty, 1, []);
 
         Action act = () => def.Activate();
         act.Should().Throw<InvalidOperationException>();
@@ -110,10 +110,24 @@ public sealed class WorkflowDefinitionTests
             new WorkflowDefinitionStepId(Guid.NewGuid()), id, 2,
             ApproverType.Role, "Director", true);
         var def = WorkflowDefinition.Create(id, "TST", "Test", null,
-            WorkflowTypeCode.Approval, [step1, step2]);
+            WorkflowTypeCode.Approval, string.Empty, 1, [step1, step2]);
 
         def.Steps.Should().HaveCount(2);
         def.Steps.ElementAt(0).Sequence.Should().Be(1);
         def.Steps.ElementAt(1).Sequence.Should().Be(2);
+    }
+
+    [Fact]
+    public void Create_Should_Set_TargetEntityType()
+    {
+        var id = new WorkflowDefinitionId(Guid.NewGuid());
+        var step = WorkflowDefinitionStep.Create(
+            new WorkflowDefinitionStepId(Guid.NewGuid()), id, 1,
+            ApproverType.Role, "HR_Manager", true);
+        var def = WorkflowDefinition.Create(id, "TST", "Test", null,
+            WorkflowTypeCode.Approval, "LeaveRequest", 2, [step]);
+
+        def.TargetEntityType.Should().Be("LeaveRequest");
+        def.Version.Should().Be(2);
     }
 }
