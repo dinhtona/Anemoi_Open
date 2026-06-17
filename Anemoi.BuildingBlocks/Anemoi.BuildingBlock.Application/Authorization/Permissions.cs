@@ -135,6 +135,7 @@ public static class Permissions
     public const string HrWorkflowView = "hr.workflow.view";
     public const string HrWorkflowManage = "hr.workflow.manage";
     public const string HrWorkflowExecute = "hr.workflow.execute";
+    public const string HrWorkflowApprove = "hr.workflow.approve";
 
     // Notification permissions
     public const string NotificationView = "notification.view";
@@ -260,6 +261,7 @@ public static class Permissions
         new(HrWorkflowView, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowView"),
         new(HrWorkflowManage, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowManage"),
         new(HrWorkflowExecute, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowExecute"),
+        new(HrWorkflowApprove, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowApprove", true, "High"),
         new(NotificationView, "PermissionGroupNotifications", "PermissionDescriptionNotificationView"),
         new(NotificationManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationManage"),
         new(NotificationPreferenceManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationPreferenceManage"),
