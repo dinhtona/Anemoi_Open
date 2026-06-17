@@ -70,6 +70,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IWorkflowTargetStatusUpdater, RecruitmentWorkflowStatusUpdater>();
         services.AddScoped<INotificationHandler<WorkflowInstanceApprovedDomainEvent>, WorkflowInstanceApprovedHandler>();
         services.AddScoped<INotificationHandler<WorkflowInstanceRejectedDomainEvent>, WorkflowInstanceRejectedHandler>();
+        services.AddScoped<INotificationHandler<WorkflowInstanceApprovedDomainEvent>, WorkflowApprovedIntegrationEventPublisher>();
+        services.AddScoped<INotificationHandler<WorkflowInstanceRejectedDomainEvent>, WorkflowRejectedIntegrationEventPublisher>();
         services.AddEfRepositoriesAsScope<HrDbContext>(typeof(IHrDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<HrDbContext>();
     }
