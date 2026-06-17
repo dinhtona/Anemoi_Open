@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Domain;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Workflow;
@@ -8,12 +9,18 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
     private readonly List<WorkflowInstanceStep> _steps = [];
     private readonly List<WorkflowHistory> _histories = [];
 
-    public WorkflowDefinitionId WorkflowDefinitionId { get; private set; }
+    /// <summary>
+    /// null = hierarchy-generated workflow (no WorkflowDefinition was used).
+    /// not null = definition-generated workflow.
+    /// </summary>
+    public WorkflowDefinitionId? WorkflowDefinitionId { get; private set; }
     public string EntityType { get; private set; }
     public string EntityId { get; private set; }
     public int CurrentStep { get; private set; }
     public string Status { get; private set; }
     public string StartedBy { get; private set; }
+    public EmployeeId RequesterEmployeeId { get; private set; }
+    public UserId RequesterUserId { get; private set; }
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
     public IReadOnlyCollection<WorkflowInstanceStep> Steps => _steps.AsReadOnly();
@@ -23,10 +30,12 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
 
     private WorkflowInstance(
         WorkflowInstanceId id,
-        WorkflowDefinitionId workflowDefinitionId,
+        WorkflowDefinitionId? workflowDefinitionId,
         string entityType,
         string entityId,
         string startedBy,
+        EmployeeId requesterEmployeeId,
+        UserId requesterUserId,
         List<WorkflowInstanceStep> steps)
     {
         Id = id;
@@ -36,19 +45,23 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         CurrentStep = steps.Count > 0 ? steps.Min(s => s.Sequence) : 0;
         Status = WorkflowStatusCode.Pending;
         StartedBy = startedBy;
+        RequesterEmployeeId = requesterEmployeeId;
+        RequesterUserId = requesterUserId;
         StartedAt = DateTime.UtcNow;
         _steps = steps;
     }
 
     public static WorkflowInstance Start(
         WorkflowInstanceId id,
-        WorkflowDefinitionId workflowDefinitionId,
+        WorkflowDefinitionId? workflowDefinitionId,
         string entityType,
         string entityId,
         string startedBy,
+        EmployeeId requesterEmployeeId,
+        UserId requesterUserId,
         List<WorkflowInstanceStep> steps)
     {
-        return new WorkflowInstance(id, workflowDefinitionId, entityType, entityId, startedBy, steps);
+        return new WorkflowInstance(id, workflowDefinitionId, entityType, entityId, startedBy, requesterEmployeeId, requesterUserId, steps);
     }
 
     public WorkflowHistory Approve(string performedBy, string? comment)
@@ -67,6 +80,7 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         {
             Status = WorkflowStatusCode.Approved;
             CompletedAt = DateTime.UtcNow;
+            AddEvent(new WorkflowInstanceApprovedDomainEvent(Id, EntityType, EntityId, performedBy));
         }
         else
         {
@@ -87,6 +101,7 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
             new WorkflowHistoryId(Guid.NewGuid()), Id,
             "Reject", performedBy, comment);
         AddHistory(history);
+        AddEvent(new WorkflowInstanceRejectedDomainEvent(Id, EntityType, EntityId, performedBy, comment));
         return history;
     }
 

@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
@@ -53,7 +54,10 @@ public sealed class StartWorkflowHandler(
         }).ToList();
 
         var instance = WorkflowInstance.Start(instanceId, definitionId,
-            request.EntityType, request.EntityId, request.StartedBy, instanceSteps);
+            request.EntityType, request.EntityId, request.StartedBy,
+            new EmployeeId(Guid.Parse(request.RequesterEmployeeId)),
+            new UserId(Guid.Parse(request.RequesterUserId)),
+            instanceSteps);
 
         var createResult = await instanceRepository.CreateOneAsync(instance, cancellationToken);
         if (createResult.TryPickT1(out var exception, out _))

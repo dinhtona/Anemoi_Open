@@ -7,4 +7,6 @@ public sealed record StartWorkflowCommand(
     string DefinitionId,
     string EntityType,
     string EntityId,
-    string StartedBy) : ICommandResult<WorkflowInstanceResponse>;
+    string StartedBy,
+    string RequesterEmployeeId,
+    string RequesterUserId) : ICommandResult<WorkflowInstanceResponse>;

@@ -1,3 +1,5 @@
+using Anemoi.BuildingBlock.Domain;
+using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using FluentAssertions;
@@ -17,7 +19,8 @@ public sealed class WorkflowInstanceTests
                 ApproverType.SpecificUser, "user-1", "user-1")).ToList();
 
         var instance = WorkflowInstance.Start(instanceId, defId,
-            "TestEntity", "entity-1", "requester-1", steps);
+            "TestEntity", "entity-1", "requester-1",
+            new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), steps);
         return (instance, instanceId);
     }
 
@@ -39,7 +42,7 @@ public sealed class WorkflowInstanceTests
         var defId = new WorkflowDefinitionId(Guid.NewGuid());
         var instanceId = new WorkflowInstanceId(Guid.NewGuid());
         var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "user", []);
+            "Test", "e-1", "user", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), []);
 
         instance.CurrentStep.Should().Be(0);
     }
@@ -204,7 +207,7 @@ public sealed class WorkflowInstanceTests
             new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
             ApproverType.Role, "HR_Manager", null);
         var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", [step]);
+            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
 
         var result = instance.IsCurrentStepApprover("any-user",
             role => role == "HR_Manager", _ => false);
@@ -221,7 +224,7 @@ public sealed class WorkflowInstanceTests
             new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
             ApproverType.Permission, "hr.workflow.execute", null);
         var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", [step]);
+            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
 
         var result = instance.IsCurrentStepApprover("any-user",
             _ => false, perm => perm == "hr.workflow.execute");
@@ -238,7 +241,7 @@ public sealed class WorkflowInstanceTests
             new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
             ApproverType.DirectManager, null, "manager-1");
         var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", [step]);
+            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
 
         var result = instance.IsCurrentStepApprover("manager-1",
             _ => false, _ => false);
@@ -317,5 +320,46 @@ public sealed class WorkflowInstanceTests
         instance.Approve("user-1", null);
 
         instance.Steps.First().ApprovedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Approve_LastStep_Should_Raise_ApprovedDomainEvent()
+    {
+        var (instance, _) = CreatePendingInstance(1);
+
+        instance.Approve("user-1", null);
+
+        instance.DomainEvents.Should().ContainSingle(e =>
+            e is WorkflowInstanceApprovedDomainEvent);
+        var evt = instance.DomainEvents.OfType<WorkflowInstanceApprovedDomainEvent>().Single();
+        evt.EntityType.Should().Be("TestEntity");
+        evt.EntityId.Should().Be("entity-1");
+        evt.PerformedBy.Should().Be("user-1");
+    }
+
+    [Fact]
+    public void Approve_NonTerminalStep_Should_Not_Raise_DomainEvent()
+    {
+        var (instance, _) = CreatePendingInstance(3);
+
+        instance.Approve("user-1", null);
+
+        instance.DomainEvents.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Reject_Should_Raise_RejectedDomainEvent()
+    {
+        var (instance, _) = CreatePendingInstance(1);
+
+        instance.Reject("user-1", "Not approved");
+
+        instance.DomainEvents.Should().ContainSingle(e =>
+            e is WorkflowInstanceRejectedDomainEvent);
+        var evt = instance.DomainEvents.OfType<WorkflowInstanceRejectedDomainEvent>().Single();
+        evt.EntityType.Should().Be("TestEntity");
+        evt.EntityId.Should().Be("entity-1");
+        evt.PerformedBy.Should().Be("user-1");
+        evt.Comment.Should().Be("Not approved");
     }
 }
