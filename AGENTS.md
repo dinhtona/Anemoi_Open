@@ -30,6 +30,7 @@ If documents conflict, follow approved ADRs first, then architecture/development
 - Localize user-facing messages.
 - Protect features with permission constants and `[HasPermission]`.
 - In `Anemoi.Hr.*` production code, centralize business/status/type string literals as constants.
+- For frontend-impacting work, run browser validation through available browser automation / DevTools MCP before reporting completion.
 
 ## Feature Workflow
 
@@ -38,6 +39,7 @@ When the repository workflow applies, stop for review after each step:
 1. Domain and data.
 2. Application layer.
 3. API and communication.
+4. Browser validation for frontend or full-stack changes.
 
 ## Commands
 

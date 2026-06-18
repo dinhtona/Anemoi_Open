@@ -50,9 +50,12 @@ Frontend work must be split into:
 Step 1: Types, services, hooks, schemas
 Step 2: Pages and components
 Step 3: i18n, permission visibility, loading/error polish
+Step 4: Browser validation through available browser automation / DevTools MCP
 ```
 
 Stop after each step and wait for review.
+
+Frontend or full-stack phases are not complete until browser validation passes. Do not rely only on `npm run build`, TypeScript, lint, or unit tests. Follow `docs/ai/core/frontend-rules.md` for the required browser validation report.
 
 ## 4. Forbidden Shortcuts
 
@@ -68,6 +71,7 @@ Do not:
 - Update sensitive HR data without audit logs.
 - Assign sensitive permissions without explicit confirmation workflow.
 - Implement multiple phases at once unless explicitly requested.
+- Report frontend completion without browser validation when browser tooling is available.
 
 ## 5. Recommended Use
 

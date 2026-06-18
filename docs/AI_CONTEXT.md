@@ -39,6 +39,8 @@ Frontend lives in `cody-web-app`.
 
 Use services for API calls, hooks for data/business state, and `messages/vi.json` plus `messages/en.json` for UI text.
 
+Frontend-impacting work requires browser validation through available browser automation / DevTools MCP before completion. Verify render, console, network, main flow, permission gating, localization, and React Query refresh after mutations.
+
 ## Review Format
 
 1. Overall Review

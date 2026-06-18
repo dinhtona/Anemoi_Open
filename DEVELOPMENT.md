@@ -88,6 +88,8 @@ Implement features in reviewed steps:
 
 Stop after each step for review when the task follows the project's iterative workflow.
 
+For frontend or full-stack work, add a final browser validation step before reporting completion. Use the available browser automation / DevTools MCP to load the implemented page, check console and network errors, exercise the main user flow, verify permission gating and localization, and confirm React Query refresh after mutations. If browser tooling is unavailable, report that limitation explicitly.
+
 ## 10. Do and Do Not
 
 - DO keep the Domain layer free of EF Core and infrastructure dependencies.
@@ -95,7 +97,9 @@ Stop after each step for review when the task follows the project's iterative wo
 - DO use `IQueryable` projections or dedicated response projections for read-heavy paths.
 - DO centralize business/status/type string literals as constants.
 - DO add tests proportional to the risk and blast radius of the change.
+- DO run browser validation for frontend-impacting changes.
 - DO NOT inject repositories into other repositories.
 - DO NOT return EF Core entities directly from APIs.
 - DO NOT introduce new libraries without explicit approval.
 - DO NOT bypass localization, permission checks, or audit requirements for sensitive HR operations.
+- DO NOT claim frontend completion based only on build, lint, TypeScript, or unit tests.

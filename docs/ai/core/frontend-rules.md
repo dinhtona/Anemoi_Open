@@ -79,3 +79,51 @@ Use compact dashboard layout:
 ```
 
 Avoid large padding, excessive shadows, and large grid gaps.
+
+## Browser Validation Rules
+
+For any frontend or full-stack task that changes pages, components, hooks, services, routing, permissions, localization, or user workflows, browser validation is mandatory before reporting completion.
+
+Use the available browser automation / DevTools MCP. If browser tooling is unavailable, state that explicitly and do not claim browser validation passed.
+
+Build, TypeScript, lint, and unit tests are not enough for frontend completion. A phase is not complete until the implemented UI is exercised in the browser.
+
+Required checks:
+
+- Start the frontend application.
+- Open the implemented route in the browser.
+- Verify the page renders without React runtime errors.
+- Verify there are no unhandled promise rejections.
+- Verify there are no unexpected failed network requests.
+- Verify API data renders correctly.
+- Execute the main user flow for the task.
+- For CRUD screens, test create, edit, detail/view, delete or cancel where applicable.
+- Verify primary workflow actions such as submit, approve, reject, publish, send, or complete where applicable.
+- Verify success and error feedback behavior.
+- Verify React Query cache invalidation or refresh updates visible tables/cards.
+- Verify permission-based UI visibility.
+- Verify `vi` and `en` localization for touched UI.
+- Capture console errors and network failures in the final report.
+
+Required browser validation report:
+
+```text
+Browser Validation:
+- Page Loaded: PASS/FAIL
+- Console Errors: PASS/FAIL
+- Network Errors: PASS/FAIL
+- Runtime Exceptions: PASS/FAIL
+- Main Flow: PASS/FAIL
+- CRUD Flow: PASS/FAIL/N/A
+- Permission Checks: PASS/FAIL
+- Localization: PASS/FAIL
+```
+
+For workflow pages, also validate:
+
+- Create or open the target request.
+- Submit/start the workflow.
+- Verify workflow instance or approval state is created.
+- Open pending approvals.
+- Approve or reject the request.
+- Verify status, history, notifications, and visible UI refresh.
