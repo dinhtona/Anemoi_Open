@@ -1,6 +1,6 @@
 # Phase 24 - Workforce Analytics
 
-Status: Planned
+Status: Designed
 
 ---
 

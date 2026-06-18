@@ -71,10 +71,10 @@ Do not:
 
 ## 5. Recommended Use
 
-Start from:
+Start from the documentation map:
 
 ```text
-CODEX_PROMPT_START_HERE.md
+docs/README.md
 ```
 
 Then execute one phase prompt at a time from:

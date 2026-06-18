@@ -62,7 +62,7 @@ Domain
 → BuildingBlock.Application
 ```
 
-previously existed and was resolved as TD-001 (Sep 2026).
+previously existed and was resolved as TD-001 (June 2026).
 
 No new violations are allowed.
 

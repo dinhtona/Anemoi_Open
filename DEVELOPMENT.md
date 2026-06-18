@@ -1,81 +1,101 @@
-# Anemoi Development Guidelines & Rules
+# Anemoi Development Guidelines
 
-This document outlines the architectural standards, coding patterns, and conventions for the Anemoi project. Following these rules ensures consistency, maintainability, and architectural integrity.
+This document summarizes the development conventions for Anemoi_Open. When in doubt, architecture decisions in [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) take precedence.
 
-## 1. Project Architecture
+## 1. Architecture
 
-The project follows **Clean Architecture** principles and is structured as a **Modular Monolith** (or microservices if deployed independently).
+The project follows Clean Architecture and can be deployed as a modular monolith or independently deployable services.
 
-### Layer Responsibilities
+Each service normally follows this shape:
 
-| Layer | Responsibility | Dependencies |
+```text
+{Service}.ModelIds
+{Service}.Domain
+{Service}.Application
+{Service}.Infrastructure
+{Service}.Api or {Service}.WorkerService
+```
+
+Some cross-service contracts live under `Anemoi.Contract`. Local aggregate IDs belong in the owning service's `*.ModelIds` project unless an existing service-specific convention says otherwise.
+
+## 2. Layer Responsibilities
+
+| Layer | Responsibility | Dependency Rule |
 | :--- | :--- | :--- |
-| **Domain** | Core business logic, Entities, Aggregates, Value Objects, Domain Events, Repository Interfaces. | None |
-| **Application** | Use Cases, CQRS Handlers, Mappings, Validators, DTOs (via Contracts). | Domain |
-| **Infrastructure** | Database (EF Core), External Service implementations, Repositories (Implementation). | Domain, Application |
-| **Host/WebAPI** | Entry point, Dependency Injection registration, Middleware, Configuration. | All layers |
-| **Contract** | Shared DTOs, Strongly Typed IDs, Response models, Integration Events. | None |
+| ModelIds | Strongly typed ID wrappers only | Depends only on shared domain primitives |
+| Domain | Entities, aggregate roots, value objects, domain events, domain rules | Must not depend on Application, Infrastructure, or Api |
+| Application | CQRS use cases, handlers, validators, DTOs, Mapperly mappers, abstractions | Must not depend on Infrastructure |
+| Infrastructure | EF Core DbContext, mappings, migrations, repositories, external providers | Depends on Application and Domain |
+| Api / WorkerService | Host startup, DI, controllers, GraphQL, MassTransit wiring | Depends on Infrastructure |
+| Contract | Cross-service DTOs, integration events, shared wire contracts | Must stay implementation-free |
 
-## 2. Coding Patterns & Standards
+## 3. CQRS and Result Handling
 
-### CQRS with MediatR
-- Every operation should be either a **Command** (state change) or a **Query** (data retrieval).
-- Use `IRequest<OneOf<T, ErrorDetailResponse>>` to ensure structured success/error handling.
-- Handlers should inherit from `ICommandHandler` or `IQueryHandler`.
+- Every mutation must be a command.
+- Every read must be a query.
+- Commands and queries should have dedicated handler files.
+- Handlers return `OneOf<TResult, ErrorDetailResponse>` for expected success/error outcomes.
+- Do not throw exceptions for normal business validation failures.
+- Controllers must not contain business logic or query EF Core directly.
 
-### Result Pattern (OneOf)
-- Avoid throwing exceptions for expected business logic errors. 
-- Return `OneOf<TResult, ErrorDetailResponse>` where `ErrorDetailResponse` contains a list of error messages.
+## 4. Strongly Typed IDs
 
-### Strongly Typed IDs
-- Avoid using primitive types (`Guid`, `int`, `string`) for entity IDs.
-- Define a strongly typed ID record (e.g., `UserId`) in the `Contract` project.
-- Inherit from `StronglyTypedId<TValue>` provided in `BuildingBlocks`.
+- Use typed ID wrappers such as `EmployeeId`, `UserId`, or `PayrollRunId` for local aggregate IDs.
+- Create new IDs with `new XxxId(IdGenerator.NextGuid())`.
+- Primitive IDs are allowed at wire boundaries only: DTOs, headers, claims, route values, and integration events.
+- Convert primitive IDs to strongly typed IDs before using them in domain/application logic.
+- Domain factories should accept IDs from the caller; ID generation belongs in the application layer.
 
-### Mapping with Mapperly
-- Use **Mapperly** for all object-to-object mappings (replacing AutoMapper).
-- Create a `partial` class with the `[Mapper]` attribute in the `Application` layer.
-- Use `partial` methods for source-generated mappings.
-- For logic like generating new IDs or hashing passwords, use manual wrapper methods.
+## 5. Mapping
 
-### Exception Handling & Validation
-- Use **FluentValidation** for request validation.
-- Validation is triggered automatically via MediatR `ValidationBehavior` pipeline.
-- If validation fails, it throws a `ValidationException` which is handled by centralized middleware.
+- Use Riok.Mapperly for object mapping.
+- Do not use AutoMapper.
+- Mapper classes belong in `Application/Mappings`.
+- Mapper classes must be `partial` and annotated with `[Mapper]`.
+- Use manual wrapper methods when mapping needs generated IDs, hashing, localization, or other non-trivial logic.
 
-### Message-Driven Architecture
-- Use **MassTransit** for event-driven coordination.
-- Entities can publish **Domain Events** which are then handled asynchronously or converted to Integration Events.
+## 6. Validation and Localization
 
-## 3. Naming Conventions
+- Use FluentValidation for command/query validation.
+- The MediatR validation pipeline triggers validation automatically.
+- User-facing messages must be localized through `IStringLocalizer<SharedResource>` or service-owned resources.
+- Business errors must expose stable error codes.
+- Do not hard-code user-facing Vietnamese or English text in controllers, handlers, validators, filters, or middleware.
 
-- **Namespaces**: `Anemoi.{Module}.{Layer}`
-- **Commands**: `Create{Entity}Command`, `Update{Entity}Command`
-- **Queries**: `Get{Entity}ByIdQuery`, `Search{Entity}Query`
-- **Interfaces**: Always prefix with `I` (e.g., `IUserRepository`).
-- **Files**: One class per file, filename must match class name.
+## 7. Messaging
 
-## 4. Feature Implementation Workflow
+- Use MassTransit for event-driven coordination.
+- Publish integration events for cross-service side effects that do not need an immediate result.
+- Use MassTransit request-response for narrow internal calls that require an immediate result.
+- Do not use HTTP/gRPC for internal service-to-service workflows unless explicitly approved.
+- External provider calls belong behind application abstractions and infrastructure implementations.
 
-When adding a new feature, follow these steps:
+## 8. Authorization
 
-1. **Contract**: Define Strongly Typed IDs and Request/Response DTOs in `Anemoi.Contract`.
-2. **Domain**: Add/Update Entities or Value Objects in the `Domain` layer. Define repository interfaces if needed.
-3. **Application**:
-   - Define Command/Query classes.
-   - Implement `ICommandHandler` or `IQueryHandler`.
-   - Update `Mapperly` mappers to handle new DTOs.
-   - Add `FluentValidation` validators.
-4. **Infrastructure**: 
-   - Update EF Core `DataContext` and configurations.
-   - Implement or update repository classes.
-5. **Host**: Register new services in Dependency Injection installers.
-6. **Messaging**: Add MassTransit integration events or narrow request-response contracts when communication crosses service boundaries.
+- Use permission-based authorization.
+- Add permission constants before exposing protected endpoints.
+- Protect endpoints with `[HasPermission(...)]` or the existing permission mechanism.
+- Do not hard-code business role names in feature code.
+- `Administrator` is a reserved system role handled by centralized authorization logic.
 
-## 5. Do's and Don'ts
+## 9. Feature Workflow
 
-- **DO** keep the Domain layer free of external framework dependencies such as EF Core.
-- **DO** use the `IdGenerator` for generating new Guids.
-- **DO** use `IQueryable` projections in mappers (`ProjectTo{Response}`) for performance.
-- **DON'T** inject repositories into other repositories; use Domain Services instead if necessary.
-- **DON'T** use `AutoMapper` (it is being phased out).
+Implement features in reviewed steps:
+
+1. Domain and data: strongly typed IDs, entities, EF Core configuration, DbContext registration.
+2. Application layer: DTOs/responses, Mapperly mappers, commands, queries, handlers, validators.
+3. API and communication: controllers/GraphQL endpoints, MassTransit events, worker wiring.
+
+Stop after each step for review when the task follows the project's iterative workflow.
+
+## 10. Do and Do Not
+
+- DO keep the Domain layer free of EF Core and infrastructure dependencies.
+- DO use existing BuildingBlocks abstractions before adding new infrastructure.
+- DO use `IQueryable` projections or dedicated response projections for read-heavy paths.
+- DO centralize business/status/type string literals as constants.
+- DO add tests proportional to the risk and blast radius of the change.
+- DO NOT inject repositories into other repositories.
+- DO NOT return EF Core entities directly from APIs.
+- DO NOT introduce new libraries without explicit approval.
+- DO NOT bypass localization, permission checks, or audit requirements for sensitive HR operations.

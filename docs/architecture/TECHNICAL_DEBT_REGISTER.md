@@ -56,7 +56,7 @@ High
 
 ### Status
 
-✅ **Resolved** — Sep 2026
+✅ **Resolved** — June 2026
 
 ### Fix Applied
 

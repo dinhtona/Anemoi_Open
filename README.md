@@ -1,130 +1,85 @@
-
 # Anemoi_Open
 
-Anemoi_Open is an open-source microservices project built with modern architectural patterns, designed to provide a scalable and robust foundation for microservices-based applications. This project incorporates CQRS (Command Query Responsibility Segregation), Event-Driven Architecture (EDA), and Saga Orchestration patterns. Additionally, it features Attribute-based Data Mapping, simplifying data handling across services and enhancing maintainability.
+Anemoi_Open is an enterprise HR management platform built on .NET 10, Clean Architecture, CQRS, Event-Driven Architecture, and Saga orchestration patterns. The repository is structured as a modular monolith / independently deployable services platform, with HR as the main active business domain.
 
+## Project Scope
 
-## 🌟 Project Highlights
+The platform currently covers identity and access management, workspace management, master data, notification, security, storage, and HR modules such as employee lifecycle, attendance, payroll, compensation, benefits, recruitment, onboarding, workflow, and analytics.
 
-CQRS Pattern: Separates command (write) and query (read) responsibilities, improving scalability and performance.
+## Technology Stack
 
-Event-Driven Architecture (EDA): Uses an event-based model for communication between services, reducing dependencies and enabling asynchronous operations.
+- .NET 10 / ASP.NET Core
+- Entity Framework Core with PostgreSQL via Npgsql
+- RabbitMQ via MassTransit
+- Riok.Mapperly for compile-time object mapping
+- MediatR with OneOf for CQRS result handling
+- FluentValidation
+- HotChocolate GraphQL where applicable
+- Serilog and Polly
+- JWT-based identity management
+- Next.js frontend in `cody-web-app`
 
-Saga Orchestration: Manages distributed transactions across multiple services to ensure data consistency.
+## Repository Structure
 
-Attribute-based Data Mapping: Streamlines data mapping across services using custom attributes, reducing repetitive code and improving readability.
-
-## 🛠 Technology Stack
-.NET Core: For backend microservices.
-
-Docker: Containerization for easy deployment and scaling.
-
-RabbitMQ: Message brokers to facilitate event-driven communication.
-
-Entity Framework Core: ORM for seamless data handling.
-
-AutoMapper: Simplifies object mapping between layers.
-
-## 📂 Repository Structure
-The project is organized as follows:
-
-```plaintext
-├── /Anemoi                     # Source code for each microservice
-│   ├── Anemoi.BuildingBlocks   # Core codebase and shared utilities
-│   ├── Anemoi.Centralize       # Aggregates services, exposing APIs to external clients
-│   ├── Anemoi.Contract         # Data Transfer Objects (DTOs) and shared identifiers
-│   ├── Anemoi.Identity         # Identity management service for authentication and authorization
-│   ├── Anemoi.MasterData       # Provides and manages static or master data shared across services
-│   ├── Anemoi.Workspace        # Workspace management, handling user or resource-specific configurations
+```text
+Anemoi.BuildingBlocks/   Shared kernel, base abstractions, CQRS pipeline, helpers
+Anemoi.Centralize/       Gateway / aggregation API
+Anemoi.Contract/         Shared contracts, integration events, cross-service DTOs
+Anemoi.Grpc/             gRPC service contracts/layers
+Anemoi.Hr/               Core HR bounded context
+Anemoi.Identity/         Authentication, users, role groups, permissions
+Anemoi.Kubernetes/       Kubernetes deployment resources
+Anemoi.MasterData/       Static/reference data
+Anemoi.Notification/     Notification and email dispatch
+Anemoi.Orchestration/    Saga orchestration
+Anemoi.Secure/           Security and encryption service
+Anemoi.Storage/          File/object storage service
+Anemoi.Workspace/        Workspace and multi-tenancy management
+cody-web-app/            Frontend application
+docs/                    Architecture, AI guidelines, roadmap, plans, reports
 ```
-Service Details
 
-### Anemoi.BuildingBlocks
+## Documentation Entry Points
 
-Contains the foundational code, utilities, and shared components used across all services. This module provides reusable blocks, helping to reduce redundancy and keep the code consistent across the microservices.
+- [docs/README.md](docs/README.md) - documentation map and source-of-truth policy
+- [ArchitectureGuide.md](ArchitectureGuide.md) - practical architecture and coding guide
+- [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) - approved architectural decisions
+- [docs/architecture/TECHNICAL_DEBT_REGISTER.md](docs/architecture/TECHNICAL_DEBT_REGISTER.md) - known technical debt
+- [docs/ai/README.md](docs/ai/README.md) - mandatory guide for AI agents
+- [DEVELOPMENT.md](DEVELOPMENT.md) - development conventions and workflow
+- [AGENTS.md](AGENTS.md) - compact project memory for coding agents
 
-### Anemoi.Centralize
+## Getting Started
 
-Acts as the central aggregation layer, exposing a unified API interface for external consumers. This service can aggregate data from multiple microservices and acts as a centralized access point, making it easier for clients to interact with the system.
+Prerequisites:
 
-### Anemoi.Contract
-Contains Data Transfer Objects (DTOs) and shared IDs that define how data is transferred between services. This module standardizes data structures across the system, ensuring smooth and consistent communication between services.
+- .NET 10 SDK
+- Docker Desktop
+- RabbitMQ, usually through Docker Compose
 
-### Anemoi.Identity
-Manages authentication and authorization, ensuring secure access to the system. This service is responsible for user management, access control, and identity verification, playing a crucial role in the overall security architecture.
+```bash
+cp .env.example .env
+docker compose up -d --build
+dotnet build Anemoi.sln
+```
 
-### Anemoi.MasterData
-Maintains static or master data used across the application. This could include reference data, configuration settings, and other data points that do not frequently change but are accessed b
-
-### Anemoi.Workspace
-Manages user or resource-specific settings, allowing customization and configuration of workspaces. This service is responsible for handling configurations and settings unique to individual users or resources within the system.
-
-### 🚀 Getting Started
-Prerequisites
-
-.NET Core SDK
-
-Docker
-
-Rabbitmq: https://hub.docker.com/r/masstransit/rabbitmq for event handling
-
-### 🌐 Usage
-CQRS Pattern: Commands and queries are separated for scalable data management.
-
-EDA: Events are published by producers and consumed by subscribers within the microservices.
-
-Saga Orchestration: Manages complex transactions across multiple services to ensure data consistency.
-
-### Docker Compose on Windows x64
-
-Use Docker Desktop with Linux containers, copy `.env.example` to `.env`, fill in
-the required passwords, then run:
+On Windows x64, use the Docker Compose override:
 
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.windows-x64.yml up -d --build
 ```
 
-The Windows x64 override replaces the ARM64-oriented Azure SQL Edge container
-with SQL Server 2022 for `linux/amd64`.
+## Development Rules
 
-## Contributing
+- Use Clean Architecture boundaries for each service.
+- Use CQRS through MediatR; mutations are commands, reads are queries.
+- Return `OneOf<TResult, ErrorDetailResponse>` for expected business outcomes.
+- Use strongly typed IDs for local aggregate IDs.
+- Use `IdGenerator.NextGuid()` when creating new IDs.
+- Use Mapperly, not AutoMapper.
+- Use FluentValidation for command/query validation.
+- Use MassTransit for internal async messaging and request-response when a synchronous internal result is required.
+- Use permission-based authorization through stable permission constants.
+- Localize user-facing backend messages with `IStringLocalizer<SharedResource>`.
 
-Contributions are always welcome!
-
-See `contributing.md` for ways to get started.
-
-Please adhere to this project's `code of conduct`.
-
-
-## 🚀 About Me
-
-
-
-## 🔗 Links
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/vu-quy-181098177/)
-
-[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/@vuquy711)
-
-[![Medium](https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@sigma.vu)
-
-
-## AI Coding Guidelines
-
-### Cách nạp kế hoạch (Prompt Workflow) mới nhất cho Anemoi_Open
-Khi bạn yêu cầu AI tạo tính năng mới, bạn có thể chat theo luồng sau đây để đảm bảo AI tuân thủ đúng kiến trúc:
-
-**Prompt 1 (Thiết lập Context):**
-> "Tôi muốn thêm tính năng [X] vào project. Hãy đọc file @ArchitectureGuide.md để hiểu quy ước Clean Architecture, CQRS, Mapperly, xử lý lỗi bằng OneOf<>, Event-driven qua MassTransit và đặc biệt chú ý **Mục 5: Iterative Execution Steps**. Chỉ phản hồi 'Đã hiểu' nếu bạn nắm rõ luật và quy trình 3 bước."
-
-**Prompt 2 (Giao việc):**
-> "Tốt, đây là Implementation Plan (File Manifest) cho tính năng này: [Dán nội dung @FeatureImplementationTemplate.md vào đây]. Hãy xác nhận danh sách file này có hợp lý không, sau đó bắt đầu code **Bước 1 (Domain & Data)**. Tuyệt đối không code Bước 2 cho đến khi tôi review xong Bước 1."
-
----
-
-### EN version (For English-speaking AI)
-
-**Prompt 1 (Set Context):**
-> "I need to add a new feature [X] to the project. Please read @ArchitectureGuide.md thoroughly to understand my Clean Architecture, CQRS, Mapperly usage, Error handling with OneOf<>, Event-driven messaging via MassTransit, and pay special attention to **Section 5: Iterative Execution Steps**. Reply 'Understood' if you grasped all the rules and the 3-step workflow."
-
-**Prompt 2 (Assign Task):**
-> "Great, here is the Implementation Plan (File Manifest): [Paste the content of @FeatureImplementationTemplate.md here]. Please review to see if the file list aligns with the project structure, then execute **Step 1 (Domain & Data)**. Do not proceed to Step 2 until I review and approve Step 1."
+For feature work, follow the iterative workflow documented in [ArchitectureGuide.md](ArchitectureGuide.md) and [docs/ai/README.md](docs/ai/README.md).

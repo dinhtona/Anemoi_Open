@@ -1,63 +1,45 @@
-ANEMOI HR MASTER CONTEXT
+# ANEMOI HR Agent Context
 
-Before doing anything, read:
+Compact HR context for agent sessions. Use [docs/README.md](README.md) for the full documentation map.
 
-- docs/ai/README.md
-- docs/AI_CONTEXT.md
-- docs/architecture/ARCHITECTURE_DECISIONS.md
-- docs/architecture/TECHNICAL_DEBT_REGISTER.md
+## Required References
 
-ERROR CODE RULE
+- `docs/ai/README.md`
+- `docs/architecture/ARCHITECTURE_DECISIONS.md`
+- `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
+- `docs/ai/core/backend-rules.md`
+- `docs/ai/core/frontend-rules.md`
 
-Never use inline string literals for business error codes,
-validation codes, permission codes, route names,
-status codes, or localization keys.
+## HR Architecture Principles
 
-Always reference the appropriate constant from:
-- HrBusinessErrorCodes
-- HrPermissions
-- Permissions
-- TranslationKeys
-- Domain constants
+- Clean Architecture with CQRS + MediatR.
+- Snapshot-based payroll and reporting.
+- Historical data must not be mutated.
+- PostgreSQL `xmin` concurrency where applicable.
+- Permission-based authorization.
+- Tax and Insurance engines stay independent; Payroll consumes snapshots.
 
-If a constant does not exist:
-1. Create it.
-2. Use the constant.
-3. Do not use raw string literals.
+## String And Code Rules
 
-String literals are allowed only for:
-- UI labels in resource files
-- Logging text
-- Test data
+Do not inline business error codes, validation codes, permission codes, route names, status codes, type keys, or localization keys.
 
+Use existing constants such as:
 
-## ===============
+- `HrBusinessErrorCodes`
+- `HrPermissions`
+- `Permissions`
+- `TranslationKeys`
+- domain status/type constants
 
+Allowed inline strings: log templates, route templates, JSON/external contract names, resource file values, and test data.
 
-Architecture:
+## Frontend
 
-- Clean Architecture
-- CQRS + MediatR
-- PostgreSQL
-- Next.js
-- React Query
-- shadcn/ui
+Frontend lives in `cody-web-app`.
 
-Principles:
+Use services for API calls, hooks for data/business state, and `messages/vi.json` plus `messages/en.json` for UI text.
 
-- Snapshot-based architecture
-- Historical preservation
-- PostgreSQL xmin concurrency
-- Permission-based authorization
-- Payroll consumes snapshots
-- Tax Engine independent
-- Insurance Engine independent
-
-Frontend:
-
-./cody-web-app
-
-Review Format:
+## Review Format
 
 1. Overall Review
 2. Issues Found
