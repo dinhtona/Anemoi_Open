@@ -11,11 +11,11 @@ public sealed class EmployeePortalAccess : Entity<EmployeePortalAccessId>
 
     private EmployeePortalAccess() { }
 
-    public static EmployeePortalAccess Create(EmployeeId employeeId)
+    public static EmployeePortalAccess Create(EmployeePortalAccessId id, EmployeeId employeeId)
     {
         return new EmployeePortalAccess
         {
-            Id = new EmployeePortalAccessId(Guid.NewGuid()),
+            Id = id,
             EmployeeId = employeeId
         };
     }
