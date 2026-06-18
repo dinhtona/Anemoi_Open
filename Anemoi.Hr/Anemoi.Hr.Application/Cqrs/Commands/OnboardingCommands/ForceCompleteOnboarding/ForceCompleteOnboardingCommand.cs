@@ -9,8 +9,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.ForceCompleteOn
 
 public sealed record ForceCompleteOnboardingCommand(
     OnboardingInstanceId InstanceId,
-    string Reason) : ICommandResult<OnboardingInstanceResponse>
+    string Reason,
+
+    [property: JsonIgnore] string? CompletedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? CompletedBy { get; set; }
 }

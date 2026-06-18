@@ -7,8 +7,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CreateCandidat
 
 public sealed record CreateCandidateApplicationCommand(
     CandidateId CandidateId,
-    JobPostingId JobPostingId) : ICommandResult<CandidateApplicationResponse>
+    JobPostingId JobPostingId,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<CandidateApplicationResponse>
 {
-    [JsonIgnore]
-    public string CreatedBy { get; set; }
 }

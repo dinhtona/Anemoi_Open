@@ -8,7 +8,6 @@ public sealed class ApproveLeaveRequestValidator : AbstractValidator<ApproveLeav
 {
     public ApproveLeaveRequestValidator()
     {
-        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
         RuleFor(x => x.ApproverEmployeeId).RequiredId(HrBusinessErrorCodes.ValApproverEmployeeIdRequired);
         RuleFor(x => x.Comment).MaximumLength(1024);
     }

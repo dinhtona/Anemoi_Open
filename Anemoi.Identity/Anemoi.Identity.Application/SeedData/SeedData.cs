@@ -66,6 +66,7 @@ public static class SeedData
     public static async Task RegisterDevTestUsersAsync(IServiceScope serviceScope)
     {
         var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
         var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
@@ -90,6 +91,94 @@ public static class SeedData
             {
                 logger.Warning("[SeedData] Failed to create dev test user {@Email}: {@Error}",
                     email, result.AsT1);
+            }
+        }
+
+        // Assign roles to dev test users for journey testing
+        await AssignDevTestUserRolesAsync(serviceScope);
+    }
+
+    private static async Task AssignDevTestUserRolesAsync(IServiceScope serviceScope)
+    {
+        var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+
+        var allUsers = await userDbRepository.GetQueryable().ToListAsync();
+        var userByEmail = allUsers.ToDictionary(u => u.Email?.Trim().ToLowerInvariant() ?? "");
+
+        var roleAssignments = new Dictionary<string, string[]>
+        {
+            // Employee role — ESS access only
+            ["minh.tran@anemoi.test"] =
+            [
+                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
+                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
+                "hr.ess.payroll.view", "hr.ess.payslip.view"
+            ],
+            ["an.pham@anemoi.test"] =
+            [
+                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
+                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
+                "hr.ess.payroll.view", "hr.ess.payslip.view"
+            ],
+            // Manager role — ESS + approval permissions
+            ["linh.nguyen@anemoi.test"] =
+            [
+                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
+                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
+                "hr.ess.payroll.view", "hr.ess.payslip.view",
+                "hr.leave.request.approve", "hr.overtime.approve",
+                "hr.employee.view", "hr.dashboard.view"
+            ],
+            // HR Manager role — HR operational permissions
+            ["mai.le@anemoi.test"] =
+            [
+                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
+                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
+                "hr.ess.payroll.view", "hr.ess.payslip.view",
+                "hr.employee.view",
+                "hr.contract.create", "hr.contract.view",
+                "hr.attendance.create", "hr.attendance.lock", "hr.attendance.update", "hr.attendance.view",
+                "hr.payroll.view", "hr.payroll.calculate", "hr.payroll.approve", "hr.payroll.lock",
+                "hr.payslip.document.generate", "hr.payslip.document.view", "hr.payslip.email.send",
+                "hr.dashboard.view", "hr.analytics.view",
+                "hr.leave.request.approve", "hr.leave.request.force_approve",
+                "hr.overtime.approve",
+                "hr.overtime.manage"
+            ],
+            // Recruiter role
+            ["khoa.do@anemoi.test"] =
+            [
+                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
+                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
+                "hr.ess.payroll.view", "hr.ess.payslip.view",
+                "hr.recruitment.view", "hr.recruitment.request.create",
+                "hr.recruitment.request.submit", "hr.recruitment.request.approve",
+                "hr.recruitment.request.manage",
+                "hr.recruitment.manage", "hr.recruitment.interview", "hr.recruitment.hire",
+                "hr.dashboard.view"
+            ]
+        };
+
+        foreach (var (email, roles) in roleAssignments)
+        {
+            if (!userByEmail.TryGetValue(email, out var user))
+            {
+                logger.Warning("[SeedData] Dev test user {Email} not found for role assignment", email);
+                continue;
+            }
+
+            var directRoles = await userRepository.GetDirectRolesAsync(user);
+            var rolesToAdd = roles.Where(r => !directRoles.Contains(r)).ToList();
+            if (rolesToAdd.Count > 0)
+            {
+                var addResult = await userRepository.AddToRolesAsync(user, rolesToAdd);
+                if (addResult.IsT1)
+                    logger.Warning("[SeedData] Failed to assign roles to {Email}: {Error}",
+                        email, addResult.AsT1.Message);
+                else
+                    logger.Information("[SeedData] Assigned {Count} roles to {Email}", rolesToAdd.Count, email);
             }
         }
     }
@@ -125,11 +214,21 @@ public static class SeedData
         var seedUsers = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>()?.SupperAdminUsers ?? [];
         var seedAdminEmails = seedUsers.Select(user => user.UserName)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var devTestEmails = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>()?.DevTestUsers
+            ?.Select(u => u.UserName?.Trim().ToLowerInvariant())
+            .ToHashSet() ?? [];
+        var protectedEmails = new HashSet<string>(seedAdminEmails, StringComparer.OrdinalIgnoreCase);
+        foreach (var devEmail in devTestEmails)
+            protectedEmails.Add(devEmail);
+
         var affectedUserIds = new HashSet<UserId>();
 
         var users = await userDbRepository.GetQueryable().ToListAsync();
         foreach (var user in users)
         {
+            if (protectedEmails.Contains(user.Email?.Trim().ToLowerInvariant() ?? ""))
+                continue;
+
             var directRoles = await userRepository.GetDirectRolesAsync(user);
             var rolesToRemove = directRoles.Where(role =>
                     role != administrator || !seedAdminEmails.Contains(user.Email))

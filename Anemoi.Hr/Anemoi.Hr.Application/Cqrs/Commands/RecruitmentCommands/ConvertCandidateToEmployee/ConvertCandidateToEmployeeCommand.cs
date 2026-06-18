@@ -15,8 +15,8 @@ public sealed record ConvertCandidateToEmployeeCommand(
     PositionId PositionId,
     DateOnly JoinDate,
     string EmploymentTypeCode,
-    string Notes) : ICommandResult<CandidateConversionResponse>
+    string Notes,
+
+    [property: JsonIgnore] string? ConvertedBy = null) : ICommandResult<CandidateConversionResponse>
 {
-    [JsonIgnore]
-    public string ConvertedBy { get; set; }
 }

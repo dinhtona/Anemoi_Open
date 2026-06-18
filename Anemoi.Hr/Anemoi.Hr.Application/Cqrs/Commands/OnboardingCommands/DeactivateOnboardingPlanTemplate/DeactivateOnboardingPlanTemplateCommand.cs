@@ -6,8 +6,8 @@ using System.Text.Json.Serialization;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.DeactivateOnboardingPlanTemplate;
 
 public sealed record DeactivateOnboardingPlanTemplateCommand(
-    OnboardingPlanTemplateId Id) : ICommandResult<OnboardingPlanTemplateResponse>
+    OnboardingPlanTemplateId Id,
+
+    [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<OnboardingPlanTemplateResponse>
 {
-    [JsonIgnore]
-    public string? UpdatedBy { get; set; }
 }

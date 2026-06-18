@@ -11,10 +11,6 @@ public sealed class CancelOvertimeRequestValidator : AbstractValidator<CancelOve
 {
     public CancelOvertimeRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotNull()
-            .WithErrorCode(HrBusinessErrorCodes.OvertimeRequestNotFound);
-
         RuleFor(x => x.CancelledBy)
             .NotEmpty()
             .WithErrorCode(HrBusinessErrorCodes.OvertimeApproverRequired);

@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.MarkInterviewPassed;
 
-public sealed record MarkInterviewPassedCommand(InterviewScheduleId Id)
+public sealed record MarkInterviewPassedCommand(InterviewScheduleId Id,
+
+    [property: JsonIgnore] string? UpdatedBy = null)
     : ICommandResult<InterviewScheduleResponse>
 {
-    [JsonIgnore]
-    public string UpdatedBy { get; set; }
 }

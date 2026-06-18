@@ -14,8 +14,8 @@ public sealed record UpdateCandidateCommand(
     DateOnly? DateOfBirth,
     string Address,
     string ResumeUrl,
-    string Notes) : ICommandResult<CandidateResponse>
+    string Notes,
+
+    [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<CandidateResponse>
 {
-    [JsonIgnore]
-    public string UpdatedBy { get; set; }
 }

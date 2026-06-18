@@ -7,10 +7,10 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.CreateOnboardin
 public sealed record CreateOnboardingPlanTemplateCommand(
     string Name,
     string? Description,
-    List<CreateOnboardingTaskTemplateDto> TaskTemplates) : ICommandResult<OnboardingPlanTemplateResponse>
+    List<CreateOnboardingTaskTemplateDto> TaskTemplates,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<OnboardingPlanTemplateResponse>
 {
-    [JsonIgnore]
-    public string? CreatedBy { get; set; }
 }
 
 public sealed record CreateOnboardingTaskTemplateDto(

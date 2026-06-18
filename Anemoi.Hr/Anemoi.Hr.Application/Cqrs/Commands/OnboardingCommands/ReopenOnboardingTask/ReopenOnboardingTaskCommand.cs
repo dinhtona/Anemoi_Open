@@ -9,8 +9,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.ReopenOnboardin
 
 public sealed record ReopenOnboardingTaskCommand(
     OnboardingTaskId TaskId,
-    string? Reason) : ICommandResult<OnboardingInstanceResponse>
+    string? Reason,
+
+    [property: JsonIgnore] string? ReopenedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? ReopenedBy { get; set; }
 }

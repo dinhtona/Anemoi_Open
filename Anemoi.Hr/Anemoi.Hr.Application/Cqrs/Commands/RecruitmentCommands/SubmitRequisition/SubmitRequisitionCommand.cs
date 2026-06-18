@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.SubmitRequisition;
 
-public sealed record SubmitRequisitionCommand(JobRequisitionId Id)
+public sealed record SubmitRequisitionCommand(JobRequisitionId Id,
+
+    [property: JsonIgnore] string? SubmittedBy = null)
     : ICommandResult<JobRequisitionResponse>
 {
-    [JsonIgnore]
-    public string SubmittedBy { get; set; }
 }

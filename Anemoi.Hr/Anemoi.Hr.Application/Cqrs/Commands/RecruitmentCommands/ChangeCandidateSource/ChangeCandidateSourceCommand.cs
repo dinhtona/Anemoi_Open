@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ChangeCandidateSource;
 
-public sealed record ChangeCandidateSourceCommand(CandidateId Id, string Source)
+public sealed record ChangeCandidateSourceCommand(CandidateId Id, string Source,
+
+    [property: JsonIgnore] string? UpdatedBy = null)
     : ICommandResult<CandidateResponse>
 {
-    [JsonIgnore]
-    public string UpdatedBy { get; set; }
 }

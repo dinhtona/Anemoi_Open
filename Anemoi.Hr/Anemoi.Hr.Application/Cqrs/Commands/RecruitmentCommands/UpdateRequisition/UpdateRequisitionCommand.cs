@@ -15,8 +15,8 @@ public sealed record UpdateRequisitionCommand(
     string EmploymentType,
     DateOnly OpenDate,
     DateOnly TargetHireDate,
-    string Description) : ICommandResult<JobRequisitionResponse>
+    string Description,
+
+    [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<JobRequisitionResponse>
 {
-    [JsonIgnore]
-    public string UpdatedBy { get; set; }
 }

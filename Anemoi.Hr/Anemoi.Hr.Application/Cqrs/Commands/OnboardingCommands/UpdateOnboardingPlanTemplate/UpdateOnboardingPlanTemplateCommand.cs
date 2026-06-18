@@ -8,12 +8,12 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.UpdateOnboardin
 public sealed record UpdateOnboardingPlanTemplateCommand(
     string Name,
     string? Description,
-    List<UpdateOnboardingTaskTemplateDto> TaskTemplates) : ICommandResult<OnboardingPlanTemplateResponse>
+    List<UpdateOnboardingTaskTemplateDto> TaskTemplates,
+
+    [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<OnboardingPlanTemplateResponse>
 {
     [JsonIgnore]
     public OnboardingPlanTemplateId Id { get; set; }
-    [JsonIgnore]
-    public string? UpdatedBy { get; set; }
 }
 
 public sealed record UpdateOnboardingTaskTemplateDto(

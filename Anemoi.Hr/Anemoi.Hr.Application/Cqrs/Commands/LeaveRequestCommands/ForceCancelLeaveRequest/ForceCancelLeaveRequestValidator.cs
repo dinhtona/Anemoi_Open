@@ -8,7 +8,6 @@ public sealed class ForceCancelLeaveRequestValidator : AbstractValidator<ForceCa
 {
     public ForceCancelLeaveRequestValidator()
     {
-        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
         RuleFor(x => x.ActorEmployeeId).RequiredId(HrBusinessErrorCodes.ValActorEmployeeIdRequired);
         RuleFor(x => x.Reason).NotEmpty().MaximumLength(1024);
         RuleFor(x => x.SensitivePermissionConfirmed)

@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CloseJobPosting;
 
-public sealed record CloseJobPostingCommand(JobPostingId Id)
+public sealed record CloseJobPostingCommand(JobPostingId Id,
+
+    [property: JsonIgnore] string? ClosedBy = null)
     : ICommandResult<JobPostingResponse>
 {
-    [JsonIgnore]
-    public string ClosedBy { get; set; }
 }

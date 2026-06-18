@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ExpireJobPosting;
 
-public sealed record ExpireJobPostingCommand(JobPostingId Id)
+public sealed record ExpireJobPostingCommand(JobPostingId Id,
+
+    [property: JsonIgnore] string? ExpiredBy = null)
     : ICommandResult<JobPostingResponse>
 {
-    [JsonIgnore]
-    public string ExpiredBy { get; set; }
 }

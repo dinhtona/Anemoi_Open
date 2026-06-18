@@ -14,8 +14,8 @@ public sealed record CreateCandidateCommand(
     string Address,
     string ResumeUrl,
     string Source,
-    string Notes) : ICommandResult<CandidateResponse>
+    string Notes,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<CandidateResponse>
 {
-    [JsonIgnore]
-    public string CreatedBy { get; set; }
 }

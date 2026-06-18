@@ -7,8 +7,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CreateOfferDec
 
 public sealed record CreateOfferDecisionCommand(
     CandidateApplicationId CandidateApplicationId,
-    string Notes) : ICommandResult<HiringDecisionResponse>
+    string Notes,
+
+    [property: JsonIgnore] string? DecidedBy = null) : ICommandResult<HiringDecisionResponse>
 {
-    [JsonIgnore]
-    public string DecidedBy { get; set; }
 }

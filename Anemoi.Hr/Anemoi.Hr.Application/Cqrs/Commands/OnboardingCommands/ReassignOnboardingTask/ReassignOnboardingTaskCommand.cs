@@ -10,8 +10,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.ReassignOnboard
 public sealed record ReassignOnboardingTaskCommand(
     OnboardingTaskId TaskId,
     string NewUserId,
-    string? NewUserDisplayName) : ICommandResult<OnboardingInstanceResponse>
+    string? NewUserDisplayName,
+
+    [property: JsonIgnore] string? ReassignedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? ReassignedBy { get; set; }
 }

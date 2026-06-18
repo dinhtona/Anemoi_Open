@@ -9,8 +9,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.CompleteOnboard
 
 public sealed record CompleteOnboardingTaskCommand(
     OnboardingTaskId TaskId,
-    string? Notes) : ICommandResult<OnboardingInstanceResponse>
+    string? Notes,
+
+    [property: JsonIgnore] string? CompletedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? CompletedBy { get; set; }
 }

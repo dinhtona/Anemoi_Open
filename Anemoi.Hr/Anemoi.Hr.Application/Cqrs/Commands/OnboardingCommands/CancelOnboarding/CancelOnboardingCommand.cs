@@ -8,8 +8,8 @@ using System.Text.Json.Serialization;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.CancelOnboarding;
 
 public sealed record CancelOnboardingCommand(
-    OnboardingInstanceId InstanceId) : ICommandResult<OnboardingInstanceResponse>
+    OnboardingInstanceId InstanceId,
+
+    [property: JsonIgnore] string? CancelledBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? CancelledBy { get; set; }
 }

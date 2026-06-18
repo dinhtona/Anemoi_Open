@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.CancelRequisition;
 
-public sealed record CancelRequisitionCommand(JobRequisitionId Id, string Reason)
+public sealed record CancelRequisitionCommand(JobRequisitionId Id, string Reason,
+
+    [property: JsonIgnore] string? CancelledBy = null)
     : ICommandResult<JobRequisitionResponse>
 {
-    [JsonIgnore]
-    public string CancelledBy { get; set; }
 }

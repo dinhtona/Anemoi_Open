@@ -11,10 +11,6 @@ public sealed class ApproveOvertimeRequestValidator : AbstractValidator<ApproveO
 {
     public ApproveOvertimeRequestValidator()
     {
-        RuleFor(x => x.Id)
-            .NotNull()
-            .WithErrorCode(HrBusinessErrorCodes.OvertimeRequestNotFound);
-
         RuleFor(x => x.ApprovedBy)
             .NotEmpty()
             .WithErrorCode(HrBusinessErrorCodes.OvertimeApproverRequired);

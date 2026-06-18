@@ -8,8 +8,8 @@ using System.Text.Json.Serialization;
 namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.SkipOnboardingTask;
 
 public sealed record SkipOnboardingTaskCommand(
-    OnboardingTaskId TaskId) : ICommandResult<OnboardingInstanceResponse>
+    OnboardingTaskId TaskId,
+
+    [property: JsonIgnore] string? SkippedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? SkippedBy { get; set; }
 }

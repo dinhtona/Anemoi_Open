@@ -11,8 +11,8 @@ public sealed record CreateJobPostingCommand(
     string PostingTitle,
     string PostingDescription,
     DateOnly PublishDate,
-    DateOnly ExpiryDate) : ICommandResult<JobPostingResponse>
+    DateOnly ExpiryDate,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<JobPostingResponse>
 {
-    [JsonIgnore]
-    public string CreatedBy { get; set; }
 }

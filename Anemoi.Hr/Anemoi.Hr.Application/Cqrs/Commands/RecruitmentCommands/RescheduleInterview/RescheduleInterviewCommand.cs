@@ -9,8 +9,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.RescheduleInte
 public sealed record RescheduleInterviewCommand(
     InterviewScheduleId Id,
     DateTime ScheduledAt,
-    int DurationMinutes) : ICommandResult<InterviewScheduleResponse>
+    int DurationMinutes,
+
+    [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<InterviewScheduleResponse>
 {
-    [JsonIgnore]
-    public string UpdatedBy { get; set; }
 }

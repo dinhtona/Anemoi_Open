@@ -11,8 +11,8 @@ public sealed record StartOnboardingCommand(
     EmployeeId EmployeeId,
     OnboardingPlanTemplateId TemplateId,
     DateTime StartDate,
-    Dictionary<string, string> RoleMappings) : ICommandResult<OnboardingInstanceResponse>
+    Dictionary<string, string> RoleMappings,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<OnboardingInstanceResponse>
 {
-    [JsonIgnore]
-    public string? CreatedBy { get; set; }
 }

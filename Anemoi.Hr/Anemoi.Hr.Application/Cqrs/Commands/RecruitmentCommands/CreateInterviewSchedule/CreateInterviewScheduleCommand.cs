@@ -12,8 +12,8 @@ public sealed record CreateInterviewScheduleCommand(
     DateTime ScheduledAt,
     int DurationMinutes,
     EmployeeId InterviewerEmployeeId,
-    string Notes) : ICommandResult<InterviewScheduleResponse>
+    string Notes,
+
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<InterviewScheduleResponse>
 {
-    [JsonIgnore]
-    public string CreatedBy { get; set; }
 }

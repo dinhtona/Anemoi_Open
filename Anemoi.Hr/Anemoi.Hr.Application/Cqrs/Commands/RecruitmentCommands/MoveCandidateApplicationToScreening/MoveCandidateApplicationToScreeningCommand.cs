@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.MoveCandidateApplicationToScreening;
 
-public sealed record MoveCandidateApplicationToScreeningCommand(CandidateApplicationId Id, string Note)
+public sealed record MoveCandidateApplicationToScreeningCommand(CandidateApplicationId Id, string Note,
+
+    [property: JsonIgnore] string? ChangedBy = null)
     : ICommandResult<CandidateApplicationResponse>
 {
-    [JsonIgnore]
-    public string ChangedBy { get; set; }
 }

@@ -8,7 +8,6 @@ public sealed class RejectLeaveRequestValidator : AbstractValidator<RejectLeaveR
 {
     public RejectLeaveRequestValidator()
     {
-        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
         RuleFor(x => x.ApproverEmployeeId).RequiredId(HrBusinessErrorCodes.ValApproverEmployeeIdRequired);
         RuleFor(x => x.Comment).NotEmpty().MaximumLength(1024);
     }

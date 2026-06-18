@@ -8,7 +8,6 @@ public sealed class CancelLeaveRequestValidator : AbstractValidator<CancelLeaveR
 {
     public CancelLeaveRequestValidator()
     {
-        RuleFor(x => x.Id).RequiredId(HrBusinessErrorCodes.ValLeaveRequestIdRequired);
         RuleFor(x => x.CancelledByEmployeeId).RequiredId(HrBusinessErrorCodes.ValEmployeeIdRequired);
         RuleFor(x => x.Reason).MaximumLength(1024);
     }
