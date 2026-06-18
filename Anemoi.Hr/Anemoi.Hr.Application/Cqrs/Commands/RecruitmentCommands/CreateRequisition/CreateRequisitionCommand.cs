@@ -15,8 +15,5 @@ public sealed record CreateRequisitionCommand(
     string EmploymentType,
     DateOnly OpenDate,
     DateOnly TargetHireDate,
-    string Description) : ICommandResult<JobRequisitionResponse>
-{
-    [JsonIgnore]
-    public string CreatedBy { get; set; }
-}
+    string Description,
+    [property: JsonIgnore] string? CreatedBy = null) : ICommandResult<JobRequisitionResponse>;
