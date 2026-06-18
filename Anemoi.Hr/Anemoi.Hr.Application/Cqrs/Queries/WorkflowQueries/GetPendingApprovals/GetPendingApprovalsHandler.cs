@@ -1,7 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Workflow;
@@ -12,8 +11,7 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetPendingApprovals
 public sealed class GetPendingApprovalsHandler(
     ISqlRepository<WorkflowInstance> instanceRepository,
     ISqlRepository<WorkflowDefinition> definitionRepository,
-    WorkflowMapper mapper,
-    IUserRolePermissionService permissionService)
+    WorkflowMapper mapper)
     : IQueryHandler<GetPendingApprovalsQuery, PaginationResponse<WorkflowInstanceResponse>>
 {
     public async Task<PaginationResponse<WorkflowInstanceResponse>> Handle(
@@ -35,8 +33,8 @@ public sealed class GetPendingApprovalsHandler(
             {
                 ApproverType.SpecificUser => step.ApproverValueSnapshot == request.UserId,
                 ApproverType.DirectManager => step.ApproverUserId == request.UserId,
-                ApproverType.Role => step.ApproverValueSnapshot != null && permissionService.UserHasRole(request.UserId, step.ApproverValueSnapshot),
-                ApproverType.Permission => step.ApproverValueSnapshot != null && permissionService.UserHasPermission(request.UserId, step.ApproverValueSnapshot),
+                ApproverType.Role => false,
+                ApproverType.Permission => false,
                 _ => false
             };
         }).ToList();

@@ -97,6 +97,7 @@ public partial class LeaveMapper
             EmployeeId = request.EmployeeId.Value.ToString(),
             LeavePolicyId = request.LeavePolicyId.Value.ToString(),
             ApproverEmployeeId = request.ApproverEmployeeId?.Value.ToString(),
+            ApproverName = request.ApproverEmployee?.FullName,
             LeaveTypeCode = request.LeaveTypeCode,
             StartDate = request.StartDate,
             EndDate = request.EndDate,

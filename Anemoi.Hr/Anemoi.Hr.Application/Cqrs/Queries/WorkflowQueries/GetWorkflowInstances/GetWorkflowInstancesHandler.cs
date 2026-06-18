@@ -40,10 +40,14 @@ public sealed class GetWorkflowInstancesHandler(
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var defIds = items.Select(x => x.WorkflowDefinitionId.Value).Distinct().ToList();
-        var defNames = await definitionRepository.GetQueryable()
-            .Where(d => defIds.Contains(d.Id.Value))
-            .ToDictionaryAsync(d => d.Id.Value, d => d.Name, cancellationToken);
+        Dictionary<Guid, string> defNames = [];
+        if (items.Count != 0)
+        {
+            var defIds = items.Select(x => x.WorkflowDefinitionId.Value).Distinct().ToList();
+            defNames = await definitionRepository.GetQueryable()
+                .Where(d => defIds.Contains(d.Id.Value))
+                .ToDictionaryAsync(d => d.Id.Value, d => d.Name, cancellationToken);
+        }
 
         var page = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 10 : request.PageSize;
