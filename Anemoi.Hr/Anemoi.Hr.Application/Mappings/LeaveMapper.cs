@@ -36,7 +36,7 @@ public partial class LeaveMapper
             Id = new LeaveRequestId(IdGenerator.NextGuid()),
             EmployeeId = command.EmployeeId,
             LeavePolicyId = command.LeavePolicyId,
-            ApproverEmployeeId = command.ApproverEmployeeId,
+            ApproverEmployeeId = new EmployeeId(Guid.Empty),
             LeaveTypeCode = command.LeaveTypeCode,
             StartDate = command.StartDate,
             EndDate = command.EndDate,

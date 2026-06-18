@@ -3,6 +3,8 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
 using Anemoi.Contract.Hr.Events;
@@ -21,6 +23,8 @@ public sealed class CreateOvertimeRequestHandler(
     ISqlRepository<Employee> employeeRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
+    IWorkflowEngine workflowEngine,
+    ICurrentUser currentUser,
     OvertimeMapper mapper,
     HrSettings hrSettings)
     : ICommandHandler<CreateOvertimeRequestCommand, OneOf<OvertimeRequestIdResponse, ErrorDetailResponse>>
@@ -69,6 +73,15 @@ public sealed class CreateOvertimeRequestHandler(
             request.Reason);
 
         await overtimeRequestRepository.CreateOneAsync(overtimeRequest, cancellationToken);
+
+        var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
+        await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.OvertimeRequest,
+            overtimeRequest.Id.Value,
+            request.EmployeeId,
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
 
         await publishEndpoint.Publish(new OvertimeRequestCreatedIntegrationEvent(
             overtimeRequest.Id.Value.ToString(),

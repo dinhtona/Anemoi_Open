@@ -139,17 +139,10 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         return history;
     }
 
-    public bool IsCurrentStepApprover(string userId, Func<string, bool> hasRole, Func<string, bool> hasPermission)
+    public bool IsCurrentStepApprover(EmployeeId employeeId)
     {
         var step = GetCurrentStepEntity();
-        return step.ApproverTypeSnapshot switch
-        {
-            ApproverType.SpecificUser => step.ApproverValueSnapshot == userId,
-            ApproverType.DirectManager => step.ApproverUserId == userId,
-            ApproverType.Role => step.ApproverValueSnapshot != null && hasRole(step.ApproverValueSnapshot),
-            ApproverType.Permission => step.ApproverValueSnapshot != null && hasPermission(step.ApproverValueSnapshot),
-            _ => false
-        };
+        return step.ApproverEmployeeId == employeeId;
     }
 
     private void EnsurePending()

@@ -3,6 +3,8 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
 using Anemoi.Contract.Hr.Events;
@@ -22,6 +24,8 @@ public sealed class SubmitLeaveRequestHandler(
     ISqlRepository<LeaveTransaction> leaveTransactionRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
+    IWorkflowEngine workflowEngine,
+    ICurrentUser currentUser,
     LeaveMapper mapper)
     : ICommandHandler<SubmitLeaveRequestCommand, OneOf<LeaveRequestIdResponse, ErrorDetailResponse>>
 {
@@ -72,21 +76,31 @@ public sealed class SubmitLeaveRequestHandler(
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
+
+        var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
+        await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.LeaveRequest,
+            leaveRequest.Id.Value,
+            request.EmployeeId,
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
+
         await publishEndpoint.Publish(new LeaveRequestSubmittedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
             leaveRequest.LeavePolicyId.Value.ToString(),
-            leaveRequest.ApproverEmployeeId?.Value.ToString()), cancellationToken);
+            null), cancellationToken);
+
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),
             balance.LeavePolicyId.Value.ToString(),
             balance.Year,
             balance.RemainingDays,
             LeaveBalanceTransactionType.PendingReserve), cancellationToken);
-
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
 
         return mapper.ToLeaveRequestIdResponse(leaveRequest);
     }

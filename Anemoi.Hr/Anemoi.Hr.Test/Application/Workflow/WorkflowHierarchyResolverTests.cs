@@ -1,8 +1,8 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Application.Services;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Anemoi.Hr.Test.Helpers;
 using FluentAssertions;
@@ -39,7 +39,8 @@ public sealed class WorkflowHierarchyResolverTests
         {
             Id = deptId,
             Name = "Test Dept",
-            ManagerEmployeeId = managerId
+            ManagerEmployeeId = managerId,
+            ParentDepartmentId = null
         };
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
@@ -54,8 +55,10 @@ public sealed class WorkflowHierarchyResolverTests
 
         var result = await resolver.ResolveHierarchyAsync(employeeId, CancellationToken.None);
 
-        result.Should().HaveCount(1);
-        result.First().ApproverUserId.Should().Be(new UserId(managerUserId));
+        // Both steps returned (deduplication happens at resolution time, not in hierarchy)
+        result.Should().HaveCount(2);
+        result.First().ApproverType.Should().Be(ApproverType.DirectManager);
+        result.Last().ApproverType.Should().Be(ApproverType.DepartmentManager);
     }
 
     [Fact]
@@ -80,7 +83,7 @@ public sealed class WorkflowHierarchyResolverTests
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
         employeeRepo.GetQueryable().Returns(
-            AsyncQueryableHelper.CreateMockQueryable(new[] { employee, employee }));
+            AsyncQueryableHelper.CreateMockQueryable(new[] { employee }));
 
         var departmentRepo = Substitute.For<ISqlRepository<Department>>();
         departmentRepo.GetQueryable().Returns(

@@ -105,6 +105,10 @@ public static class HrPermissions
     public const string WorkflowExecute = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowExecute;
     public const string WorkflowApprove = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrWorkflowApprove;
 
+    public const string OrganizationView = "hr.organization.view";
+    public const string OrganizationManage = "hr.organization.manage";
+    public const string WorkflowOverride = "hr.workflow.override";
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -211,7 +215,10 @@ public static class HrPermissions
         EssOvertimeView,
         EssOvertimeCreate,
         EssPayrollView,
-        EssPayslipView
+        EssPayslipView,
+        OrganizationView,
+        OrganizationManage,
+        WorkflowOverride
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =
@@ -251,7 +258,8 @@ public static class HrPermissions
             [RecruitmentRequestManage] = new(RecruitmentRequestManage, "High"),
             [OnboardingManage] = new(OnboardingManage, "High"),
             [OnboardingTaskManage] = new(OnboardingTaskManage, "High"),
-            [WorkflowApprove] = new(WorkflowApprove, "High")
+            [WorkflowApprove] = new(WorkflowApprove, "High"),
+            [OrganizationManage] = new(OrganizationManage, "High")
         };
 }
 

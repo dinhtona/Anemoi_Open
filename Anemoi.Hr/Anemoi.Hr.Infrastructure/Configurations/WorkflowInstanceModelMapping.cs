@@ -76,6 +76,9 @@ public sealed class WorkflowInstanceStepModelMapping : IEntityTypeConfiguration<
         builder.Property(x => x.ApproverTypeSnapshot).HasMaxLength(50).IsRequired();
         builder.Property(x => x.ApproverValueSnapshot).HasMaxLength(256).IsRequired(false);
         builder.Property(x => x.ApproverUserId).HasMaxLength(128).IsRequired(false);
+        builder.Property(x => x.ApproverEmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .HasColumnType("uuid").IsRequired(false);
         builder.Property(x => x.Status).HasMaxLength(50).IsRequired();
         builder.Property(x => x.ApprovedAt).IsRequired(false);
         builder.Property(x => x.RejectedAt).IsRequired(false);
@@ -83,6 +86,29 @@ public sealed class WorkflowInstanceStepModelMapping : IEntityTypeConfiguration<
 
         builder.HasIndex(x => x.WorkflowInstanceId);
         builder.HasIndex(x => x.Status);
+    }
+}
+
+public sealed class WorkflowRoleAssignmentModelMapping : IEntityTypeConfiguration<WorkflowRoleAssignment>
+{
+    public void Configure(EntityTypeBuilder<WorkflowRoleAssignment> builder)
+    {
+        builder.ToTable("WorkflowRoleAssignments");
+        builder.HasKey(x => x.Id);
+
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new WorkflowRoleAssignmentId(id))
+            .HasColumnType("uuid").IsRequired();
+
+        builder.Property(x => x.Role).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id))
+            .HasColumnType("uuid").IsRequired();
+        builder.Property(x => x.CreatedAt).IsRequired();
+
+        builder.HasIndex(x => x.Role);
+        builder.HasIndex(x => x.EmployeeId);
+        builder.HasIndex(x => new { x.Role, x.EmployeeId }).IsUnique();
     }
 }
 

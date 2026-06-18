@@ -64,6 +64,9 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IWorkflowEngine, WorkflowEngine>();
         services.AddScoped<IWorkflowHierarchyResolver, WorkflowHierarchyResolver>();
         services.AddScoped<IWorkflowBuilder, WorkflowBuilder>();
+        services.AddScoped<IApprovalResolver, DefaultApprovalResolver>();
+        services.AddScoped<IWorkflowRoleResolver, DefaultWorkflowRoleResolver>();
+        services.AddScoped<IOrganizationService, OrganizationService>();
         services.AddScoped<IWorkflowTargetStatusUpdater, LeaveWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, OvertimeWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, PayrollWorkflowStatusUpdater>();

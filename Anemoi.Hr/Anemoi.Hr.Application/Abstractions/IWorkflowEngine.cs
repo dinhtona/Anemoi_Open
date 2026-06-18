@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Hr.Application.Models;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using OneOf;
@@ -26,5 +27,8 @@ public interface IWorkflowEngine
         CancellationToken ct);
 
     Task<IReadOnlyList<UserId>> GetCurrentApproversAsync(
+        WorkflowInstanceId workflowInstanceId, CancellationToken ct);
+
+    Task<IReadOnlyList<WorkflowApproverCandidate>> ResolveApproversAsync(
         WorkflowInstanceId workflowInstanceId, CancellationToken ct);
 }

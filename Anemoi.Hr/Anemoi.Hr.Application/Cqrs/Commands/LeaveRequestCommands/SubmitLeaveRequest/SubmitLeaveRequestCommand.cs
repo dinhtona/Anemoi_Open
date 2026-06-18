@@ -7,7 +7,6 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.SubmitLeaveRe
 public sealed record SubmitLeaveRequestCommand(
     EmployeeId EmployeeId,
     LeavePolicyId LeavePolicyId,
-    EmployeeId ApproverEmployeeId,
     string LeaveTypeCode,
     DateOnly StartDate,
     DateOnly EndDate,

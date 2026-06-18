@@ -59,8 +59,8 @@ public sealed class WorkflowBuilderTests
         var hierarchyResolver = Substitute.For<IWorkflowHierarchyResolver>();
         var hierarchySteps = new List<ResolvedApproverStep>
         {
-            new(1, ApproverType.SpecificUser, null, new UserId(Guid.NewGuid())),
-            new(2, ApproverType.SpecificUser, null, new UserId(Guid.NewGuid()))
+            new(1, ApproverType.DirectManager, null),
+            new(2, ApproverType.DepartmentManager, null)
         };
         hierarchyResolver.ResolveHierarchyAsync(Arg.Any<EmployeeId>(), Arg.Any<CancellationToken>())
             .Returns(hierarchySteps);

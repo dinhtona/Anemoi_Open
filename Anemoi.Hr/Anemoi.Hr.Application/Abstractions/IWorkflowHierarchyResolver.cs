@@ -1,10 +1,9 @@
-using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Abstractions;
 
 public sealed record ResolvedApproverStep(
-    int StepOrder, string ApproverType, string? ApproverValue, UserId? ApproverUserId);
+    int StepOrder, string ApproverType, string? ApproverValue);
 
 public interface IWorkflowHierarchyResolver
 {

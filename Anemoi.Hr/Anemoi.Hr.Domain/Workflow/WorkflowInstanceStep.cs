@@ -10,6 +10,7 @@ public sealed class WorkflowInstanceStep : Entity<WorkflowInstanceStepId>
     public string ApproverTypeSnapshot { get; private set; }
     public string? ApproverValueSnapshot { get; private set; }
     public string? ApproverUserId { get; private set; }
+    public EmployeeId? ApproverEmployeeId { get; private set; }
     public string Status { get; private set; }
     public DateTime? ApprovedAt { get; private set; }
     public DateTime? RejectedAt { get; private set; }
@@ -35,6 +36,12 @@ public sealed class WorkflowInstanceStep : Entity<WorkflowInstanceStepId>
             ApproverUserId = approverUserId,
             Status = WorkflowStepStatusCode.Pending
         };
+    }
+
+    public void SetApprover(EmployeeId employeeId, string userId)
+    {
+        ApproverEmployeeId = employeeId;
+        ApproverUserId = userId;
     }
 
     internal void Approve(string? comment)

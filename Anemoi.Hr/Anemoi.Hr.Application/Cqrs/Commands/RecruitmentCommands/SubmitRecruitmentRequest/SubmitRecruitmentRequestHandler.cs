@@ -3,26 +3,28 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Hr.Events;
+using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.SubmitRecruitmentRequest;
 
 public sealed class SubmitRecruitmentRequestHandler(
     ISqlRepository<RecruitmentRequest> requestRepository,
     ISqlRepository<RecruitmentRequestHistory> historyRepository,
+    ISqlRepository<Employee> employeeRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
+    IWorkflowEngine workflowEngine,
+    ICurrentUser currentUser,
     RecruitmentMapper mapper)
     : ICommandHandler<SubmitRecruitmentRequestCommand, OneOf<RecruitmentRequestResponse, ErrorDetailResponse>>
 {
@@ -57,6 +59,18 @@ public sealed class SubmitRecruitmentRequestHandler(
         var historyResult = await historyRepository.CreateOneAsync(history, cancellationToken);
         if (historyResult.TryPickT1(out var histException, out _))
             return HrErrorResponses.FromSaveResult(histException, HrBusinessErrorCodes.SaveChangesFailed);
+
+        var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
+        var requesterEmployee = await employeeRepository.GetQueryable()
+            .FirstOrDefaultAsync(e => e.IdentityUserId == requesterUserId.Value, cancellationToken);
+
+        await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
+            recruitmentRequest.Id.Value,
+            requesterEmployee?.Id ?? new EmployeeId(Guid.Empty),
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
 
         await publishEndpoint.Publish(new RecruitmentRequestSubmittedIntegrationEvent(
             recruitmentRequest.Id.Value.ToString(),

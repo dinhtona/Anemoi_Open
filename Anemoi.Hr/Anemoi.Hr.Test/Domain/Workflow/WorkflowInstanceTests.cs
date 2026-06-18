@@ -15,14 +15,19 @@ public sealed class WorkflowInstanceTests
     {
         var defId = new WorkflowDefinitionId(Guid.NewGuid());
         var instanceId = new WorkflowInstanceId(Guid.NewGuid());
+        var employeeId = new EmployeeId(Guid.NewGuid());
         var steps = Enumerable.Range(1, stepCount).Select(i =>
-            WorkflowInstanceStep.Create(
+        {
+            var step = WorkflowInstanceStep.Create(
                 new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, i,
-                ApproverType.SpecificUser, "user-1", "user-1")).ToList();
+                ApproverType.SpecificUser, null, null);
+            step.SetApprover(employeeId, "user-1");
+            return step;
+        }).ToList();
 
         var instance = WorkflowInstance.Start(instanceId, defId,
             "TestEntity", "entity-1", "requester-1",
-            new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), steps);
+            employeeId, new UserId(Guid.NewGuid()), steps);
         return (instance, instanceId);
     }
 
@@ -183,8 +188,7 @@ public sealed class WorkflowInstanceTests
     {
         var (instance, _) = CreatePendingInstance(1);
 
-        var result = instance.IsCurrentStepApprover("wrong-user",
-            _ => false, _ => false);
+        var result = instance.IsCurrentStepApprover(new EmployeeId(Guid.NewGuid()));
 
         result.Should().BeFalse();
     }
@@ -193,60 +197,9 @@ public sealed class WorkflowInstanceTests
     public void Approve_CurrentSpecificUser_ShouldPass()
     {
         var (instance, _) = CreatePendingInstance(1);
+        var firstStep = instance.Steps.First();
 
-        var result = instance.IsCurrentStepApprover("user-1",
-            _ => false, _ => false);
-
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void Approve_WithRole_ShouldPass()
-    {
-        var defId = new WorkflowDefinitionId(Guid.NewGuid());
-        var instanceId = new WorkflowInstanceId(Guid.NewGuid());
-        var step = WorkflowInstanceStep.Create(
-            new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
-            ApproverType.Role, "HR_Manager", null);
-        var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
-
-        var result = instance.IsCurrentStepApprover("any-user",
-            role => role == "HR_Manager", _ => false);
-
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void Approve_WithPermission_ShouldPass()
-    {
-        var defId = new WorkflowDefinitionId(Guid.NewGuid());
-        var instanceId = new WorkflowInstanceId(Guid.NewGuid());
-        var step = WorkflowInstanceStep.Create(
-            new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
-            ApproverType.Permission, "hr.workflow.execute", null);
-        var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
-
-        var result = instance.IsCurrentStepApprover("any-user",
-            _ => false, perm => perm == "hr.workflow.execute");
-
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void Approve_ByDirectManager_ShouldPass()
-    {
-        var defId = new WorkflowDefinitionId(Guid.NewGuid());
-        var instanceId = new WorkflowInstanceId(Guid.NewGuid());
-        var step = WorkflowInstanceStep.Create(
-            new WorkflowInstanceStepId(Guid.NewGuid()), instanceId, 1,
-            ApproverType.DirectManager, null, "manager-1");
-        var instance = WorkflowInstance.Start(instanceId, defId,
-            "Test", "e-1", "requester-1", new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()), [step]);
-
-        var result = instance.IsCurrentStepApprover("manager-1",
-            _ => false, _ => false);
+        var result = instance.IsCurrentStepApprover(firstStep.ApproverEmployeeId!);
 
         result.Should().BeTrue();
     }

@@ -388,6 +388,7 @@ public static class HrBusinessErrorCodes
     public const string WorkflowDefinitionRequiresDefinition = "HR_WF_DEF_REQUIRES_DEFINITION";
     public const string WorkflowHierarchyResolutionFailed = "HR_WF_HIERARCHY_RESOLUTION_FAILED";
     public const string WorkflowUniqueActiveConstraint = "HR_WF_UNIQUE_ACTIVE_CONSTRAINT";
+    public const string WorkflowApproverNotFound = "HR_WORKFLOW_APPROVER_NOT_FOUND";
 
     // Workflow Definition
     public const string WorkflowDefinitionNotFound = "HR_WF_DEF_NOT_FOUND";

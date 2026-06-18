@@ -57,8 +57,7 @@ public sealed class WorkflowBuilder(
         {
             var stepId = new WorkflowInstanceStepId(IdGenerator.NextGuid());
             return WorkflowInstanceStep.Create(stepId, default, s.StepOrder,
-                ApproverType.SpecificUser, null,
-                s.ApproverUserId?.Value.ToString());
+                s.ApproverType, null, null);
         }).ToList();
         return OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>.FromT0(result);
     }

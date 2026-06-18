@@ -2,6 +2,8 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Contract.Hr.Events;
@@ -11,9 +13,6 @@ using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.SubmitPayrollRunForApproval;
 
@@ -21,6 +20,7 @@ public sealed class SubmitPayrollRunForApprovalHandler(
     ISqlRepository<PayrollRun> payrollRunRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
+    IWorkflowEngine workflowEngine,
     PayrollMapper mapper)
     : ICommandHandler<SubmitPayrollRunForApprovalCommand, OneOf<PayrollRunDetailResponse, ErrorDetailResponse>>
 {
@@ -38,6 +38,18 @@ public sealed class SubmitPayrollRunForApprovalHandler(
 
         if (!run.SubmitForApproval(request.SubmittedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
+
+        if (request.SubmittedBy is not null)
+        {
+            var requesterUserId = new UserId(Guid.Parse(request.SubmittedBy));
+            await workflowEngine.StartAsync(
+                WorkflowConstants.TargetEntityTypes.PayrollRun,
+                run.Id.Value,
+                run.EmployeeId,
+                requesterUserId,
+                requesterUserId,
+                cancellationToken);
+        }
 
         await publishEndpoint.Publish(new PayrollRunSubmittedIntegrationEvent(
             run.Id.Value.ToString(),

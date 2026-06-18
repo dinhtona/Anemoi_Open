@@ -4,6 +4,7 @@ using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Services;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Anemoi.Hr.Test.Helpers;
@@ -41,7 +42,23 @@ public sealed class WorkflowEngineTests
             });
 
         var historyRepo = Substitute.For<ISqlRepository<WorkflowHistory>>();
-        var engine = new WorkflowEngine(instanceRepo, historyRepo, workflowBuilder);
+        var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
+        employeeRepo.GetQueryable().Returns(
+            AsyncQueryableHelper.CreateMockQueryable<Employee>([]));
+
+        var resolvedEmployeeId = new EmployeeId(Guid.NewGuid());
+        var resolvedApprovers = new List<ResolvedApprover>
+        {
+            new(new UserId(Guid.NewGuid()), resolvedEmployeeId, "Test User", "test@test.com", "SpecificUser")
+        };
+        var approvalResolver = Substitute.For<IApprovalResolver>();
+        approvalResolver.ResolveApproversAsync(Arg.Any<string>(), Arg.Any<string?>(),
+                Arg.Any<ApprovalRoutingContext>(), Arg.Any<CancellationToken>())
+            .Returns(OneOf<IReadOnlyList<ResolvedApprover>, ErrorDetailResponse>.FromT0(
+                resolvedApprovers));
+
+        var engine = new WorkflowEngine(instanceRepo, historyRepo, employeeRepo,
+            workflowBuilder, approvalResolver);
 
         var result = await engine.StartAsync(
             "TestEntity", Guid.NewGuid(),
@@ -67,7 +84,10 @@ public sealed class WorkflowEngineTests
             AsyncQueryableHelper.CreateMockQueryable<WorkflowInstance>([]));
 
         var historyRepo = Substitute.For<ISqlRepository<WorkflowHistory>>();
-        var engine = new WorkflowEngine(instanceRepo, historyRepo, workflowBuilder);
+        var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
+        var approvalResolver = Substitute.For<IApprovalResolver>();
+        var engine = new WorkflowEngine(instanceRepo, historyRepo, employeeRepo,
+            workflowBuilder, approvalResolver);
 
         var result = await engine.ApproveAsync(
             new WorkflowInstanceId(Guid.NewGuid()),

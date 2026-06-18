@@ -86,6 +86,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<WorkflowInstance> WorkflowInstances { get; set; }
     public DbSet<WorkflowInstanceStep> WorkflowInstanceSteps { get; set; }
     public DbSet<WorkflowHistory> WorkflowHistories { get; set; }
+    public DbSet<WorkflowRoleAssignment> WorkflowRoleAssignments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
