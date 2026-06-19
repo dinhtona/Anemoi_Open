@@ -19,6 +19,7 @@ namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.Arc
 
 public sealed class ArchiveAllReadNotificationsHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
+    IUnitOfWork unitOfWork,
     ILogger logger)
     : IRequestHandler<ArchiveAllReadNotificationsCommand, OneOf<None, ErrorDetailResponse>>
 {
@@ -29,17 +30,15 @@ public sealed class ArchiveAllReadNotificationsHandler(
         try
         {
             var userId = new UserId(Guid.Parse(request.UserId));
-            var now = DateTime.UtcNow;
 
-            await sqlRepository.GetQueryable()
+            var items = await sqlRepository.GetQueryable()
                 .Where(x => x.UserId == userId && x.IsRead && !x.IsArchived)
-                .ExecuteUpdateAsync(
-                    setters => setters
-                        .SetProperty(x => x.IsArchived, true)
-                        .SetProperty(x => x.ArchivedAt, now)
-                        .SetProperty(x => x.ArchivedBy, userId.Value),
-                    cancellationToken);
+                .ToListAsync(cancellationToken);
 
+            foreach (var item in items)
+                item.Archive(userId.Value);
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return None.Value;
         }
         catch (Exception ex)

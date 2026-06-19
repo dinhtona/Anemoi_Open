@@ -290,7 +290,7 @@ public sealed class NotificationController(ISender sender) : ControllerBase
         var userId = HttpContext.GetUserId();
         var query = new GetMyNotificationPreferenceQuery(userId);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpPut]

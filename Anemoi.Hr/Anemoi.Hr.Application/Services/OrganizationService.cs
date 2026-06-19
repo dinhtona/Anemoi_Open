@@ -28,7 +28,8 @@ public sealed class OrganizationService(
     ISqlRepository<Department> departmentRepository,
     ISqlRepository<WorkflowDefinition> definitionRepository,
     IApprovalResolver approvalResolver,
-    IWorkflowHierarchyResolver hierarchyResolver)
+    IWorkflowHierarchyResolver hierarchyResolver,
+    IUnitOfWork unitOfWork)
     : IOrganizationService
 {
     public async Task<List<OrganizationNode>> GetOrganizationTreeAsync(CancellationToken ct)
@@ -157,6 +158,7 @@ public sealed class OrganizationService(
 
         employee.DirectManagerEmployeeId = managerId;
         employee.UpdatedAt = DateTime.UtcNow;
+        await unitOfWork.SaveChangesAsync(ct);
 
         return true;
     }

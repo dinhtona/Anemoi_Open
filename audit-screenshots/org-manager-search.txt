@@ -1,0 +1,13 @@
+uid=30_0 RootWebArea "Dev Tool Dashboard" url="http://localhost:3000/en/hr/organization"
+  uid=30_84 region "Notifications alt+T" live="polite" relevant="additions text"
+  uid=30_85 button "Open Next.js Dev Tools" expandable haspopup="menu"
+  uid=33_0 dialog "Select Employee"
+    uid=33_1 heading "Select Employee" level="2"
+    uid=33_2 textbox "Type to search..." focusable focused
+    uid=33_3 button "AA Anemoi Admin DEV-ADMIN-001 · admin@anemoi.com"
+    uid=33_4 button "LN Linh Nguyen DEV-ENG-001 · linh.nguyen@anemoi.test"
+    uid=33_5 button "MT Minh Tran DEV-ENG-002 · minh.tran@anemoi.test"
+    uid=33_6 button "AP An Pham DEV-ENG-003 · an.pham@anemoi.test"
+    uid=33_7 button "ML Mai Le DEV-HR-001 · mai.le@anemoi.test"
+    uid=33_8 button "KD Khoa Do DEV-HR-002 · khoa.do@anemoi.test"
+    uid=33_9 button "Close"

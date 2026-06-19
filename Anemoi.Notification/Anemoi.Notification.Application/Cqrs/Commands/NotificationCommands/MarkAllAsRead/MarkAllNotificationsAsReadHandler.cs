@@ -19,6 +19,7 @@ namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.Mar
 
 public sealed class MarkAllNotificationsAsReadHandler(
     ISqlRepository<NotificationHistory> sqlRepository,
+    IUnitOfWork unitOfWork,
     ILogger logger)
     : IRequestHandler<MarkAllNotificationsAsReadCommand, OneOf<None, ErrorDetailResponse>>
 {
@@ -28,16 +29,15 @@ public sealed class MarkAllNotificationsAsReadHandler(
         try
         {
             var userId = new UserId(Guid.Parse(request.UserId));
-            var now = DateTime.UtcNow;
 
-            await sqlRepository.GetQueryable()
+            var items = await sqlRepository.GetQueryable()
                 .Where(x => x.UserId == userId && !x.IsRead && !x.IsArchived)
-                .ExecuteUpdateAsync(
-                    setters => setters
-                        .SetProperty(x => x.IsRead, true)
-                        .SetProperty(x => x.ReadTime, now),
-                    cancellationToken);
+                .ToListAsync(cancellationToken);
 
+            foreach (var item in items)
+                item.MarkAsRead();
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
             return None.Value;
         }
         catch (Exception ex)
