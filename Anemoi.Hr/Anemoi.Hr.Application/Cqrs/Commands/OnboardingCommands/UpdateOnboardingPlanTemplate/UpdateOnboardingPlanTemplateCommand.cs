@@ -13,7 +13,7 @@ public sealed record UpdateOnboardingPlanTemplateCommand(
     [property: JsonIgnore] string? UpdatedBy = null) : ICommandResult<OnboardingPlanTemplateResponse>
 {
     [JsonIgnore]
-    public OnboardingPlanTemplateId Id { get; set; }
+    public OnboardingPlanTemplateId? Id { get; set; }
 }
 
 public sealed record UpdateOnboardingTaskTemplateDto(

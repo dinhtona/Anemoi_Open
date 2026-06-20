@@ -43,10 +43,15 @@ public sealed class GetWorkflowInstancesHandler(
         Dictionary<Guid, string> defNames = [];
         if (items.Count != 0)
         {
-            var defIds = items.Select(x => x.WorkflowDefinitionId.Value).Distinct().ToList();
-            defNames = await definitionRepository.GetQueryable()
+            var defIds = items
+                .Where(x => x.WorkflowDefinitionId is not null)
+                .Select(x => x.WorkflowDefinitionId!.Value)
+                .Distinct()
+                .ToList();
+            var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
+            defNames = allDefs
                 .Where(d => defIds.Contains(d.Id.Value))
-                .ToDictionaryAsync(d => d.Id.Value, d => d.Name, cancellationToken);
+                .ToDictionary(d => d.Id.Value, d => d.Name);
         }
 
         var page = request.Page < 1 ? 1 : request.Page;

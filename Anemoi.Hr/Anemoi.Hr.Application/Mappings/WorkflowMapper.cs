@@ -92,6 +92,7 @@ public sealed class WorkflowMapper
         return instances.Select(i =>
         {
             var name = definitionNames is not null
+                && i.WorkflowDefinitionId is not null
                 && definitionNames.TryGetValue(i.WorkflowDefinitionId.Value, out var n) ? n : null;
             return ToResponse(i, name);
         }).ToList();

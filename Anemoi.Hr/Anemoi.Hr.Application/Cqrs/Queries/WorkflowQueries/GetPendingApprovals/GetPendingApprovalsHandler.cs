@@ -66,10 +66,15 @@ public sealed class GetPendingApprovalsHandler(
             .Take(request.PageSize)
             .ToList();
 
-        var defIds = pageItems.Select(x => x.WorkflowDefinitionId.Value).Distinct().ToList();
-        var defNames = await definitionRepository.GetQueryable()
+        var defIds = pageItems
+            .Where(x => x.WorkflowDefinitionId is not null)
+            .Select(x => x.WorkflowDefinitionId!.Value)
+            .Distinct()
+            .ToList();
+        var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
+        var defNames = allDefs
             .Where(d => defIds.Contains(d.Id.Value))
-            .ToDictionaryAsync(d => d.Id.Value, d => d.Name, cancellationToken);
+            .ToDictionary(d => d.Id.Value, d => d.Name);
 
         var page = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 10 : request.PageSize;
