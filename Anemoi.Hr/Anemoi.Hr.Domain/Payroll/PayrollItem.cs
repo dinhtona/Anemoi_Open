@@ -40,4 +40,5 @@ public static class PayrollItemType
     public const string BasePay = "BasePay";
     public const string Allowance = "Allowance";
     public const string Deduction = "Deduction";
+    public const string Overtime = "Overtime";
 }

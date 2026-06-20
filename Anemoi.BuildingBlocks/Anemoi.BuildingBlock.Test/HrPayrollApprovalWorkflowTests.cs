@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.SubmitPayrollRunForApproval;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.ApprovePayrollRun;
@@ -141,11 +142,13 @@ public sealed class HrPayrollApprovalWorkflowTests
             new FakeRepository<PayrollRun>([run]),
             new FakeUnitOfWork(),
             Substitute.For<IPublishEndpoint>(),
+            Substitute.For<IWorkflowEngine>(),
             new PayrollMapper()
         );
 
+        var testUserId = Guid.NewGuid().ToString();
         var result = await handler.Handle(
-            new SubmitPayrollRunForApprovalCommand(runId, "test-user"),
+            new SubmitPayrollRunForApprovalCommand(runId, testUserId),
             CancellationToken.None
         );
 
@@ -153,7 +156,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         {
             Assert.True(result.IsT0);
             Assert.Equal(PayrollRunStatus.SubmittedForApproval.ToString(), result.AsT0.Status);
-            Assert.Equal("test-user", result.AsT0.SubmittedBy);
+            Assert.Equal(testUserId, result.AsT0.SubmittedBy);
             Assert.NotNull(result.AsT0.SubmittedAt);
         }
         else

@@ -31,7 +31,7 @@ public sealed class CreateWorkflowDefinitionHandler(
             return WorkflowDefinitionStep.Create(stepId, id, s.Sequence, s.ApproverType, s.ApproverValue, s.IsRequired);
         }).ToList();
 
-        var definition = WorkflowDefinition.Create(id, request.Code, request.Name, request.Description, request.WorkflowTypeCode, string.Empty, 1, steps);
+        var definition = WorkflowDefinition.Create(id, request.Code, request.Name, request.Description, request.WorkflowTypeCode, request.WorkflowTypeCode, 1, steps);
 
         var createResult = await repository.CreateOneAsync(definition, cancellationToken);
         if (createResult.TryPickT1(out var exception, out _))

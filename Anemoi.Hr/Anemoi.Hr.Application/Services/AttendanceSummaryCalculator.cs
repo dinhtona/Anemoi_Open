@@ -17,9 +17,9 @@ public static class AttendanceSummaryCalculator
             attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Leave).Sum(x => x.WorkedDays),
             attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Absent).Sum(x => x.WorkedDays),
             attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Holiday).Sum(x => x.WorkedDays),
-            attendanceRecords.Sum(x => x.WorkedDays),
-            0,
-            0);
+            attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Present).Sum(x => x.WorkedDays),
+            attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Leave).Sum(x => x.WorkedDays),
+            attendanceRecords.Where(x => x.Status == AttendanceStatusCodes.Absent).Sum(x => x.WorkedDays));
     }
 }
 

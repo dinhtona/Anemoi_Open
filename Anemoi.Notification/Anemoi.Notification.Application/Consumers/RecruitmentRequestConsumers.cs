@@ -5,7 +5,6 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
-using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
 using Serilog;
@@ -13,7 +12,6 @@ using Serilog;
 namespace Anemoi.Notification.Application.Consumers;
 
 public sealed class RecruitmentRequestSubmittedConsumer(
-    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -40,12 +38,7 @@ public sealed class RecruitmentRequestSubmittedConsumer(
             return;
         }
 
-        var userId = await recipientResolver.ResolveApproverUserIdByEmployeeId(message.ApproverUserId, context.CancellationToken);
-        if (string.IsNullOrEmpty(userId))
-        {
-            logger.Warning("Could not resolve Approver User ID for EmployeeId: {ApproverId}. Skipping notification.", message.ApproverUserId);
-            return;
-        }
+        var userId = message.ApproverUserId;
 
         var command = new CreateNotificationCommand(
             UserId: userId,
@@ -65,7 +58,6 @@ public sealed class RecruitmentRequestSubmittedConsumer(
 }
 
 public sealed class RecruitmentRequestApprovedConsumer(
-    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -86,12 +78,7 @@ public sealed class RecruitmentRequestApprovedConsumer(
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
 
-        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.ApprovedBy, context.CancellationToken);
-        if (string.IsNullOrEmpty(userId))
-        {
-            logger.Warning("Could not resolve Requester User ID for ApprovedBy: {ApprovedBy}. Skipping notification.", message.ApprovedBy);
-            return;
-        }
+        var userId = message.ApprovedBy;
 
         var command = new CreateNotificationCommand(
             UserId: userId,
@@ -111,7 +98,6 @@ public sealed class RecruitmentRequestApprovedConsumer(
 }
 
 public sealed class RecruitmentRequestRejectedConsumer(
-    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -132,12 +118,7 @@ public sealed class RecruitmentRequestRejectedConsumer(
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
 
-        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.RejectedBy, context.CancellationToken);
-        if (string.IsNullOrEmpty(userId))
-        {
-            logger.Warning("Could not resolve Requester User ID for RejectedBy: {RejectedBy}. Skipping notification.", message.RejectedBy);
-            return;
-        }
+        var userId = message.RejectedBy;
 
         var command = new CreateNotificationCommand(
             UserId: userId,

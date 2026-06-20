@@ -8,6 +8,18 @@ public static class PayrollConstants
     public const string AllowanceItemCodeFallback = "ALLOWANCE";
     public const string AllowanceItemNameFallback = "Allowance";
 
+    public const string OvertimeItemCode = "OVERTIME";
+    public const string OvertimeItemName = "Overtime Pay";
+
+    public const string TaxDeductionItemCode = "TAX_DEDUCTION";
+    public const string TaxDeductionItemName = "Income Tax";
+
+    public const string InsuranceDeductionItemCode = "INSURANCE_DEDUCTION";
+    public const string InsuranceDeductionItemName = "Insurance";
+
+    public const decimal StandardWorkingHoursPerDay = 8m;
+    public const decimal OvertimeRateMultiplier = 1.5m;
+
     public const string SystemActor = "system";
 
     public const string PayslipStatusNotGenerated = "NotGenerated";

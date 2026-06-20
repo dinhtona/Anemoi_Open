@@ -2,6 +2,7 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
@@ -18,6 +19,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.Hr.Domain.Attendance;
+using Anemoi.Hr.Domain.Insurance;
+using Anemoi.Hr.Domain.Taxation;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
 
@@ -29,6 +32,9 @@ public sealed class CalculatePayrollRunHandler(
     ISqlRepository<EmployeeAllowance> employeeAllowanceRepository,
     ISqlRepository<AttendancePeriod> attendancePeriodRepository,
     ISqlRepository<AttendanceSummary> attendanceSummaryRepository,
+    ISqlRepository<TaxCalculationSnapshot> taxSnapshotRepository,
+    ISqlRepository<InsuranceCalculationSnapshot> insuranceSnapshotRepository,
+    IOvertimeSnapshotProvider overtimeSnapshotProvider,
     IUnitOfWork unitOfWork,
     PayrollMapper mapper,
     ILogger<CalculatePayrollRunHandler> logger = null)
@@ -144,11 +150,51 @@ public sealed class CalculatePayrollRunHandler(
             .ToListAsync(cancellationToken);
 
         var totalAllowanceAmount = activeAllowances.Sum(x => x.Amount);
-        var grossAmount = Math.Round(basePayAmount + totalAllowanceAmount, 2, MidpointRounding.AwayFromZero);
-        var totalDeductionAmount = 0m;
+
+        // Overtime calculation
+        var overtimeRequests = await overtimeSnapshotProvider.GetApprovedOvertimeRequestsAsync(
+            period.StartDate.ToDateTime(TimeOnly.MinValue),
+            period.EndDate.ToDateTime(TimeOnly.MaxValue),
+            cancellationToken);
+
+        var employeeOvertimeRequests = overtimeRequests
+            .Where(x => x.EmployeeId == request.EmployeeId.Value
+                        && x.OvertimeDate >= period.StartDate
+                        && x.OvertimeDate <= period.EndDate)
+            .ToList();
+
+        var totalOvertimePay = 0m;
+        foreach (var ot in employeeOvertimeRequests)
+        {
+            var hourlyRate = dailyRate / PayrollConstants.StandardWorkingHoursPerDay;
+            var overtimePay = Math.Round(
+                ot.DurationHours * hourlyRate * PayrollConstants.OvertimeRateMultiplier,
+                2, MidpointRounding.AwayFromZero);
+            totalOvertimePay += overtimePay;
+        }
+        totalOvertimePay = Math.Round(totalOvertimePay, 2, MidpointRounding.AwayFromZero);
+
+        var grossAmount = Math.Round(basePayAmount + totalAllowanceAmount + totalOvertimePay, 2, MidpointRounding.AwayFromZero);
+
+        // 9. Fetch Tax and Insurance snapshots
+        var taxSnapshot = await taxSnapshotRepository.GetQueryable()
+            .Where(x => x.EmployeeId == request.EmployeeId
+                        && x.CalculationPeriodStart == period.StartDate
+                        && x.CalculationPeriodEnd == period.EndDate)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var insuranceSnapshot = await insuranceSnapshotRepository.GetQueryable()
+            .Where(x => x.EmployeeId == request.EmployeeId
+                        && x.CalculationPeriodStart == period.StartDate
+                        && x.CalculationPeriodEnd == period.EndDate)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var taxDeductionAmount = taxSnapshot?.TotalTaxAmount ?? 0m;
+        var insuranceDeductionAmount = insuranceSnapshot?.TotalEmployeeContribution ?? 0m;
+        var totalDeductionAmount = Math.Round(taxDeductionAmount + insuranceDeductionAmount, 2, MidpointRounding.AwayFromZero);
         var netAmount = Math.Round(grossAmount - totalDeductionAmount, 2, MidpointRounding.AwayFromZero);
 
-        // 9. Create PayrollRun
+        // 10. Create PayrollRun
         var payrollRun = new PayrollRun
         {
             Id = new PayrollRunId(IdGenerator.NextGuid()),
@@ -172,7 +218,7 @@ public sealed class CalculatePayrollRunHandler(
             CalculatedBy = request.CalculatedBy ?? PayrollConstants.SystemActor
         };
 
-        // 10. Add PayrollItems
+        // 11. Add PayrollItems
         // Base Pay Item
         var basePayItem = new PayrollItem
         {
@@ -216,6 +262,60 @@ public sealed class CalculatePayrollRunHandler(
                 };
                 payrollRun.PayrollItems.Add(allowanceItem);
             }
+        }
+
+        // Overtime Pay Item (only add if amount > 0)
+        if (totalOvertimePay > 0)
+        {
+            var overtimePayItem = new PayrollItem
+            {
+                Id = new PayrollItemId(IdGenerator.NextGuid()),
+                PayrollRunId = payrollRun.Id,
+                ItemCode = PayrollConstants.OvertimeItemCode,
+                ItemName = PayrollConstants.OvertimeItemName,
+                ItemTypeCode = PayrollItemType.Overtime,
+                Amount = totalOvertimePay,
+                CurrencyCode = currencyCode,
+                PaidWorkingDays = 0,
+                PaidLeaveDays = 0,
+                UnpaidLeaveDays = 0,
+                BaseSalarySnapshot = dailyRate,
+                DailyRateSnapshot = PayrollConstants.OvertimeRateMultiplier,
+                BasePayAmount = totalOvertimePay
+            };
+            payrollRun.PayrollItems.Add(overtimePayItem);
+        }
+
+        // Tax Deduction Item (only add if amount > 0)
+        if (taxDeductionAmount > 0)
+        {
+            var taxDeductionItem = new PayrollItem
+            {
+                Id = new PayrollItemId(IdGenerator.NextGuid()),
+                PayrollRunId = payrollRun.Id,
+                ItemCode = PayrollConstants.TaxDeductionItemCode,
+                ItemName = PayrollConstants.TaxDeductionItemName,
+                ItemTypeCode = PayrollItemType.Deduction,
+                Amount = taxDeductionAmount,
+                CurrencyCode = currencyCode
+            };
+            payrollRun.PayrollItems.Add(taxDeductionItem);
+        }
+
+        // Insurance Deduction Item (only add if amount > 0)
+        if (insuranceDeductionAmount > 0)
+        {
+            var insuranceDeductionItem = new PayrollItem
+            {
+                Id = new PayrollItemId(IdGenerator.NextGuid()),
+                PayrollRunId = payrollRun.Id,
+                ItemCode = PayrollConstants.InsuranceDeductionItemCode,
+                ItemName = PayrollConstants.InsuranceDeductionItemName,
+                ItemTypeCode = PayrollItemType.Deduction,
+                Amount = insuranceDeductionAmount,
+                CurrencyCode = currencyCode
+            };
+            payrollRun.PayrollItems.Add(insuranceDeductionItem);
         }
 
         await payrollRunRepository.CreateOneAsync(payrollRun, cancellationToken);

@@ -7,16 +7,20 @@ using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain.Models;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.AttendanceCommands.LockAttendancePeriod;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.CalculatePayrollRun;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.LockPayrollPeriod;
 using Anemoi.Hr.Application.Cqrs.Commands.PayrollCommands.RecalculatePayrollRun;
 using Anemoi.Hr.Application.Mappings;
+using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Attendance;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Payroll;
+using Anemoi.Hr.Domain.Taxation;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -141,8 +145,8 @@ public sealed class HrAttendancePayrollIntegrationTests
         Assert.Equal(1.5m, summary.WorkedDays);
         Assert.Equal(12, summary.WorkedHours);
         Assert.Equal(0.5m, summary.LeaveDays);
-        Assert.Equal(1.5m, summary.PaidWorkingDays);
-        Assert.Equal(0, summary.PaidLeaveDays);
+        Assert.Equal(1m, summary.PaidWorkingDays);
+        Assert.Equal(0.5m, summary.PaidLeaveDays);
         Assert.Equal(0, summary.UnpaidLeaveDays);
     }
 
@@ -416,6 +420,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([]),
             new FakeRepository<AttendanceSummary>([]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -469,6 +476,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([attPeriod]),
             new FakeRepository<AttendanceSummary>([]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -522,6 +532,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([attPeriod]),
             new FakeRepository<AttendanceSummary>([]), // No summary
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -577,6 +590,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([attendancePeriod]),
             new FakeRepository<AttendanceSummary>(summaries),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper());
 
@@ -617,6 +633,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([]),
             new FakeRepository<AttendanceSummary>([]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -684,6 +703,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([attPeriod]),
             new FakeRepository<AttendanceSummary>([summary]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -769,6 +791,9 @@ public sealed class HrAttendancePayrollIntegrationTests
             new FakeRepository<EmployeeAllowance>([]),
             new FakeRepository<AttendancePeriod>([attPeriod]),
             new FakeRepository<AttendanceSummary>([summary]),
+            new FakeRepository<TaxCalculationSnapshot>([]),
+            new FakeRepository<InsuranceCalculationSnapshot>([]),
+            new FakeOvertimeSnapshotProvider(),
             new FakeUnitOfWork(),
             new PayrollMapper()
         );
@@ -913,6 +938,15 @@ public sealed class HrAttendancePayrollIntegrationTests
         Assert.NotEqual(initialItem.Id, payrollRun.PayrollItems.First().Id);
         Assert.Equal(2000, payrollRun.BasePayAmount);
         Assert.Equal(20, payrollRun.PayrollItems.First().PaidWorkingDays);
+    }
+
+    private sealed class FakeOvertimeSnapshotProvider : IOvertimeSnapshotProvider
+    {
+        public Task<IEnumerable<OvertimeRequestResponse>> GetApprovedOvertimeRequestsAsync(
+            DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(Enumerable.Empty<OvertimeRequestResponse>());
+        }
     }
 
     private sealed class FakeUnitOfWork : IUnitOfWork

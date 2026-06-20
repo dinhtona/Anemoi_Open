@@ -17,7 +17,8 @@ public sealed class CreateWorkflowDefinitionValidator : AbstractValidator<Create
             step.RuleFor(s => s.Sequence).GreaterThan(0).WithErrorCode(HrBusinessErrorCodes.ValWorkflowStepSequenceInvalid);
             step.RuleFor(s => s.ApproverType)
                 .Must(t => t is ApproverType.Role or ApproverType.Permission
-                    or ApproverType.DirectManager or ApproverType.SpecificUser)
+                    or ApproverType.DirectManager or ApproverType.DepartmentManager
+                    or ApproverType.HrManager or ApproverType.SpecificUser)
                 .WithErrorCode(HrBusinessErrorCodes.ValWorkflowApproverTypeRequired);
         });
         RuleFor(x => x.Steps.Select(s => s.Sequence))
