@@ -79,7 +79,7 @@ public sealed class AllowanceTypeController(ISender sender) : ControllerBase
     public async Task<IActionResult> DeactivateAllowanceType(
         [FromRoute] AllowanceTypeId id, CancellationToken cancellationToken)
     {
-        var res = await sender.Send(new DeactivateAllowanceTypeCommand(id, false), cancellationToken);
+        var res = await sender.Send(new DeactivateAllowanceTypeCommand(id, true), cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 }
