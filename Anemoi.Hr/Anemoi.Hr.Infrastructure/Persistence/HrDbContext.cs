@@ -6,6 +6,7 @@ using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Ess;
 using Anemoi.Hr.Domain.Leaves;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.Domain.Overtime;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.ShiftManagement;
@@ -31,7 +32,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<EmployeePositionHistory> EmployeePositionHistories { get; set; }
     public DbSet<EmployeeGradeHistory> EmployeeGradeHistories { get; set; }
     public DbSet<EmployeeManagerHistory> EmployeeManagerHistories { get; set; }
-    public DbSet<LeavePolicy> LeavePolicies { get; set; }
+    public DbSet<Anemoi.Hr.Domain.Leaves.LeavePolicy> LeavePolicies { get; set; }
     public DbSet<LeaveBalance> LeaveBalances { get; set; }
     public DbSet<LeaveRequest> LeaveRequests { get; set; }
     public DbSet<LeaveTransaction> LeaveTransactions { get; set; }
@@ -87,6 +88,9 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<WorkflowInstanceStep> WorkflowInstanceSteps { get; set; }
     public DbSet<WorkflowHistory> WorkflowHistories { get; set; }
     public DbSet<WorkflowRoleAssignment> WorkflowRoleAssignments { get; set; }
+    public DbSet<LeaveType> LeaveTypes { get; set; }
+    public DbSet<OvertimeRule> OvertimeRules { get; set; }
+    public DbSet<Anemoi.Hr.Domain.MasterData.LeavePolicy> MasterDataLeavePolicies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

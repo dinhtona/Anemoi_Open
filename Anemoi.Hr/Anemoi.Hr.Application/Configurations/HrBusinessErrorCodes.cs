@@ -147,6 +147,17 @@ public static class HrBusinessErrorCodes
     public const string DbForeignKeyViolation = "HR_DB_FOREIGN_KEY_VIOLATION";
     public const string DbCheckViolation = "HR_DB_CHECK_VIOLATION";
 
+    // Master Data error codes
+    public const string LeaveTypeNotFound = "HR_LEAVE_TYPE_NOT_FOUND";
+    public const string LeaveTypeCodeAlreadyExists = "HR_LEAVE_TYPE_CODE_ALREADY_EXISTS";
+    public const string LeaveTypeInUse = "HR_LEAVE_TYPE_IN_USE";
+    public const string LeavePolicySettingsNotFound = "HR_LEAVE_POLICY_SETTINGS_NOT_FOUND";
+    public const string LeavePolicySettingsCodeAlreadyExists = "HR_LEAVE_POLICY_SETTINGS_CODE_ALREADY_EXISTS";
+    public const string LeavePolicySettingsDuplicate = "HR_LEAVE_POLICY_SETTINGS_DUPLICATE";
+    public const string OvertimeRuleNotFound = "HR_OVERTIME_RULE_NOT_FOUND";
+    public const string OvertimeRuleCodeAlreadyExists = "HR_OVERTIME_RULE_CODE_ALREADY_EXISTS";
+    public const string OvertimeRuleInUse = "HR_OVERTIME_RULE_IN_USE";
+
     public const string ShiftTemplateConcurrencyConflict = "HR_SHIFT_TEMPLATE_CONCURRENCY_CONFLICT";
 
     // Salary error codes

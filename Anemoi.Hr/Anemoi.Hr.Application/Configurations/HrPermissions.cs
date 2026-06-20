@@ -111,6 +111,13 @@ public static class HrPermissions
     public const string OrganizationManage = "hr.organization.manage";
     public const string WorkflowOverride = "hr.workflow.override";
 
+    public const string LeaveTypeView = "hr.leave.type.view";
+    public const string LeaveTypeManage = "hr.leave.type.manage";
+    public const string LeavePolicySettingsView = "hr.leave.policy.settings.view";
+    public const string LeavePolicySettingsManage = "hr.leave.policy.settings.manage";
+    public const string OvertimeRuleView = "hr.overtime.rule.view";
+    public const string OvertimeRuleManage = "hr.overtime.rule.manage";
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -222,6 +229,12 @@ public static class HrPermissions
         EssPayslipView,
         OrganizationView,
         OrganizationManage,
+        LeaveTypeView,
+        LeaveTypeManage,
+        LeavePolicySettingsView,
+        LeavePolicySettingsManage,
+        OvertimeRuleView,
+        OvertimeRuleManage,
         WorkflowOverride
     ];
 

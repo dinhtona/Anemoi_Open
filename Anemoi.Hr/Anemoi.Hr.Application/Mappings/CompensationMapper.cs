@@ -122,8 +122,11 @@ public partial class CompensationMapper
             Code = entity.Code,
             Name = entity.Name,
             Description = entity.Description,
-            IsTaxable = entity.IsTaxable,
-            IsActive = entity.IsActive
+            Taxable = entity.Taxable,
+            SubjectToInsurance = entity.SubjectToInsurance,
+            IsActive = entity.IsActive,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt
         };
     }
 }

@@ -87,9 +87,9 @@ public sealed class AllowanceTypeModelMapping : IEntityTypeConfiguration<Allowan
         builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(128).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(512);
-
+        builder.Property(x => x.Taxable).IsRequired();
+        builder.Property(x => x.SubjectToInsurance).IsRequired();
         builder.HasIndex(x => x.Code).IsUnique();
-
         builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
     }
 }

@@ -1,5 +1,4 @@
 using Anemoi.BuildingBlock.Application.Helpers;
-using Anemoi.Hr.Application.Cqrs.Commands.LeavePolicyCommands.CreateLeavePolicy;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.SubmitLeaveRequest;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Leaves;
@@ -11,24 +10,6 @@ namespace Anemoi.Hr.Application.Mappings;
 [Mapper]
 public partial class LeaveMapper
 {
-    public LeavePolicy ToLeavePolicy(CreateLeavePolicyCommand command)
-    {
-        return new LeavePolicy
-        {
-            Id = new LeavePolicyId(IdGenerator.NextGuid()),
-            Code = command.Code,
-            Name = command.Name,
-            LeaveTypeCode = command.LeaveTypeCode,
-            MonthlyAccrualDays = command.MonthlyAccrualDays,
-            AnnualMaxDays = command.AnnualMaxDays,
-            AllowCarryForward = command.AllowCarryForward,
-            MaxCarryForwardDays = command.MaxCarryForwardDays,
-            IsActive = command.IsActive,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-    }
-
     public LeaveRequest ToLeaveRequest(SubmitLeaveRequestCommand command)
     {
         return new LeaveRequest
@@ -48,27 +29,7 @@ public partial class LeaveMapper
         };
     }
 
-    public LeavePolicyIdResponse ToLeavePolicyIdResponse(LeavePolicy policy) => new(policy.Id.Value.ToString());
-
     public LeaveRequestIdResponse ToLeaveRequestIdResponse(LeaveRequest request) => new(request.Id.Value.ToString());
-
-    public LeavePolicyResponse ToLeavePolicyResponse(LeavePolicy policy)
-    {
-        return new LeavePolicyResponse
-        {
-            Id = policy.Id.Value.ToString(),
-            Code = policy.Code,
-            Name = policy.Name,
-            LeaveTypeCode = policy.LeaveTypeCode,
-            MonthlyAccrualDays = policy.MonthlyAccrualDays,
-            AnnualMaxDays = policy.AnnualMaxDays,
-            AllowCarryForward = policy.AllowCarryForward,
-            MaxCarryForwardDays = policy.MaxCarryForwardDays,
-            IsActive = policy.IsActive,
-            CreatedAt = policy.CreatedAt,
-            UpdatedAt = policy.UpdatedAt
-        };
-    }
 
     public LeaveBalanceResponse ToLeaveBalanceResponse(LeaveBalance balance)
     {

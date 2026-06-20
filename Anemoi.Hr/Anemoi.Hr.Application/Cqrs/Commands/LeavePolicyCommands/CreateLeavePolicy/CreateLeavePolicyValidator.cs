@@ -8,9 +8,7 @@ public sealed class CreateLeavePolicyValidator : AbstractValidator<CreateLeavePo
     {
         RuleFor(x => x.Code).NotEmpty().MaximumLength(64);
         RuleFor(x => x.Name).NotEmpty().MaximumLength(256);
-        RuleFor(x => x.LeaveTypeCode).NotEmpty().MaximumLength(64);
-        RuleFor(x => x.MonthlyAccrualDays).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.AnnualMaxDays).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.MaxCarryForwardDays).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.LeaveTypeId).NotNull();
+        RuleFor(x => x.AnnualEntitlement).GreaterThanOrEqualTo(0);
     }
 }

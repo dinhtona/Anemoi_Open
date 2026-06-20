@@ -43,7 +43,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(IReadOnlyCollection<AllowanceTypeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllowanceTypes(CancellationToken cancellationToken)
     {
-        var res = await sender.Send(new GetAllowanceTypesQuery(), cancellationToken);
+        var res = await sender.Send(new GetAllowanceTypesQuery(null, null), cancellationToken);
         return Ok(res);
     }
     [HttpPost]

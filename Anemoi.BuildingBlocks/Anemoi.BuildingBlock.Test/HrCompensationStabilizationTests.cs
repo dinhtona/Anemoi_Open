@@ -122,7 +122,7 @@ public sealed class HrCompensationStabilizationTests
         var usdEmployeeId = new EmployeeId(Guid.NewGuid());
         var vndEmployeeId = new EmployeeId(Guid.NewGuid());
         var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
-        var allowanceType = new AllowanceType { Id = allowanceTypeId, Code = "MEAL", Name = "Meal", IsActive = true };
+        var allowanceType = AllowanceType.Create(allowanceTypeId, "MEAL", "Meal", "", false, false);
 
         var handler = new GetCompensationDashboardHandler(
             new FakeRepository<Employee>([
@@ -183,7 +183,7 @@ public sealed class HrCompensationStabilizationTests
         var allowanceTypeId = new AllowanceTypeId(Guid.NewGuid());
         var handler = new AssignEmployeeAllowanceHandler(
             new FakeRepository<Employee>([Employee(employeeId)]),
-            new FakeRepository<AllowanceType>([new AllowanceType { Id = allowanceTypeId, Code = "MEAL", Name = "Meal", IsActive = true }]),
+            new FakeRepository<AllowanceType>([            AllowanceType.Create(allowanceTypeId, "MEAL", "Meal", "", false, false)]),
             new FakeRepository<EmployeeAllowance>([]),
             new HrSettings { BusinessTimeZone = "Asia/Ho_Chi_Minh" },
             new FailingUnitOfWork());
@@ -597,17 +597,8 @@ public sealed class HrCompensationStabilizationTests
     [Fact]
     public async Task UpdateAllowanceType_Succeeds_UpdatesName()
     {
-        var allowanceType = new AllowanceType
-        {
-            Id = new AllowanceTypeId(Guid.NewGuid()),
-            Code = "MEAL",
-            Name = "Old Name",
-            Description = "Old desc",
-            IsTaxable = false,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var id = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceType = AllowanceType.Create(id, "MEAL", "Old Name", "Old desc", false, false);
 
         var repo = new FakeRepository<AllowanceType>([allowanceType]);
         var handler = new UpdateAllowanceTypeHandler(
@@ -627,7 +618,7 @@ public sealed class HrCompensationStabilizationTests
         Assert.True(result.IsT0);
         Assert.Equal("New Name", allowanceType.Name);
         Assert.Equal("New desc", allowanceType.Description);
-        Assert.True(allowanceType.IsTaxable);
+        Assert.True(allowanceType.Taxable);
         Assert.False(allowanceType.IsActive);
     }
 
@@ -678,17 +669,8 @@ public sealed class HrCompensationStabilizationTests
     [Fact]
     public async Task DeactivateAllowanceType_Succeeds()
     {
-        var allowanceType = new AllowanceType
-        {
-            Id = new AllowanceTypeId(Guid.NewGuid()),
-            Code = "MEAL",
-            Name = "Meal Allowance",
-            Description = "Lunch benefit",
-            IsTaxable = true,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var id = new AllowanceTypeId(Guid.NewGuid());
+        var allowanceType = AllowanceType.Create(id, "MEAL", "Meal Allowance", "Lunch benefit", true, false);
 
         var repo = new FakeRepository<AllowanceType>([allowanceType]);
         var handler = new DeactivateAllowanceTypeHandler(

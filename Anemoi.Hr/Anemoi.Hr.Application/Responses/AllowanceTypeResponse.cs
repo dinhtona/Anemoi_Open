@@ -1,5 +1,3 @@
-using System;
-
 namespace Anemoi.Hr.Application.Responses;
 
 public sealed class AllowanceTypeResponse
@@ -8,6 +6,9 @@ public sealed class AllowanceTypeResponse
     public string Code { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public bool IsTaxable { get; set; }
+    public bool Taxable { get; set; }
+    public bool SubjectToInsurance { get; set; }
     public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

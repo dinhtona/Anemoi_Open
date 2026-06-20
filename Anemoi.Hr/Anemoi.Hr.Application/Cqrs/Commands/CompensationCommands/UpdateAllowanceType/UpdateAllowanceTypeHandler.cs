@@ -32,6 +32,7 @@ public sealed class UpdateAllowanceTypeHandler(
             request.Name,
             request.Description,
             request.IsTaxable,
+            false,
             request.IsActive);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);

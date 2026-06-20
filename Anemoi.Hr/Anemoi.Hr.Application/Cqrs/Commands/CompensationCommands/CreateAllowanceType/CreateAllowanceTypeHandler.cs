@@ -7,9 +7,6 @@ using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.ModelIds.ModelIds;
 using OneOf;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.CompensationCommands.CreateAllowanceType;
 
@@ -30,17 +27,9 @@ public sealed class CreateAllowanceTypeHandler(
         if (exists)
             return HrErrorResponses.Create(HrBusinessErrorCodes.AllowanceTypeCodeAlreadyExists);
 
-        var newType = new AllowanceType
-        {
-            Id = new AllowanceTypeId(IdGenerator.NextGuid()),
-            Code = cleanCode,
-            Name = request.Name.Trim(),
-            Description = request.Description?.Trim(),
-            IsTaxable = request.IsTaxable,
-            IsActive = request.IsActive,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var id = new AllowanceTypeId(IdGenerator.NextGuid());
+        var newType = AllowanceType.Create(id, cleanCode, request.Name.Trim(),
+            request.Description?.Trim(), request.IsTaxable, false, request.IsActive);
 
         await allowanceTypeRepository.CreateOneAsync(newType, cancellationToken);
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
