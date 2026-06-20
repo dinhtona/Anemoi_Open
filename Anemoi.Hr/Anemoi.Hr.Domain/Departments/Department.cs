@@ -5,26 +5,71 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Departments;
 
-public sealed class Department : ValueObject
+public sealed class Department : Entity<DepartmentId>
 {
-    public DepartmentId Id { get; set; }
-    public string Code { get; set; }
-    public string Name { get; set; }
-    public string DepartmentTypeCode { get; set; }
-    public DepartmentId? ParentDepartmentId { get; set; }
-    public EmployeeId? ManagerEmployeeId { get; set; }
-    public bool IsActive { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    public string Code { get; private set; }
+    public string Name { get; private set; }
+    public string DepartmentTypeCode { get; private set; }
+    public DepartmentId? ParentDepartmentId { get; private set; }
+    public EmployeeId? ManagerEmployeeId { get; private set; }
+    public bool IsActive { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
 
-    public Department ParentDepartment { get; set; }
-    public List<Department> ChildDepartments { get; set; } = [];
-    public Employee ManagerEmployee { get; set; }
-    public List<Employee> PrimaryEmployees { get; set; } = [];
-    public List<Position> Positions { get; set; } = [];
+    public Department ParentDepartment { get; private set; }
+    public List<Department> ChildDepartments { get; private set; } = [];
+    public Employee ManagerEmployee { get; private set; }
+    public List<Employee> PrimaryEmployees { get; private set; } = [];
+    public List<Position> Positions { get; private set; } = [];
 
-    protected override IEnumerable<object> GetEqualityComponents()
+    private Department() { }
+
+    public static Department Create(
+        DepartmentId id,
+        string code,
+        string name,
+        string departmentTypeCode,
+        DepartmentId? parentDepartmentId,
+        EmployeeId? managerEmployeeId)
     {
-        yield return Id;
+        return new Department
+        {
+            Id = id,
+            Code = code,
+            Name = name,
+            DepartmentTypeCode = departmentTypeCode,
+            ParentDepartmentId = parentDepartmentId,
+            ManagerEmployeeId = managerEmployeeId,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+    }
+
+    public void UpdateInfo(
+        string code,
+        string name,
+        string departmentTypeCode,
+        DepartmentId? parentDepartmentId,
+        EmployeeId? managerEmployeeId)
+    {
+        Code = code;
+        Name = name;
+        DepartmentTypeCode = departmentTypeCode;
+        ParentDepartmentId = parentDepartmentId;
+        ManagerEmployeeId = managerEmployeeId;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Activate()
+    {
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
     }
 }

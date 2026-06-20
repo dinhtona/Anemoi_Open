@@ -35,13 +35,9 @@ public sealed class WorkflowHierarchyResolverTests
             PrimaryDepartmentId = deptId
         };
 
-        var department = new Department
-        {
-            Id = deptId,
-            Name = "Test Dept",
-            ManagerEmployeeId = managerId,
-            ParentDepartmentId = null
-        };
+        var department = Department.Create(
+            deptId, "DEPT001", "Test Dept",
+            DepartmentTypeCode.Functional, null, managerId);
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
         employeeRepo.GetQueryable().Returns(
@@ -74,12 +70,9 @@ public sealed class WorkflowHierarchyResolverTests
             PrimaryDepartmentId = deptId
         };
 
-        var department = new Department
-        {
-            Id = deptId,
-            Name = "Test Dept",
-            ManagerEmployeeId = null
-        };
+        var department = Department.Create(
+            deptId, "DEPT001", "Test Dept",
+            DepartmentTypeCode.Functional, null, null);
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
         employeeRepo.GetQueryable().Returns(

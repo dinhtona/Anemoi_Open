@@ -106,9 +106,18 @@ public sealed class WorkflowRoleAssignmentModelMapping : IEntityTypeConfiguratio
             .HasColumnType("uuid").IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+
         builder.HasIndex(x => x.Role);
         builder.HasIndex(x => x.EmployeeId);
         builder.HasIndex(x => new { x.Role, x.EmployeeId }).IsUnique();
+
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 

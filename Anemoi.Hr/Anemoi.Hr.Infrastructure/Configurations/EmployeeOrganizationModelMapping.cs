@@ -90,6 +90,9 @@ public sealed class EmployeeOrganizationModelMapping :
         builder.Property(x => x.ManagerEmployeeId)
             .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
         builder.HasKey(x => x.Id);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
         builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
         builder.Property(x => x.DepartmentTypeCode).HasMaxLength(64).IsRequired();
@@ -112,6 +115,9 @@ public sealed class EmployeeOrganizationModelMapping :
         builder.Property(x => x.DepartmentId)
             .HasConversion(x => x.Value, id => new DepartmentId(id));
         builder.HasKey(x => x.Id);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
         builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
         builder.Property(x => x.PositionTypeCode).HasMaxLength(64).IsRequired();

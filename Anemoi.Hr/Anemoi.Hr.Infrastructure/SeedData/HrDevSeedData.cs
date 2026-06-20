@@ -66,26 +66,12 @@ public static class HrDevSeedData
     {
         var departments = new[]
         {
-            new Department
-            {
-                Id = EngineeringDepartmentId,
-                Code = "ENG",
-                Name = "Engineering",
-                DepartmentTypeCode = "functional",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Department
-            {
-                Id = PeopleDepartmentId,
-                Code = "PEOPLE",
-                Name = "People Operations",
-                DepartmentTypeCode = "functional",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            }
+            Department.Create(
+                EngineeringDepartmentId, "ENG", "Engineering",
+                DepartmentTypeCode.Functional, null, null),
+            Department.Create(
+                PeopleDepartmentId, "PEOPLE", "People Operations",
+                DepartmentTypeCode.Functional, null, null)
         };
 
         foreach (var department in departments)
@@ -102,61 +88,41 @@ public static class HrDevSeedData
     {
         var positions = new[]
         {
-            new Position
-            {
-                Id = EngineeringManagerPositionId,
-                DepartmentId = EngineeringDepartmentId,
-                Code = "ENG-MGR",
-                Name = "Engineering Manager",
-                PositionTypeCode = "manager",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Position
-            {
-                Id = SoftwareEngineerPositionId,
-                DepartmentId = EngineeringDepartmentId,
-                Code = "SWE",
-                Name = "Software Engineer",
-                PositionTypeCode = "individual_contributor",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Position
-            {
-                Id = HrManagerPositionId,
-                DepartmentId = PeopleDepartmentId,
-                Code = "HR-MGR",
-                Name = "HR Manager",
-                PositionTypeCode = "manager",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Position
-            {
-                Id = HrSpecialistPositionId,
-                DepartmentId = PeopleDepartmentId,
-                Code = "HR-SPEC",
-                Name = "HR Specialist",
-                PositionTypeCode = "individual_contributor",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Position
-            {
-                Id = SystemAdministratorPositionId,
-                DepartmentId = PeopleDepartmentId,
-                Code = "SYS-ADMIN",
-                Name = "System Administrator",
-                PositionTypeCode = "administrator",
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            }
+            Position.Create(
+                EngineeringManagerPositionId,
+                EngineeringDepartmentId,
+                "ENG-MGR",
+                "Engineering Manager",
+                PositionTypeCode.Manager
+            ),
+            Position.Create(
+                SoftwareEngineerPositionId,
+                EngineeringDepartmentId,
+                "SWE",
+                "Software Engineer",
+                PositionTypeCode.IndividualContributor
+            ),
+            Position.Create(
+                HrManagerPositionId,
+                PeopleDepartmentId,
+                "HR-MGR",
+                "HR Manager",
+                PositionTypeCode.Manager
+            ),
+            Position.Create(
+                HrSpecialistPositionId,
+                PeopleDepartmentId,
+                "HR-SPEC",
+                "HR Specialist",
+                PositionTypeCode.IndividualContributor
+            ),
+            Position.Create(
+                SystemAdministratorPositionId,
+                PeopleDepartmentId,
+                "SYS-ADMIN",
+                "System Administrator",
+                PositionTypeCode.Administrator
+            )
         };
 
         foreach (var position in positions)

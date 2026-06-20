@@ -267,8 +267,8 @@ public sealed class HrPayrollReportingTests
 
         var departments = new List<Department>
         {
-            new() { Id = deptId1, Name = "Engineering" },
-            new() { Id = deptId2, Name = "Product" }
+            Department.Create(deptId1, "DEPT001", "Engineering", DepartmentTypeCode.Functional, null, null),
+            Department.Create(deptId2, "DEPT002", "Product", DepartmentTypeCode.Functional, null, null)
         }.AsQueryable();
 
         var taxSnapshots = new List<TaxCalculationSnapshot>().AsQueryable();

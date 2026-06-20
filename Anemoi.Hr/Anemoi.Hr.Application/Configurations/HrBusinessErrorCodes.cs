@@ -404,11 +404,27 @@ public static class HrBusinessErrorCodes
     public const string WorkflowInstanceAlreadyCompleted = "HR_WF_INSTANCE_ALREADY_COMPLETED";
     public const string WorkflowInstanceNotApprover = "HR_WF_INSTANCE_NOT_APPROVER";
 
+    // Workflow Role Assignment
+    public const string WorkflowRoleAssignmentNotFound = "HR_WORKFLOW_ROLE_ASSIGNMENT_NOT_FOUND";
+    public const string WorkflowRoleAssignmentDuplicate = "HR_WORKFLOW_ROLE_ASSIGNMENT_DUPLICATE";
+
     // Validation
+    public const string ValWorkflowRoleInvalid = "VAL_WORKFLOW_ROLE_INVALID";
     public const string ValWorkflowDefinitionIdRequired = "VAL_WF_DEF_ID_REQUIRED";
     public const string ValWorkflowInstanceIdRequired = "VAL_WF_INSTANCE_ID_REQUIRED";
     public const string ValWorkflowCodeRequired = "VAL_WF_CODE_REQUIRED";
     public const string ValWorkflowNameRequired = "VAL_WF_NAME_REQUIRED";
     public const string ValWorkflowStepSequenceInvalid = "VAL_WF_STEP_SEQUENCE_INVALID";
     public const string ValWorkflowApproverTypeRequired = "VAL_WF_APPROVER_TYPE_REQUIRED";
+
+    // Department error codes
+    public const string DepartmentCodeExists = "HR_DEPARTMENT_CODE_EXISTS";
+    public const string DepartmentHasChildren = "HR_DEPARTMENT_HAS_CHILDREN";
+    public const string DepartmentHasActiveEmployees = "HR_DEPARTMENT_HAS_ACTIVE_EMPLOYEES";
+    public const string DepartmentHasActivePositions = "HR_DEPARTMENT_HAS_ACTIVE_POSITIONS";
+    public const string ValDepartmentTypeCodeInvalid = "VAL_DEPARTMENT_TYPE_CODE_INVALID";
+
+    public const string PositionCodeExists = "HR_POSITION_CODE_EXISTS";
+    public const string PositionHasActiveEmployees = "HR_POSITION_HAS_ACTIVE_EMPLOYEES";
+    public const string ValPositionTypeCodeInvalid = "VAL_POSITION_TYPE_CODE_INVALID";
 }

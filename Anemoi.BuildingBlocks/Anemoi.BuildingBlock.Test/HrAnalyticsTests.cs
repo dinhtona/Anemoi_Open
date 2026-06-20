@@ -398,13 +398,9 @@ public sealed class HrAnalyticsTests
 
     private static Department CreateDepartment(DepartmentId id, string name)
     {
-        return new Department
-        {
-            Id = id,
-            Code = id.Value.ToString("N")[..8],
-            Name = name,
-            IsActive = true
-        };
+        return Department.Create(
+            id, id.Value.ToString("N")[..8], name,
+            DepartmentTypeCode.Functional, null, null);
     }
 
     private static Department CreateDepartment(string id, string name)
@@ -414,13 +410,12 @@ public sealed class HrAnalyticsTests
 
     private static Position CreatePosition(PositionId id)
     {
-        return new Position
-        {
-            Id = id,
-            Code = id.Value.ToString("N")[..8],
-            Name = "Position " + id.Value.ToString("N")[..8],
-            IsActive = true
-        };
+        return Position.Create(
+            id,
+            new DepartmentId(Guid.NewGuid()),
+            id.Value.ToString("N")[..8],
+            "Position " + id.Value.ToString("N")[..8],
+            PositionTypeCode.IndividualContributor);
     }
 
     private static PayrollRun CreateFinalizedPayrollRun(string id, string employeeId, string periodId, decimal netAmount)
