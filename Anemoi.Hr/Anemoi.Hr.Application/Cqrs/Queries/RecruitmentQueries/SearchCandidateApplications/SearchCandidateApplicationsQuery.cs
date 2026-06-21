@@ -6,7 +6,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchCandidateApplications;
 
 public sealed record SearchCandidateApplicationsQuery(
-    string SearchTerm,
-    string CurrentStage,
-    CandidateId CandidateId,
-    JobPostingId JobPostingId) : GetManyQuery, IQueryPaged<CandidateApplicationResponse>;
+    string? SearchTerm,
+    string? CurrentStage,
+    CandidateId? CandidateId,
+    JobPostingId? JobPostingId) : GetManyQuery, IQueryPaged<CandidateApplicationResponse>;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -32,7 +33,7 @@ public sealed class GetNotificationsHandler(
 
         return fromFlow
             .WithFilter(filter)
-            .WithSpecialAction(x => x)
+            .WithSpecialAction(x => x.Include(n => n.Actions))
             .WithSortFieldWhenNotSet(x => x.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
     }

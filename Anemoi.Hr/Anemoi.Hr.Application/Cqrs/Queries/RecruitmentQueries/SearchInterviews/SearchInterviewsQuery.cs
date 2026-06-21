@@ -7,8 +7,8 @@ using System;
 namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchInterviews;
 
 public sealed record SearchInterviewsQuery(
-    string SearchTerm,
-    string Result,
-    EmployeeId InterviewerEmployeeId,
+    string? SearchTerm,
+    string? Result,
+    EmployeeId? InterviewerEmployeeId,
     DateTime? FromDate,
     DateTime? ToDate) : GetManyQuery, IQueryPaged<InterviewScheduleResponse>;

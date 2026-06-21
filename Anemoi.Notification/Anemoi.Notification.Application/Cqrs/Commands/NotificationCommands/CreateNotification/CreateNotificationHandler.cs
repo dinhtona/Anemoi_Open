@@ -113,8 +113,27 @@ public sealed class CreateNotificationHandler(
                 CorrelationId = request.CorrelationId,
                 CausationId = request.CausationId,
                 Type = string.IsNullOrEmpty(request.Type) ? Anemoi.Contract.Notification.Constants.NotificationConstants.Types.Business : request.Type,
-                Severity = string.IsNullOrEmpty(request.Severity) ? Anemoi.Contract.Notification.Constants.NotificationConstants.Severities.Info : request.Severity
+                Severity = string.IsNullOrEmpty(request.Severity) ? Anemoi.Contract.Notification.Constants.NotificationConstants.Severities.Info : request.Severity,
+                AggregateType = request.AggregateType,
+                AggregateId = request.AggregateId,
+                WorkflowType = request.WorkflowType,
+                WorkflowState = request.WorkflowState
             };
+
+            if (request.Actions is { } actions)
+            {
+                foreach (var actionInput in actions)
+                {
+                    notification.AddAction(
+                        new NotificationActionId(IdGenerator.NextGuid()),
+                        actionInput.ActionCode,
+                        actionInput.ActionLabel,
+                        actionInput.ActionType,
+                        actionInput.ActionUrl,
+                        actionInput.RequiresConfirmation,
+                        actionInput.SortOrder);
+                }
+            }
 
             var createResult = await sqlRepository.CreateOneAsync(notification, cancellationToken);
             var isFailed = createResult.Match(_ => false, _ => true);

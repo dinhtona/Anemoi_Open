@@ -4,4 +4,4 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.OnboardingQueries.GetMyOnboardingTasks;
 
-public sealed record GetMyOnboardingTasksQuery(string UserId) : GetManyQuery, IQueryPaged<OnboardingTaskResponse>;
+public sealed record GetMyOnboardingTasksQuery(string? UserId) : GetManyQuery, IQueryPaged<OnboardingTaskResponse>;

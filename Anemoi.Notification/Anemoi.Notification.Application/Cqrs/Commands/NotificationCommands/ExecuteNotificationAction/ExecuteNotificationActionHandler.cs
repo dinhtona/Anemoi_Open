@@ -57,7 +57,8 @@ public sealed class ExecuteNotificationActionHandler(
             if (action == null)
                 return NotificationErrorDetail.ActionError.ActionNotFound().ToErrorDetailResponse();
 
-            var executor = executorResolver.Resolve(action.ActionCode);
+            var executor = executorResolver.Resolve(notification.AggregateType ?? action.ActionCode)
+                ?? executorResolver.Resolve(action.ActionCode);
             if (executor == null)
                 return NotificationErrorDetail.ActionError.ExecutorNotFound().ToErrorDetailResponse();
 

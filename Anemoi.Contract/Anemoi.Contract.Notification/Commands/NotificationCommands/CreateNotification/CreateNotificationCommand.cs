@@ -21,4 +21,9 @@ public sealed record CreateNotificationCommand(
     Guid? CorrelationId = null,
     Guid? CausationId = null,
     string Type = null,
-    string Severity = null) : ICommandResult<NotificationResponse>;
+    string Severity = null,
+    IReadOnlyList<CreateNotificationActionInput>? Actions = null,
+    string AggregateType = null,
+    string AggregateId = null,
+    string WorkflowType = null,
+    string WorkflowState = null) : ICommandResult<NotificationResponse>;

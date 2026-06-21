@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Anemoi.Contract.Hr;
 using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
@@ -50,13 +51,39 @@ public sealed class LeaveRequestSubmittedConsumer(
 
         var command = new CreateNotificationCommand(
             UserId: userId,
+            Title: "New Leave Request",
+            Content: "A new leave request requires your approval",
             TitleLocalizationKey: "notification.leave.submitted.title",
             ContentLocalizationKey: "notification.leave.submitted.content",
             Category: NotificationConstants.Categories.Leave,
             ActionUrl: "/hr/leave",
             DeduplicationKey: $"leave:{message.LeaveRequestId}:submitted:{userId}",
             Type: NotificationConstants.Types.Business,
-            Severity: NotificationConstants.Severities.Info
+            Severity: NotificationConstants.Severities.Info,
+            AggregateType: "LeaveRequest",
+            AggregateId: message.LeaveRequestId,
+            WorkflowType: "Approval",
+            Actions:
+            [
+                new CreateNotificationActionInput(
+                    ActionCode: NotificationWorkflowConstants.ActionCodes.ApproveLeaveRequest,
+                    ActionLabel: "Approve",
+                    ActionType: "Command",
+                    RequiresConfirmation: true,
+                    SortOrder: 1),
+                new CreateNotificationActionInput(
+                    ActionCode: NotificationWorkflowConstants.ActionCodes.RejectLeaveRequest,
+                    ActionLabel: "Reject",
+                    ActionType: "Command",
+                    RequiresConfirmation: true,
+                    SortOrder: 2),
+                new CreateNotificationActionInput(
+                    ActionCode: NotificationWorkflowConstants.ActionCodes.ViewLeaveRequest,
+                    ActionLabel: "View",
+                    ActionType: "Navigate",
+                    ActionUrl: "/hr/leave",
+                    SortOrder: 0)
+            ]
         );
 
         await mediator.Send(command, context.CancellationToken);

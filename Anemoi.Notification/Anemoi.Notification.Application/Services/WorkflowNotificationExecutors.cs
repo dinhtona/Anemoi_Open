@@ -12,7 +12,7 @@ namespace Anemoi.Notification.Application.Services;
 public sealed class LeaveNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => NotificationWorkflowConstants.TargetServices.Leave;
+    public string ActionCode => "LeaveRequest";
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ public sealed class LeaveNotificationExecutor(IRequestClient<NotificationActionC
 public sealed class OvertimeNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => NotificationWorkflowConstants.TargetServices.Overtime;
+    public string ActionCode => "OvertimeRequest";
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -82,7 +82,7 @@ public sealed class OvertimeNotificationExecutor(IRequestClient<NotificationActi
 public sealed class PayrollNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => NotificationWorkflowConstants.TargetServices.Payroll;
+    public string ActionCode => "PayrollRun";
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -114,7 +114,7 @@ public sealed class PayrollNotificationExecutor(IRequestClient<NotificationActio
 public sealed class OnboardingNotificationExecutor(IRequestClient<NotificationActionCommand> requestClient)
     : INotificationActionExecutor
 {
-    public string ActionCode => NotificationWorkflowConstants.TargetServices.Onboarding;
+    public string ActionCode => "OnboardingTask";
 
     public async Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)
@@ -145,7 +145,7 @@ public sealed class OnboardingNotificationExecutor(IRequestClient<NotificationAc
 
 public sealed class RecruitmentNotificationExecutor : INotificationActionExecutor
 {
-    public string ActionCode => NotificationWorkflowConstants.TargetServices.Recruitment;
+    public string ActionCode => "RecruitmentRequest";
 
     public Task<OneOf<ExecuteActionResult, ErrorDetailResponse>> ExecuteAsync(
         NotificationHistory notification, NotificationAction action, CancellationToken cancellationToken)

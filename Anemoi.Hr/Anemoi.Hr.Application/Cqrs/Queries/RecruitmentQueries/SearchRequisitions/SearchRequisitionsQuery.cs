@@ -6,6 +6,6 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchRequisitions;
 
 public sealed record SearchRequisitionsQuery(
-    string SearchTerm,
-    string Status,
-    DepartmentId DepartmentId) : GetManyQuery, IQueryPaged<JobRequisitionResponse>;
+    string? SearchTerm,
+    string? Status,
+    DepartmentId? DepartmentId) : GetManyQuery, IQueryPaged<JobRequisitionResponse>;
