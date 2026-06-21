@@ -67,16 +67,18 @@ public static class EfExtensions
         var efUnitOfWorkType = typeof(EfUnitOfWork);
         var typeBuilder = newModule.DefineType("UnitOfWork", TypeAttributes.Public, efUnitOfWorkType);
         var ctorTypes = efUnitOfWorkType
-            .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, [typeof(TDbContext), typeof(ILogger)])!;
+            .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+                [typeof(TDbContext), typeof(ILogger), typeof(MediatR.IMediator)])!;
         // Define the constructor for the dynamic class
         var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
-            CallingConventions.Standard, [typeof(TDbContext), typeof(ILogger)]);
+            CallingConventions.Standard, [typeof(TDbContext), typeof(ILogger), typeof(MediatR.IMediator)]);
         // Generate the constructor IL code
         var ilGenerator = constructorBuilder.GetILGenerator();
         ilGenerator.Emit(OpCodes.Ldarg_0); // Load "this" onto the stack
         ilGenerator.Emit(OpCodes.Ldarg_1); // Load the TDbContext argument onto the stack
         ilGenerator.Emit(OpCodes.Ldarg_2); // Load the ILogger argument onto the stack
-        // Call the base constructor with the TDbContext and ILogger arguments
+        ilGenerator.Emit(OpCodes.Ldarg_3); // Load the IMediator argument onto the stack
+        // Call the base constructor with the TDbContext, ILogger and IMediator arguments
         ilGenerator.Emit(OpCodes.Call, ctorTypes);
         ilGenerator.Emit(OpCodes.Ret); // Return from the constructor
         var unitOfWorkType = typeBuilder.CreateType();
