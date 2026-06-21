@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
@@ -298,7 +299,7 @@ public static class HrDevSeedData
 
             await repository.CreateOneAsync(new LeaveBalance
             {
-                Id = new LeaveBalanceId(Guid.CreateVersion7()),
+                Id = new LeaveBalanceId(IdGenerator.NextGuid()),
                 EmployeeId = employeeId,
                 LeavePolicyId = AnnualLeavePolicyId,
                 Year = year,
