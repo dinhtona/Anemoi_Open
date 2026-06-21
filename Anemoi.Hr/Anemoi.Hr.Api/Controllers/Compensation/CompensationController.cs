@@ -44,7 +44,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetAllowanceTypes(CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetAllowanceTypesQuery(null, null), cancellationToken);
-        return Ok(res);
+        return Ok(res.Items);
     }
     [HttpPost]
     [HasPermission(HrPermissions.SalaryChange)]
