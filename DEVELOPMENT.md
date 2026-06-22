@@ -103,3 +103,42 @@ For frontend or full-stack work, add a final browser validation step before repo
 - DO NOT introduce new libraries without explicit approval.
 - DO NOT bypass localization, permission checks, or audit requirements for sensitive HR operations.
 - DO NOT claim frontend completion based only on build, lint, TypeScript, or unit tests.
+
+## 11. Verification Rules
+
+### Status Definitions
+
+NOT REVIEWED
+REVIEWED
+TESTED
+VERIFIED
+PASS
+FAIL
+
+### Evidence Requirements
+
+Code review alone is not evidence.
+
+A feature may only be marked PASS when:
+- executed through browser or API,
+- expected state change is observed,
+- evidence is recorded.
+
+Acceptable evidence:
+- Browser interaction
+- API response
+- Database state
+- Test execution
+- Build output
+
+### Browser First Principle
+
+For frontend or full-stack features:
+
+Browser
+→ Network
+→ API
+→ Database
+→ Code
+
+The browser is the source of truth.

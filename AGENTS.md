@@ -32,6 +32,14 @@ If documents conflict, follow approved ADRs first, then architecture/development
 - In `Anemoi.Hr.*` production code, centralize business/status/type string literals as constants.
 - For frontend-impacting work, run browser validation through available browser automation / DevTools MCP before reporting completion.
 
+## Verification Requirements
+
+- Code review is NOT verification.
+- Do not report PASS, VERIFIED, COMPLETE, or UAT READY without execution evidence.
+- Browser validation is required for frontend-impacting work.
+- Evidence must come from browser, API, database, test execution, or build output.
+- If evidence is missing, report REVIEWED instead of PASS.
+
 ## Feature Workflow
 
 When the repository workflow applies, stop for review after each step:
