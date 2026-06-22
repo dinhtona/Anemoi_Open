@@ -72,7 +72,7 @@ public sealed class EmployeeTransfer : Entity<EmployeeTransferId>
 
     public void Submit()
     {
-        StatusCode = TransferStatusCode.PendingApproval;
+        StatusCode = TransferStatusCode.Pending;
         AddEvent(new TransferSubmittedDomainEvent(Id, EmployeeId, CreatedBy));
     }
 

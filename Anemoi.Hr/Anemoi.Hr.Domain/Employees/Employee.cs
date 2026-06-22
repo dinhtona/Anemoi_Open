@@ -19,7 +19,7 @@ public sealed class Employee : Entity<EmployeeId>
     public DateOnly JoinDate { get; set; }
     public string EmploymentStatusCode { get; set; }
     public string EmploymentTypeCode { get; set; }
-    public string GradeCode { get; set; }
+    public string? GradeCode { get; set; }
     public DepartmentId PrimaryDepartmentId { get; set; }
     public PositionId PrimaryPositionId { get; set; }
     public EmployeeId? DirectManagerEmployeeId { get; set; }

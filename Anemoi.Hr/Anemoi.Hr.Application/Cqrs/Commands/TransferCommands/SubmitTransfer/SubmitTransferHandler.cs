@@ -63,10 +63,7 @@ public sealed class SubmitTransferHandler(
                 currentUser.UserId);
 
             transfer.Submit();
-
-            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-            if (saveResult.IsT1)
-                return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+            await transferRepository.CreateOneAsync(transfer, cancellationToken);
 
             var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
             var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
@@ -77,6 +74,10 @@ public sealed class SubmitTransferHandler(
                 requesterUserId,
                 requesterUserId,
                 cancellationToken);
+
+            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+            if (saveResult.IsT1)
+                return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
 
             return mapper.ToDto(transfer);
         }
