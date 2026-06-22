@@ -19,6 +19,7 @@ using Anemoi.Hr.Domain.Onboarding;
 using Anemoi.Hr.Domain.Probation;
 using Anemoi.Hr.Domain.Separations;
 using Anemoi.Hr.Domain.Transfers;
+using Anemoi.Hr.ModelIds.ModelIds;
 using Anemoi.Hr.Domain.Workflow;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +103,13 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Ignore strongly-typed IDs to prevent EF from treating them as entities
+        modelBuilder.Ignore<EmployeeId>();
+        modelBuilder.Ignore<EmployeeOrganizationHistoryId>();
+        modelBuilder.Ignore<EmployeeHistoryId>();
+        modelBuilder.Ignore<ProbationRecordId>();
+        modelBuilder.Ignore<EmployeeTransferId>();
+        modelBuilder.Ignore<EmployeeSeparationId>();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IHrInfrastructureAssemblyMarker).Assembly);
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
