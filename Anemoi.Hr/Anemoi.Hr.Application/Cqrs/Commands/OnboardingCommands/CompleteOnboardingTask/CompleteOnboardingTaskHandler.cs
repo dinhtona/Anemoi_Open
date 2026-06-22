@@ -5,6 +5,8 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Onboarding;
+using Anemoi.Hr.Domain.Onboarding.Events;
+using MediatR;
 using OneOf;
 using System;
 using System.Linq;
@@ -16,7 +18,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.OnboardingCommands.CompleteOnboard
 public sealed class CompleteOnboardingTaskHandler(
     ISqlRepository<OnboardingInstance> instanceRepository,
     IUnitOfWork unitOfWork,
-    OnboardingMapper mapper)
+    OnboardingMapper mapper,
+    IMediator mediator)
     : ICommandHandler<CompleteOnboardingTaskCommand, OneOf<OnboardingInstanceResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<OnboardingInstanceResponse, ErrorDetailResponse>> Handle(
@@ -36,6 +39,13 @@ public sealed class CompleteOnboardingTaskHandler(
                 return HrErrorResponses.Create(HrBusinessErrorCodes.HrOnboardingTaskAlreadyCompleted);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (instance.Status == OnboardingInstanceStatusCode.Completed)
+                await mediator.Publish(new OnboardingInstanceCompletedDomainEvent(
+                    InstanceId: instance.Id,
+                    EmployeeId: instance.EmployeeId,
+                    CompletedBy: request.CompletedBy,
+                    CompletionType: "AutoComplete"), cancellationToken);
 
             return mapper.ToResponse(instance);
         }
