@@ -6,6 +6,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Onboarding;
 using Anemoi.Hr.ModelIds.ModelIds;
 using FluentAssertions;
+using MediatR;
 using NSubstitute;
 using OneOf;
 using Xunit;
@@ -17,6 +18,7 @@ public class CompleteOnboardingTaskHandlerTests
     private readonly ISqlRepository<OnboardingInstance> _instanceRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly OnboardingMapper _mapper;
+    private readonly IMediator _mediator;
     private readonly CompleteOnboardingTaskHandler _handler;
 
     public CompleteOnboardingTaskHandlerTests()
@@ -24,7 +26,8 @@ public class CompleteOnboardingTaskHandlerTests
         _instanceRepository = Substitute.For<ISqlRepository<OnboardingInstance>>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _mapper = new OnboardingMapper();
-        _handler = new CompleteOnboardingTaskHandler(_instanceRepository, _unitOfWork, _mapper);
+        _mediator = Substitute.For<IMediator>();
+        _handler = new CompleteOnboardingTaskHandler(_instanceRepository, _unitOfWork, _mapper, _mediator);
     }
 
     private (OnboardingInstance Instance, OnboardingTaskId TaskId) CreateInstanceWithPendingTask()
