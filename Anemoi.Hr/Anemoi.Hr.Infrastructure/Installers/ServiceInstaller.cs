@@ -72,6 +72,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IWorkflowTargetStatusUpdater, OvertimeWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, PayrollWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, RecruitmentWorkflowStatusUpdater>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, EmployeeTransferWorkflowStatusUpdater>();
+        services.AddScoped<IWorkflowTargetStatusUpdater, EmployeeSeparationWorkflowStatusUpdater>();
         services.AddScoped<INotificationHandler<WorkflowInstanceApprovedDomainEvent>, WorkflowInstanceApprovedHandler>();
         services.AddScoped<INotificationHandler<WorkflowInstanceRejectedDomainEvent>, WorkflowInstanceRejectedHandler>();
         services.AddScoped<INotificationHandler<WorkflowInstanceApprovedDomainEvent>, WorkflowApprovedIntegrationEventPublisher>();

@@ -10,6 +10,8 @@ public static class WorkflowConstants
         public const string OvertimeRequest = "OvertimeRequest";
         public const string PayrollRun = "PayrollRun";
         public const string RecruitmentRequest = "RecruitmentRequest";
+        public const string EmployeeTransfer = "EmployeeTransfer";
+        public const string EmployeeSeparation = "EmployeeSeparation";
     }
 
     public static class DefaultPolicy
@@ -18,6 +20,8 @@ public static class WorkflowConstants
         public const int OvertimeRequestSteps = 2;
         public const int RecruitmentRequestSteps = 0;
         public const int PayrollRunSteps = 0;
+        public const int EmployeeTransferSteps = 2;
+        public const int EmployeeSeparationSteps = 2;
 
         public static int GetStepCount(string entityType) => entityType switch
         {
@@ -25,6 +29,8 @@ public static class WorkflowConstants
             TargetEntityTypes.OvertimeRequest => OvertimeRequestSteps,
             TargetEntityTypes.RecruitmentRequest => RecruitmentRequestSteps,
             TargetEntityTypes.PayrollRun => PayrollRunSteps,
+            TargetEntityTypes.EmployeeTransfer => EmployeeTransferSteps,
+            TargetEntityTypes.EmployeeSeparation => EmployeeSeparationSteps,
             _ => throw new InvalidOperationException($"No default workflow policy for '{entityType}'.")
         };
 

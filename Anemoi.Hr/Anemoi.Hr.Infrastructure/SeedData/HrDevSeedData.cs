@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Positions;
+using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,10 @@ public static class HrDevSeedData
         new(Guid.Parse("30000000-0000-0000-0000-000000000006"));
     private static readonly LeavePolicyId AnnualLeavePolicyId =
         new(Guid.Parse("40000000-0000-0000-0000-000000000001"));
+    private static readonly WorkflowDefinitionId TransferWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000001"));
+    private static readonly WorkflowDefinitionId SeparationWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000002"));
 
     public static async Task SeedAsync(IServiceScope serviceScope, CancellationToken cancellationToken = default)
     {
@@ -56,6 +62,7 @@ public static class HrDevSeedData
         await SeedEmployeesAsync(employeeRepository, now, cancellationToken);
         await SeedLeavePolicyAsync(leavePolicyRepository, now, cancellationToken);
         await SeedLeaveBalancesAsync(leaveBalanceRepository, now.Year, now, cancellationToken);
+        await SeedWorkflowDefinitionsAsync(serviceScope, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
@@ -272,6 +279,54 @@ public static class HrDevSeedData
             CreatedAt = now,
             UpdatedAt = now
         }, cancellationToken);
+    }
+
+    private static async Task SeedWorkflowDefinitionsAsync(
+        IServiceScope serviceScope,
+        CancellationToken cancellationToken)
+    {
+        var workflowDefinitionRepository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<WorkflowDefinition>>();
+
+        var transferCode = "EMPLOYEE-TRANSFER";
+        if (await workflowDefinitionRepository.ExistByConditionAsync(
+                x => x.Code == transferCode, cancellationToken)) return;
+
+        var transferSteps = new List<WorkflowDefinitionStep>
+        {
+            WorkflowDefinitionStep.Create(
+                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000101")),
+                TransferWorkflowDefId, 1, ApproverType.DirectManager, null, true),
+            WorkflowDefinitionStep.Create(
+                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000102")),
+                TransferWorkflowDefId, 2, ApproverType.HrManager, null, true)
+        };
+
+        var transferDef = WorkflowDefinition.Create(
+            TransferWorkflowDefId, transferCode, "Employee Transfer Approval",
+            null, WorkflowTypeCode.Approval, WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
+            1, transferSteps);
+        transferDef.Activate();
+
+        var separationCode = "EMPLOYEE-SEPARATION";
+        var separationSteps = new List<WorkflowDefinitionStep>
+        {
+            WorkflowDefinitionStep.Create(
+                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000201")),
+                SeparationWorkflowDefId, 1, ApproverType.DirectManager, null, true),
+            WorkflowDefinitionStep.Create(
+                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000202")),
+                SeparationWorkflowDefId, 2, ApproverType.HrManager, null, true)
+        };
+
+        var separationDef = WorkflowDefinition.Create(
+            SeparationWorkflowDefId, separationCode, "Employee Separation Approval",
+            null, WorkflowTypeCode.Approval, WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
+            1, separationSteps);
+        separationDef.Activate();
+
+        await workflowDefinitionRepository.CreateOneAsync(transferDef, cancellationToken);
+        await workflowDefinitionRepository.CreateOneAsync(separationDef, cancellationToken);
     }
 
     private static async Task SeedLeaveBalancesAsync(

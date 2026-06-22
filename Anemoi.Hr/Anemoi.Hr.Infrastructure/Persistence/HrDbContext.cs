@@ -16,6 +16,9 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Taxation;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.Domain.Onboarding;
+using Anemoi.Hr.Domain.Probation;
+using Anemoi.Hr.Domain.Separations;
+using Anemoi.Hr.Domain.Transfers;
 using Anemoi.Hr.Domain.Workflow;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -88,6 +91,11 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<WorkflowInstanceStep> WorkflowInstanceSteps { get; set; }
     public DbSet<WorkflowHistory> WorkflowHistories { get; set; }
     public DbSet<WorkflowRoleAssignment> WorkflowRoleAssignments { get; set; }
+    public DbSet<ProbationRecord> ProbationRecords { get; set; }
+    public DbSet<EmployeeTransfer> EmployeeTransfers { get; set; }
+    public DbSet<EmployeeSeparation> EmployeeSeparations { get; set; }
+    public DbSet<EmployeeOrganizationHistory> EmployeeOrganizationHistories { get; set; }
+    public DbSet<EmployeeHistory> EmployeeHistories { get; set; }
     public DbSet<LeaveType> LeaveTypes { get; set; }
     public DbSet<OvertimeRule> OvertimeRules { get; set; }
     public DbSet<Anemoi.Hr.Domain.MasterData.LeavePolicy> MasterDataLeavePolicies { get; set; }
