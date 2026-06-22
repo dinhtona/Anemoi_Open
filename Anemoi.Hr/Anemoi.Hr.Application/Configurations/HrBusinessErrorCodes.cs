@@ -438,4 +438,16 @@ public static class HrBusinessErrorCodes
     public const string PositionCodeExists = "HR_POSITION_CODE_EXISTS";
     public const string PositionHasActiveEmployees = "HR_POSITION_HAS_ACTIVE_EMPLOYEES";
     public const string ValPositionTypeCodeInvalid = "VAL_POSITION_TYPE_CODE_INVALID";
+
+    // Lifecycle management error codes
+    public const string ProbationRecordNotFound = "HR_PROBATION_RECORD_NOT_FOUND";
+    public const string TransferNotFound = "HR_TRANSFER_NOT_FOUND";
+    public const string SeparationNotFound = "HR_SEPARATION_NOT_FOUND";
+
+    // Lifecycle validation error codes
+    public const string ValProbationRecordIdRequired = "VAL_PROBATION_RECORD_ID_REQUIRED";
+    public const string ValProbationResultRequired = "VAL_PROBATION_RESULT_REQUIRED";
+    public const string ValNewEndDateRequired = "VAL_NEW_END_DATE_REQUIRED";
+    public const string ValSeparationTypeRequired = "VAL_SEPARATION_TYPE_REQUIRED";
+    public const string ValLastWorkingDateRequired = "VAL_LAST_WORKING_DATE_REQUIRED";
 }

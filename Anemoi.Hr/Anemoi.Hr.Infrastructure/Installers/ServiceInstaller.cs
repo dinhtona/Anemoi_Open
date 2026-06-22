@@ -44,6 +44,10 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<WorkflowMapper>();
         services.AddScoped<MasterDataMapper>();
         services.AddScoped<WorkflowRoleAssignmentMapper>();
+        services.AddScoped<ProbationRecordMapper>();
+        services.AddScoped<EmployeeTransferMapper>();
+        services.AddScoped<EmployeeSeparationMapper>();
+        services.AddScoped<EmployeeHistoryMapper>();
         services.AddScoped<PayrollReportExportService>();
         services.AddScoped<IReportExporter, CsvReportExporter>();
         services.AddScoped<IPayslipDocumentStorage, LocalPayslipDocumentStorage>();
