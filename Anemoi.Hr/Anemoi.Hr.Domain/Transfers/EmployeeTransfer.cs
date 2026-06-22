@@ -22,6 +22,10 @@ public sealed class EmployeeTransfer : Entity<EmployeeTransferId>
     public DateTime? ReviewedAt { get; set; }
     public string? ReviewedBy { get; set; }
     public string? ReviewComment { get; set; }
+    public EmployeeId? SourceManagerId { get; set; }
+    public EmployeeId? TargetManagerId { get; set; }
+    public string SourceGradeCode { get; set; }
+    public string TargetGradeCode { get; set; }
     public WorkflowInstanceId? WorkflowInstanceId { get; set; }
 
     public Employee Employee { get; set; }
@@ -37,6 +41,10 @@ public sealed class EmployeeTransfer : Entity<EmployeeTransferId>
         DepartmentId targetDepartmentId,
         PositionId sourcePositionId,
         PositionId targetPositionId,
+        EmployeeId? sourceManagerId,
+        EmployeeId? targetManagerId,
+        string sourceGradeCode,
+        string targetGradeCode,
         DateOnly effectiveDate,
         string reason,
         string createdBy)
@@ -49,14 +57,23 @@ public sealed class EmployeeTransfer : Entity<EmployeeTransferId>
             TargetDepartmentId = targetDepartmentId,
             SourcePositionId = sourcePositionId,
             TargetPositionId = targetPositionId,
+            SourceManagerId = sourceManagerId,
+            TargetManagerId = targetManagerId,
+            SourceGradeCode = sourceGradeCode,
+            TargetGradeCode = targetGradeCode,
             StatusCode = TransferStatusCode.Draft,
             EffectiveDate = effectiveDate,
             Reason = reason,
             CreatedBy = createdBy,
             CreatedAt = DateTime.UtcNow
         };
-        transfer.AddEvent(new TransferSubmittedDomainEvent(id, employeeId, createdBy));
         return transfer;
+    }
+
+    public void Submit()
+    {
+        StatusCode = TransferStatusCode.PendingApproval;
+        AddEvent(new TransferSubmittedDomainEvent(Id, EmployeeId, CreatedBy));
     }
 
     public void Approve(string reviewer)

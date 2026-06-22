@@ -54,11 +54,15 @@ public sealed class SubmitTransferHandler(
                 request.ToDepartmentId,
                 employee.PrimaryPositionId,
                 request.ToPositionId,
+                employee.DirectManagerEmployeeId,
+                request.ToManagerId,
+                employee.GradeCode ?? "G1",
+                request.ToGradeCode ?? "G1",
                 request.EffectiveDate,
                 request.Reason,
                 currentUser.UserId);
 
-            await transferRepository.CreateOneAsync(transfer, cancellationToken);
+            transfer.Submit();
 
             var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
             if (saveResult.IsT1)
