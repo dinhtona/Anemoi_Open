@@ -39,7 +39,7 @@ public sealed class HrAnalyticsTests
         {
             CreateEmployee("10000000-0000-0000-0000-000000000001", deptId1, EmploymentStatusCode.Active),
             CreateEmployee("20000000-0000-0000-0000-000000000002", deptId1, EmploymentStatusCode.Active),
-            CreateEmployee("30000000-0000-0000-0000-000000000003", deptId2, EmploymentStatusCode.Inactive)
+            CreateEmployee("30000000-0000-0000-0000-000000000003", deptId2, EmploymentStatusCode.Archived)
         };
 
         var departments = new List<Department>

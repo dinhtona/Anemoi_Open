@@ -35,68 +35,27 @@ public sealed class Employee : Entity<EmployeeId>
     public List<EmployeeGradeHistory> GradeHistories { get; set; } = [];
     public List<EmployeeManagerHistory> ManagerHistories { get; set; } = [];
 
-    public void StartOnboarding(string actor)
+    private void ChangeStatus(string toStatus, string actor)
     {
-        if (EmploymentStatusCode != EmpStatus.PendingOnboarding)
-            throw new DomainException($"Cannot start onboarding from status {EmploymentStatusCode}");
-        EmploymentStatusCode = EmpStatus.Onboarding;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, EmpStatus.PendingOnboarding, EmpStatus.Onboarding, actor));
-    }
-
-    public void Activate(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Onboarding && EmploymentStatusCode != EmpStatus.Suspended)
-            throw new DomainException($"Cannot activate from status {EmploymentStatusCode}");
         var fromStatus = EmploymentStatusCode;
-        EmploymentStatusCode = EmpStatus.Active;
+        if (!EmpStatus.IsValidTransition(fromStatus, toStatus))
+            throw new DomainException($"Cannot change status from {fromStatus} to {toStatus}");
+        EmploymentStatusCode = toStatus;
         UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, fromStatus, EmpStatus.Active, actor));
+        AddEvent(new EmployeeStatusChangedDomainEvent(Id, fromStatus, toStatus, actor));
     }
 
-    public void Suspend(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Active)
-            throw new DomainException($"Cannot suspend from status {EmploymentStatusCode}");
-        EmploymentStatusCode = EmpStatus.Suspended;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, EmpStatus.Active, EmpStatus.Suspended, actor));
-    }
+    public void StartOnboarding(string actor) => ChangeStatus(EmpStatus.Onboarding, actor);
 
-    public void Resume(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Suspended)
-            throw new DomainException($"Cannot resume from status {EmploymentStatusCode}");
-        EmploymentStatusCode = EmpStatus.Active;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, EmpStatus.Suspended, EmpStatus.Active, actor));
-    }
+    public void Activate(string actor) => ChangeStatus(EmpStatus.Active, actor);
 
-    public void Resign(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Active)
-            throw new DomainException($"Cannot resign from status {EmploymentStatusCode}");
-        EmploymentStatusCode = EmpStatus.Resigned;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, EmpStatus.Active, EmpStatus.Resigned, actor));
-    }
+    public void Suspend(string actor) => ChangeStatus(EmpStatus.Suspended, actor);
 
-    public void Terminate(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Active)
-            throw new DomainException($"Cannot terminate from status {EmploymentStatusCode}");
-        EmploymentStatusCode = EmpStatus.Terminated;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, EmpStatus.Active, EmpStatus.Terminated, actor));
-    }
+    public void Resume(string actor) => ChangeStatus(EmpStatus.Active, actor);
 
-    public void Archive(string actor)
-    {
-        if (EmploymentStatusCode != EmpStatus.Resigned && EmploymentStatusCode != EmpStatus.Terminated)
-            throw new DomainException($"Cannot archive from status {EmploymentStatusCode}");
-        var fromStatus = EmploymentStatusCode;
-        EmploymentStatusCode = EmpStatus.Archived;
-        UpdatedAt = DateTime.UtcNow;
-        AddEvent(new EmployeeStatusChangedDomainEvent(Id, fromStatus, EmpStatus.Archived, actor));
-    }
+    public void Resign(string actor) => ChangeStatus(EmpStatus.Resigned, actor);
+
+    public void Terminate(string actor) => ChangeStatus(EmpStatus.Terminated, actor);
+
+    public void Archive(string actor) => ChangeStatus(EmpStatus.Archived, actor);
 }
