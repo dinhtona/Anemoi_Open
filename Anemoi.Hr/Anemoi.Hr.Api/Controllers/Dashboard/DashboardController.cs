@@ -1,29 +1,28 @@
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Cqrs.Queries.DashboardQueries.GetDashboardOverview;
-using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Application.Cqrs.Queries.LifecycleQueries.GetLifecycleSummary;
+using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Api.Controllers.Dashboard;
 
 [ApiController]
-[Route("api/hr/dashboard/[controller]/[action]")]
+[Route("api/hr/dashboard")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
 public sealed class DashboardController(ISender sender) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("lifecycle-summary")]
     [HasPermission(HrPermissions.DashboardView)]
-    [ProducesResponseType(typeof(DashboardOverviewResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetDashboardOverview(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(DashboardLifecycleSummaryDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetLifecycleSummary(CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new GetDashboardOverviewQuery(), cancellationToken);
-        return Ok(result);
+        var res = await sender.Send(new GetLifecycleSummaryQuery(), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

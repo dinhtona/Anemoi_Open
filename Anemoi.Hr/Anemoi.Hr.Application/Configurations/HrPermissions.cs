@@ -118,6 +118,14 @@ public static class HrPermissions
     public const string OvertimeRuleView = "hr.overtime.rule.view";
     public const string OvertimeRuleManage = "hr.overtime.rule.manage";
 
+    public const string ProbationView = "Probation.View";
+    public const string ProbationManage = "Probation.Manage";
+    public const string TransferCreate = "Transfer.Create";
+    public const string TransferView = "Transfer.View";
+    public const string SeparationCreate = "Separation.Create";
+    public const string SeparationView = "Separation.View";
+    public const string EmployeeTimelineView = "EmployeeTimeline.View";
+
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;
     public const string EssLeaveRequest = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveRequest;
@@ -235,7 +243,14 @@ public static class HrPermissions
         LeavePolicySettingsManage,
         OvertimeRuleView,
         OvertimeRuleManage,
-        WorkflowOverride
+        WorkflowOverride,
+        ProbationView,
+        ProbationManage,
+        TransferCreate,
+        TransferView,
+        SeparationCreate,
+        SeparationView,
+        EmployeeTimelineView
     ];
 
     public static readonly IReadOnlyDictionary<string, SensitivePermissionDefinition> SensitivePermissions =

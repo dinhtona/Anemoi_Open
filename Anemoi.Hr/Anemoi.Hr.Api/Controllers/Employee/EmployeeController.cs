@@ -13,6 +13,8 @@ using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePromotionTim
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployees;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetMyEmployeeProfile;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.SearchEmployees;
+using Anemoi.Hr.Application.Cqrs.Queries.LifecycleQueries.GetEmployeeTimeline;
+using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MediatR;
@@ -20,6 +22,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Anemoi.Hr.Api.Controllers.Employee;
 
@@ -139,5 +142,42 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
     {
         var res = await sender.Send(new GetEmployeePromotionTimelineQuery(employeeId), cancellationToken);
         return Ok(res);
+    }
+
+    [HttpGet("{id}/timeline")]
+    [HasPermission(HrPermissions.EmployeeTimelineView)]
+    [ProducesResponseType(typeof(PaginationResponse<EmployeeHistoryDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetEmployeeTimeline(
+        [FromRoute] EmployeeId id,
+        [FromQuery] string? eventType,
+        [FromQuery] string? entityType,
+        [FromQuery] DateTime? dateFrom,
+        [FromQuery] DateTime? dateTo,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetEmployeeTimelineQuery(id, eventType, entityType, dateFrom, dateTo);
+        return Ok(await sender.Send(query, cancellationToken));
+    }
+
+    [HttpGet("me/timeline")]
+    [HasPermission(HrPermissions.EmployeeTimelineView)]
+    [ProducesResponseType(typeof(PaginationResponse<EmployeeHistoryDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMyTimeline(
+        [FromQuery] string? eventType,
+        [FromQuery] string? entityType,
+        [FromQuery] DateTime? dateFrom,
+        [FromQuery] DateTime? dateTo,
+        CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var email = HttpContext.GetClaimValue("email");
+        var profileRes = await sender.Send(
+            new GetMyEmployeeProfileQuery(userId, email), cancellationToken);
+        if (!profileRes.TryPickT0(out var profile, out var error))
+            return BadRequest(error);
+
+        var employeeId = new EmployeeId(Guid.Parse(profile.Id));
+        var query = new GetEmployeeTimelineQuery(employeeId, eventType, entityType, dateFrom, dateTo);
+        return Ok(await sender.Send(query, cancellationToken));
     }
 }
