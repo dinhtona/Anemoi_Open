@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Separations;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
@@ -12,7 +14,8 @@ public sealed class EmployeeSeparationWorkflowStatusUpdater(
     ISqlRepository<EmployeeSeparation> separationRepository,
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<EmployeeOrganizationHistory> organizationHistoryRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint)
     : IWorkflowTargetStatusUpdater
 {
     public bool CanHandle(string entityType)
@@ -45,6 +48,13 @@ public sealed class EmployeeSeparationWorkflowStatusUpdater(
         }
 
         await unitOfWork.SaveChangesAsync(ct);
+
+        await publishEndpoint.Publish(new SeparationApprovedIntegrationEvent(
+            separation.Id.Value,
+            separation.EmployeeId.Value,
+            separation.SeparationTypeCode,
+            separation.LastWorkingDate ?? separation.SeparationDate
+        ), ct);
     }
 
     public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)

@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Transfers;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
@@ -13,7 +15,8 @@ public sealed class EmployeeTransferWorkflowStatusUpdater(
     ISqlRepository<EmployeeTransfer> transferRepository,
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<EmployeeOrganizationHistory> organizationHistoryRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint)
     : IWorkflowTargetStatusUpdater
 {
     public bool CanHandle(string entityType)
@@ -56,6 +59,15 @@ public sealed class EmployeeTransferWorkflowStatusUpdater(
         }, ct);
 
         await unitOfWork.SaveChangesAsync(ct);
+
+        await publishEndpoint.Publish(new TransferApprovedIntegrationEvent(
+            transfer.Id.Value,
+            transfer.EmployeeId.Value,
+            transfer.SourceDepartmentId.Value.ToString(),
+            transfer.TargetDepartmentId.Value.ToString(),
+            transfer.SourcePositionId.Value.ToString(),
+            transfer.TargetPositionId.Value.ToString()
+        ), ct);
     }
 
     public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)

@@ -2,12 +2,16 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Employees.Events;
+using Anemoi.Hr.Domain.Onboarding;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 using System;
@@ -23,7 +27,9 @@ public sealed class ConvertCandidateToEmployeeHandler(
     ISqlRepository<HiringDecision> decisionRepository,
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<RecruitmentOpening> openingRepository,
-    IUnitOfWork unitOfWork)
+    ISqlRepository<OnboardingInstance> onboardingInstanceRepository,
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<ConvertCandidateToEmployeeCommand, OneOf<CandidateConversionResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<CandidateConversionResponse, ErrorDetailResponse>> Handle(
@@ -83,7 +89,7 @@ public sealed class ConvertCandidateToEmployeeHandler(
             FullName = request.FullName,
             WorkEmail = request.WorkEmail,
             JoinDate = request.JoinDate,
-            EmploymentStatusCode = EmploymentStatusCode.Active,
+            EmploymentStatusCode = EmploymentStatusCode.PendingOnboarding,
             EmploymentTypeCode = request.EmploymentTypeCode,
             GradeCode = "G1",
             PrimaryDepartmentId = request.DepartmentId,
@@ -96,6 +102,9 @@ public sealed class ConvertCandidateToEmployeeHandler(
         if (createResult.TryPickT1(out var exception, out _))
             return HrErrorResponses.FromSaveResult(exception,
                 HrBusinessErrorCodes.ConversionEmployeeCreationFailed);
+
+        employee.AddEvent(new EmployeeCreatedDomainEvent(
+            employeeId, request.EmployeeCode, request.FullName, request.ConvertedBy));
 
         // Link candidate to employee
         candidate.LinkEmployee(employeeId, request.ConvertedBy, now);
@@ -111,10 +120,28 @@ public sealed class ConvertCandidateToEmployeeHandler(
             }
         }
 
+        // Auto-create OnboardingInstance
+        var onboardingInstance = OnboardingInstance.Create(
+            new OnboardingInstanceId(IdGenerator.NextGuid()),
+            employee.Id,
+            null,
+            "Standard Onboarding",
+            1,
+            DateTime.UtcNow,
+            request.ConvertedBy);
+        await onboardingInstanceRepository.CreateOneAsync(onboardingInstance, cancellationToken);
+
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.TryPickT1(out var saveException, out _))
             return HrErrorResponses.FromSaveResult(saveException,
                 HrBusinessErrorCodes.ConversionEmployeeCreationFailed);
+
+        await publishEndpoint.Publish(new EmployeeCreatedIntegrationEvent(
+            employeeId.Value,
+            request.EmployeeCode,
+            request.FullName,
+            request.WorkEmail
+        ), cancellationToken);
 
         return new CandidateConversionResponse
         {
