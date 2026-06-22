@@ -5,9 +5,8 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Employees;
 
-public sealed class Employee : ValueObject
+public sealed class Employee : Entity<EmployeeId>
 {
-    public EmployeeId Id { get; set; }
     public Guid? IdentityUserId { get; set; }
     public string EmployeeCode { get; set; }
     public string FullName { get; set; }
@@ -33,9 +32,4 @@ public sealed class Employee : ValueObject
     public List<EmployeePositionHistory> PositionHistories { get; set; } = [];
     public List<EmployeeGradeHistory> GradeHistories { get; set; } = [];
     public List<EmployeeManagerHistory> ManagerHistories { get; set; } = [];
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Id;
-    }
 }
