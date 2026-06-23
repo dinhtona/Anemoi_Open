@@ -43,9 +43,9 @@ public sealed class GetLifecycleSummaryHandler(
             .LongCountAsync(x => x.StatusCode == SeparationStatusCode.Pending, cancellationToken);
 
         var created7 = await employeeRepository.GetQueryable()
-            .LongCountAsync(x => x.CreatedAt >= daysAgo7.ToDateTime(TimeOnly.MinValue), cancellationToken);
+            .LongCountAsync(x => x.CreatedAt >= daysAgo7.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc), cancellationToken);
         var created30 = await employeeRepository.GetQueryable()
-            .LongCountAsync(x => x.CreatedAt >= daysAgo30.ToDateTime(TimeOnly.MinValue), cancellationToken);
+            .LongCountAsync(x => x.CreatedAt >= daysAgo30.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc), cancellationToken);
 
         return new DashboardLifecycleSummaryDto
         {

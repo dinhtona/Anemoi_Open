@@ -137,6 +137,13 @@ public static class Permissions
     public const string HrWorkflowExecute = "hr.workflow.execute";
     public const string HrWorkflowApprove = "hr.workflow.approve";
 
+    // Phase 33: Employee Lifecycle permissions
+    public const string HrProbationView = "Probation.View";
+    public const string HrProbationManage = "Probation.Manage";
+    public const string HrSeparationCreate = "Separation.Create";
+    public const string HrSeparationView = "Separation.View";
+    public const string HrEmployeeTimelineView = "EmployeeTimeline.View";
+
     // Notification permissions
     public const string NotificationView = "notification.view";
     public const string NotificationManage = "notification.manage";
@@ -258,6 +265,11 @@ public static class Permissions
         new(HrOnboardingManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingManage"),
         new(HrOnboardingTaskComplete, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskComplete"),
         new(HrOnboardingTaskManage, "PermissionGroupHrOnboarding", "PermissionDescriptionHrOnboardingTaskManage"),
+        new(HrProbationView, "PermissionGroupHrEmployee", "PermissionDescriptionHrProbationView"),
+        new(HrProbationManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrProbationManage", true, "High"),
+        new(HrSeparationView, "PermissionGroupHrEmployee", "PermissionDescriptionHrSeparationView"),
+        new(HrSeparationCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrSeparationCreate", true, "High"),
+        new(HrEmployeeTimelineView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTimelineView"),
         new(HrWorkflowView, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowView"),
         new(HrWorkflowManage, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowManage"),
         new(HrWorkflowExecute, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowExecute"),

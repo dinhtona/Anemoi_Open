@@ -118,13 +118,13 @@ public static class HrPermissions
     public const string OvertimeRuleView = "hr.overtime.rule.view";
     public const string OvertimeRuleManage = "hr.overtime.rule.manage";
 
-    public const string ProbationView = "Probation.View";
-    public const string ProbationManage = "Probation.Manage";
-    public const string TransferCreate = "Transfer.Create";
+    public const string ProbationView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrProbationView;
+    public const string ProbationManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrProbationManage;
     public const string TransferView = "Transfer.View";
-    public const string SeparationCreate = "Separation.Create";
-    public const string SeparationView = "Separation.View";
-    public const string EmployeeTimelineView = "EmployeeTimeline.View";
+    public const string TransferCreate = "Transfer.Create";
+    public const string SeparationView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSeparationView;
+    public const string SeparationCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSeparationCreate;
+    public const string EmployeeTimelineView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTimelineView;
 
     public const string EssProfileView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssProfileView;
     public const string EssLeaveView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEssLeaveView;

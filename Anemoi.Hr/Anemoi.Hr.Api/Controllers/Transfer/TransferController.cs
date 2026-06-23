@@ -21,7 +21,7 @@ namespace Anemoi.Hr.Api.Controllers.Transfer;
 public sealed class TransferController(ISender sender) : ControllerBase
 {
     [HttpPost("submit")]
-    [HasPermission(HrPermissions.TransferCreate)]
+    [HasPermission(HrPermissions.EmployeeTransferCreate)]
     [ProducesResponseType(typeof(EmployeeTransferDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Submit(
         [FromBody] SubmitTransferCommand command,
@@ -32,7 +32,7 @@ public sealed class TransferController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
-    [HasPermission(HrPermissions.TransferView)]
+    [HasPermission(HrPermissions.EmployeeTransferView)]
     [ProducesResponseType(typeof(PaginationResponse<EmployeeTransferDto>), StatusCodes.Status200OK)]
     public async Task<PaginationResponse<EmployeeTransferDto>> GetAll(
         [FromQuery] GetTransfersQuery query,
