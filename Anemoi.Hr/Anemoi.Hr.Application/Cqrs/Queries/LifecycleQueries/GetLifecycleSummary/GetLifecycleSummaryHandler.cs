@@ -22,10 +22,19 @@ public sealed class GetLifecycleSummaryHandler(
         GetLifecycleSummaryQuery request, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
-        var thirtyDaysFromNow = DateOnly.FromDateTime(now.AddDays(30));
+        var today = DateOnly.FromDateTime(now);
+        var in7Days = DateOnly.FromDateTime(now.AddDays(7));
+        var in14Days = DateOnly.FromDateTime(now.AddDays(14));
+        var in30Days = DateOnly.FromDateTime(now.AddDays(30));
+        var daysAgo7 = DateOnly.FromDateTime(now.AddDays(-7));
+        var daysAgo30 = DateOnly.FromDateTime(now.AddDays(-30));
 
-        var expiringProbationCount = await probationRepository.GetQueryable()
-            .LongCountAsync(x => x.StatusCode == ProbationStatusCode.Pending && x.EndDate <= thirtyDaysFromNow, cancellationToken);
+        var probQuery = probationRepository.GetQueryable()
+            .Where(x => x.StatusCode == ProbationStatusCode.Pending && x.EndDate >= today);
+
+        var count7 = await probQuery.CountAsync(x => x.EndDate <= in7Days, cancellationToken);
+        var count14 = await probQuery.CountAsync(x => x.EndDate <= in14Days, cancellationToken);
+        var count30 = await probQuery.CountAsync(x => x.EndDate <= in30Days, cancellationToken);
 
         var pendingTransferCount = await transferRepository.GetQueryable()
             .LongCountAsync(x => x.StatusCode == TransferStatusCode.Pending, cancellationToken);
@@ -33,28 +42,26 @@ public sealed class GetLifecycleSummaryHandler(
         var pendingSeparationCount = await separationRepository.GetQueryable()
             .LongCountAsync(x => x.StatusCode == SeparationStatusCode.Pending, cancellationToken);
 
-        var lastMonth = now.AddMonths(-1);
-        var newEmployeeCount = await employeeRepository.GetQueryable()
-            .LongCountAsync(x => x.JoinDate >= DateOnly.FromDateTime(lastMonth), cancellationToken);
-
-        var activeProbationCount = await probationRepository.GetQueryable()
-            .LongCountAsync(x => x.StatusCode == ProbationStatusCode.Pending, cancellationToken);
-
-        var activeTransferCount = await transferRepository.GetQueryable()
-            .LongCountAsync(x => x.StatusCode == TransferStatusCode.Draft || x.StatusCode == TransferStatusCode.Pending, cancellationToken);
-
-        var activeSeparationCount = await separationRepository.GetQueryable()
-            .LongCountAsync(x => x.StatusCode == SeparationStatusCode.Draft || x.StatusCode == SeparationStatusCode.Pending, cancellationToken);
+        var created7 = await employeeRepository.GetQueryable()
+            .LongCountAsync(x => x.CreatedAt >= daysAgo7.ToDateTime(TimeOnly.MinValue), cancellationToken);
+        var created30 = await employeeRepository.GetQueryable()
+            .LongCountAsync(x => x.CreatedAt >= daysAgo30.ToDateTime(TimeOnly.MinValue), cancellationToken);
 
         return new DashboardLifecycleSummaryDto
         {
-            ExpiringProbationCount = (int)expiringProbationCount,
-            PendingTransferCount = (int)pendingTransferCount,
-            PendingSeparationCount = (int)pendingSeparationCount,
-            NewEmployeeCount = (int)newEmployeeCount,
-            ActiveProbationCount = (int)activeProbationCount,
-            ActiveTransferCount = (int)activeTransferCount,
-            ActiveSeparationCount = (int)activeSeparationCount
+            ProbationsExpiring = new ProbationsExpiringDto
+            {
+                Count7 = count7,
+                Count14 = count14,
+                Count30 = count30
+            },
+            PendingTransfers = (int)pendingTransferCount,
+            PendingSeparations = (int)pendingSeparationCount,
+            NewEmployees = new NewEmployeesDto
+            {
+                Count7 = (int)created7,
+                Count30 = (int)created30
+            }
         };
     }
 }
