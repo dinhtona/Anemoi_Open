@@ -2,10 +2,12 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.ModelIds.ModelIds;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
 
@@ -14,7 +16,8 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.LinkEmployeesToId
 public sealed class LinkEmployeesToIdentityUsersHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<EmployeeIdentityLinkLog> linkLogRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<LinkEmployeesToIdentityUsersCommand, OneOf<EmployeeIdentityLinkResultResponse, ErrorDetailResponse>>
 {
     private const string SystemCreatedBy = "system:employee-identity-linker";
@@ -50,6 +53,14 @@ public sealed class LinkEmployeesToIdentityUsersHandler(
             if (status == EmployeeIdentityLinkMatchStatuses.Matched && !request.DryRun)
             {
                 employee.IdentityUserId = matchedIdentityUserId;
+#pragma warning disable CS4014
+                publishEndpoint.Publish(new EmployeeCreatedIntegrationEvent(
+                    employee.Id.Value,
+                    employee.EmployeeCode,
+                    employee.FullName,
+                    employee.WorkEmail
+                ));
+#pragma warning restore CS4014
             }
 
             Increment(result, status);

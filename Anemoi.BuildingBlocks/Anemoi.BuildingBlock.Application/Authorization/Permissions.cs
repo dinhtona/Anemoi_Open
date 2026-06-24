@@ -138,11 +138,11 @@ public static class Permissions
     public const string HrWorkflowApprove = "hr.workflow.approve";
 
     // Phase 33: Employee Lifecycle permissions
-    public const string HrProbationView = "Probation.View";
-    public const string HrProbationManage = "Probation.Manage";
-    public const string HrSeparationCreate = "Separation.Create";
-    public const string HrSeparationView = "Separation.View";
-    public const string HrEmployeeTimelineView = "EmployeeTimeline.View";
+    public const string HrProbationView = "hr.probation.view";
+    public const string HrProbationManage = "hr.probation.manage";
+    public const string HrSeparationCreate = "hr.separation.create";
+    public const string HrSeparationView = "hr.separation.view";
+    public const string HrEmployeeTimelineView = "hr.employee.timeline.view";
 
     // Notification permissions
     public const string NotificationView = "notification.view";

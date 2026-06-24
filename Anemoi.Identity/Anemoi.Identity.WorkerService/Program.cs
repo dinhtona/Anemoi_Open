@@ -40,6 +40,8 @@ var serviceScope = app.Services.CreateScope();
 
 await SeedData.SeedRolesAsync(serviceScope);
 
+await EmployeeRoleSeeder.SeedDefaultRoleGroupsAsync(serviceScope);
+
 await SeedData.SeedApplicationPoliciesAsync(serviceScope);
 
 await SeedData.RegisterAdministratorAsync(serviceScope);

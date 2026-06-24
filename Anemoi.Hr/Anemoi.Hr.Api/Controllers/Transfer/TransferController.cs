@@ -42,7 +42,7 @@ public sealed class TransferController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [HasPermission(HrPermissions.TransferView)]
+    [HasPermission(HrPermissions.EmployeeTransferView)]
     [ProducesResponseType(typeof(EmployeeTransferDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetById(
         [FromRoute] EmployeeTransferId id,

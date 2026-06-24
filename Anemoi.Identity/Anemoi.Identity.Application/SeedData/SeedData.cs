@@ -21,6 +21,110 @@ using Serilog;
 
 namespace Lambda.Identity.Application.SeedData;
 
+public static class EmployeeRoleSeeder
+{
+    public const string EmployeeRoleName = "Employee";
+
+    public static readonly string[] EmployeePermissions =
+    [
+        "hr.ess.profile.view",
+        "hr.ess.leave.view",
+        "hr.ess.leave.request",
+        "hr.ess.attendance.view",
+        "hr.ess.overtime.view",
+        "hr.ess.overtime.create",
+        "hr.ess.payroll.view",
+        "hr.ess.payslip.view",
+        "hr.ess.onboarding.view",
+        "hr.ess.onboarding.task.complete",
+        "notification.view",
+        "notification.preference.manage",
+        "notification.action.execute"
+    ];
+
+    public static async Task SeedDefaultRoleGroupsAsync(IServiceScope serviceScope)
+    {
+        var roleRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Role>>();
+        var roleGroupRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<RoleGroup>>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+
+        var allRoles = await roleRepository.GetQueryable().AsNoTracking().ToListAsync();
+        var roleByName = allRoles.ToDictionary(r => r.Name!);
+
+        var expectedRoleIds = new List<RoleId>();
+        foreach (var perm in EmployeePermissions)
+        {
+            if (roleByName.TryGetValue(perm, out var role))
+                expectedRoleIds.Add(role.RoleId);
+            else
+                logger.Warning("[SeedData] Role '{Permission}' not found for Employee role group", perm);
+        }
+
+        if (expectedRoleIds.Count == 0)
+        {
+            logger.Warning("[SeedData] No roles found for Employee role group, skipping");
+            return;
+        }
+
+        var existing = await roleGroupRepository
+            .GetFirstByConditionAsync(
+                x => x.Name == EmployeeRoleName && x.IsDefault,
+                query => query.Include(rg => rg.RoleGroupMapRoles));
+
+        if (existing is not null)
+        {
+            var existingRoleIds = existing.RoleGroupMapRoles
+                .Select(m => m.RoleId)
+                .ToHashSet();
+            var missingRoleIds = expectedRoleIds
+                .Where(rid => !existingRoleIds.Contains(rid))
+                .ToList();
+
+            if (missingRoleIds.Count == 0)
+            {
+                logger.Information("[SeedData] Employee role group is up to date");
+                return;
+            }
+
+            foreach (var rid in missingRoleIds)
+            {
+                existing.RoleGroupMapRoles.Add(new RoleGroupMapRole
+                {
+                    Id = new RoleGroupMapUserRoleId(IdGenerator.NextGuid()),
+                    RoleGroupId = existing.Id,
+                    RoleId = rid
+                });
+            }
+
+            await unitOfWork.SaveChangesAsync();
+            logger.Information(
+                "[SeedData] Synced {Count} missing permissions to Employee role group",
+                missingRoleIds.Count);
+            return;
+        }
+
+        var roleGroup = new RoleGroup
+        {
+            Id = new RoleGroupId(IdGenerator.NextGuid()),
+            Name = EmployeeRoleName,
+            Description = "Base employee self-service role",
+            IsDefault = true,
+            CreatedTime = DateTime.UtcNow,
+            RoleGroupMapRoles = expectedRoleIds.Select(rid => new RoleGroupMapRole
+            {
+                Id = new RoleGroupMapUserRoleId(IdGenerator.NextGuid()),
+                RoleId = rid
+            }).ToList(),
+            RoleGroupClaims = []
+        };
+
+        await roleGroupRepository.CreateOneAsync(roleGroup);
+        await unitOfWork.SaveChangesAsync();
+        logger.Information("[SeedData] Seeded Employee role group with {Count} permissions", expectedRoleIds.Count);
+    }
+}
+
 public static class SeedData
 {
     public static async Task RegisterAdministratorAsync(IServiceScope serviceScope)
@@ -285,6 +389,7 @@ public static class SeedData
         var roles = defaultApplicationPolicies.ApplicationPolicies
             .SelectMany(x => x.Roles)
             .Concat(Permissions.All)
+            .Append(EmployeeRoleSeeder.EmployeeRoleName)
             .Distinct();
         var isChangeed = false;
         foreach (var role in roles)

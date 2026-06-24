@@ -120,8 +120,6 @@ public static class HrPermissions
 
     public const string ProbationView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrProbationView;
     public const string ProbationManage = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrProbationManage;
-    public const string TransferView = "Transfer.View";
-    public const string TransferCreate = "Transfer.Create";
     public const string SeparationView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSeparationView;
     public const string SeparationCreate = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrSeparationCreate;
     public const string EmployeeTimelineView = Anemoi.BuildingBlock.Application.Authorization.Permissions.HrEmployeeTimelineView;
@@ -246,8 +244,6 @@ public static class HrPermissions
         WorkflowOverride,
         ProbationView,
         ProbationManage,
-        TransferCreate,
-        TransferView,
         SeparationCreate,
         SeparationView,
         EmployeeTimelineView
