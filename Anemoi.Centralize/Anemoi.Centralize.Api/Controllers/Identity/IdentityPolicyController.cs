@@ -44,14 +44,32 @@ public class IdentityPolicyController(
             .Select(role =>
             {
                 var permission = Permissions.Find(role.Name);
-                role.Group = localizer[permission?.GroupKey ?? "PermissionGroupOther"].Value;
+                role.Group = Localize(permission?.GroupKey ?? "PermissionGroupOther", "Other");
                 role.Description = permission is null
-                    ? localizer["PermissionDescriptionUnmapped", role.Name].Value
-                    : localizer[permission.DescriptionKey].Value;
+                    ? Localize("PermissionDescriptionUnmapped", role.Name, role.Name)
+                    : Localize(permission.DescriptionKey, ToDisplayName(permission.Key));
                 return role;
             });
         return Ok(roles);
     }
+
+    private string Localize(string key, string fallback)
+    {
+        var localized = localizer[key];
+        return localized.ResourceNotFound ? fallback : localized.Value;
+    }
+
+    private string Localize(string key, object argument, string fallback)
+    {
+        var localized = localizer[key, argument];
+        return localized.ResourceNotFound ? fallback : localized.Value;
+    }
+
+    private static string ToDisplayName(string permissionCode) =>
+        string.Join(" ", permissionCode
+            .Replace('_', '.')
+            .Split('.', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => char.ToUpperInvariant(part[0]) + part[1..]));
 
     /// <summary>
     /// GetIdentityPolicies

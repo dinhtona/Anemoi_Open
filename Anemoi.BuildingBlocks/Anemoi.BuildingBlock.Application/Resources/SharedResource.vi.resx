@@ -234,6 +234,7 @@
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
+  <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>Xem phân tích nhân sự.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>Xem lịch sử chuyển phòng ban của nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Thực hiện chuyển phòng ban cho nhân viên.</value></data>
   <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>Xem lịch sử thăng chức của nhân viên.</value></data>
@@ -242,6 +243,19 @@
   <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Thực hiện thay đổi chức vụ cho nhân viên.</value></data>
   <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi cấp bậc của nhân viên.</value></data>
   <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Thực hiện thay đổi cấp bậc cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractView" xml:space="preserve"><value>Xem hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractCreate" xml:space="preserve"><value>Tạo hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractUpdate" xml:space="preserve"><value>Cập nhật hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractTerminate" xml:space="preserve"><value>Chấm dứt hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryView" xml:space="preserve"><value>Xem thông tin lương nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryChange" xml:space="preserve"><value>Thay đổi thông tin lương nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeView" xml:space="preserve"><value>Xem cấp bậc lương.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeManage" xml:space="preserve"><value>Quản lý cấp bậc lương.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeView" xml:space="preserve"><value>Xem loại phụ cấp.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeManage" xml:space="preserve"><value>Quản lý loại phụ cấp.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceView" xml:space="preserve"><value>Xem phụ cấp nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceChange" xml:space="preserve"><value>Thay đổi phụ cấp nhân viên.</value></data>
+  <data name="PermissionDescriptionHrCompensationDashboardView" xml:space="preserve"><value>Xem bảng điều khiển đãi ngộ.</value></data>
   <data name="PermissionGroupHrAttendance" xml:space="preserve"><value>Chấm công</value></data>
   <data name="PermissionDescriptionHrAttendanceView" xml:space="preserve"><value>Xem dữ liệu chấm công.</value></data>
   <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Tạo dữ liệu chấm công.</value></data>
@@ -280,8 +294,46 @@
   <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>Xem phiếu lương cá nhân qua ESS.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>Xem các báo cáo lương nâng cao.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Xuất các báo cáo lương nâng cao ra file CSV.</value></data>
+  <data name="PermissionGroupHrRecruitment" xml:space="preserve"><value>Tuyển dụng</value></data>
+  <data name="PermissionDescriptionHrRecruitmentView" xml:space="preserve"><value>Xem hồ sơ tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentManage" xml:space="preserve"><value>Quản lý cấu hình và hồ sơ tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestView" xml:space="preserve"><value>Xem yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestCreate" xml:space="preserve"><value>Tạo yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestSubmit" xml:space="preserve"><value>Gửi yêu cầu tuyển dụng để phê duyệt.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestApprove" xml:space="preserve"><value>Phê duyệt yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestManage" xml:space="preserve"><value>Quản lý yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentInterview" xml:space="preserve"><value>Quản lý phỏng vấn tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentHire" xml:space="preserve"><value>Hoàn tất thao tác tuyển dụng ứng viên.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentAnalytics" xml:space="preserve"><value>Xem phân tích tuyển dụng.</value></data>
+  <data name="PermissionGroupHrWorkflow" xml:space="preserve"><value>Quy trình nhân sự</value></data>
+  <data name="PermissionDescriptionHrWorkflowView" xml:space="preserve"><value>Xem định nghĩa và phiên bản quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Quản lý định nghĩa quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Phê duyệt tác vụ quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Thực hiện tác vụ quy trình nhân sự.</value></data>
+  <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>Hội nhập nhân viên</value></data>
+  <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>Xem kế hoạch và phiên bản hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Quản lý kế hoạch và phiên bản hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskManage" xml:space="preserve"><value>Quản lý tác vụ hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskComplete" xml:space="preserve"><value>Hoàn thành tác vụ hội nhập.</value></data>
+  <data name="PermissionDescriptionHrProbationView" xml:space="preserve"><value>Xem hồ sơ thử việc.</value></data>
+  <data name="PermissionDescriptionHrProbationManage" xml:space="preserve"><value>Quản lý hồ sơ thử việc.</value></data>
+  <data name="PermissionDescriptionHrSeparationView" xml:space="preserve"><value>Xem hồ sơ nghỉ việc.</value></data>
+  <data name="PermissionDescriptionHrSeparationCreate" xml:space="preserve"><value>Tạo hồ sơ nghỉ việc.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTimelineView" xml:space="preserve"><value>Xem dòng thời gian nhân viên.</value></data>
+  <data name="PermissionGroupHrInsurance" xml:space="preserve"><value>Bảo hiểm</value></data>
+  <data name="PermissionDescriptionHrInsuranceView" xml:space="preserve"><value>Xem hồ sơ bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceManage" xml:space="preserve"><value>Quản lý hồ sơ bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceCalculate" xml:space="preserve"><value>Tính khoản đóng bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceReport" xml:space="preserve"><value>Xem báo cáo bảo hiểm.</value></data>
+  <data name="PermissionGroupHrTax" xml:space="preserve"><value>Thuế</value></data>
+  <data name="PermissionDescriptionHrTaxView" xml:space="preserve"><value>Xem hồ sơ thuế.</value></data>
+  <data name="PermissionDescriptionHrTaxManage" xml:space="preserve"><value>Quản lý hồ sơ thuế.</value></data>
+  <data name="PermissionDescriptionHrTaxCalculate" xml:space="preserve"><value>Tính số tiền thuế.</value></data>
   <data name="PermissionGroupNotifications" xml:space="preserve"><value>Thông báo</value></data>
   <data name="PermissionDescriptionNotificationView" xml:space="preserve"><value>Xem thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationActionExecute" xml:space="preserve"><value>Thực hiện hành động thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationArchive" xml:space="preserve"><value>Lưu trữ thông báo.</value></data>
   <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Quản lý thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>Xem nhật ký kiểm tra thông báo.</value></data>
   <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Quản lý tùy chọn thông báo.</value></data>
 </root>

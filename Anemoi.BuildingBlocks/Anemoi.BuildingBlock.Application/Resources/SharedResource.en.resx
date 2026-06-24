@@ -234,6 +234,7 @@
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>View HR position information.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>View HR dashboard.</value></data>
+  <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>View HR analytics.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>View employee department transfer history.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Execute department transfers for employees.</value></data>
   <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>View employee promotion history.</value></data>
@@ -242,6 +243,19 @@
   <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Execute employee position changes.</value></data>
   <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>View employee grade change history.</value></data>
   <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Execute employee grade changes.</value></data>
+  <data name="PermissionDescriptionHrContractView" xml:space="preserve"><value>View employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractCreate" xml:space="preserve"><value>Create employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractUpdate" xml:space="preserve"><value>Update employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractTerminate" xml:space="preserve"><value>Terminate employee contracts.</value></data>
+  <data name="PermissionDescriptionHrSalaryView" xml:space="preserve"><value>View employee salary information.</value></data>
+  <data name="PermissionDescriptionHrSalaryChange" xml:space="preserve"><value>Change employee salary information.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeView" xml:space="preserve"><value>View salary grades.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeManage" xml:space="preserve"><value>Manage salary grades.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeView" xml:space="preserve"><value>View allowance types.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeManage" xml:space="preserve"><value>Manage allowance types.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceView" xml:space="preserve"><value>View employee allowances.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceChange" xml:space="preserve"><value>Change employee allowances.</value></data>
+  <data name="PermissionDescriptionHrCompensationDashboardView" xml:space="preserve"><value>View compensation dashboard.</value></data>
   <data name="PermissionGroupHrAttendance" xml:space="preserve"><value>HR Attendance</value></data>
   <data name="PermissionDescriptionHrAttendanceView" xml:space="preserve"><value>View attendance records.</value></data>
   <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Create attendance records.</value></data>
@@ -280,8 +294,46 @@
   <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>View own payslips via ESS.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>View advanced payroll reports.</value></data>
   <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Export advanced payroll reports to CSV format.</value></data>
+  <data name="PermissionGroupHrRecruitment" xml:space="preserve"><value>HR Recruitment</value></data>
+  <data name="PermissionDescriptionHrRecruitmentView" xml:space="preserve"><value>View recruitment records.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentManage" xml:space="preserve"><value>Manage recruitment configuration and records.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestView" xml:space="preserve"><value>View recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestCreate" xml:space="preserve"><value>Create recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestSubmit" xml:space="preserve"><value>Submit recruitment requests for approval.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestApprove" xml:space="preserve"><value>Approve recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestManage" xml:space="preserve"><value>Manage recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentInterview" xml:space="preserve"><value>Manage recruitment interviews.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentHire" xml:space="preserve"><value>Complete candidate hiring actions.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentAnalytics" xml:space="preserve"><value>View recruitment analytics.</value></data>
+  <data name="PermissionGroupHrWorkflow" xml:space="preserve"><value>HR Workflow</value></data>
+  <data name="PermissionDescriptionHrWorkflowView" xml:space="preserve"><value>View HR workflow definitions and instances.</value></data>
+  <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Manage HR workflow definitions.</value></data>
+  <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Approve HR workflow tasks.</value></data>
+  <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Execute HR workflow tasks.</value></data>
+  <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>HR Onboarding</value></data>
+  <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>View onboarding plans and instances.</value></data>
+  <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Manage onboarding plans and instances.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskManage" xml:space="preserve"><value>Manage onboarding tasks.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskComplete" xml:space="preserve"><value>Complete onboarding tasks.</value></data>
+  <data name="PermissionDescriptionHrProbationView" xml:space="preserve"><value>View probation records.</value></data>
+  <data name="PermissionDescriptionHrProbationManage" xml:space="preserve"><value>Manage probation records.</value></data>
+  <data name="PermissionDescriptionHrSeparationView" xml:space="preserve"><value>View separation records.</value></data>
+  <data name="PermissionDescriptionHrSeparationCreate" xml:space="preserve"><value>Create separation records.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTimelineView" xml:space="preserve"><value>View employee timeline.</value></data>
+  <data name="PermissionGroupHrInsurance" xml:space="preserve"><value>HR Insurance</value></data>
+  <data name="PermissionDescriptionHrInsuranceView" xml:space="preserve"><value>View insurance records.</value></data>
+  <data name="PermissionDescriptionHrInsuranceManage" xml:space="preserve"><value>Manage insurance records.</value></data>
+  <data name="PermissionDescriptionHrInsuranceCalculate" xml:space="preserve"><value>Calculate insurance contributions.</value></data>
+  <data name="PermissionDescriptionHrInsuranceReport" xml:space="preserve"><value>View insurance reports.</value></data>
+  <data name="PermissionGroupHrTax" xml:space="preserve"><value>HR Tax</value></data>
+  <data name="PermissionDescriptionHrTaxView" xml:space="preserve"><value>View tax records.</value></data>
+  <data name="PermissionDescriptionHrTaxManage" xml:space="preserve"><value>Manage tax records.</value></data>
+  <data name="PermissionDescriptionHrTaxCalculate" xml:space="preserve"><value>Calculate tax amounts.</value></data>
   <data name="PermissionGroupNotifications" xml:space="preserve"><value>Notifications</value></data>
   <data name="PermissionDescriptionNotificationView" xml:space="preserve"><value>View notifications.</value></data>
+  <data name="PermissionDescriptionNotificationActionExecute" xml:space="preserve"><value>Execute notification actions.</value></data>
+  <data name="PermissionDescriptionNotificationArchive" xml:space="preserve"><value>Archive notifications.</value></data>
   <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Manage notifications.</value></data>
+  <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>View notification audit records.</value></data>
   <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Manage notification preferences.</value></data>
 </root>
