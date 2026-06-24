@@ -19,6 +19,18 @@ Compact HR context for agent sessions. Use [docs/README.md](README.md) for the f
 - Permission-based authorization.
 - Tax and Insurance engines stay independent; Payroll consumes snapshots.
 
+## HR Scope Architecture
+
+All HR business modules must separate three perspectives and must not mix them:
+
+- Employee / Self-Service: only the current employee's own data, such as my leave requests, overtime requests, payslips, attendance, and profile.
+- Manager / Approval Scope: only data under the manager's approval or management scope, such as requests needing my approval, employees I manage, and onboarding/probation employees I am responsible for. Managers do not automatically have HR rights.
+- HR/Admin / Organization Scope: company-wide data, such as all leave requests, overtime requests, payslips, attendance data, and employee records.
+
+UI routes must follow `/ess/*`, `/manager/*`, and `/hr/*`. Permission conventions are `hr.ess.*` for ESS, `*.approve` for manager approval actions, and `hr.*.view` / `hr.*.manage` for HR/Admin.
+
+Every new HR feature must answer: what does Employee see, what does Manager see, and what does HR see? If those three answers are not clear, the feature is incomplete.
+
 ## String And Code Rules
 
 Do not inline business error codes, validation codes, permission codes, route names, status codes, type keys, or localization keys.

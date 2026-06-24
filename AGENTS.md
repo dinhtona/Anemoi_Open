@@ -29,7 +29,7 @@ If documents conflict, follow approved ADRs first, then architecture/development
 - Use MassTransit for internal messaging; avoid HTTP/gRPC between internal services unless explicitly approved.
 - Localize user-facing messages.
 - Protect features with permission constants and `[HasPermission]`.
-- In `Anemoi.Hr.*` production code, centralize business/status/type string literals as constants.
+- In `Anemoi.Hr.*` production code, centralize business/status/type string literals as constants and follow the HR scope rules in `docs/AI_CONTEXT.md`.
 - For frontend-impacting work, run browser validation through available browser automation / DevTools MCP before reporting completion.
 
 ## Verification Requirements
