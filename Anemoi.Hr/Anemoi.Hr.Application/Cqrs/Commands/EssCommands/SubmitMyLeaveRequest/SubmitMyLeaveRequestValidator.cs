@@ -9,7 +9,6 @@ public sealed class SubmitMyLeaveRequestValidator : AbstractValidator<SubmitMyLe
     public SubmitMyLeaveRequestValidator()
     {
         RuleFor(x => x.LeavePolicyId).RequiredId(HrBusinessErrorCodes.ValLeavePolicyIdRequired);
-        RuleFor(x => x.ApproverEmployeeId).RequiredId(HrBusinessErrorCodes.ValApproverEmployeeIdRequired);
         RuleFor(x => x.LeaveTypeCode).NotEmpty().MaximumLength(64);
         RuleFor(x => x.RequestedDays).GreaterThan(0);
         RuleFor(x => x.EndDate)

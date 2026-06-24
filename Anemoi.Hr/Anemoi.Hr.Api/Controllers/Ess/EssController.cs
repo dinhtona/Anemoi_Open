@@ -10,6 +10,7 @@ using Anemoi.Hr.Application.Cqrs.Commands.EssCommands.SubmitMyOvertimeRequest;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyAttendanceRecords;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyAttendanceSummary;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyLeaveBalances;
+using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyApproverPreview;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyLeaveRequests;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyOvertimeRequests;
 using Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyPayrollHistory;
@@ -61,6 +62,17 @@ public sealed class EssController(ISender sender) : ControllerBase
         var userId = HttpContext.GetUserId();
         var email = HttpContext.GetClaimValue("email");
         var res = await sender.Send(new GetMyLeaveRequestsQuery(userId, email), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
+    }
+
+    [HttpGet("leave/approver-preview")]
+    [HasPermission(HrPermissions.EssLeaveRequest)]
+    [ProducesResponseType(typeof(EssApproverPreviewResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMyApproverPreview(CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        var email = HttpContext.GetClaimValue("email");
+        var res = await sender.Send(new GetMyApproverPreviewQuery(userId!, email!), cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 

@@ -95,6 +95,15 @@ public sealed class EssPayrollPeriodResponse
     public DateTime CreatedAt { get; set; }
 }
 
+public sealed class EssApproverPreviewResponse
+{
+    public string? EmployeeId { get; set; }
+    public string? FullName { get; set; }
+    public string? PositionName { get; set; }
+    public string? ResolutionSource { get; set; }
+    public bool CanResolve { get; set; }
+}
+
 public sealed class EssPayslipResponse
 {
     public string Id { get; set; }
