@@ -42,7 +42,98 @@ public static class EmployeeRoleSeeder
         "notification.action.execute"
     ];
 
+    private static readonly IReadOnlyCollection<SystemRoleProfile> DefaultProfiles =
+    [
+        SystemRoleProfiles.Employee,
+        SystemRoleProfiles.Hr,
+        SystemRoleProfiles.Recruiter,
+        SystemRoleProfiles.WorkflowAdmin,
+        SystemRoleProfiles.Admin
+    ];
+
     public static async Task SeedDefaultRoleGroupsAsync(IServiceScope serviceScope)
+    {
+        await SystemRoleGroupSeeder.SeedDefaultRoleGroupsAsync(serviceScope, DefaultProfiles);
+    }
+}
+
+public sealed record SystemRoleProfile(string Name, string Description, IReadOnlyCollection<string> Permissions);
+
+public static class SystemRoleProfiles
+{
+    public static readonly SystemRoleProfile Employee = new(
+        EmployeeRoleSeeder.EmployeeRoleName,
+        "Base employee self-service role",
+        EmployeeRoleSeeder.EmployeePermissions);
+
+    public static readonly SystemRoleProfile Hr = new(
+        "HR",
+        "HR operations role",
+        EmployeeRoleSeeder.EmployeePermissions.Concat([
+            "hr.employee.view",
+            "hr.employee.create",
+            "hr.employee.update",
+            "hr.department.view",
+            "hr.department.manage",
+            "hr.position.view",
+            "hr.position.manage",
+            "hr.attendance.view",
+            "hr.attendance.create",
+            "hr.attendance.update",
+            "hr.attendance.lock",
+            "hr.contract.create",
+            "hr.contract.view",
+            "hr.dashboard.view",
+            "hr.analytics.view",
+            "hr.overtime.manage"
+        ]).Distinct().ToArray());
+
+    public static readonly SystemRoleProfile Recruiter = new(
+        "Recruiter",
+        "Recruitment operations role",
+        EmployeeRoleSeeder.EmployeePermissions.Concat([
+            "hr.recruitment.view",
+            "hr.recruitment.request.create",
+            "hr.recruitment.request.submit",
+            "hr.recruitment.request.manage",
+            "hr.recruitment.manage",
+            "hr.recruitment.interview",
+            "hr.recruitment.hire"
+        ]).Distinct().ToArray());
+
+    public static readonly SystemRoleProfile WorkflowAdmin = new(
+        "WorkflowAdmin",
+        "Workflow configuration role",
+        EmployeeRoleSeeder.EmployeePermissions.Concat([
+            "hr.workflow.view",
+            "hr.workflow.manage",
+            "hr.workflow.execute"
+        ]).Distinct().ToArray());
+
+    public static readonly SystemRoleProfile Admin = new(
+        "Admin",
+        "Business administration role",
+        Hr.Permissions.Concat(Recruiter.Permissions).Concat(WorkflowAdmin.Permissions).Distinct().ToArray());
+}
+
+public static class DevTestRoleAssignments
+{
+    public static readonly IReadOnlyDictionary<string, string[]> RoleGroupsByEmail =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["linh.nguyen@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
+            ["minh.tran@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
+            ["an.pham@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
+            ["mai.le@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
+            ["khoa.do@anemoi.test"] = [SystemRoleProfiles.Employee.Name]
+        };
+}
+
+internal static class SystemRoleGroupSeeder
+{
+    public static async Task SeedDefaultRoleGroupsAsync(
+        IServiceScope serviceScope,
+        IReadOnlyCollection<SystemRoleProfile> profiles)
     {
         var roleRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Role>>();
         var roleGroupRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<RoleGroup>>();
@@ -52,76 +143,73 @@ public static class EmployeeRoleSeeder
         var allRoles = await roleRepository.GetQueryable().AsNoTracking().ToListAsync();
         var roleByName = allRoles.ToDictionary(r => r.Name!);
 
-        var expectedRoleIds = new List<RoleId>();
-        foreach (var perm in EmployeePermissions)
+        foreach (var profile in profiles)
         {
-            if (roleByName.TryGetValue(perm, out var role))
-                expectedRoleIds.Add(role.RoleId);
-            else
-                logger.Warning("[SeedData] Role '{Permission}' not found for Employee role group", perm);
-        }
-
-        if (expectedRoleIds.Count == 0)
-        {
-            logger.Warning("[SeedData] No roles found for Employee role group, skipping");
-            return;
-        }
-
-        var existing = await roleGroupRepository
-            .GetFirstByConditionAsync(
-                x => x.Name == EmployeeRoleName && x.IsDefault,
-                query => query.Include(rg => rg.RoleGroupMapRoles));
-
-        if (existing is not null)
-        {
-            var existingRoleIds = existing.RoleGroupMapRoles
-                .Select(m => m.RoleId)
-                .ToHashSet();
-            var missingRoleIds = expectedRoleIds
-                .Where(rid => !existingRoleIds.Contains(rid))
-                .ToList();
-
-            if (missingRoleIds.Count == 0)
+            var expectedRoleIds = new List<RoleId>();
+            foreach (var perm in profile.Permissions)
             {
-                logger.Information("[SeedData] Employee role group is up to date");
-                return;
+                if (roleByName.TryGetValue(perm, out var role))
+                    expectedRoleIds.Add(role.RoleId);
+                else
+                    logger.Warning("[SeedData] Role '{Permission}' not found for {RoleGroup} role group",
+                        perm, profile.Name);
             }
 
-            foreach (var rid in missingRoleIds)
+            if (expectedRoleIds.Count == 0)
             {
-                existing.RoleGroupMapRoles.Add(new RoleGroupMapRole
+                logger.Warning("[SeedData] No roles found for {RoleGroup} role group, skipping", profile.Name);
+                continue;
+            }
+
+            var existing = await roleGroupRepository
+                .GetFirstByConditionAsync(
+                    x => x.Name == profile.Name && x.IsDefault,
+                    query => query.Include(rg => rg.RoleGroupMapRoles));
+
+            if (existing is not null)
+            {
+                var existingRoleIds = existing.RoleGroupMapRoles
+                    .Select(m => m.RoleId)
+                    .ToHashSet();
+                var missingRoleIds = expectedRoleIds
+                    .Where(rid => !existingRoleIds.Contains(rid))
+                    .ToList();
+
+                foreach (var rid in missingRoleIds)
+                {
+                    existing.RoleGroupMapRoles.Add(new RoleGroupMapRole
+                    {
+                        Id = new RoleGroupMapUserRoleId(IdGenerator.NextGuid()),
+                        RoleGroupId = existing.Id,
+                        RoleId = rid
+                    });
+                }
+
+                continue;
+            }
+
+            var roleGroupId = new RoleGroupId(IdGenerator.NextGuid());
+            var roleGroup = new RoleGroup
+            {
+                Id = roleGroupId,
+                Name = profile.Name,
+                Description = profile.Description,
+                IsDefault = true,
+                CreatedTime = DateTime.UtcNow,
+                RoleGroupMapRoles = expectedRoleIds.Select(rid => new RoleGroupMapRole
                 {
                     Id = new RoleGroupMapUserRoleId(IdGenerator.NextGuid()),
-                    RoleGroupId = existing.Id,
+                    RoleGroupId = roleGroupId,
                     RoleId = rid
-                });
-            }
+                }).ToList(),
+                RoleGroupClaims = []
+            };
 
-            await unitOfWork.SaveChangesAsync();
-            logger.Information(
-                "[SeedData] Synced {Count} missing permissions to Employee role group",
-                missingRoleIds.Count);
-            return;
+            await roleGroupRepository.CreateOneAsync(roleGroup);
         }
 
-        var roleGroup = new RoleGroup
-        {
-            Id = new RoleGroupId(IdGenerator.NextGuid()),
-            Name = EmployeeRoleName,
-            Description = "Base employee self-service role",
-            IsDefault = true,
-            CreatedTime = DateTime.UtcNow,
-            RoleGroupMapRoles = expectedRoleIds.Select(rid => new RoleGroupMapRole
-            {
-                Id = new RoleGroupMapUserRoleId(IdGenerator.NextGuid()),
-                RoleId = rid
-            }).ToList(),
-            RoleGroupClaims = []
-        };
-
-        await roleGroupRepository.CreateOneAsync(roleGroup);
         await unitOfWork.SaveChangesAsync();
-        logger.Information("[SeedData] Seeded Employee role group with {Count} permissions", expectedRoleIds.Count);
+        logger.Information("[SeedData] Seeded/synced {Count} default system role groups", profiles.Count);
     }
 }
 
@@ -206,66 +294,17 @@ public static class SeedData
     {
         var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
         var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var roleGroupRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<RoleGroup>>();
+        var userMapRoleGroupRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<UserMapRoleGroup>>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
 
         var allUsers = await userDbRepository.GetQueryable().ToListAsync();
         var userByEmail = allUsers.ToDictionary(u => u.Email?.Trim().ToLowerInvariant() ?? "");
+        var roleGroups = await roleGroupRepository.GetQueryable(x => x.IsDefault)
+            .ToDictionaryAsync(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
-        var roleAssignments = new Dictionary<string, string[]>
-        {
-            // Employee role — ESS access only
-            ["minh.tran@anemoi.test"] =
-            [
-                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
-                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
-                "hr.ess.payroll.view", "hr.ess.payslip.view"
-            ],
-            ["an.pham@anemoi.test"] =
-            [
-                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
-                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
-                "hr.ess.payroll.view", "hr.ess.payslip.view"
-            ],
-            // Manager role — ESS + approval permissions
-            ["linh.nguyen@anemoi.test"] =
-            [
-                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
-                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
-                "hr.ess.payroll.view", "hr.ess.payslip.view",
-                "hr.leave.request.approve", "hr.overtime.approve",
-                "hr.employee.view", "hr.dashboard.view"
-            ],
-            // HR Manager role — HR operational permissions
-            ["mai.le@anemoi.test"] =
-            [
-                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
-                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
-                "hr.ess.payroll.view", "hr.ess.payslip.view",
-                "hr.employee.view",
-                "hr.contract.create", "hr.contract.view",
-                "hr.attendance.create", "hr.attendance.lock", "hr.attendance.update", "hr.attendance.view",
-                "hr.payroll.view", "hr.payroll.calculate", "hr.payroll.approve", "hr.payroll.lock",
-                "hr.payslip.document.generate", "hr.payslip.document.view", "hr.payslip.email.send",
-                "hr.dashboard.view", "hr.analytics.view",
-                "hr.leave.request.approve", "hr.leave.request.force_approve",
-                "hr.overtime.approve",
-                "hr.overtime.manage"
-            ],
-            // Recruiter role
-            ["khoa.do@anemoi.test"] =
-            [
-                "hr.ess.profile.view", "hr.ess.leave.view", "hr.ess.leave.request",
-                "hr.ess.attendance.view", "hr.ess.overtime.view", "hr.ess.overtime.create",
-                "hr.ess.payroll.view", "hr.ess.payslip.view",
-                "hr.recruitment.view", "hr.recruitment.request.create",
-                "hr.recruitment.request.submit", "hr.recruitment.request.approve",
-                "hr.recruitment.request.manage",
-                "hr.recruitment.manage", "hr.recruitment.interview", "hr.recruitment.hire",
-                "hr.dashboard.view"
-            ]
-        };
-
-        foreach (var (email, roles) in roleAssignments)
+        foreach (var (email, roleGroupNames) in DevTestRoleAssignments.RoleGroupsByEmail)
         {
             if (!userByEmail.TryGetValue(email, out var user))
             {
@@ -274,17 +313,39 @@ public static class SeedData
             }
 
             var directRoles = await userRepository.GetDirectRolesAsync(user);
-            var rolesToAdd = roles.Where(r => !directRoles.Contains(r)).ToList();
-            if (rolesToAdd.Count > 0)
+            var obsoleteDirectRoles = directRoles
+                .Where(role => role != SystemRoles.Administrator)
+                .ToList();
+            if (obsoleteDirectRoles.Count > 0)
             {
-                var addResult = await userRepository.AddToRolesAsync(user, rolesToAdd);
-                if (addResult.IsT1)
-                    logger.Warning("[SeedData] Failed to assign roles to {Email}: {Error}",
-                        email, addResult.AsT1.Message);
-                else
-                    logger.Information("[SeedData] Assigned {Count} roles to {Email}", rolesToAdd.Count, email);
+                var removeResult = await userRepository.RemoveFromRolesAsync(user, obsoleteDirectRoles);
+                if (removeResult.IsT1)
+                    logger.Warning("[SeedData] Failed to remove obsolete direct dev roles from {Email}: {Error}",
+                        email, removeResult.AsT1.Message);
+            }
+
+            foreach (var roleGroupName in roleGroupNames)
+            {
+                if (!roleGroups.TryGetValue(roleGroupName, out var roleGroup))
+                {
+                    logger.Warning("[SeedData] Role group {RoleGroup} not found for {Email}", roleGroupName, email);
+                    continue;
+                }
+
+                var exists = await userMapRoleGroupRepository.ExistByConditionAsync(x =>
+                    x.UserId == user.UserId && x.RoleGroupId == roleGroup.Id);
+                if (exists) continue;
+
+                await userMapRoleGroupRepository.CreateOneAsync(new UserMapRoleGroup
+                {
+                    Id = new UserMapRoleGroupId(IdGenerator.NextGuid()),
+                    UserId = user.UserId,
+                    RoleGroupId = roleGroup.Id
+                });
             }
         }
+
+        await unitOfWork.SaveChangesAsync();
     }
 
     public static async Task RemoveReservedApplicationPolicyClaimsAsync(IServiceScope serviceScope)

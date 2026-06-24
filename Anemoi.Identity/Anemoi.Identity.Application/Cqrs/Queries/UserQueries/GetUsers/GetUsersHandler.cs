@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -87,7 +88,12 @@ public sealed class GetUsersHandler(
                 if (user is not null)
                 {
                     response.DirectRoles = (await userRepository.GetDirectRolesAsync(user)).ToList();
-                    response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
+                    response.Permissions = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
+                    response.Roles = response.DirectRoles
+                        .Where(role => role == SystemRoles.Administrator)
+                        .Concat(response.RoleGroupNames)
+                        .Distinct()
+                        .ToList();
                 }
             }
         }

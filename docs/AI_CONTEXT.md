@@ -18,6 +18,7 @@ Compact HR context for agent sessions. Use [docs/README.md](README.md) for the f
 - PostgreSQL `xmin` concurrency where applicable.
 - Permission-based authorization.
 - Tax and Insurance engines stay independent; Payroll consumes snapshots.
+- Employee Position, System Role, and Workflow Role are separate concepts: position/job title/department must never grant permissions or JWT claims; system permissions come only from explicit Identity role groups/permission assignments; workflow roles are approval-routing responsibilities only and must not grant system access; frontend authorization must use `user.permissions`, while `user.roles` is display/system-role metadata only.
 
 ## HR Scope Architecture
 

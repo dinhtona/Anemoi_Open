@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryOneFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryOne;
@@ -50,7 +51,12 @@ public sealed class GetUserHandler(
         response.RoleGroupNames = roleGroups.Select(rg => rg.RoleGroup.Name).ToList();
 
         response.DirectRoles = (await userRepository.GetDirectRolesAsync(user)).ToList();
-        response.Roles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
+        response.Permissions = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
+        response.Roles = response.DirectRoles
+            .Where(role => role == SystemRoles.Administrator)
+            .Concat(response.RoleGroupNames)
+            .Distinct()
+            .ToList();
 
         return response;
     }
