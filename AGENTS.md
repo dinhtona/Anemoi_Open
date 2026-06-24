@@ -30,6 +30,7 @@ If documents conflict, follow approved ADRs first, then architecture/development
 - Localize user-facing messages.
 - Protect features with permission constants and `[HasPermission]`.
 - In `Anemoi.Hr.*` production code, centralize business/status/type string literals as constants and follow the HR scope rules in `docs/AI_CONTEXT.md`.
+- Follow the Three-Scope Architecture (ADR-027): every module must define Employee (ESS), Approval (manager/approvals), and HR/Admin (organization) scopes. Approval inbox must be centralized under `/manager/approvals` (ADR-028).
 - For frontend-impacting work, run browser validation through available browser automation / DevTools MCP before reporting completion.
 
 ## Verification Requirements

@@ -12,11 +12,11 @@ Before changing an existing pattern, verify whether an Architecture Decision Rec
 
 # ANEMOI HR - Architecture Decisions Record (ADR)
 
-Version: After Phase 19 Approval
+Version: After ADR-028 Approval
 
 Status: Active
 
-Last Updated: 2026-06-15
+Last Updated: 2026-06-24
 
 ---
 
@@ -662,6 +662,168 @@ Implement a 3-layer idempotency strategy:
 - Slight insert overhead from the dedup pre-check query and index maintenance.
 - `DeduplicationKey` is stored on every `NotificationHistory` row, adding storage cost.
 - The 3-layer defense ensures correctness under all failure modes (broker redelivery, consumer crash-restart, concurrent inserts).
+
+---
+
+---
+
+## ADR-027 — Three-Scope Architecture Separation
+
+### Status
+
+Approved (2026-06-24)
+
+### Context
+
+Leave and Overtime modules mixed personal data, approval data, and organization-wide data in a single HR page. This violated least-privilege visibility and created no clear pattern for future modules. The Workflow Engine (Phase 28–30) requires a clean separation between who submits, who approves, and who administers.
+
+### Decision
+
+Every business module must explicitly define three scopes before implementation:
+
+#### 1. Employee Scope (ESS)
+
+Route pattern: `/ess/*`
+
+- Personal data only: My Requests, My Balances, My Status
+- Self-service operations
+- Readonly display of current approver (resolved by Workflow Engine)
+- Never: pending approvals, organization-wide data, manual approver selection
+
+#### 2. Approval Scope (Manager)
+
+Route pattern: `/manager/approvals`
+
+- Only items requiring the current user's approval
+- Data routed exclusively by Workflow Engine
+- Visibility based on approval permissions and workflow responsibilities, never role names
+- Must work with all approver types: DirectManager, DepartmentManager, WorkflowRole, Permission-based, SpecificUser, future types
+
+#### 3. HR/Admin Scope (Organization)
+
+Route pattern: `/hr/*`
+
+- Organization-wide data, reporting, administration, configuration
+- Must not become an approval inbox
+- May observe workflow progress (CurrentApprover, WorkflowStatus) without approval authority
+
+### Key Rule: CanObserveWorkflow ≠ CanApproveWorkflow
+
+- Approval Scope: Can approve, reject, observe own inbox
+- HR Scope: May observe workflow state on entity records without approval authority
+- Future permission `hr.workflow.view` may govern workflow observation
+
+### Shared Workflow Read Model: IWorkflowQueryService
+
+To avoid duplicating WorkflowInstance → WorkflowInstanceStep → Employee joins across modules, all workflow observation queries must use a shared read model.
+
+**Batch API (avoids N+1):**
+
+```csharp
+public interface IWorkflowQueryService
+{
+    Task<Dictionary<Guid, WorkflowSummaryResponse>> GetWorkflowSummariesAsync(
+        string entityType,
+        IReadOnlyCollection<Guid> entityIds,
+        CancellationToken ct);
+}
+
+public sealed record WorkflowSummaryResponse(
+    string? CurrentApproverName,
+    string? CurrentStepName,
+    string? WorkflowStatus);
+```
+
+Batch-load for N entity IDs in 1–3 queries instead of N per-entity queries. Consumers call once with all entity IDs from their result set and join the returned dictionary in-memory.
+
+Consumers:
+- ESS queries (Leave, Overtime)
+- HR queries (Leave, Overtime)
+- Future module queries (Recruitment, Transfer, Separation, Probation)
+
+Manager approval handlers may query WorkflowInstance directly since they already load workflow data as part of the pending approvals resolution. All other consumers go through `IWorkflowQueryService`.
+
+### Implications
+
+- Add this rule to AGENTS.md Architecture Rules
+- Add scope definitions to every future module specification
+- A feature is not complete until all three scopes are defined and verified in browser validation
+
+---
+
+## ADR-028 — Approval Inbox Centralization
+
+### Status
+
+Approved (2026-06-24)
+
+### Context
+
+Without a centralization rule, each business module could create its own approval page (e.g., `/leave/pending`, `/overtime/pending`, `/recruitment/pending`). This fragments the approval experience, duplicates UI code, and forces users to check multiple locations for pending actions.
+
+### Decision
+
+`/manager/approvals` is the single approval inbox for the entire platform.
+
+#### Forbidden patterns
+
+```txt
+/leave/pending
+/overtime/pending
+/recruitment/pending
+/probation/pending
+/separation/pending
+/transfer/pending
+```
+
+Business modules may expose only:
+
+- **ESS (`/ess/*`)**: My Requests — user's own submissions
+- **HR (`/hr/*`)**: All Records — organization-wide data
+
+Approval inbox belongs exclusively to the Approval Scope.
+
+#### Tab-based entity views
+
+The single inbox uses tabs for entity-specific filtering (Leave, Overtime, Probation, etc.). The "All" tab is the default view, showing everything requiring the user's action.
+
+#### Future unification
+
+Entity-specific manager API endpoints (`/api/hr/manager/approvals/leave`, `/overtime`) are acceptable for the current implementation phase. Future direction is a single unified endpoint:
+
+```txt
+GET /api/hr/workflow/pending-approvals
+```
+
+with a polymorphic response containing:
+```csharp
+EntityType          // discriminator
+EntityId
+WorkflowInstanceId
+DisplayTitle
+SubmittedBy
+SubmittedAt
+CurrentStep
+Status
+```
+
+Do not implement the unified endpoint yet. The entity-specific endpoints remain as a transitional pattern.
+
+#### Future combined permission
+
+Current sidebar visibility logic (`hr.leave.request.approve` OR `hr.overtime.approve`) requires updating the route mapping for each new workflow type. Future direction is a single combined permission:
+
+```txt
+approval.inbox.view
+```
+
+or
+
+```txt
+workflow.approval.view
+```
+
+This permission would grant access to the entire `/manager/approvals` approval center without per-entity enumeration in the sidebar. Do not implement yet — existing per-entity permissions remain sufficient for the current phase.
 
 ---
 
