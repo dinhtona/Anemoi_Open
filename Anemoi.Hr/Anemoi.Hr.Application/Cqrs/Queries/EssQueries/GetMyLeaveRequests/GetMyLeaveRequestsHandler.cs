@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
@@ -13,7 +14,8 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyLeaveRequests;
 public sealed class GetMyLeaveRequestsHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<LeaveRequest> leaveRequestRepository,
-    EssMapper mapper)
+    EssMapper mapper,
+    IWorkflowQueryService workflowQueryService)
     : IQueryHandler<GetMyLeaveRequestsQuery, OneOf<IReadOnlyCollection<EssLeaveRequestResponse>, ErrorDetailResponse>>
 {
     public async Task<OneOf<IReadOnlyCollection<EssLeaveRequestResponse>, ErrorDetailResponse>> Handle(
@@ -39,6 +41,20 @@ public sealed class GetMyLeaveRequestsHandler(
             query => query.OrderByDescending(r => r.CreatedAt),
             cancellationToken);
 
-        return requests.Select(mapper.ToEssLeaveRequestResponse).ToList();
+        var responses = requests.Select(mapper.ToEssLeaveRequestResponse).ToList();
+
+        var entityIds = requests.Select(r => r.Id.Value).ToList();
+        var summaries = await workflowQueryService.GetWorkflowSummariesAsync(
+            WorkflowConstants.TargetEntityTypes.LeaveRequest, entityIds, cancellationToken);
+
+        foreach (var response in responses)
+            if (Guid.TryParse(response.Id, out var guid) && summaries.TryGetValue(guid, out var summary))
+            {
+                response.CurrentApproverName = summary.CurrentApproverName;
+                response.CurrentStepName = summary.CurrentStepName;
+                response.WorkflowStatus = summary.WorkflowStatus;
+            }
+
+        return responses;
     }
 }

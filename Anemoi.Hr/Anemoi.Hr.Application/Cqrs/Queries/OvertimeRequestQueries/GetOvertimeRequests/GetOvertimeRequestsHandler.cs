@@ -1,6 +1,8 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
@@ -10,7 +12,8 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.OvertimeRequestQueries.GetOvertimeR
 
 public sealed class GetOvertimeRequestsHandler(
     ISqlRepository<OvertimeRequest> overtimeRequestRepository,
-    OvertimeMapper mapper)
+    OvertimeMapper mapper,
+    IWorkflowQueryService workflowQueryService)
     : IQueryHandler<GetOvertimeRequestsQuery, PaginationResponse<OvertimeRequestResponse>>
 {
     public async Task<PaginationResponse<OvertimeRequestResponse>> Handle(GetOvertimeRequestsQuery request,
@@ -50,8 +53,21 @@ public sealed class GetOvertimeRequestsHandler(
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        return new PaginationResponse<OvertimeRequestResponse>(
-            rows.Select(mapper.ToOvertimeRequestResponse).ToList(),
-            totalRecords);
+        var responses = rows.Select(mapper.ToOvertimeRequestResponse).ToList();
+        var entityIds = rows.Select(x => x.Id.Value).ToList();
+        var summaries = await workflowQueryService.GetWorkflowSummariesAsync(
+            WorkflowConstants.TargetEntityTypes.OvertimeRequest, entityIds, cancellationToken);
+
+        foreach (var response in responses)
+        {
+            if (summaries.TryGetValue(response.Id, out var summary))
+            {
+                response.CurrentApproverName = summary.CurrentApproverName;
+                response.CurrentStepName = summary.CurrentStepName;
+                response.WorkflowStatus = summary.WorkflowStatus;
+            }
+        }
+
+        return new PaginationResponse<OvertimeRequestResponse>(responses, totalRecords);
     }
 }

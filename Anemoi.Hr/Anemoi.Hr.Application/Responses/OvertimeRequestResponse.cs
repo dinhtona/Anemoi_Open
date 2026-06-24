@@ -19,4 +19,7 @@ public sealed class OvertimeRequestResponse
     public string CancelledBy { get; init; }
     public DateTime? CancelledAt { get; init; }
     public DateTime CreatedAt { get; init; }
+    public string? CurrentApproverName { get; set; }
+    public string? CurrentStepName { get; set; }
+    public string? WorkflowStatus { get; set; }
 }

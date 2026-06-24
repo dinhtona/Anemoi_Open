@@ -47,6 +47,9 @@ public sealed class EssLeaveRequestResponse
     public string Reason { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public string? CurrentApproverName { get; set; }
+    public string? CurrentStepName { get; set; }
+    public string? WorkflowStatus { get; set; }
 }
 
 public sealed class EssAttendanceRecordResponse
@@ -82,6 +85,9 @@ public sealed class EssOvertimeRequestResponse
     public string Reason { get; init; } = string.Empty;
     public string Status { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
+    public string? CurrentApproverName { get; init; }
+    public string? CurrentStepName { get; init; }
+    public string? WorkflowStatus { get; init; }
 }
 
 public sealed class EssPayrollPeriodResponse

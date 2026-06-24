@@ -1,6 +1,8 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
+using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Leaves;
@@ -8,7 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveRequestQueries.GetLeaveRequests;
 
-public sealed class GetLeaveRequestsHandler(ISqlRepository<LeaveRequest> repository, LeaveMapper mapper)
+public sealed class GetLeaveRequestsHandler(
+    ISqlRepository<LeaveRequest> repository,
+    LeaveMapper mapper,
+    IWorkflowQueryService workflowQueryService)
     : IQueryHandler<GetLeaveRequestsQuery, PaginationResponse<LeaveRequestResponse>>
 {
     public async Task<PaginationResponse<LeaveRequestResponse>> Handle(GetLeaveRequestsQuery request,
@@ -36,8 +41,22 @@ public sealed class GetLeaveRequestsHandler(ISqlRepository<LeaveRequest> reposit
 
         var items = await paged.ToListAsync(cancellationToken);
 
-        return new PaginationResponse<LeaveRequestResponse>(
-            items.Select(mapper.ToLeaveRequestResponse).ToList(),
-            total);
+        var responses = items.Select(mapper.ToLeaveRequestResponse).ToList();
+
+        var entityIds = items.Select(x => x.Id.Value).ToList();
+        var summaries = await workflowQueryService.GetWorkflowSummariesAsync(
+            WorkflowConstants.TargetEntityTypes.LeaveRequest, entityIds, cancellationToken);
+
+        foreach (var (item, response) in items.Zip(responses))
+        {
+            if (summaries.TryGetValue(item.Id.Value, out var summary))
+            {
+                response.CurrentApproverName = summary.CurrentApproverName;
+                response.CurrentStepName = summary.CurrentStepName;
+                response.WorkflowStatus = summary.WorkflowStatus;
+            }
+        }
+
+        return new PaginationResponse<LeaveRequestResponse>(responses, total);
     }
 }

@@ -1,6 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
@@ -13,7 +14,8 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.EssQueries.GetMyOvertimeRequests;
 public sealed class GetMyOvertimeRequestsHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<OvertimeRequest> overtimeRequestRepository,
-    EssMapper mapper)
+    EssMapper mapper,
+    IWorkflowQueryService workflowQueryService)
     : IQueryHandler<GetMyOvertimeRequestsQuery, OneOf<IReadOnlyCollection<EssOvertimeRequestResponse>, ErrorDetailResponse>>
 {
     public async Task<OneOf<IReadOnlyCollection<EssOvertimeRequestResponse>, ErrorDetailResponse>> Handle(
@@ -39,6 +41,31 @@ public sealed class GetMyOvertimeRequestsHandler(
             query => query.OrderByDescending(r => r.CreatedAt),
             cancellationToken);
 
-        return requests.Select(mapper.ToEssOvertimeRequestResponse).ToList();
+        var entityIds = requests.Select(r => r.Id.Value).ToList();
+        var workflowSummaries = await workflowQueryService.GetWorkflowSummariesAsync(
+            WorkflowConstants.TargetEntityTypes.OvertimeRequest, entityIds, cancellationToken);
+
+        var responses = new List<EssOvertimeRequestResponse>();
+        foreach (var overtimeRequest in requests)
+        {
+            var mapped = mapper.ToEssOvertimeRequestResponse(overtimeRequest);
+            workflowSummaries.TryGetValue(mapped.Id, out var summary);
+            responses.Add(new EssOvertimeRequestResponse
+            {
+                Id = mapped.Id,
+                OvertimeDate = mapped.OvertimeDate,
+                StartTime = mapped.StartTime,
+                EndTime = mapped.EndTime,
+                DurationHours = mapped.DurationHours,
+                Reason = mapped.Reason,
+                Status = mapped.Status,
+                CreatedAt = mapped.CreatedAt,
+                CurrentApproverName = summary?.CurrentApproverName,
+                CurrentStepName = summary?.CurrentStepName,
+                WorkflowStatus = summary?.WorkflowStatus
+            });
+        }
+
+        return responses;
     }
 }
