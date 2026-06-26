@@ -25,44 +25,40 @@ public sealed class SubmitSeparationHandler(
     public async Task<OneOf<EmployeeSeparationDto, ErrorDetailResponse>> Handle(
         SubmitSeparationCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var employee = await employeeRepository.GetFirstByConditionAsync(
-                x => x.Id == request.EmployeeId, null, cancellationToken);
-            if (employee == null)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+        var employee = await employeeRepository.GetFirstByConditionAsync(
+            x => x.Id == request.EmployeeId, null, cancellationToken);
+        if (employee == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
-            var id = new EmployeeSeparationId(IdGenerator.NextGuid());
-            var separation = EmployeeSeparation.Create(
-                id,
-                request.EmployeeId,
-                request.SeparationType,
-                request.LastWorkingDate,
-                request.LastWorkingDate,
-                request.Reason,
-                currentUser.UserId);
+        var id = new EmployeeSeparationId(IdGenerator.NextGuid());
+        var separation = EmployeeSeparation.Create(
+            id,
+            request.EmployeeId,
+            request.SeparationType,
+            request.LastWorkingDate,
+            request.LastWorkingDate,
+            request.Reason,
+            currentUser.UserId);
 
-            await separationRepository.CreateOneAsync(separation, cancellationToken);
+        await separationRepository.CreateOneAsync(separation, cancellationToken);
 
-            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-            if (saveResult.IsT1)
-                return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+        var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
+        var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
+        var workflowResult = await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
+            separation.Id.Value,
+            requesterEmployeeId,
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
 
-            var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
-            var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
-            await workflowEngine.StartAsync(
-                WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
-                separation.Id.Value,
-                requesterEmployeeId,
-                requesterUserId,
-                requesterUserId,
-                cancellationToken);
+        if (workflowResult.TryPickT1(out var workflowError, out _))
+            return workflowError;
 
-            return mapper.ToDto(separation);
-        }
-        catch (Exception exception)
-        {
-            return HrErrorResponses.FromSaveResult(exception, HrBusinessErrorCodes.SaveChangesFailed);
-        }
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+
+        return mapper.ToDto(separation);
     }
 }

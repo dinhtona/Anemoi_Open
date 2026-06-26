@@ -64,13 +64,20 @@ public sealed class SubmitRecruitmentRequestHandler(
         var requesterEmployee = await employeeRepository.GetQueryable()
             .FirstOrDefaultAsync(e => e.IdentityUserId == requesterUserId.Value, cancellationToken);
 
-        await workflowEngine.StartAsync(
+        var workflowResult = await workflowEngine.StartAsync(
             WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
             recruitmentRequest.Id.Value,
             requesterEmployee?.Id ?? new EmployeeId(Guid.Empty),
             requesterUserId,
             requesterUserId,
             cancellationToken);
+
+        if (workflowResult.TryPickT1(out var workflowError, out _))
+            return workflowError;
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.TryPickT1(out var exception, out _))
+            return HrErrorResponses.FromSaveResult(exception, HrBusinessErrorCodes.SaveChangesFailed);
 
         await publishEndpoint.Publish(new RecruitmentRequestSubmittedIntegrationEvent(
             recruitmentRequest.Id.Value.ToString(),
@@ -81,10 +88,6 @@ public sealed class SubmitRecruitmentRequestHandler(
             recruitmentRequest.PositionId.Value.ToString(),
             recruitmentRequest.RequestedHeadcount
         ), cancellationToken);
-
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.TryPickT1(out var exception, out _))
-            return HrErrorResponses.FromSaveResult(exception, HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToResponse(recruitmentRequest);
     }

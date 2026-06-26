@@ -42,22 +42,25 @@ public sealed class SubmitPayrollRunForApprovalHandler(
         if (request.SubmittedBy is not null)
         {
             var requesterUserId = new UserId(Guid.Parse(request.SubmittedBy));
-            await workflowEngine.StartAsync(
+            var workflowResult = await workflowEngine.StartAsync(
                 WorkflowConstants.TargetEntityTypes.PayrollRun,
                 run.Id.Value,
                 run.EmployeeId,
                 requesterUserId,
                 requesterUserId,
                 cancellationToken);
-        }
 
-        await publishEndpoint.Publish(new PayrollRunSubmittedIntegrationEvent(
-            run.Id.Value.ToString(),
-            request.SubmittedBy ?? PayrollConstants.SystemActor), cancellationToken);
+            if (workflowResult.TryPickT1(out var workflowError, out _))
+                return workflowError;
+        }
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
             return HrErrorResponses.FromSaveResult(saveResult.AsT1, null);
+
+        await publishEndpoint.Publish(new PayrollRunSubmittedIntegrationEvent(
+            run.Id.Value.ToString(),
+            request.SubmittedBy ?? PayrollConstants.SystemActor), cancellationToken);
 
         return mapper.ToDetailResponse(run);
     }

@@ -29,61 +29,57 @@ public sealed class SubmitTransferHandler(
     public async Task<OneOf<EmployeeTransferDto, ErrorDetailResponse>> Handle(
         SubmitTransferCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            var employee = await employeeRepository.GetFirstByConditionAsync(
-                x => x.Id == request.EmployeeId, null, cancellationToken);
-            if (employee == null)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+        var employee = await employeeRepository.GetFirstByConditionAsync(
+            x => x.Id == request.EmployeeId, null, cancellationToken);
+        if (employee == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
-            var targetDepartment = await departmentRepository.GetFirstByConditionAsync(
-                x => x.Id == request.ToDepartmentId, null, cancellationToken);
-            if (targetDepartment == null)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.DepartmentNotFound);
+        var targetDepartment = await departmentRepository.GetFirstByConditionAsync(
+            x => x.Id == request.ToDepartmentId, null, cancellationToken);
+        if (targetDepartment == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.DepartmentNotFound);
 
-            var targetPosition = await positionRepository.GetFirstByConditionAsync(
-                x => x.Id == request.ToPositionId, null, cancellationToken);
-            if (targetPosition == null)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.PositionNotFound);
+        var targetPosition = await positionRepository.GetFirstByConditionAsync(
+            x => x.Id == request.ToPositionId, null, cancellationToken);
+        if (targetPosition == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PositionNotFound);
 
-            var id = new EmployeeTransferId(IdGenerator.NextGuid());
-            var transfer = EmployeeTransfer.Create(
-                id,
-                request.EmployeeId,
-                employee.PrimaryDepartmentId,
-                request.ToDepartmentId,
-                employee.PrimaryPositionId,
-                request.ToPositionId,
-                employee.DirectManagerEmployeeId,
-                request.ToManagerId,
-                employee.GradeCode ?? "G1",
-                request.ToGradeCode ?? "G1",
-                request.EffectiveDate,
-                request.Reason,
-                currentUser.UserId);
+        var id = new EmployeeTransferId(IdGenerator.NextGuid());
+        var transfer = EmployeeTransfer.Create(
+            id,
+            request.EmployeeId,
+            employee.PrimaryDepartmentId,
+            request.ToDepartmentId,
+            employee.PrimaryPositionId,
+            request.ToPositionId,
+            employee.DirectManagerEmployeeId,
+            request.ToManagerId,
+            employee.GradeCode ?? "G1",
+            request.ToGradeCode ?? "G1",
+            request.EffectiveDate,
+            request.Reason,
+            currentUser.UserId);
 
-            transfer.Submit();
-            await transferRepository.CreateOneAsync(transfer, cancellationToken);
+        transfer.Submit();
+        await transferRepository.CreateOneAsync(transfer, cancellationToken);
 
-            var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
-            var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
-            await workflowEngine.StartAsync(
-                WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
-                transfer.Id.Value,
-                requesterEmployeeId,
-                requesterUserId,
-                requesterUserId,
-                cancellationToken);
+        var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
+        var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
+        var workflowResult = await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
+            transfer.Id.Value,
+            requesterEmployeeId,
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
 
-            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-            if (saveResult.IsT1)
-                return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+        if (workflowResult.TryPickT1(out var workflowError, out _))
+            return workflowError;
 
-            return mapper.ToDto(transfer);
-        }
-        catch (Exception exception)
-        {
-            return HrErrorResponses.FromSaveResult(exception, HrBusinessErrorCodes.SaveChangesFailed);
-        }
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+
+        return mapper.ToDto(transfer);
     }
 }
