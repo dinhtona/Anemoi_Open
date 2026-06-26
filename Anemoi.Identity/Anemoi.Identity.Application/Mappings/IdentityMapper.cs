@@ -110,6 +110,8 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
         roleGroup.CreatedTime = DateTime.UtcNow;
         roleGroup.CreatorId = new UserId(Guid.Parse(userIdGetter.UserId));
         roleGroup.SearchHint = command.Name.GenerateSearchHint();
+        if (string.IsNullOrWhiteSpace(roleGroup.Code))
+            roleGroup.Code = string.Concat(roleGroup.Name.ToLowerInvariant().Split(' ')).Replace("-", "").Replace("_", "");
 
         if (command.IdentityRoleIds is { Count: > 0 } identityRoleIds)
         {

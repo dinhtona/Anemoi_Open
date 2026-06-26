@@ -109,6 +109,18 @@ public sealed class UserRepository(
         return directRoles.Union(roleGroupRoles).ToList();
     }
 
+    public async Task<IList<string>> GetUserRoleGroupCodesAsync(User user)
+    {
+        return await dbContext.UserMapRoleGroups
+            .Where(um => um.UserId == user.UserId &&
+                !um.RoleGroup.RoleGroupClaims.Any(claim =>
+                    claim.Key == AuthorizationClaimTypes.WorkspaceId) &&
+                um.RoleGroup.Code != null)
+            .Select(um => um.RoleGroup.Code!)
+            .Distinct()
+            .ToListAsync();
+    }
+
     public async Task<OneOf<None, Exception>> AddToRolesAsync(
         User user,
         IEnumerable<string> rolesName)

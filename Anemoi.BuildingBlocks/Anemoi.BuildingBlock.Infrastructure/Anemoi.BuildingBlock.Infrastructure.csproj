@@ -17,6 +17,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Anemoi.BuildingBlock.Application\Anemoi.BuildingBlock.Application.csproj" />
+        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Identity\Anemoi.Contract.Identity.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="RequestHandlers\" />

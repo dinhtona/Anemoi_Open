@@ -1,20 +1,35 @@
-using Anemoi.BuildingBlock.Application.Authorization;
-using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Application.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Anemoi.BuildingBlock.Infrastructure.Authorization;
 
 public sealed class HasPermissionHandler : AuthorizationHandler<HasPermissionRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+    private readonly IPermissionResolver _permissionResolver;
+
+    public HasPermissionHandler(IPermissionResolver permissionResolver)
+    {
+        _permissionResolver = permissionResolver;
+    }
+
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
         HasPermissionRequirement requirement)
     {
-        if (context.User.IsInRole(SystemRoles.Administrator) ||
-            context.User.IsInRole(requirement.Permission))
+        var roleGroups = context.User.FindAll(AuthorizationClaimTypes.RoleGroup)
+            .Select(c => c.Value)
+            .ToList();
+
+        if (roleGroups.Count == 0)
+            return;
+
+        if (roleGroups.Contains(SystemRoles.Administrator) ||
+            await _permissionResolver.HasPermissionAsync(roleGroups, requirement.Permission))
         {
             context.Succeed(requirement);
         }
-
-        return Task.CompletedTask;
     }
 }

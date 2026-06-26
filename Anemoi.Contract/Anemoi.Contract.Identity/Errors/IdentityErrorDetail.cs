@@ -101,6 +101,8 @@ public static class IdentityErrorDetail
 
         public static ErrorDetail DuplicateNameFailed() => ErrorDetail.FromCode("RGE_05");
 
+        public static ErrorDetail DuplicateCodeFailed() => ErrorDetail.FromCode("RGE_10");
+
         public static ErrorDetail Applied() => ErrorDetail.FromCode("RGE_06");
 
         public static ErrorDetail RoleGroupDefault() => ErrorDetail.FromCode("RGE_08");

@@ -45,8 +45,12 @@ public sealed class TokenGeneratorHandler(
         {
             claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Email, user.Email));
         }
-        var userRoles = (await userRepository.GetEffectiveRolesAsync(user)).ToList();
-        claimsIdentity.AddClaims(userRoles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+        var userRoleGroups = await userRepository.GetUserRoleGroupCodesAsync(user);
+        claimsIdentity.AddClaims(userRoleGroups.Select(rg => new Claim(AuthorizationClaimTypes.RoleGroup, rg)));
+
+        // Collect all permissions from role groups for policy resolution only (not added to JWT)
+        var allPermissions = await userRepository.GetEffectiveRolesAsync(user);
+        var userRoles = allPermissions.ToList();
 
         // Dynamically add policy claims based on user roles
         // Include IdentityPolicyMapRoles -> Role so EF Core can translate

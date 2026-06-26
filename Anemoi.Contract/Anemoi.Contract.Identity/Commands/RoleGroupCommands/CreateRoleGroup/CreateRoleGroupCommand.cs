@@ -10,4 +10,5 @@ public sealed record CreateRoleGroupCommand(
     string Description,
     List<RoleGroupClaimContract> RoleGroupClaims,
     List<RoleId> IdentityRoleIds,
-    [property: JsonIgnore] bool IsDefault) : ICommandVoid;
+    [property: JsonIgnore] bool IsDefault,
+    string Code = null) : ICommandVoid;

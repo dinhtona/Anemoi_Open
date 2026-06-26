@@ -110,7 +110,8 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
         }
         claimsIdentity.AddClaims(roleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
         claimsIdentity.AddClaims(RoleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
-        claimsIdentity.AddClaims(roles.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+        var userRoleGroups = rolesResult.Items.Select(a => a.Name).Distinct();
+        claimsIdentity.AddClaims(userRoleGroups.Select(rg => new Claim(AuthorizationClaimTypes.RoleGroup, rg)));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

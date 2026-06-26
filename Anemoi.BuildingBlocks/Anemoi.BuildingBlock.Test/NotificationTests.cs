@@ -684,7 +684,7 @@ public class NotificationTests
         var hub = new NotificationHub(new MockLogger<NotificationHub>(), new MockConnectedUsersRegistry(), new MockLocalizer());
 
         var workspaceId = "tenant-123";
-        var claims = new List<Claim> { new(ClaimTypes.Role, "Administrator") };
+        var claims = new List<Claim> { new("role_group", "administrator") };
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var principal = new ClaimsPrincipal(identity);
 

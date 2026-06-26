@@ -9,6 +9,7 @@ public static class AuthorizationClaimTypes
     public const string ApplicationPolicyAgency = "applicationPolicyAgency";
     public const string ApplicationPolicyUser = "applicationPolicyUser";
     public const string WorkspaceId = "workspaceId";
+    public const string RoleGroup = "role_group";
 
     public static readonly IReadOnlyList<string> ReservedApplicationPolicyClaims =
     [

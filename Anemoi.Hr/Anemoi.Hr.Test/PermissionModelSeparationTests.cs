@@ -59,9 +59,21 @@ public sealed class PermissionModelSeparationTests
     [Fact]
     public void Dev_test_users_receive_employee_role_group_only_by_default()
     {
-        DevTestRoleAssignments.RoleGroupsByEmail.Values.Should()
+        // Non-HR dev users receive only Employee role group
+        var nonHrUsers = DevTestRoleAssignments.RoleGroupsByEmail
+            .Where(kv => kv.Key is not "mai.le@anemoi.test" and not "khoa.do@anemoi.test")
+            .ToList();
+
+        nonHrUsers.Should().NotBeEmpty();
+        nonHrUsers.Select(kv => kv.Value).Should()
             .OnlyContain(roleGroups =>
-                roleGroups.Length == 1 && roleGroups[0] == SystemRoleProfiles.Employee.Name);
+                roleGroups.Length == 1 && roleGroups[0] == SystemRoleProfiles.Employee.Code);
+
+        // HR dev users receive Employee + HR role groups
+        DevTestRoleAssignments.RoleGroupsByEmail["mai.le@anemoi.test"]
+            .Should().BeEquivalentTo([SystemRoleProfiles.Employee.Code, SystemRoleProfiles.Hr.Code]);
+        DevTestRoleAssignments.RoleGroupsByEmail["khoa.do@anemoi.test"]
+            .Should().BeEquivalentTo([SystemRoleProfiles.Employee.Code, SystemRoleProfiles.Hr.Code]);
 
         DevTestRoleAssignments.RoleGroupsByEmail.Keys.Should().Contain([
             "linh.nguyen@anemoi.test",

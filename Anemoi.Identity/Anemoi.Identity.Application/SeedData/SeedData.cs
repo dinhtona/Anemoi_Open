@@ -57,16 +57,18 @@ public static class EmployeeRoleSeeder
     }
 }
 
-public sealed record SystemRoleProfile(string Name, string Description, IReadOnlyCollection<string> Permissions);
+public sealed record SystemRoleProfile(string Code, string Name, string Description, IReadOnlyCollection<string> Permissions);
 
 public static class SystemRoleProfiles
 {
     public static readonly SystemRoleProfile Employee = new(
+        "employee",
         EmployeeRoleSeeder.EmployeeRoleName,
         "Base employee self-service role",
         EmployeeRoleSeeder.EmployeePermissions);
 
     public static readonly SystemRoleProfile Hr = new(
+        "hr",
         "HR",
         "HR operations role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
@@ -85,10 +87,13 @@ public static class SystemRoleProfiles
             "hr.contract.view",
             "hr.dashboard.view",
             "hr.analytics.view",
-            "hr.overtime.manage"
+            "hr.overtime.manage",
+            "hr.leave.request.approve",
+            "hr.overtime.approve"
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile Recruiter = new(
+        "recruiter",
         "Recruiter",
         "Recruitment operations role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
@@ -102,6 +107,7 @@ public static class SystemRoleProfiles
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile WorkflowAdmin = new(
+        "workflow_admin",
         "WorkflowAdmin",
         "Workflow configuration role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
@@ -111,6 +117,7 @@ public static class SystemRoleProfiles
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile Admin = new(
+        "administrator",
         "Admin",
         "Business administration role",
         Hr.Permissions.Concat(Recruiter.Permissions).Concat(WorkflowAdmin.Permissions).Distinct().ToArray());
@@ -121,11 +128,11 @@ public static class DevTestRoleAssignments
     public static readonly IReadOnlyDictionary<string, string[]> RoleGroupsByEmail =
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            ["linh.nguyen@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
-            ["minh.tran@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
-            ["an.pham@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
-            ["mai.le@anemoi.test"] = [SystemRoleProfiles.Employee.Name],
-            ["khoa.do@anemoi.test"] = [SystemRoleProfiles.Employee.Name]
+            ["linh.nguyen@anemoi.test"] = [SystemRoleProfiles.Employee.Code],
+            ["minh.tran@anemoi.test"] = [SystemRoleProfiles.Employee.Code],
+            ["an.pham@anemoi.test"] = [SystemRoleProfiles.Employee.Code],
+            ["mai.le@anemoi.test"] = [SystemRoleProfiles.Employee.Code, SystemRoleProfiles.Hr.Code],
+            ["khoa.do@anemoi.test"] = [SystemRoleProfiles.Employee.Code, SystemRoleProfiles.Hr.Code]
         };
 }
 
@@ -163,11 +170,13 @@ internal static class SystemRoleGroupSeeder
 
             var existing = await roleGroupRepository
                 .GetFirstByConditionAsync(
-                    x => x.Name == profile.Name && x.IsDefault,
+                    x => x.Code == profile.Code && x.IsDefault,
                     query => query.Include(rg => rg.RoleGroupMapRoles));
 
             if (existing is not null)
             {
+                existing.Name = profile.Name;
+                existing.Description = profile.Description;
                 var existingRoleIds = existing.RoleGroupMapRoles
                     .Select(m => m.RoleId)
                     .ToHashSet();
@@ -192,6 +201,7 @@ internal static class SystemRoleGroupSeeder
             var roleGroup = new RoleGroup
             {
                 Id = roleGroupId,
+                Code = profile.Code,
                 Name = profile.Name,
                 Description = profile.Description,
                 IsDefault = true,
@@ -301,10 +311,10 @@ public static class SeedData
 
         var allUsers = await userDbRepository.GetQueryable().ToListAsync();
         var userByEmail = allUsers.ToDictionary(u => u.Email?.Trim().ToLowerInvariant() ?? "");
-        var roleGroups = await roleGroupRepository.GetQueryable(x => x.IsDefault)
-            .ToDictionaryAsync(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        var roleGroups = await roleGroupRepository.GetQueryable(x => x.IsDefault && x.Code != null)
+            .ToDictionaryAsync(x => x.Code!, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var (email, roleGroupNames) in DevTestRoleAssignments.RoleGroupsByEmail)
+        foreach (var (email, roleGroupCodes) in DevTestRoleAssignments.RoleGroupsByEmail)
         {
             if (!userByEmail.TryGetValue(email, out var user))
             {
@@ -324,11 +334,11 @@ public static class SeedData
                         email, removeResult.AsT1.Message);
             }
 
-            foreach (var roleGroupName in roleGroupNames)
+            foreach (var roleGroupCode in roleGroupCodes)
             {
-                if (!roleGroups.TryGetValue(roleGroupName, out var roleGroup))
+                if (!roleGroups.TryGetValue(roleGroupCode, out var roleGroup))
                 {
-                    logger.Warning("[SeedData] Role group {RoleGroup} not found for {Email}", roleGroupName, email);
+                    logger.Warning("[SeedData] Role group {RoleGroupCode} not found for {Email}", roleGroupCode, email);
                     continue;
                 }
 

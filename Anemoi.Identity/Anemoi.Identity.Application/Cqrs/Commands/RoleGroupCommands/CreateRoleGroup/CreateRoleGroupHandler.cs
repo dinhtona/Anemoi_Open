@@ -35,9 +35,9 @@ public sealed class CreateRoleGroupHandler(
                 if (command.IdentityRoleIds.Distinct().Count() != command.IdentityRoleIds.Count)
                     return IdentityErrorDetail.RoleError.RolesRequestDuplicated();
 
-                var duplicateName = await SqlRepository.ExistByConditionAsync(
-                    x => x.Name == roleGroup.Name, cancellationToken);
-                if (duplicateName) return IdentityErrorDetail.RoleGroupError.DuplicateNameFailed();
+                if (await SqlRepository.ExistByConditionAsync(
+                    x => x.Code == roleGroup.Code, cancellationToken))
+                    return IdentityErrorDetail.RoleGroupError.DuplicateCodeFailed();
 
                 var roleIds = command.IdentityRoleIds;
                 var isSystemWide = !(command.RoleGroupClaims ?? []).Any(claim =>

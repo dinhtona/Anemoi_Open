@@ -12,6 +12,12 @@ public sealed class AuthorizationInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
+        services.AddSingleton<IPermissionResolver>(sp =>
+            new CachedPermissionResolver(
+                sp.GetRequiredService<IServiceScopeFactory>(),
+                sp.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>(),
+                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<CachedPermissionResolver>>()));
         services.AddSingleton<IAuthorizationHandler, HasOneOfPolicyHandler>();
         services.AddSingleton<IAuthorizationHandler, HasPermissionHandler>();
         services.AddAuthorization(options =>

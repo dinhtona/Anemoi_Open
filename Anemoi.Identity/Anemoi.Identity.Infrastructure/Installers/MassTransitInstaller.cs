@@ -26,6 +26,7 @@ public sealed class MassTransitInstaller : IInstaller
                 outbox.UseBusOutbox();
             });
             configurator.AddConsumersFromNamespaceContaining<IIdentityApplicationAssemblyMarker>();
+            configurator.AddConsumer<Consumers.ResolvePermissionsQueryConsumer>();
             var serviceConsumer = ConsumersHelper
                 .CreateDynamicConsumerHandlers<IIdentityContractAssemblyMarker>("IdentityHandlersConsumer");
             configurator.AddConsumer(serviceConsumer);

@@ -6,6 +6,7 @@ using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Application.Services;
 using Anemoi.Identity.Domain;
 using Anemoi.Identity.Domain.Models;
+using Anemoi.Identity.Infrastructure.Authorization;
 using Anemoi.Identity.Infrastructure.DataContext;
 using Anemoi.Identity.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -41,5 +42,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IApplicationPolicyGetter>(sp => sp.GetRequiredService<IApplicationPolicySetter>() as ApplicationPolicyService);
         services.AddScoped<ITokenSetter, TokenService>();
         services.AddScoped<ITokenGetter>(sp => sp.GetRequiredService<ITokenSetter>() as TokenService);
+
+        services.AddScoped<IPermissionResolver, Authorization.IdentityPermissionResolver>();
     }
 }
