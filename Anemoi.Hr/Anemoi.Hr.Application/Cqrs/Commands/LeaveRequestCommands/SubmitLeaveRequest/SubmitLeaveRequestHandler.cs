@@ -76,18 +76,21 @@ public sealed class SubmitLeaveRequestHandler(
             CreatedAt = DateTime.UtcNow
         }, cancellationToken);
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
-
         var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
-        await workflowEngine.StartAsync(
+        var workflowResult = await workflowEngine.StartAsync(
             WorkflowConstants.TargetEntityTypes.LeaveRequest,
             leaveRequest.Id.Value,
             request.EmployeeId,
             requesterUserId,
             requesterUserId,
             cancellationToken);
+
+        if (workflowResult.TryPickT1(out var workflowError, out _))
+            return workflowError;
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
 
         await publishEndpoint.Publish(new LeaveRequestSubmittedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),

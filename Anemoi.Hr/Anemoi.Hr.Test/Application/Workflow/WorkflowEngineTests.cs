@@ -76,6 +76,84 @@ public sealed class WorkflowEngineTests
     }
 
     [Fact]
+    public async Task StartAsync_WithEmptySteps_ReturnsError()
+    {
+        var workflowBuilder = Substitute.For<IWorkflowBuilder>();
+        var buildResult = OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>
+            .FromT0([]);
+        workflowBuilder.BuildAsync(Arg.Any<string>(), Arg.Any<EmployeeId>(),
+                Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(buildResult);
+
+        var instanceRepo = Substitute.For<ISqlRepository<WorkflowInstance>>();
+        var historyRepo = Substitute.For<ISqlRepository<WorkflowHistory>>();
+        var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
+        var approvalResolver = Substitute.For<IApprovalResolver>();
+        var engine = new WorkflowEngine(instanceRepo, historyRepo, employeeRepo,
+            workflowBuilder, approvalResolver);
+
+        var result = await engine.StartAsync(
+            "TestEntity", Guid.NewGuid(),
+            new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()),
+            new UserId(Guid.NewGuid()), CancellationToken.None);
+
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Code.Should().Be(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
+        await instanceRepo.DidNotReceive().CreateOneAsync(
+            Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenActivationFails_ReturnsErrorAndDoesNotTrackInstance()
+    {
+        var workflowBuilder = Substitute.For<IWorkflowBuilder>();
+        var stepId = new WorkflowInstanceStepId(Guid.NewGuid());
+        var steps = new List<WorkflowInstanceStep>
+        {
+            WorkflowInstanceStep.Create(stepId, default, 1,
+                ApproverType.DirectManager, null, null)
+        };
+        var buildResult = OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>
+            .FromT0(steps);
+        workflowBuilder.BuildAsync(Arg.Any<string>(), Arg.Any<EmployeeId>(),
+                Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(buildResult);
+
+        var instanceRepo = Substitute.For<ISqlRepository<WorkflowInstance>>();
+        instanceRepo.CreateOneAsync(Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var instance = callInfo.Arg<WorkflowInstance>();
+                return Task.FromResult<OneOf<WorkflowInstance, Exception>>(instance);
+            });
+
+        var historyRepo = Substitute.For<ISqlRepository<WorkflowHistory>>();
+        var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
+        employeeRepo.GetQueryable().Returns(
+            AsyncQueryableHelper.CreateMockQueryable<Employee>([]));
+
+        var approvalResolver = Substitute.For<IApprovalResolver>();
+        approvalResolver.ResolveApproversAsync(Arg.Any<string>(), Arg.Any<string?>(),
+                Arg.Any<ApprovalRoutingContext>(), Arg.Any<CancellationToken>())
+            .Returns(HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound));
+
+        var engine = new WorkflowEngine(instanceRepo, historyRepo, employeeRepo,
+            workflowBuilder, approvalResolver);
+
+        var result = await engine.StartAsync(
+            "TestEntity", Guid.NewGuid(),
+            new EmployeeId(Guid.NewGuid()), new UserId(Guid.NewGuid()),
+            new UserId(Guid.NewGuid()), CancellationToken.None);
+
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Code.Should().Be(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
+        await instanceRepo.DidNotReceive().CreateOneAsync(
+            Arg.Any<WorkflowInstance>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ApproveAsync_NonExistentInstance_ReturnsError()
     {
         var workflowBuilder = Substitute.For<IWorkflowBuilder>();

@@ -85,13 +85,16 @@ public sealed class SubmitMyOvertimeRequestHandler(
         if (request.UserId is not null)
         {
             var requesterUserId = new UserId(Guid.Parse(request.UserId));
-            await workflowEngine.StartAsync(
+            var workflowResult = await workflowEngine.StartAsync(
                 WorkflowConstants.TargetEntityTypes.OvertimeRequest,
                 overtimeRequest.Id.Value,
                 employee.Id,
                 requesterUserId,
                 requesterUserId,
                 cancellationToken);
+
+            if (workflowResult.TryPickT1(out var workflowError, out _))
+                return workflowError;
         }
 
         await publishEndpoint.Publish(new OvertimeRequestCreatedIntegrationEvent(

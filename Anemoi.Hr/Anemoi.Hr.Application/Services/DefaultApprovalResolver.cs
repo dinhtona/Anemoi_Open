@@ -28,7 +28,7 @@ public sealed class DefaultApprovalResolver(
             ApproverType.DepartmentManager => await ResolveDepartmentManagerAsync(context, ct),
             ApproverType.HrManager => await roleResolver.ResolveAsync(WorkflowRole.HrManager, ct),
             ApproverType.SpecificUser => await ResolveSpecificUserAsync(approverValue, ct),
-            ApproverType.Role => HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound),
+            ApproverType.Role => await roleResolver.ResolveAsync(approverValue ?? WorkflowRole.HrManager, ct),
             _ => HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound)
         };
     }

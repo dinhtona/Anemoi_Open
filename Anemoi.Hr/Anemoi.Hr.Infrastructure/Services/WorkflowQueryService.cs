@@ -20,17 +20,10 @@ public sealed class WorkflowQueryService(
 
         var entityIdStrings = entityIds.Select(id => id.ToString()).ToHashSet();
 
-        var pendingStatuses = new HashSet<string>
-        {
-            WorkflowStatusCode.Pending,
-            WorkflowStatusCode.Returned
-        };
-
         var instances = await workflowRepo.GetQueryable()
             .Include(x => x.Steps)
             .Where(x => x.EntityType == entityType
-                     && entityIdStrings.Contains(x.EntityId)
-                     && pendingStatuses.Contains(x.Status))
+                     && entityIdStrings.Contains(x.EntityId))
             .ToListAsync(ct);
 
         if (instances.Count == 0)

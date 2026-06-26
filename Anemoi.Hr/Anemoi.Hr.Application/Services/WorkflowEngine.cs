@@ -32,6 +32,9 @@ public sealed class WorkflowEngine(
         if (buildResult.TryPickT1(out var buildError, out var steps))
             return HrErrorResponses.Create(buildError.ErrorCode);
 
+        if (steps.Count == 0)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
         var instanceId = new WorkflowInstanceId(IdGenerator.NextGuid());
 
         var instance = WorkflowInstance.Start(
@@ -40,13 +43,13 @@ public sealed class WorkflowEngine(
             requesterEmployeeId, requesterUserId,
             steps.ToList());
 
-        var createResult = await instanceRepository.CreateOneAsync(instance, ct);
-        if (createResult.TryPickT1(out _, out _))
-            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
-
         var activateResult = await ActivateCurrentStepAsync(instance, ct);
         if (activateResult.TryPickT1(out var error, out _))
             return error;
+
+        var createResult = await instanceRepository.CreateOneAsync(instance, ct);
+        if (createResult.TryPickT1(out _, out _))
+            return HrErrorResponses.Create(HrBusinessErrorCodes.SaveChangesFailed);
 
         return instance;
     }
