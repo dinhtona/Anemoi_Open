@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +12,11 @@ using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RoleGroupCommands.UpdateRoleGroup;
 using Anemoi.Contract.Identity.Errors;
+using Anemoi.Contract.Identity.Events;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Application.Abstractions;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
@@ -31,7 +34,8 @@ public sealed class UpdateRoleGroupHandler(
     ISqlRepository<User> userDbRepository,
     IUserRepository userRepository,
     IUserSessionRevocationService sessionRevocationService,
-    IUserPermissionChangeNotifier permissionChangeNotifier)
+    IUserPermissionChangeNotifier permissionChangeNotifier,
+    IPublishEndpoint publishEndpoint)
     : EfCommandOneVoidHandler<RoleGroup, UpdateRoleGroupCommand>(sqlRepository,
         unitOfWork, logger)
 {
@@ -146,6 +150,12 @@ public sealed class UpdateRoleGroupHandler(
                     await sessionRevocationService.PublishAsync(prepareResult.AsT0, cancellationToken);
                 }
                 await permissionChangeNotifier.PublishAsync(permissionChangedUserIds, cancellationToken);
+                await publishEndpoint.Publish(
+                    new RoleGroupPermissionChangedIntegrationEvent
+                    {
+                        RoleGroupCode = roleGroup.Code,
+                        ChangedAt = DateTime.UtcNow
+                    }, cancellationToken);
                 return None.Value;
             })
             .WithModify(roleGroup => mapper.UpdateRoleGroup(command, roleGroup))

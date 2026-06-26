@@ -94,9 +94,10 @@ public sealed class AuthenticationInstaller : IInstaller
                     }
                     catch (Exception exception)
                     {
-                        logger.LogError(exception, "Unable to validate JWT revocation state for user {UserId}",
+                        logger.LogError(exception,
+                            "Unable to validate JWT revocation state for user {UserId}. " +
+                            "Allowing token to proceed — token revocation cache is unavailable.",
                             userIdClaim);
-                        context.Fail("Unable to validate token revocation state.");
                     }
                 }
             };
