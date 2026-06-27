@@ -48,6 +48,9 @@ public sealed class TokenGeneratorHandler(
         var userRoleGroups = await userRepository.GetUserRoleGroupCodesAsync(user);
         claimsIdentity.AddClaims(userRoleGroups.Select(rg => new Claim(AuthorizationClaimTypes.RoleGroup, rg)));
 
+        var directRoles = await userRepository.GetDirectRolesAsync(user);
+        claimsIdentity.AddClaims(directRoles.Select(r => new Claim(ClaimTypes.Role, r.ToLowerInvariant())));
+
         // Collect all permissions from role groups for policy resolution only (not added to JWT)
         var allPermissions = await userRepository.GetEffectiveRolesAsync(user);
         var userRoles = allPermissions.ToList();

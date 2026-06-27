@@ -240,6 +240,18 @@ public sealed class AdministratorAuthorizationBehaviorTests
         new AuthenticationInstaller().InstallerServices(builder.Services, builder.Configuration);
         new AuthorizationInstaller().InstallerServices(builder.Services, builder.Configuration);
 
+        var permissionResolver = Substitute.For<IPermissionResolver>();
+        permissionResolver.HasPermissionAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var roleGroups = callInfo.ArgAt<IEnumerable<string>>(0);
+                return new ValueTask<bool>(roleGroups.Contains(SystemRoleProfiles.Admin.Code));
+            });
+        builder.Services.AddSingleton(permissionResolver);
+
         var app = builder.Build();
         app.UseAuthentication();
         app.UseAuthorization();

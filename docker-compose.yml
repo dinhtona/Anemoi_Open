@@ -251,6 +251,8 @@ services:
         condition: service_started
     networks:
       - anemoi_network
+    volumes:
+      - jwt_keys:/home/app/.anemoi/jwt
 
   # Orchestrator service (for Saga orchestration)
   # anemoi_orchestrator:

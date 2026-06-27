@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Microsoft.AspNetCore.Authorization;
 
@@ -26,8 +25,7 @@ public sealed class HasPermissionHandler : AuthorizationHandler<HasPermissionReq
         if (roleGroups.Count == 0)
             return;
 
-        if (roleGroups.Contains(SystemRoles.Administrator) ||
-            await _permissionResolver.HasPermissionAsync(roleGroups, requirement.Permission))
+        if (await _permissionResolver.HasPermissionAsync(roleGroups, requirement.Permission))
         {
             context.Succeed(requirement);
         }

@@ -42,7 +42,8 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
     ITokenGetter tokenGetter,
     IUserClaimRepository userClaimRepository,
     ISqlRepository<IdentityPolicy> identityPolicyRepository,
-    JwtSetting jwtSetting)
+    JwtSetting jwtSetting,
+    IUserRepository identityUserRepository)
     : EfCommandOneResultHandler<RefreshToken, GenerateTokenByRoleGroupClaimsCommand, AuthenticationSuccessResponse>(
         sqlRepository, unitOfWork, logger)
 {
@@ -110,8 +111,11 @@ public sealed class GenerateTokenByRoleGroupClaimsHandler(
         }
         claimsIdentity.AddClaims(roleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
         claimsIdentity.AddClaims(RoleGroupClaims.Select(a => new Claim(a.Key, a.Value)));
-        var userRoleGroups = rolesResult.Items.Select(a => a.Name).Distinct();
+        var userRoleGroups = rolesResult.Items.Select(a => a.Code).Distinct();
         claimsIdentity.AddClaims(userRoleGroups.Select(rg => new Claim(AuthorizationClaimTypes.RoleGroup, rg)));
+
+        var directRoles = await identityUserRepository.GetDirectRolesAsync(user);
+        claimsIdentity.AddClaims(directRoles.Select(r => new Claim(ClaimTypes.Role, r.ToLowerInvariant())));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
