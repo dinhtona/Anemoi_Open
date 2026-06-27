@@ -78,6 +78,14 @@ Some cross-service contracts live under `Anemoi.Contract`. Local aggregate IDs b
 - Do not hard-code business role names in feature code.
 - `Administrator` is a reserved system role handled by centralized authorization logic.
 
+## 8.1 Development JWT Key Ownership
+
+- Development JWT signing keys must stay outside the repository.
+- `Anemoi.Identity` is the only service allowed to create the development JWT key pair.
+- `Anemoi.Centralize` and `Anemoi.Hr` must treat JWT keys as read-only and load only the configured public key.
+- If the public key is missing in Development, start `Anemoi.Identity` first or ensure the shared `jwt_keys` Docker volume already contains the generated key pair.
+- Do not reintroduce startup logic that lets non-Identity services generate JWT signing keys.
+
 ## 9. Feature Workflow
 
 Implement features in reviewed steps:

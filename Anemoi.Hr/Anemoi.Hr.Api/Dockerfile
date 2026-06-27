@@ -29,5 +29,6 @@ RUN dotnet publish "Anemoi.Hr.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publis
 
 FROM base AS final
 WORKDIR /app
+RUN mkdir -p /home/app/.anemoi/jwt
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Anemoi.Hr.Api.dll"]

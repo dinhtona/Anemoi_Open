@@ -125,6 +125,7 @@ services:
       - RedisSetting__ConnectionString=redis:6379
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}
+      - JwtSetting__PublicKeyPath=${JWT_PUBLIC_KEY_PATH:-/home/app/.anemoi/jwt/development-public.crt}
       - PUBLIC_APP_ORIGIN=${PUBLIC_APP_ORIGIN:-}
       - DevEnvironmentsSetting__MailWebUiUrl=/mail/
       - DevEnvironmentsSetting__MailApiUrl=http://smtp4dev:80/mail/api/messages
@@ -141,6 +142,7 @@ services:
       - anemoi_network
     volumes:
       - centralize_keys:/root/.aspnet/DataProtection-Keys
+      - jwt_keys:/home/app/.anemoi/jwt
       - /var/run/docker.sock:/var/run/docker.sock
       - ./local_env/env_data:/app/env_data
       - ./local_env/sftp_data:/app/sftp_data
@@ -160,11 +162,14 @@ services:
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}
+      - JwtSetting__PrivateKeyPath=${JWT_PRIVATE_KEY_PATH:-/home/app/.anemoi/jwt/development-private.key}
+      - JwtSetting__PublicKeyPath=${JWT_PUBLIC_KEY_PATH:-/home/app/.anemoi/jwt/development-public.crt}
       - ExternalAuthSetting__GoogleClientId=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
       - Kestrel__Endpoints__Http2__Url=http://0.0.0.0:5021
       - Kestrel__Endpoints__Http1__Url=http://0.0.0.0:5031
     volumes:
       - identity_keys:/home/app/.aspnet/DataProtection-Keys
+      - jwt_keys:/home/app/.anemoi/jwt
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -231,6 +236,7 @@ services:
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
       - JwtSetting__Issuer=${JWT_ISSUER}
       - JwtSetting__Audience=${JWT_AUDIENCE}
+      - JwtSetting__PublicKeyPath=${JWT_PUBLIC_KEY_PATH:-/home/app/.anemoi/jwt/development-public.crt}
       - HrSettings__BusinessTimeZone=Asia/Ho_Chi_Minh
       - HrSettings__MonthlyAccrualCheckIntervalHours=12
       - HrSettings__MonthlyAccrualRunHour=0
@@ -241,6 +247,8 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      anemoi_identity:
+        condition: service_started
     networks:
       - anemoi_network
 
@@ -396,6 +404,7 @@ volumes:
   masterdata_keys:
   workspace_keys:
   notification_keys:
+  jwt_keys:
   # mssql_data:
   postgres_data:
   mongodb_data:

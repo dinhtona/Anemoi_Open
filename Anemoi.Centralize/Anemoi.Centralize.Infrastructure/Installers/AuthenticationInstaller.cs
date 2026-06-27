@@ -15,9 +15,11 @@ public sealed class AuthenticationInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>();
-        
-        var publicKeyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jwtSettings.PublicKeyPath);
+        var jwtSettings = configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>()!;
+
+        var publicKeyPath = JwtSecurity.ResolveKeyPath(jwtSettings.PublicKeyPath,
+            JwtSecurity.DevelopmentPublicKeyRelativePath);
+        JwtSecurity.EnsureDevelopmentPublicKeyExists(publicKeyPath);
         var publicSigningCredential = JwtSecurity.GetPublicSigningCredential(publicKeyPath);
         
         var tokenValidationParameters = new TokenValidationParameters

@@ -69,6 +69,12 @@ On Windows x64, use the Docker Compose override:
 docker compose -f docker-compose.yml -f docker-compose.windows-x64.yml up -d --build
 ```
 
+JWT key handling:
+
+- Development generates the JWT key pair outside the repository on first run, using the configured `JwtSetting` paths.
+- Docker Compose overrides `JwtSetting__PrivateKeyPath` and `JwtSetting__PublicKeyPath` so all local containers share the same dev key pair through the `jwt_keys` volume.
+- Production deployments should set the same `JwtSetting__...Path` values explicitly through environment variables.
+
 ## Development Rules
 
 - Use Clean Architecture boundaries for each service.

@@ -18,11 +18,8 @@
         <Content Include="..\..\.dockerignore">
           <Link>.dockerignore</Link>
         </Content>
-        <Content Include="Certifications\*.*">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
         <Content Update="serilogConfiguration.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
         <Content Update="defaultApplicationPolicy.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -46,8 +46,10 @@ builder.Host.ConfigureServices((context, services) =>
     })
     .AddJwtBearer(options =>
     {
-        var jwtSettings = context.Configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>();
-        var publicKeyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jwtSettings.PublicKeyPath);
+        var jwtSettings = context.Configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>()!;
+        var publicKeyPath = JwtSecurity.ResolveKeyPath(jwtSettings.PublicKeyPath,
+            JwtSecurity.DevelopmentPublicKeyRelativePath);
+        JwtSecurity.EnsureDevelopmentPublicKeyExists(publicKeyPath);
         var publicSigningCredential = JwtSecurity.GetPublicSigningCredential(publicKeyPath);
 
         options.SaveToken = true;

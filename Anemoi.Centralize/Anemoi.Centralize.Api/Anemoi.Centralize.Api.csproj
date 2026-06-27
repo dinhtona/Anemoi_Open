@@ -21,9 +21,6 @@
         <Content Include="..\..\.dockerignore">
           <Link>.dockerignore</Link>
         </Content>
-        <Content Include="Certifications\public.crt">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
         <Content Update="serilogConfiguration.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>

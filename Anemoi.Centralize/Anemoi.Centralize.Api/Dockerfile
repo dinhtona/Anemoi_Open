@@ -28,5 +28,6 @@ RUN dotnet publish "Anemoi.Centralize.Api.csproj" -c $BUILD_CONFIGURATION -o /ap
 
 FROM base AS final
 WORKDIR /app
+RUN mkdir -p /home/app/.anemoi/jwt
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Anemoi.Centralize.Api.dll"]

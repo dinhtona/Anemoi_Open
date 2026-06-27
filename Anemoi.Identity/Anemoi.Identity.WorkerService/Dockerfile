@@ -29,6 +29,6 @@ FROM base AS final
 WORKDIR /app
 # Pre-create the DataProtection-Keys directory as APP_UID so mounted volumes
 # inherit correct ownership (avoids Permission denied on Docker volume mount)
-RUN mkdir -p /home/app/.aspnet/DataProtection-Keys
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys /home/app/.anemoi/jwt
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Anemoi.Identity.WorkerService.dll"]

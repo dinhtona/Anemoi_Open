@@ -25,25 +25,17 @@ services:
 
 **Alternative:** Remove Docker socket entirely in production. The dev environment management (mail/SFTP/mock API toggling) is a development feature and should not be exposed in production.
 
-### 1.2 JWT Private Key
+### 1.2 JWT Key Paths
 
-**Current state:** `Anemoi.Centralize/appsettings.json` contains a hardcoded JWT private key.
+**Current state:** JWT key material is no longer committed in source. Development uses a generated RSA key pair outside the repository, and local Docker overrides the paths through environment variables.
 
 **Production requirement:**
-```json
-{
-  "JwtSetting": {
-    "Privatekey": "" // MUST be empty in source
-  }
-}
-```
-
-Inject via environment variable:
 ```bash
-JwtSetting__Privatekey="<base64-encoded-private-key>"
+JwtSetting__PrivateKeyPath="/secure/path/to/deployment-private.key"
+JwtSetting__PublicKeyPath="/secure/path/to/deployment-public.crt"
 ```
 
-Or use a secrets manager (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault).
+The signing service and every verifier must point to the same key pair.
 
 ### 1.3 PostgreSQL Credentials
 
@@ -174,8 +166,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 | `POSTGRES_USER` | PostgreSQL user | No | `postgres` |
 | `RABBITMQ_DEFAULT_USER` | RabbitMQ user | No | `guest` |
 | `RABBITMQ_DEFAULT_PASS` | RabbitMQ password | No | `guest` |
-| `JwtSetting__Privatekey` | JWT signing private key | Yes | — |
-| `JwtSetting__Publickey` | JWT verification public key | Yes | — |
+| `JwtSetting__PrivateKeyPath` | JWT signing private key path | Yes | — |
+| `JwtSetting__PublicKeyPath` | JWT verification public key path | Yes | — |
 | `JwtSetting__Issuer` | JWT issuer | No | `anemoi-identity` |
 | `JwtSetting__Audience` | JWT audience | No | `anemoi-services` |
 | `MassTransitSetting__Host` | RabbitMQ host | No | `rabbitmq` |

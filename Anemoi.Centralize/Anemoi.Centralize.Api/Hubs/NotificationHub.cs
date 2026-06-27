@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Resources;
 using Anemoi.BuildingBlock.Application.Authorization;
+using Anemoi.BuildingBlock.Application.Helpers;
 
 namespace Anemoi.Centralize.Api.Hubs;
 
@@ -85,7 +86,7 @@ public sealed class NotificationHub(
     private bool UserHasWorkspaceClaim(string workspaceId)
     {
         if (Context.User == null) return false;
-        if (Context.User.IsInRole(SystemRoles.Administrator)) return true;
+        if (IsAdministrator()) return true;
 
         var workspaceClaims = Context.User.Claims
             .Where(x => string.Equals(x.Type, "workspaceId", StringComparison.OrdinalIgnoreCase))
@@ -96,5 +97,11 @@ public sealed class NotificationHub(
 
     private bool CanObserveUsers() =>
         Context.User?.HasClaim("applicationPolicyInternal", "Internal") == true &&
-        (Context.User.IsInRole(SystemRoles.Administrator) || Context.User.IsInRole(Permissions.UserRead));
+        (IsAdministrator() || Context.User.IsInRole(Permissions.UserRead));
+
+    private bool IsAdministrator() =>
+        Context.User?.IsInRole(SystemRoles.Administrator) == true ||
+        Context.User?.Claims.Any(claim =>
+            string.Equals(claim.Type, AuthorizationClaimTypes.RoleGroup, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(claim.Value, SystemRoles.Administrator, StringComparison.OrdinalIgnoreCase)) == true;
 }

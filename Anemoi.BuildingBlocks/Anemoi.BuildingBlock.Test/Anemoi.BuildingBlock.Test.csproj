@@ -11,6 +11,8 @@
         <ProjectReference Include="..\Anemoi.BuildingBlock.Infrastructure\Anemoi.BuildingBlock.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Anemoi.Hr\Anemoi.Hr.Application\Anemoi.Hr.Application.csproj" />
         <ProjectReference Include="..\..\Anemoi.Hr\Anemoi.Hr.Infrastructure\Anemoi.Hr.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Anemoi.Identity\Anemoi.Identity.Application\Anemoi.Identity.Application.csproj" />
+        <ProjectReference Include="..\..\Anemoi.Identity\Anemoi.Identity.Domain\Anemoi.Identity.Domain.csproj" />
         <ProjectReference Include="..\..\Anemoi.Notification\Anemoi.Notification.Application\Anemoi.Notification.Application.csproj" />
         <ProjectReference Include="..\..\Anemoi.Notification\Anemoi.Notification.Infrastructure\Anemoi.Notification.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Anemoi.Centralize\Anemoi.Centralize.Api\Anemoi.Centralize.Api.csproj" />

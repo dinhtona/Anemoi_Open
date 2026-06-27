@@ -120,7 +120,7 @@ public static class SystemRoleProfiles
         "administrator",
         "Admin",
         "Business administration role",
-        Hr.Permissions.Concat(Recruiter.Permissions).Concat(WorkflowAdmin.Permissions).Distinct().ToArray());
+        Permissions.All.ToArray());
 }
 
 public static class DevTestRoleAssignments
@@ -230,11 +230,16 @@ public static class SeedData
         const string administrator = SystemRoles.Administrator;
         var userRepository = serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
         var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var roleGroupRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<RoleGroup>>();
+        var userMapRoleGroupRepository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<UserMapRoleGroup>>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
         var seedUserData = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>();
         var users = seedUserData.SupperAdminUsers;
+        var hasMappingChanges = false;
         foreach (var user in users)
         {
             var existUser = await userDbRepository.GetFirstByConditionAsync(x => x.Email == user.UserName);
@@ -243,6 +248,11 @@ public static class SeedData
                 var userRoles = await userRepository.GetDirectRolesAsync(existUser);
                 if (!userRoles.Contains(administrator))
                     await userRepository.AddToRolesAsync(existUser, [administrator]);
+                hasMappingChanges |= await EnsureSystemRoleGroupAssignmentAsync(
+                    existUser,
+                    roleGroupRepository,
+                    userMapRoleGroupRepository,
+                    logger);
                 continue;
             }
 
@@ -262,7 +272,47 @@ public static class SeedData
             var createdUser = await userDbRepository.GetFirstByConditionAsync(x =>
                 x.UserId == new UserId(Guid.Parse(newUserResult.AsT0.Id)));
             await userRepository.AddToRolesAsync(createdUser, [administrator]);
+            hasMappingChanges |= await EnsureSystemRoleGroupAssignmentAsync(
+                createdUser,
+                roleGroupRepository,
+                userMapRoleGroupRepository,
+                logger);
         }
+
+        if (hasMappingChanges)
+            await unitOfWork.SaveChangesAsync();
+    }
+
+    private static async Task<bool> EnsureSystemRoleGroupAssignmentAsync(
+        User? user,
+        ISqlRepository<RoleGroup> roleGroupRepository,
+        ISqlRepository<UserMapRoleGroup> userMapRoleGroupRepository,
+        ILogger logger)
+    {
+        if (user is null)
+            return false;
+
+        var administratorRoleGroup = await roleGroupRepository.GetFirstByConditionAsync(
+            x => x.IsDefault && x.Code == SystemRoleProfiles.Admin.Code);
+        if (administratorRoleGroup is null)
+        {
+            logger.Warning("[SeedData] Administrator role group with code {RoleGroupCode} was not found",
+                SystemRoleProfiles.Admin.Code);
+            return false;
+        }
+
+        var mappingExists = await userMapRoleGroupRepository.ExistByConditionAsync(x =>
+            x.UserId == user.UserId && x.RoleGroupId == administratorRoleGroup.Id);
+        if (mappingExists)
+            return false;
+
+        await userMapRoleGroupRepository.CreateOneAsync(new UserMapRoleGroup
+        {
+            Id = new UserMapRoleGroupId(IdGenerator.NextGuid()),
+            UserId = user.UserId,
+            RoleGroupId = administratorRoleGroup.Id
+        });
+        return true;
     }
 
     public static async Task RegisterDevTestUsersAsync(IServiceScope serviceScope)
