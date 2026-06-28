@@ -39,10 +39,16 @@ public static class Permissions
     public const string HrLeaveRequestForceApprove = "hr.leave.request.force_approve";
     public const string HrLeaveRequestForceCancel = "hr.leave.request.force_cancel";
     public const string HrLeaveTransactionView = "hr.leave.transaction.view";
+    public const string HrLeaveTypeView = "hr.leave.type.view";
+    public const string HrLeaveTypeManage = "hr.leave.type.manage";
+    public const string HrLeavePolicySettingsView = "hr.leave.policy.settings.view";
+    public const string HrLeavePolicySettingsManage = "hr.leave.policy.settings.manage";
     public const string HrEmployeeView = "hr.employee.view";
     public const string HrEmployeeIdentityLink = "hr.employee.identity_link";
     public const string HrDepartmentView = "hr.department.view";
+    public const string HrDepartmentManage = "hr.department.manage";
     public const string HrPositionView = "hr.position.view";
+    public const string HrPositionManage = "hr.position.manage";
     public const string HrDashboardView = "hr.dashboard.view";
     public const string HrAnalyticsView = "hr.analytics.view";
     public const string HrEmployeeTransferView = "hr.employee.transfer.view";
@@ -77,6 +83,8 @@ public static class Permissions
     public const string HrOvertimeRequest = "hr.overtime.request";
     public const string HrOvertimeApprove = "hr.overtime.approve";
     public const string HrOvertimeManage = "hr.overtime.manage";
+    public const string HrOvertimeRuleView = "hr.overtime.rule.view";
+    public const string HrOvertimeRuleManage = "hr.overtime.rule.manage";
     public const string HrAttendanceCreate = "hr.attendance.create";
     public const string HrAttendanceUpdate = "hr.attendance.update";
     public const string HrAttendanceLock = "hr.attendance.lock";
@@ -136,6 +144,9 @@ public static class Permissions
     public const string HrWorkflowManage = "hr.workflow.manage";
     public const string HrWorkflowExecute = "hr.workflow.execute";
     public const string HrWorkflowApprove = "hr.workflow.approve";
+    public const string HrWorkflowOverride = "hr.workflow.override";
+    public const string HrOrganizationView = "hr.organization.view";
+    public const string HrOrganizationManage = "hr.organization.manage";
 
     // Phase 33: Employee Lifecycle permissions
     public const string HrProbationView = "hr.probation.view";
@@ -184,11 +195,17 @@ public static class Permissions
         new(HrLeaveRequestForceCancel, "PermissionGroupHrLeave",
             "PermissionDescriptionHrLeaveRequestForceCancel", true, "High"),
         new(HrLeaveTransactionView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTransactionView"),
+        new(HrLeaveTypeView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTypeView"),
+        new(HrLeaveTypeManage, "PermissionGroupHrLeave", "PermissionDescriptionHrLeaveTypeManage"),
+        new(HrLeavePolicySettingsView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicySettingsView"),
+        new(HrLeavePolicySettingsManage, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicySettingsManage"),
         new(HrEmployeeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeView"),
         new(HrEmployeeIdentityLink, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeIdentityLink",
             true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
+        new(HrDepartmentManage, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentManage"),
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),
+        new(HrPositionManage, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionManage"),
         new(HrDashboardView, "PermissionGroupHrEmployee", "PermissionDescriptionHrDashboardView"),
         new(HrAnalyticsView, "PermissionGroupHrEmployee", "PermissionDescriptionHrAnalyticsView"),
         new(HrEmployeeTransferView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeTransferView"),
@@ -220,6 +237,8 @@ public static class Permissions
         new(HrOvertimeRequest, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeRequest"),
         new(HrOvertimeApprove, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeApprove"),
         new(HrOvertimeManage, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeManage", true, "High"),
+        new(HrOvertimeRuleView, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeRuleView"),
+        new(HrOvertimeRuleManage, "PermissionGroupHrOvertime", "PermissionDescriptionHrOvertimeRuleManage"),
         new(HrShiftView, "PermissionGroupHrShift", "PermissionDescriptionHrShiftView"),
         new(HrShiftManage, "PermissionGroupHrShift", "PermissionDescriptionHrShiftManage"),
         new(HrShiftAssign, "PermissionGroupHrShift", "PermissionDescriptionHrShiftAssign"),
@@ -274,6 +293,9 @@ public static class Permissions
         new(HrWorkflowManage, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowManage"),
         new(HrWorkflowExecute, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowExecute"),
         new(HrWorkflowApprove, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowApprove", true, "High"),
+        new(HrWorkflowOverride, "PermissionGroupHrWorkflow", "PermissionDescriptionHrWorkflowOverride"),
+        new(HrOrganizationView, "PermissionGroupHrOrganization", "PermissionDescriptionHrOrganizationView"),
+        new(HrOrganizationManage, "PermissionGroupHrOrganization", "PermissionDescriptionHrOrganizationManage"),
         new(NotificationView, "PermissionGroupNotifications", "PermissionDescriptionNotificationView"),
         new(NotificationManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationManage"),
         new(NotificationPreferenceManage, "PermissionGroupNotifications", "PermissionDescriptionNotificationPreferenceManage"),

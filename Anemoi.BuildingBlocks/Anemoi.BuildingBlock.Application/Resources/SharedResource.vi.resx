@@ -226,13 +226,19 @@
   <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Bắt buộc phê duyệt yêu cầu nghỉ phép.</value></data>
   <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Bắt buộc hủy yêu cầu nghỉ phép.</value></data>
   <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>Xem giao dịch nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeView" xml:space="preserve"><value>Xem loại nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeManage" xml:space="preserve"><value>Quản lý loại nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsView" xml:space="preserve"><value>Xem cài đặt chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsManage" xml:space="preserve"><value>Quản lý cài đặt chính sách nghỉ phép.</value></data>
   <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>Nhân viên</value></data>
   <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>Xem thông tin nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Liên kết nhân viên với người dùng định danh.</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
+  <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Quản lý thông tin phòng ban.</value></data>
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
+  <data name="PermissionDescriptionHrPositionManage" xml:space="preserve"><value>Quản lý thông tin chức vụ.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
   <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>Xem phân tích nhân sự.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>Xem lịch sử chuyển phòng ban của nhân viên.</value></data>
@@ -266,6 +272,8 @@
   <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Tạo và hủy yêu cầu làm thêm giờ.</value></data>
   <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Phê duyệt và từ chối yêu cầu làm thêm giờ.</value></data>
   <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Quản lý cấu hình và tất cả yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleView" xml:space="preserve"><value>Xem quy tắc tăng ca.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleManage" xml:space="preserve"><value>Quản lý quy tắc tăng ca.</value></data>
   <data name="PermissionGroupHrShift" xml:space="preserve"><value>Quản lý Ca làm</value></data>
   <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>Xem mẫu ca, phân ca và lịch làm việc.</value></data>
   <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Tạo, cập nhật, kích hoạt và vô hiệu hóa mẫu ca.</value></data>
@@ -310,6 +318,7 @@
   <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Quản lý định nghĩa quy trình nhân sự.</value></data>
   <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Phê duyệt tác vụ quy trình nhân sự.</value></data>
   <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Thực hiện tác vụ quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowOverride" xml:space="preserve"><value>Ghi đè bước và người phê duyệt workflow.</value></data>
   <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>Hội nhập nhân viên</value></data>
   <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>Xem kế hoạch và phiên bản hội nhập.</value></data>
   <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Quản lý kế hoạch và phiên bản hội nhập.</value></data>
@@ -336,4 +345,7 @@
   <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Quản lý thông báo.</value></data>
   <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>Xem nhật ký kiểm tra thông báo.</value></data>
   <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Quản lý tùy chọn thông báo.</value></data>
+  <data name="PermissionGroupHrOrganization" xml:space="preserve"><value>Tổ chức</value></data>
+  <data name="PermissionDescriptionHrOrganizationView" xml:space="preserve"><value>Xem cấu trúc tổ chức.</value></data>
+  <data name="PermissionDescriptionHrOrganizationManage" xml:space="preserve"><value>Quản lý cấu trúc tổ chức.</value></data>
 </root>

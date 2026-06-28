@@ -148,7 +148,7 @@ internal static class SystemRoleGroupSeeder
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
 
         var allRoles = await roleRepository.GetQueryable().AsNoTracking().ToListAsync();
-        var roleByName = allRoles.ToDictionary(r => r.Name!);
+        var roleByName = allRoles.ToDictionary(r => r.Name!, StringComparer.OrdinalIgnoreCase);
 
         foreach (var profile in profiles)
         {
@@ -534,7 +534,7 @@ public static class SeedData
         var defaultApplicationPolicies = serviceScope.ServiceProvider.GetRequiredService<DefaultApplicationPolices>();
         var systemRoles = await roleRepository.GetQueryable().AsNoTracking().ToListAsync();
 
-        var roleByName = systemRoles.ToDictionary(role => role.Name!);
+        var roleByName = systemRoles.ToDictionary(role => role.Name!, StringComparer.OrdinalIgnoreCase);
         var isChanged = false;
         foreach (var applicationPolicy in defaultApplicationPolicies.ApplicationPolicies)
         {

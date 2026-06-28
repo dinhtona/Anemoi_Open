@@ -226,13 +226,19 @@
   <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Force approve HR leave requests.</value></data>
   <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Force cancel HR leave requests.</value></data>
   <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>View HR leave transactions.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeView" xml:space="preserve"><value>View HR leave types.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeManage" xml:space="preserve"><value>Manage HR leave types.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsView" xml:space="preserve"><value>View HR leave policy settings.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsManage" xml:space="preserve"><value>Manage HR leave policy settings.</value></data>
   <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>HR Employee</value></data>
   <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>View HR employee profiles.</value></data>
   <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Link HR employees to identity users.</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>HR Department</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>View HR department information.</value></data>
+  <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Manage HR department information.</value></data>
   <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>
   <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>View HR position information.</value></data>
+  <data name="PermissionDescriptionHrPositionManage" xml:space="preserve"><value>Manage HR position information.</value></data>
   <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>View HR dashboard.</value></data>
   <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>View HR analytics.</value></data>
   <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>View employee department transfer history.</value></data>
@@ -266,6 +272,8 @@
   <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Create and cancel overtime requests.</value></data>
   <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Approve and reject overtime requests.</value></data>
   <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Manage overtime configuration and all requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleView" xml:space="preserve"><value>View HR overtime rules.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleManage" xml:space="preserve"><value>Manage HR overtime rules.</value></data>
   <data name="PermissionGroupHrShift" xml:space="preserve"><value>HR Shift Management</value></data>
   <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>View shift templates, assignments and schedule calendar.</value></data>
   <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Create, update, activate and deactivate shift templates.</value></data>
@@ -310,6 +318,7 @@
   <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Manage HR workflow definitions.</value></data>
   <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Approve HR workflow tasks.</value></data>
   <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Execute HR workflow tasks.</value></data>
+  <data name="PermissionDescriptionHrWorkflowOverride" xml:space="preserve"><value>Override HR workflow steps and approvers.</value></data>
   <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>HR Onboarding</value></data>
   <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>View onboarding plans and instances.</value></data>
   <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Manage onboarding plans and instances.</value></data>
@@ -336,4 +345,7 @@
   <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Manage notifications.</value></data>
   <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>View notification audit records.</value></data>
   <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Manage notification preferences.</value></data>
+  <data name="PermissionGroupHrOrganization" xml:space="preserve"><value>HR Organization</value></data>
+  <data name="PermissionDescriptionHrOrganizationView" xml:space="preserve"><value>View HR organization structure.</value></data>
+  <data name="PermissionDescriptionHrOrganizationManage" xml:space="preserve"><value>Manage HR organization structure.</value></data>
 </root>

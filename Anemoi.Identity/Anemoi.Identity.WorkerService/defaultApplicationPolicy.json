@@ -5,7 +5,7 @@
         "Key": "applicationPolicyInternal",
         "Value": "Internal",
         "Roles": [
-          "Administrator",
+          "administrator",
           "Sale",
           "Staff",
           "Accountant"
@@ -15,7 +15,7 @@
         "Key": "applicationPolicyAgency",
         "Value": "Agency",
         "Roles": [
-          "Administrator",
+          "administrator",
           "Staff",
           "Accountant"
         ]
