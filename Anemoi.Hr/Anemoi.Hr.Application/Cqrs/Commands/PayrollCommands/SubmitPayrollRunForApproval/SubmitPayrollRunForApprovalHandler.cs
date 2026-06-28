@@ -39,20 +39,17 @@ public sealed class SubmitPayrollRunForApprovalHandler(
         if (!run.SubmitForApproval(request.SubmittedBy ?? PayrollConstants.SystemActor, DateTime.UtcNow))
             return HrErrorResponses.Create(HrBusinessErrorCodes.PayrollRunInvalidStatus);
 
-        if (request.SubmittedBy is not null)
-        {
-            var requesterUserId = new UserId(Guid.Parse(request.SubmittedBy));
-            var workflowResult = await workflowEngine.StartAsync(
-                WorkflowConstants.TargetEntityTypes.PayrollRun,
-                run.Id.Value,
-                run.EmployeeId,
-                requesterUserId,
-                requesterUserId,
-                cancellationToken);
+        var requesterUserId = new UserId(Guid.Parse(request.SubmittedBy!));
+        var workflowResult = await workflowEngine.StartAsync(
+            WorkflowConstants.TargetEntityTypes.PayrollRun,
+            run.Id.Value,
+            run.EmployeeId,
+            requesterUserId,
+            requesterUserId,
+            cancellationToken);
 
-            if (workflowResult.TryPickT1(out var workflowError, out _))
-                return workflowError;
-        }
+        if (workflowResult.TryPickT1(out var workflowError, out _))
+            return workflowError;
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)

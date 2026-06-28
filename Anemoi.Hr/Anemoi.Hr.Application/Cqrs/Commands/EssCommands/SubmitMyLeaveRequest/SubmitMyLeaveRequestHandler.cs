@@ -116,8 +116,12 @@ public sealed class SubmitMyLeaveRequestHandler(
             requesterUserId,
             cancellationToken);
 
-        if (workflowResult.TryPickT1(out var workflowError, out _))
+        if (workflowResult.TryPickT1(out var workflowError, out var workflowInstance))
             return workflowError;
+
+        var currentApproverEmployeeId = workflowInstance.Steps
+            .FirstOrDefault(s => s.Sequence == workflowInstance.CurrentStep)
+            ?.ApproverEmployeeId?.Value.ToString();
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
@@ -127,7 +131,7 @@ public sealed class SubmitMyLeaveRequestHandler(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
             leaveRequest.LeavePolicyId.Value.ToString(),
-            null), cancellationToken);
+            currentApproverEmployeeId), cancellationToken);
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),
             balance.LeavePolicyId.Value.ToString(),

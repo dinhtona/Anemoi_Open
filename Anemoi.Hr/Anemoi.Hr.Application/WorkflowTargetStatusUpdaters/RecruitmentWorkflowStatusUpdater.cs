@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
 
 public sealed class RecruitmentWorkflowStatusUpdater(
-    ISqlRepository<RecruitmentRequest> recruitmentRepository)
+    ISqlRepository<RecruitmentRequest> recruitmentRepository,
+    IUnitOfWork unitOfWork)
     : IWorkflowTargetStatusUpdater
 {
     public bool CanHandle(string entityType)
@@ -21,6 +22,7 @@ public sealed class RecruitmentWorkflowStatusUpdater(
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (request is null) return;
         request.Approve(performedBy, DateTime.UtcNow);
+        await unitOfWork.SaveChangesAsync(ct);
     }
 
     public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
@@ -30,5 +32,6 @@ public sealed class RecruitmentWorkflowStatusUpdater(
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (request is null) return;
         request.Reject(performedBy, DateTime.UtcNow, reason);
+        await unitOfWork.SaveChangesAsync(ct);
     }
 }

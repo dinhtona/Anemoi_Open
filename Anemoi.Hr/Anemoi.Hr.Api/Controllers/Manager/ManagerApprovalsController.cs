@@ -1,7 +1,5 @@
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.Authorization;
-using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Queries.ManagerApprovalQueries.GetMyPendingLeaveApprovals;
 using Anemoi.Hr.Application.Cqrs.Queries.ManagerApprovalQueries.GetMyPendingOvertimeApprovals;
 using Anemoi.Hr.Application.Responses;
@@ -19,7 +17,7 @@ namespace Anemoi.Hr.Api.Controllers.Manager;
 public sealed class ManagerApprovalsController(ISender sender) : ControllerBase
 {
     [HttpGet("leave")]
-    [HasPermission(HrPermissions.LeaveRequestApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(IReadOnlyCollection<ManagerLeavePendingApprovalResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPendingLeaveApprovals(CancellationToken cancellationToken)
     {
@@ -29,7 +27,7 @@ public sealed class ManagerApprovalsController(ISender sender) : ControllerBase
     }
 
     [HttpGet("overtime")]
-    [HasPermission(HrPermissions.OvertimeApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(IReadOnlyCollection<ManagerOvertimePendingApprovalResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPendingOvertimeApprovals(CancellationToken cancellationToken)
     {

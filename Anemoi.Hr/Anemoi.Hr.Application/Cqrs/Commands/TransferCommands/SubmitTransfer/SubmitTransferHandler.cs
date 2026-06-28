@@ -64,11 +64,10 @@ public sealed class SubmitTransferHandler(
         await transferRepository.CreateOneAsync(transfer, cancellationToken);
 
         var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
-        var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
         var workflowResult = await workflowEngine.StartAsync(
             WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
             transfer.Id.Value,
-            requesterEmployeeId,
+            employee.Id,
             requesterUserId,
             requesterUserId,
             cancellationToken);

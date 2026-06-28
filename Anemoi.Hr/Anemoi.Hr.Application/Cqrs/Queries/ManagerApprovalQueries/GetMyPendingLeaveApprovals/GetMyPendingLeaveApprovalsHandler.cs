@@ -37,13 +37,13 @@ public sealed class GetMyPendingLeaveApprovalsHandler(
             return Array.Empty<ManagerLeavePendingApprovalResponse>();
 
         var entityIds = matchedIds
-            .Select(i => Guid.Parse(i.EntityId))
+            .Select(i => new LeaveRequestId(Guid.Parse(i.EntityId)))
             .Distinct()
             .ToList();
 
         var leaveRequests = await leaveRequestRepository.GetQueryable()
             .Include(x => x.Employee)
-            .Where(x => entityIds.Contains(x.Id.Value))
+            .Where(x => entityIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
 
         var employeeIds = leaveRequests

@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
 
 public sealed class OvertimeWorkflowStatusUpdater(
-    ISqlRepository<OvertimeRequest> overtimeRepository)
+    ISqlRepository<OvertimeRequest> overtimeRepository,
+    IUnitOfWork unitOfWork)
     : IWorkflowTargetStatusUpdater
 {
     public bool CanHandle(string entityType)
@@ -21,6 +22,7 @@ public sealed class OvertimeWorkflowStatusUpdater(
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (overtime is null) return;
         overtime.Approve(performedBy);
+        await unitOfWork.SaveChangesAsync(ct);
     }
 
     public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
@@ -30,5 +32,6 @@ public sealed class OvertimeWorkflowStatusUpdater(
             .FirstOrDefaultAsync(x => x.Id == id, ct);
         if (overtime is null) return;
         overtime.Reject(performedBy, reason);
+        await unitOfWork.SaveChangesAsync(ct);
     }
 }

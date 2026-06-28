@@ -5,4 +5,4 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.WorkflowCommands.CancelWorkflow;
 
 public sealed record CancelWorkflowCommand(
     string InstanceId,
-    string PerformedBy) : ICommandResult<WorkflowInstanceResponse>;
+    string? PerformedBy) : ICommandResult<WorkflowInstanceResponse>;

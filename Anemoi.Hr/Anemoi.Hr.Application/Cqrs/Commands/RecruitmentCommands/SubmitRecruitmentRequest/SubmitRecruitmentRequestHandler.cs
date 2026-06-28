@@ -64,10 +64,13 @@ public sealed class SubmitRecruitmentRequestHandler(
         var requesterEmployee = await employeeRepository.GetQueryable()
             .FirstOrDefaultAsync(e => e.IdentityUserId == requesterUserId.Value, cancellationToken);
 
+        if (requesterEmployee is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
         var workflowResult = await workflowEngine.StartAsync(
             WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
             recruitmentRequest.Id.Value,
-            requesterEmployee?.Id ?? new EmployeeId(Guid.Empty),
+            requesterEmployee.Id,
             requesterUserId,
             requesterUserId,
             cancellationToken);

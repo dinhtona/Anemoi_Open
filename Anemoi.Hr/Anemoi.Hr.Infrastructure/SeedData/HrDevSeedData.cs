@@ -1,3 +1,4 @@
+using System;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Application.Configurations;
@@ -76,10 +77,10 @@ public static class HrDevSeedData
         {
             Department.Create(
                 EngineeringDepartmentId, "ENG", "Engineering",
-                DepartmentTypeCode.Functional, null, null),
+                DepartmentTypeCode.Functional, null, EngineeringManagerEmployeeId),
             Department.Create(
                 PeopleDepartmentId, "PEOPLE", "People Operations",
-                DepartmentTypeCode.Functional, null, null)
+                DepartmentTypeCode.Functional, null, HrManagerEmployeeId)
         };
 
         foreach (var department in departments)
@@ -160,6 +161,7 @@ public static class HrDevSeedData
                 EmploymentTypeCode = "full_time",
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = EngineeringManagerPositionId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-74be-08ded0d6c9db"),
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -177,6 +179,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = SoftwareEngineerPositionId,
                 DirectManagerEmployeeId = EngineeringManagerEmployeeId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-9384-08ded0d6c9e1"),
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -194,6 +197,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = SoftwareEngineerPositionId,
                 DirectManagerEmployeeId = EngineeringManagerEmployeeId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-32da-08ded0d6c9e7"),
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -210,6 +214,7 @@ public static class HrDevSeedData
                 EmploymentTypeCode = "full_time",
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = HrManagerPositionId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-e9a2-08ded0d6c9ec"),
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -227,6 +232,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = HrSpecialistPositionId,
                 DirectManagerEmployeeId = HrManagerEmployeeId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-c22b-08ded0d6c9f2"),
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -244,6 +250,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = SystemAdministratorPositionId,
                 DirectManagerEmployeeId = HrManagerEmployeeId,
+                IdentityUserId = Guid.Parse("01000000-0000-0000-ddad-08ded0d6c9b8"),
                 CreatedAt = now,
                 UpdatedAt = now
             }

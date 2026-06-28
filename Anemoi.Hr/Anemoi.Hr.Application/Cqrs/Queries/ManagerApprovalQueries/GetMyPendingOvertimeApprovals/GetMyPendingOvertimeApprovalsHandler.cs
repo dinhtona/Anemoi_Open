@@ -37,13 +37,13 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
             return Array.Empty<ManagerOvertimePendingApprovalResponse>();
 
         var entityIds = matchedIds
-            .Select(i => Guid.Parse(i.EntityId))
+            .Select(i => new OvertimeRequestId(Guid.Parse(i.EntityId)))
             .Distinct()
             .ToList();
 
         var overtimeRequests = await overtimeRequestRepository.GetQueryable()
             .Include(x => x.Employee)
-            .Where(x => entityIds.Contains(x.Id.Value))
+            .Where(x => entityIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
 
         var employeeIds = overtimeRequests

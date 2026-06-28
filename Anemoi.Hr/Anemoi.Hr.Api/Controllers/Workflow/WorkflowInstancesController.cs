@@ -39,7 +39,7 @@ public sealed class WorkflowInstancesController(
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> ApproveWorkflowStep(
         [FromBody] ApproveWorkflowStepCommand command, CancellationToken cancellationToken)
@@ -49,7 +49,7 @@ public sealed class WorkflowInstancesController(
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> RejectWorkflowStep(
         [FromBody] RejectWorkflowStepCommand command, CancellationToken cancellationToken)
@@ -59,7 +59,7 @@ public sealed class WorkflowInstancesController(
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelWorkflow(
         [FromBody] CancelWorkflowCommand command, CancellationToken cancellationToken)
@@ -69,7 +69,7 @@ public sealed class WorkflowInstancesController(
     }
 
     [HttpPost]
-    [HasPermission(HrPermissions.WorkflowApprove)]
+    [Authorize]
     [ProducesResponseType(typeof(WorkflowInstanceResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> ReturnWorkflow(
         [FromBody] ReturnWorkflowCommand command, CancellationToken cancellationToken)

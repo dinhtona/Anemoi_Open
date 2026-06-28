@@ -6,4 +6,4 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.WorkflowCommands.ReturnWorkflow;
 public sealed record ReturnWorkflowCommand(
     string InstanceId,
     string? Comment,
-    string PerformedBy) : ICommandResult<WorkflowInstanceResponse>;
+    string? PerformedBy) : ICommandResult<WorkflowInstanceResponse>;

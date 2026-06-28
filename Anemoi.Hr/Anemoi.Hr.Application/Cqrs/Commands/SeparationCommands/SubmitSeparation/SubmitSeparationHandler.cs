@@ -43,11 +43,10 @@ public sealed class SubmitSeparationHandler(
         await separationRepository.CreateOneAsync(separation, cancellationToken);
 
         var requesterUserId = new UserId(Guid.Parse(currentUser.UserId));
-        var requesterEmployeeId = new EmployeeId(Guid.Parse(currentUser.UserId));
         var workflowResult = await workflowEngine.StartAsync(
             WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
             separation.Id.Value,
-            requesterEmployeeId,
+            employee.Id,
             requesterUserId,
             requesterUserId,
             cancellationToken);
