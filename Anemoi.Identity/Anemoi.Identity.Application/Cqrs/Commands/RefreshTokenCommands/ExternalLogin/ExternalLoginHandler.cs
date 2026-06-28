@@ -14,6 +14,7 @@ using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Configurations;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Domain.Models;
+using Lambda.Identity.Application.SeedData;
 using MediatR;
 using OneOf;
 
@@ -23,6 +24,8 @@ public sealed class ExternalLoginHandler(
     IHttpClientFactory httpClientFactory,
     ISqlRepository<User> userRepository,
     ISqlRepository<RefreshToken> refreshTokenRepository,
+    ISqlRepository<RoleGroup> roleGroupRepository,
+    ISqlRepository<UserMapRoleGroup> userMapRoleGroupRepository,
     IUnitOfWork unitOfWork,
     ISender sender,
     ExternalAuthSetting externalAuthSetting)
@@ -141,6 +144,9 @@ public sealed class ExternalLoginHandler(
 
             await userRepository.CreateOneAsync(user, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await AssignDefaultRoleGroupAsync(user, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         // 2. Generate Auth Tokens
@@ -180,4 +186,24 @@ public sealed class ExternalLoginHandler(
         Code = code,
         Messages = [code]
     };
+
+    private async Task AssignDefaultRoleGroupAsync(User user, CancellationToken cancellationToken)
+    {
+        var employeeRoleGroup = await roleGroupRepository.GetFirstByConditionAsync(
+            x => x.IsDefault && x.Code == SystemRoleProfiles.Employee.Code,
+            token: cancellationToken);
+        if (employeeRoleGroup is null) return;
+
+        var exists = await userMapRoleGroupRepository.ExistByConditionAsync(
+            x => x.UserId == user.UserId && x.RoleGroupId == employeeRoleGroup.Id,
+            cancellationToken);
+        if (exists) return;
+
+        await userMapRoleGroupRepository.CreateOneAsync(new UserMapRoleGroup
+        {
+            Id = new UserMapRoleGroupId(IdGenerator.NextGuid()),
+            UserId = user.UserId,
+            RoleGroupId = employeeRoleGroup.Id
+        }, cancellationToken);
+    }
 }
