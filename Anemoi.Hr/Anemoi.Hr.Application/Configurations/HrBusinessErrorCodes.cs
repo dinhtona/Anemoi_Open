@@ -427,6 +427,7 @@ public static class HrBusinessErrorCodes
     public const string ValWorkflowNameRequired = "VAL_WF_NAME_REQUIRED";
     public const string ValWorkflowStepSequenceInvalid = "VAL_WF_STEP_SEQUENCE_INVALID";
     public const string ValWorkflowApproverTypeRequired = "VAL_WF_APPROVER_TYPE_REQUIRED";
+    public const string ValWorkflowApproverValueRequired = "VAL_WF_APPROVER_VALUE_REQUIRED";
 
     // Department error codes
     public const string DepartmentCodeExists = "HR_DEPARTMENT_CODE_EXISTS";

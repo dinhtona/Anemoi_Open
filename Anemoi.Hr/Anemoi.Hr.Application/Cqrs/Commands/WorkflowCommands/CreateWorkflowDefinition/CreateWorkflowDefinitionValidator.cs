@@ -20,6 +20,10 @@ public sealed class CreateWorkflowDefinitionValidator : AbstractValidator<Create
                     or ApproverType.DirectManager or ApproverType.DepartmentManager
                     or ApproverType.HrManager or ApproverType.SpecificUser)
                 .WithErrorCode(HrBusinessErrorCodes.ValWorkflowApproverTypeRequired);
+            step.When(s => s.ApproverType is ApproverType.SpecificUser or ApproverType.Role or ApproverType.Permission,
+                () => step.RuleFor(s => s.ApproverValue)
+                    .NotEmpty()
+                    .WithErrorCode(HrBusinessErrorCodes.ValWorkflowApproverValueRequired));
         });
         RuleFor(x => x.Steps.Select(s => s.Sequence))
             .Must(seqs => seqs.Distinct().Count() == seqs.Count())

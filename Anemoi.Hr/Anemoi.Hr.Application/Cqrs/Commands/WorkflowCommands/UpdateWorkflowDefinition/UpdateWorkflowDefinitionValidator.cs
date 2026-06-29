@@ -19,6 +19,10 @@ public sealed class UpdateWorkflowDefinitionValidator : AbstractValidator<Update
                     or ApproverType.DirectManager or ApproverType.DepartmentManager
                     or ApproverType.HrManager or ApproverType.SpecificUser)
                 .WithErrorCode(HrBusinessErrorCodes.ValWorkflowApproverTypeRequired);
+            step.When(s => s.ApproverType is ApproverType.SpecificUser or ApproverType.Role or ApproverType.Permission,
+                () => step.RuleFor(s => s.ApproverValue)
+                    .NotEmpty()
+                    .WithErrorCode(HrBusinessErrorCodes.ValWorkflowApproverValueRequired));
         });
     }
 }
