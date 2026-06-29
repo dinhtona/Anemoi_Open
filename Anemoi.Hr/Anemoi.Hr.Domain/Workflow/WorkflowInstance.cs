@@ -14,6 +14,8 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
     /// not null = definition-generated workflow.
     /// </summary>
     public WorkflowDefinitionId? WorkflowDefinitionId { get; private set; }
+    public string? WorkflowDefinitionName { get; private set; }
+    public int? WorkflowDefinitionVersion { get; private set; }
     public string EntityType { get; private set; }
     public string EntityId { get; private set; }
     public int CurrentStep { get; private set; }
@@ -36,10 +38,14 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         string startedBy,
         EmployeeId requesterEmployeeId,
         UserId requesterUserId,
-        List<WorkflowInstanceStep> steps)
+        List<WorkflowInstanceStep> steps,
+        string? workflowDefinitionName,
+        int? workflowDefinitionVersion)
     {
         Id = id;
         WorkflowDefinitionId = workflowDefinitionId;
+        WorkflowDefinitionName = workflowDefinitionName;
+        WorkflowDefinitionVersion = workflowDefinitionVersion;
         EntityType = entityType;
         EntityId = entityId;
         CurrentStep = steps.Count > 0 ? steps.Min(s => s.Sequence) : 0;
@@ -59,9 +65,13 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         string startedBy,
         EmployeeId requesterEmployeeId,
         UserId requesterUserId,
-        List<WorkflowInstanceStep> steps)
+        List<WorkflowInstanceStep> steps,
+        string? workflowDefinitionName = null,
+        int? workflowDefinitionVersion = null)
     {
-        return new WorkflowInstance(id, workflowDefinitionId, entityType, entityId, startedBy, requesterEmployeeId, requesterUserId, steps);
+        return new WorkflowInstance(id, workflowDefinitionId, entityType, entityId,
+            startedBy, requesterEmployeeId, requesterUserId, steps,
+            workflowDefinitionName, workflowDefinitionVersion);
     }
 
     /// <summary>

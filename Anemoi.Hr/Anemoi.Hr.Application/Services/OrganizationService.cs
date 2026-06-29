@@ -254,10 +254,6 @@ public sealed class OrganizationService(
                 }
             }
         }
-        else if (!WorkflowConstants.DefaultPolicy.RequiresDefinition(entityType))
-        {
-            return await GetApproversPreviewAsync(employeeId, entityType, ct);
-        }
 
         return candidates;
     }

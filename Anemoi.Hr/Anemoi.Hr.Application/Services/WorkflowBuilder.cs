@@ -14,7 +14,7 @@ public sealed class WorkflowBuilder(
     IWorkflowHierarchyResolver hierarchyResolver)
     : IWorkflowBuilder
 {
-    public async Task<OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>> BuildAsync(
+    public async Task<OneOf<WorkflowBuildResult, WorkflowBuildError>> BuildAsync(
         string entityType, EmployeeId requesterEmployeeId, string startedBy, CancellationToken ct)
     {
         var definition = await definitionRepository.GetQueryable()
@@ -25,7 +25,7 @@ public sealed class WorkflowBuilder(
         if (definition is not null)
         {
             var sortedSteps = definition.Steps.OrderBy(s => s.Sequence).ToList();
-            return BuildFromDefinition(sortedSteps);
+            return BuildFromDefinition(sortedSteps, definition.Id, definition.Name, definition.Version);
         }
 
         if (WorkflowConstants.DefaultPolicy.RequiresDefinition(entityType))
@@ -34,19 +34,21 @@ public sealed class WorkflowBuilder(
         return await BuildFromHierarchyAsync(entityType, requesterEmployeeId, ct);
     }
 
-    private static OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError> BuildFromDefinition(
-        List<WorkflowDefinitionStep> steps)
+    private static OneOf<WorkflowBuildResult, WorkflowBuildError> BuildFromDefinition(
+        List<WorkflowDefinitionStep> steps, WorkflowDefinitionId definitionId,
+        string definitionName, int definitionVersion)
     {
-        var result = steps.Select(s =>
+        var instanceSteps = steps.Select(s =>
         {
             var stepId = new WorkflowInstanceStepId(IdGenerator.NextGuid());
             return WorkflowInstanceStep.Create(stepId, default, s.Sequence,
                 s.ApproverType, s.ApproverValue, null);
         }).ToList();
-        return OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>.FromT0(result);
+        return OneOf<WorkflowBuildResult, WorkflowBuildError>.FromT0(
+            new WorkflowBuildResult(instanceSteps, definitionId, definitionName, definitionVersion));
     }
 
-    private async Task<OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>> BuildFromHierarchyAsync(
+    private async Task<OneOf<WorkflowBuildResult, WorkflowBuildError>> BuildFromHierarchyAsync(
         string entityType, EmployeeId requesterEmployeeId, CancellationToken ct)
     {
         var hierarchy = await hierarchyResolver.ResolveHierarchyAsync(requesterEmployeeId, ct);
@@ -59,6 +61,7 @@ public sealed class WorkflowBuilder(
             return WorkflowInstanceStep.Create(stepId, default, s.StepOrder,
                 s.ApproverType, null, null);
         }).ToList();
-        return OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>.FromT0(result);
+        return OneOf<WorkflowBuildResult, WorkflowBuildError>.FromT0(
+            new WorkflowBuildResult(result, null, null, null));
     }
 }

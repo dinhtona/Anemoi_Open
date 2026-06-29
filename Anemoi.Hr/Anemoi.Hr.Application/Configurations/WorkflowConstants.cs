@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Anemoi.Hr.Application.Configurations;
 
@@ -15,12 +16,25 @@ public static class WorkflowConstants
         public const string ProbationRecord = "ProbationRecord";
     }
 
+    private static readonly HashSet<string> RequiredEntityTypes =
+    [
+        TargetEntityTypes.LeaveRequest,
+        TargetEntityTypes.OvertimeRequest,
+        TargetEntityTypes.PayrollRun,
+        TargetEntityTypes.RecruitmentRequest,
+        TargetEntityTypes.EmployeeTransfer,
+        TargetEntityTypes.EmployeeSeparation,
+        TargetEntityTypes.ProbationRecord
+    ];
+
+    public static bool IsRequiredEntityType(string entityType) => RequiredEntityTypes.Contains(entityType);
+
     public static class DefaultPolicy
     {
         public const int LeaveRequestSteps = 2;
         public const int OvertimeRequestSteps = 2;
-        public const int RecruitmentRequestSteps = 0;
-        public const int PayrollRunSteps = 0;
+        public const int RecruitmentRequestSteps = 2;
+        public const int PayrollRunSteps = 2;
         public const int EmployeeTransferSteps = 2;
         public const int EmployeeSeparationSteps = 2;
         public const int ProbationRecordSteps = 2;
@@ -37,6 +51,6 @@ public static class WorkflowConstants
             _ => throw new InvalidOperationException($"No default workflow policy for '{entityType}'.")
         };
 
-        public static bool RequiresDefinition(string entityType) => GetStepCount(entityType) == 0;
+        public static bool RequiresDefinition(string entityType) => IsRequiredEntityType(entityType);
     }
 }

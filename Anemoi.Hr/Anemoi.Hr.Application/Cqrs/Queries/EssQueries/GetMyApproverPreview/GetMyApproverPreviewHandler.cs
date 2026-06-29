@@ -42,10 +42,10 @@ public sealed class GetMyApproverPreviewHandler(
             WorkflowConstants.TargetEntityTypes.LeaveRequest,
             employee.Id, request.UserId, cancellationToken);
 
-        if (buildResult.TryPickT1(out var buildError, out var steps))
+        if (buildResult.TryPickT1(out var buildError, out var result))
             return new EssApproverPreviewResponse { CanResolve = false };
 
-        var firstStep = steps.FirstOrDefault();
+        var firstStep = result.Steps.FirstOrDefault();
         if (firstStep is null)
             return new EssApproverPreviewResponse { CanResolve = false };
 

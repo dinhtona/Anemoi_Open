@@ -22,6 +22,12 @@ public sealed class WorkflowInstanceModelMapping : IEntityTypeConfiguration<Work
             .HasConversion(x => x.Value, id => new WorkflowDefinitionId(id))
             .HasColumnType("uuid").IsRequired(false);
 
+        builder.Property(x => x.WorkflowDefinitionName)
+            .HasMaxLength(256).IsRequired(false);
+
+        builder.Property(x => x.WorkflowDefinitionVersion)
+            .IsRequired(false);
+
         builder.Property(x => x.EntityType).HasMaxLength(100).IsRequired();
         builder.Property(x => x.EntityId).HasMaxLength(100).IsRequired();
         builder.Property(x => x.CurrentStep).IsRequired();

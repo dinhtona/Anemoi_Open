@@ -29,19 +29,25 @@ public sealed class WorkflowEngine(
         var buildResult = await workflowBuilder.BuildAsync(
             entityType, requesterEmployeeId, startedBy.Value.ToString(), ct);
 
-        if (buildResult.TryPickT1(out var buildError, out var steps))
+        if (buildResult.TryPickT1(out var buildError, out var result))
             return HrErrorResponses.Create(buildError.ErrorCode);
 
-        if (steps.Count == 0)
+        if (result.Steps.Count == 0)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
+        if (WorkflowConstants.IsRequiredEntityType(entityType) && result.DefinitionId is null)
+            return HrErrorResponses.Create(
+                HrBusinessErrorCodes.WorkflowDefinitionRequiresDefinition);
 
         var instanceId = new WorkflowInstanceId(IdGenerator.NextGuid());
 
         var instance = WorkflowInstance.Start(
-            instanceId, null, entityType, entityId.ToString(),
+            instanceId, result.DefinitionId, entityType, entityId.ToString(),
             startedBy.Value.ToString(),
             requesterEmployeeId, requesterUserId,
-            steps.ToList());
+            result.Steps.ToList(),
+            result.DefinitionName,
+            result.DefinitionVersion);
 
         var activateResult = await ActivateCurrentStepAsync(instance, ct);
         if (activateResult.TryPickT1(out var error, out _))

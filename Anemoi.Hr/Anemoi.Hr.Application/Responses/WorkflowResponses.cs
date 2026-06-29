@@ -11,9 +11,11 @@ public sealed record WorkflowDefinitionStepResponse(
     string ApproverType, string? ApproverValue, bool IsRequired);
 
 public sealed record WorkflowInstanceResponse(
-    string Id, string? WorkflowDefinitionId, string WorkflowDefinitionName,
+    string Id, string? WorkflowDefinitionId, string? WorkflowDefinitionName,
+    int? WorkflowDefinitionVersion,
     string EntityType, string EntityId, int CurrentStep,
     string Status, string StartedBy, string RequesterEmployeeId, string RequesterUserId,
+    string? RequesterName, string? CurrentApproverName,
     DateTime StartedAt, DateTime? CompletedAt,
     IReadOnlyCollection<WorkflowInstanceStepResponse> Steps,
     IReadOnlyCollection<WorkflowHistoryResponse> Histories);

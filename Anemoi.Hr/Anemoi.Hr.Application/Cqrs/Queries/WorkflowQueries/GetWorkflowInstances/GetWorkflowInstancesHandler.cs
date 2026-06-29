@@ -3,6 +3,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetWorkflowInstance
 public sealed class GetWorkflowInstancesHandler(
     ISqlRepository<WorkflowInstance> instanceRepository,
     ISqlRepository<WorkflowDefinition> definitionRepository,
+    ISqlRepository<Employee> employeeRepository,
     WorkflowMapper mapper)
     : IQueryHandler<GetWorkflowInstancesQuery, PaginationResponse<WorkflowInstanceResponse>>
 {
@@ -41,6 +43,7 @@ public sealed class GetWorkflowInstancesHandler(
             .ToListAsync(cancellationToken);
 
         Dictionary<Guid, string> defNames = [];
+        Dictionary<Guid, string> empNames = [];
         if (items.Count != 0)
         {
             var defIds = items
@@ -48,16 +51,36 @@ public sealed class GetWorkflowInstancesHandler(
                 .Select(x => x.WorkflowDefinitionId!.Value)
                 .Distinct()
                 .ToList();
-            var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
-            defNames = allDefs
-                .Where(d => defIds.Contains(d.Id.Value))
-                .ToDictionary(d => d.Id.Value, d => d.Name);
+            if (defIds.Count > 0)
+            {
+                var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
+                defNames = allDefs
+                    .Where(d => defIds.Contains(d.Id.Value))
+                    .ToDictionary(d => d.Id.Value, d => d.Name);
+            }
+
+            var employeeIds = new HashSet<Guid>();
+            foreach (var item in items)
+            {
+                employeeIds.Add(item.RequesterEmployeeId.Value);
+                var currentStep = item.Steps.FirstOrDefault(s => s.Sequence == item.CurrentStep);
+                if (currentStep?.ApproverEmployeeId is not null)
+                    employeeIds.Add(currentStep.ApproverEmployeeId.Value);
+            }
+
+            if (employeeIds.Count > 0)
+            {
+                var allEmployees = await employeeRepository.GetQueryable().ToListAsync(cancellationToken);
+                empNames = allEmployees
+                    .Where(e => employeeIds.Contains(e.Id.Value))
+                    .ToDictionary(e => e.Id.Value, e => e.FullName);
+            }
         }
 
         var page = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 10 : request.PageSize;
 
         return new PaginationResponse<WorkflowInstanceResponse>(
-            mapper.ToResponses(items, defNames).ToList(), total);
+            mapper.ToResponses(items, defNames, empNames).ToList(), total);
     }
 }

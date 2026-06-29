@@ -33,13 +33,15 @@ public sealed class WorkflowMapper
             IsRequired: step.IsRequired);
     }
 
-    public WorkflowInstanceResponse ToResponse(WorkflowInstance instance, string definitionName = null)
+    public WorkflowInstanceResponse ToResponse(WorkflowInstance instance,
+        string definitionName = null, string requesterName = null, string currentApproverName = null)
     {
         if (instance is null) return null;
         return new WorkflowInstanceResponse(
             Id: instance.Id.Value.ToString(),
             WorkflowDefinitionId: instance.WorkflowDefinitionId?.Value.ToString(),
-            WorkflowDefinitionName: definitionName,
+            WorkflowDefinitionName: definitionName ?? instance.WorkflowDefinitionName,
+            WorkflowDefinitionVersion: instance.WorkflowDefinitionVersion,
             EntityType: instance.EntityType,
             EntityId: instance.EntityId,
             CurrentStep: instance.CurrentStep,
@@ -47,6 +49,8 @@ public sealed class WorkflowMapper
             StartedBy: instance.StartedBy,
             RequesterEmployeeId: instance.RequesterEmployeeId.Value.ToString(),
             RequesterUserId: instance.RequesterUserId.Value.ToString(),
+            RequesterName: requesterName,
+            CurrentApproverName: currentApproverName,
             StartedAt: instance.StartedAt,
             CompletedAt: instance.CompletedAt,
             Steps: instance.Steps.Select(ToStepResponse).ToList(),
@@ -86,15 +90,29 @@ public sealed class WorkflowMapper
     }
 
     public IReadOnlyCollection<WorkflowInstanceResponse> ToResponses(IEnumerable<WorkflowInstance> instances,
-        IDictionary<Guid, string> definitionNames = null)
+        IDictionary<Guid, string> definitionNames = null,
+        IDictionary<Guid, string> employeeNames = null)
     {
         if (instances is null) return [];
         return instances.Select(i =>
         {
-            var name = definitionNames is not null
+            var defName = definitionNames is not null
                 && i.WorkflowDefinitionId is not null
                 && definitionNames.TryGetValue(i.WorkflowDefinitionId.Value, out var n) ? n : null;
-            return ToResponse(i, name);
+
+            string? requesterName = null;
+            if (employeeNames is not null
+                && employeeNames.TryGetValue(i.RequesterEmployeeId.Value, out var rn))
+                requesterName = rn;
+
+            string? currentApproverName = null;
+            var currentStep = i.Steps.FirstOrDefault(s => s.Sequence == i.CurrentStep);
+            if (currentStep is not null && currentStep.ApproverEmployeeId is not null
+                && employeeNames is not null
+                && employeeNames.TryGetValue(currentStep.ApproverEmployeeId.Value, out var an))
+                currentApproverName = an;
+
+            return ToResponse(i, defName, requesterName, currentApproverName);
         }).ToList();
     }
 }

@@ -47,6 +47,16 @@ public static class HrDevSeedData
         new(Guid.Parse("80000000-0000-0000-0000-000000000001"));
     private static readonly WorkflowDefinitionId SeparationWorkflowDefId =
         new(Guid.Parse("80000000-0000-0000-0000-000000000002"));
+    private static readonly WorkflowDefinitionId LeaveWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000003"));
+    private static readonly WorkflowDefinitionId OvertimeWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000004"));
+    private static readonly WorkflowDefinitionId PayrollWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000005"));
+    private static readonly WorkflowDefinitionId RecruitmentWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000006"));
+    private static readonly WorkflowDefinitionId ProbationWorkflowDefId =
+        new(Guid.Parse("80000000-0000-0000-0000-000000000007"));
 
     public static async Task SeedAsync(IServiceScope serviceScope, CancellationToken cancellationToken = default)
     {
@@ -295,45 +305,71 @@ public static class HrDevSeedData
         var workflowDefinitionRepository = serviceScope.ServiceProvider
             .GetRequiredService<ISqlRepository<WorkflowDefinition>>();
 
-        var transferCode = "EMPLOYEE-TRANSFER";
-        if (await workflowDefinitionRepository.ExistByConditionAsync(
-                x => x.Code == transferCode, cancellationToken)) return;
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "LEAVE-REQUEST", "Leave Request Approval",
+            WorkflowConstants.TargetEntityTypes.LeaveRequest,
+            LeaveWorkflowDefId, 0x301, 0x302);
 
-        var transferSteps = new List<WorkflowDefinitionStep>
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "OVERTIME-REQUEST", "Overtime Request Approval",
+            WorkflowConstants.TargetEntityTypes.OvertimeRequest,
+            OvertimeWorkflowDefId, 0x401, 0x402);
+
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "PAYROLL-RUN", "Payroll Run Approval",
+            WorkflowConstants.TargetEntityTypes.PayrollRun,
+            PayrollWorkflowDefId, 0x501, 0x502);
+
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "RECRUITMENT-REQUEST", "Recruitment Request Approval",
+            WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
+            RecruitmentWorkflowDefId, 0x601, 0x602);
+
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "EMPLOYEE-TRANSFER", "Employee Transfer Approval",
+            WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
+            TransferWorkflowDefId, 0x101, 0x102);
+
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "EMPLOYEE-SEPARATION", "Employee Separation Approval",
+            WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
+            SeparationWorkflowDefId, 0x201, 0x202);
+
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+            "PROBATION-RECORD", "Probation Record Approval",
+            WorkflowConstants.TargetEntityTypes.ProbationRecord,
+            ProbationWorkflowDefId, 0x701, 0x702);
+    }
+
+    private static async Task SeedDefinitionIfNotExists(
+        ISqlRepository<WorkflowDefinition> repository,
+        CancellationToken cancellationToken,
+        string code,
+        string name,
+        string targetEntityType,
+        WorkflowDefinitionId defId,
+        int step1Suffix,
+        int step2Suffix)
+    {
+        if (await repository.ExistByConditionAsync(
+                x => x.Code == code, cancellationToken)) return;
+
+        var steps = new List<WorkflowDefinitionStep>
         {
             WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000101")),
-                TransferWorkflowDefId, 1, ApproverType.DirectManager, null, true),
+                new WorkflowDefinitionStepId(Guid.Parse($"80000000-0000-0000-0000-0000{step1Suffix:X8}")),
+                defId, 1, ApproverType.DirectManager, null, true),
             WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000102")),
-                TransferWorkflowDefId, 2, ApproverType.HrManager, null, true)
+                new WorkflowDefinitionStepId(Guid.Parse($"80000000-0000-0000-0000-0000{step2Suffix:X8}")),
+                defId, 2, ApproverType.HrManager, null, true)
         };
 
-        var transferDef = WorkflowDefinition.Create(
-            TransferWorkflowDefId, transferCode, "Employee Transfer Approval",
-            null, WorkflowTypeCode.Approval, WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
-            1, transferSteps);
-        transferDef.Activate();
-
-        var separationCode = "EMPLOYEE-SEPARATION";
-        var separationSteps = new List<WorkflowDefinitionStep>
-        {
-            WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000201")),
-                SeparationWorkflowDefId, 1, ApproverType.DirectManager, null, true),
-            WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse("80000000-0000-0000-0000-000000000202")),
-                SeparationWorkflowDefId, 2, ApproverType.HrManager, null, true)
-        };
-
-        var separationDef = WorkflowDefinition.Create(
-            SeparationWorkflowDefId, separationCode, "Employee Separation Approval",
-            null, WorkflowTypeCode.Approval, WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
-            1, separationSteps);
-        separationDef.Activate();
-
-        await workflowDefinitionRepository.CreateOneAsync(transferDef, cancellationToken);
-        await workflowDefinitionRepository.CreateOneAsync(separationDef, cancellationToken);
+        var def = WorkflowDefinition.Create(
+            defId, code, name,
+            null, WorkflowTypeCode.Approval, targetEntityType,
+            1, steps);
+        def.Activate();
+        await repository.CreateOneAsync(def, cancellationToken);
     }
 
     private static async Task SeedLeaveBalancesAsync(

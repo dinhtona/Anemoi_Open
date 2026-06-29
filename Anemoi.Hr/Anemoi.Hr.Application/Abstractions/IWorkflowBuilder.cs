@@ -6,8 +6,14 @@ namespace Anemoi.Hr.Application.Abstractions;
 
 public sealed record WorkflowBuildError(string ErrorCode);
 
+public sealed record WorkflowBuildResult(
+    IReadOnlyList<WorkflowInstanceStep> Steps,
+    WorkflowDefinitionId? DefinitionId,
+    string? DefinitionName,
+    int? DefinitionVersion);
+
 public interface IWorkflowBuilder
 {
-    Task<OneOf<IReadOnlyList<WorkflowInstanceStep>, WorkflowBuildError>> BuildAsync(
+    Task<OneOf<WorkflowBuildResult, WorkflowBuildError>> BuildAsync(
         string entityType, EmployeeId requesterEmployeeId, string startedBy, CancellationToken ct);
 }
