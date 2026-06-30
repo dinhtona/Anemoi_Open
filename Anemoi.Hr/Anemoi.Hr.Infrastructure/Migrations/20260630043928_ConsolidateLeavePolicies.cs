@@ -11,6 +11,19 @@ namespace Anemoi.Hr.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Phase 0: Seed required LeaveTypes before any data migration
+            // The LeaveTypes table may be empty (seed data runs after migrations),
+            // so inserting here ensures Phase 1a and Phase 3 can resolve them.
+            migrationBuilder.Sql(@"
+                INSERT INTO ""LeaveTypes"" (""Id"", ""Code"", ""Name"", ""IsPaid"",
+                    ""RequiresApproval"", ""AnnualEntitlement"", ""CarryForwardAllowed"",
+                    ""MaxCarryForwardDays"", ""IsActive"", ""CreatedAt"", ""UpdatedAt"")
+                VALUES ('50000000-0000-0000-0000-000000000001',
+                    'Annual', 'Annual Leave',
+                    TRUE, TRUE, 15, TRUE, 5, TRUE, NOW(), NOW())
+                ON CONFLICT (""Code"") DO NOTHING;
+            ");
+
             // Phase 1: Data copy — old column names still exist (before any schema changes)
             // 1a. Copy MasterDataLeavePolicies rows into old LeavePolicies schema
             migrationBuilder.Sql(@"
@@ -84,6 +97,18 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                     ""ApplicableGradeCode"" = ''''
                 FROM ""LeaveTypes"" lt
                 WHERE lt.""Code"" = lp.""ApplicableGradeCode"";
+            ");
+
+            // Phase 3.5: Safety net — assign any rows that couldn't be matched to
+            // a LeaveType (e.g., old rows with a LeaveTypeCode that doesn't match
+            // any LeaveTypes.Code) to the default Annual leave type. This preserves
+            // related data (LeaveBalances, LeaveRequests, etc.) and satisfies the FK.
+            // This runs BEFORE FK constraint so we don't violate referential integrity.
+            migrationBuilder.Sql(@"
+                UPDATE ""LeavePolicies""
+                SET ""LeaveTypeId"" = '50000000-0000-0000-0000-000000000001',
+                    ""ApplicableGradeCode"" = ''''
+                WHERE ""LeaveTypeId"" = '00000000-0000-0000-0000-000000000000';
             ");
 
             // Phase 4: Indexes and FK constraints (after data is clean)

@@ -67,7 +67,7 @@ public sealed class DefaultApprovalResolverTests
     }
 
     [Fact]
-    public async Task ResolveApproversAsync_DirectManager_WhenNoManager_ReturnsError()
+    public async Task ResolveApproversAsync_DirectManager_WhenNoManager_ReturnsEmpty()
     {
         var requesterId = new EmployeeId(Guid.NewGuid());
         var requester = CreateEmployee(requesterId, directManagerId: null);
@@ -84,8 +84,8 @@ public sealed class DefaultApprovalResolverTests
         var result = await resolver.ResolveApproversAsync(
             ApproverType.DirectManager, null, context, CancellationToken.None);
 
-        result.IsT1.Should().BeTrue();
-        result.AsT1.Code.Should().Be(HrBusinessErrorCodes.WorkflowApproverNotFound);
+        result.IsT0.Should().BeTrue();
+        result.AsT0.Should().BeEmpty();
     }
 
     [Fact]

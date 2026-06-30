@@ -272,7 +272,12 @@ public sealed class WorkflowEngine(
 
         var approvers = result.AsT0;
         if (approvers.Count == 0)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+        {
+            instance.SkipCurrentStep();
+            if (instance.Status == WorkflowStatusCode.Approved)
+                return true;
+            return await ActivateCurrentStepAsync(instance, ct);
+        }
 
         step.SetApprover(approvers[0].EmployeeId, approvers[0].UserId.Value.ToString());
         return true;

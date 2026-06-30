@@ -43,7 +43,7 @@ public sealed class DefaultApprovalResolver(
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
 
         if (employee.DirectManagerEmployeeId is null)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+            return new List<ResolvedApprover>();
 
         var manager = await employeeRepository.GetQueryable()
             .FirstOrDefaultAsync(e => e.Id == employee.DirectManagerEmployeeId, ct);

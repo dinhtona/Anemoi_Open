@@ -62,4 +62,9 @@ public sealed class WorkflowInstanceStep : Entity<WorkflowInstanceStepId>
     {
         Status = WorkflowStepStatusCode.Cancelled;
     }
+
+    internal void Skip()
+    {
+        Status = WorkflowStepStatusCode.Skipped;
+    }
 }

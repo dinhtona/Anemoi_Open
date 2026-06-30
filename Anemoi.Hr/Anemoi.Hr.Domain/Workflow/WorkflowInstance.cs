@@ -155,6 +155,24 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         return step.ApproverEmployeeId == employeeId;
     }
 
+    public void SkipCurrentStep()
+    {
+        EnsurePending();
+        var step = GetCurrentStepEntity();
+        step.Skip();
+        var nextSequence = step.Sequence + 1;
+        var nextStep = _steps.FirstOrDefault(s => s.Sequence == nextSequence);
+        if (nextStep is null || nextStep.Status != WorkflowStepStatusCode.Pending)
+        {
+            Status = WorkflowStatusCode.Approved;
+            CompletedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            CurrentStep = nextSequence;
+        }
+    }
+
     private void EnsurePending()
     {
         if (Status != WorkflowStatusCode.Pending)

@@ -26,7 +26,7 @@ public sealed class GetMyLeaveBalancesHandler(
 
         var balances = await leaveBalanceRepository.GetManyByConditionAsync(
             x => x.EmployeeId == employee.Id,
-            query => query.Include(x => x.LeavePolicy),
+            query => query.Include(x => x.LeavePolicy).ThenInclude(x => x.LeaveType),
             cancellationToken);
 
         return balances.Select(mapper.ToEssLeaveBalanceResponse).ToList();
