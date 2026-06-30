@@ -827,7 +827,62 @@ This permission would grant access to the entire `/manager/approvals` approval c
 
 ---
 
-# Conclusion
+## ADR-029 — Workflow Definition-Bound Architecture
+
+### Status
+
+Approved (2026-06-30)
+
+### Context
+
+The Phase 29 spec originally allowed hierarchy-driven workflow building (no WorkflowDefinition needed) for LeaveRequest and OvertimeRequest when no active WorkflowDefinition was found. PayrollRun and RecruitmentRequest required a definition (GetStepCount == 0). This created two issues:
+
+1. **Inconsistent behavior** — some entity types could silently fall back to org hierarchy without a definition, while others could not. This made the system unpredictable in production without seed data.
+
+2. **Definition coupling** — The Workflow Engine's `StartAsync` had a defense-in-depth guard (`IsRequiredEntityType && DefinitionId is null`) that applied to ALL required types, while the builder's check (`RequiresDefinition`) only applied to the subset with GetStepCount == 0. This inconsistency between builder and engine guards created confusion about whether hierarchy fallback was actually allowed for a given type.
+
+### Decision
+
+ALL required business workflow types are definition-bound:
+
+- LeaveRequest
+- OvertimeRequest
+- PayrollRun
+- RecruitmentRequest
+- EmployeeTransfer
+- EmployeeSeparation
+- ProbationRecord
+
+`WorkflowConstants.DefaultPolicy.RequiresDefinition(entityType)` returns `IsRequiredEntityType(entityType)` — not `GetStepCount(entityType) == 0` as the original spec stated. This means every type in `RequiredEntityTypes` must have an active `WorkflowDefinition` before submissions can succeed.
+
+### Why not use GetStepCount == 0?
+
+The spec's original `RequiresDefinition` implementation (checking `GetStepCount == 0`) was correct in intent but effectively meaningless with the engine's defense-in-depth guard. The `BuildFromHierarchyAsync` path was already dead for all required types due to the engine guard. Hardening `RequiresDefinition` to match `IsRequiredEntityType` eliminates the misleading code path and makes the architecture explicit: every required type is definition-bound.
+
+### BuildFromHierarchyAsync Status
+
+`BuildFromHierarchyAsync` is **preview-only / test-only**. It must never be used for production workflow routing. The method is preserved to support:
+- Development/testing scenarios without a WorkflowDefinition
+- Future non-required entity types that might use hierarchy-based routing
+
+Any new type added to `RequiredEntityTypes` MUST also have a corresponding seed `WorkflowDefinition` in `HrDevSeedData.cs`.
+
+### Guard Architecture
+
+Two independent guards protect the definition-bound rule:
+
+1. **Builder guard** (`WorkflowBuilder.BuildAsync`): If `RequiresDefinition(entityType)` is true and no active definition is found, returns `HR_WF_DEF_REQUIRES_DEFINITION` immediately before attempting hierarchy fallback.
+
+2. **Engine guard** (`WorkflowEngine.StartAsync`): After the builder succeeds, if `IsRequiredEntityType(entityType)` is true and `result.DefinitionId` is null, returns `WorkflowDefinitionRequiresDefinition`. This is defense-in-depth — it catches any path where the builder might produce steps without binding a definition.
+
+### Implications
+
+- Every new workflow-enabled entity type must be added to `RequiredEntityTypes` AND have a seed definition.
+- Changes to `RequiresDefinition` / `IsRequiredEntityType` logic require architecture review.
+- The `DefaultPolicy.GetStepCount` values are informational only (used for the preview-only hierarchy path).
+- `BuildFromHierarchyAsync` may be removed in a future phase if no non-required entity types need it.
+
+---
 
 ANEMOI HR prioritizes:
 

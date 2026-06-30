@@ -2,8 +2,19 @@
 
 **Date:** 2026-06-17
 **Status:** Approved
-**Last Updated:** 2026-06-17
+**Last Updated:** 2026-06-30
 **Based on:** Phase 28 — Approval Workflow Engine Foundation
+
+> **Architecture Reassessment (2026-06-30):** The original spec allowed
+> hierarchy-driven workflow building (no WorkflowDefinition needed) for
+> LeaveRequest and OvertimeRequest. This has been hardened: ALL required
+> business workflow types are now definition-bound. Hierarchy fallback
+> (`BuildFromHierarchyAsync`) is preview-only/test-only and must never
+> be used for production workflow routing. See ADR-029 and the current
+> `WorkflowConstants.RequiresDefinition` implementation.
+> This document is preserved for historical reference only. The current
+> implementation in `WorkflowConstants.cs` and `WorkflowBuilder.cs`
+> takes precedence over the spec text below.
 
 ## Purpose
 
@@ -217,7 +228,12 @@ Implementation (`WorkflowBuilder` in `Application/Services/`):
 
 1. Query active `WorkflowDefinition` by `TargetEntityType == entityType`
 2. If found → map definition steps to instance steps. Resolve `ApproverType.DirectManager` → actual `UserId` via `IWorkflowHierarchyResolver`
-3. If not found → call `ResolveHierarchyAsync` → apply `DefaultWorkflowPolicy.GetStepCount(entityType)` to trim → create instance steps as `ApproverType.SpecificUser`
+3. If not found → check `RequiresDefinition(entityType)` — if true, return error `HR_WF_DEF_REQUIRES_DEFINITION`
+4. Otherwise (non-required type only) → call `BuildFromHierarchyAsync()` as preview-only fallback
+
+**Note:** `BuildFromHierarchyAsync` is preview-only/test-only. ALL production
+business workflow types are definition-bound. This path is preserved only
+for development/testing scenarios with no active WorkflowDefinition.
 
 ### IWorkflowTargetStatusUpdater (Application/Abstractions/)
 
@@ -262,7 +278,7 @@ Benefits of `CanHandle()`:
 - Easier to refactor without changing string comparisons in multiple places
 - Future versioning: `CanHandle()` can check version or feature flags
 
-### WorkflowConstants (Application/Configurations/)
+### WorkflowConstants (Application/Configurations/) — Current Implementation
 
 ```csharp
 public static class WorkflowConstants
@@ -273,27 +289,28 @@ public static class WorkflowConstants
         public const string OvertimeRequest = "OvertimeRequest";
         public const string PayrollRun = "PayrollRun";
         public const string RecruitmentRequest = "RecruitmentRequest";
+        public const string EmployeeTransfer = "EmployeeTransfer";
+        public const string EmployeeSeparation = "EmployeeSeparation";
+        public const string ProbationRecord = "ProbationRecord";
     }
 
+    // All 7 types require an active WorkflowDefinition.
+    // RequiresDefinition(entityType) == IsRequiredEntityType(entityType),
+    // NOT GetStepCount(entityType) == 0 (as the original spec stated).
+    // This is a deliberate hardening — hierarchy fallback is not allowed
+    // for production business workflows.
     public static class DefaultPolicy
     {
-        // Number of hierarchy steps when no WorkflowDefinition exists.
-        // 0 = hierarchy fallback disabled, definition required.
-        public const int LeaveRequestSteps = 2;          // DirectManager + DeptManager
-        public const int OvertimeRequestSteps = 2;       // DirectManager + DeptManager
-        public const int RecruitmentRequestSteps = 0;    // definition required
-        public const int PayrollRunSteps = 0;            // definition required
+        public const int LeaveRequestSteps = 2;
+        public const int OvertimeRequestSteps = 2;
+        public const int PayrollRunSteps = 2;
+        public const int RecruitmentRequestSteps = 2;
+        public const int EmployeeTransferSteps = 2;
+        public const int EmployeeSeparationSteps = 2;
+        public const int ProbationRecordSteps = 2;
 
-        public static int GetStepCount(string entityType) => entityType switch
-        {
-            TargetEntityTypes.LeaveRequest => LeaveRequestSteps,
-            TargetEntityTypes.OvertimeRequest => OvertimeRequestSteps,
-            TargetEntityTypes.RecruitmentRequest => RecruitmentRequestSteps,
-            TargetEntityTypes.PayrollRun => PayrollRunSteps,
-            _ => throw new InvalidOperationException($"No default workflow policy for '{entityType}'.")
-        };
-
-        public static bool RequiresDefinition(string entityType) => GetStepCount(entityType) == 0;
+        public static int GetStepCount(string entityType) => entityType switch { ... };
+        public static bool RequiresDefinition(string entityType) => IsRequiredEntityType(entityType);
     }
 }
 ```

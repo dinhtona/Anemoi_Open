@@ -51,6 +51,14 @@ public static class WorkflowConstants
             _ => throw new InvalidOperationException($"No default workflow policy for '{entityType}'.")
         };
 
+        /// <summary>
+        /// All required business workflow types are definition-bound.
+        /// Hierarchy fallback (BuildFromHierarchyAsync) is NOT allowed for
+        /// production business workflows. Every entity type listed in
+        /// RequiredEntityTypes must have an active WorkflowDefinition
+        /// before submissions can succeed. This is by design — see ADR-029
+        /// in ARCHITECTURE_DECISIONS.md.
+        /// </summary>
         public static bool RequiresDefinition(string entityType) => IsRequiredEntityType(entityType);
     }
 }

@@ -48,6 +48,13 @@ public sealed class WorkflowBuilder(
             new WorkflowBuildResult(instanceSteps, definitionId, definitionName, definitionVersion));
     }
 
+    /// <summary>
+    /// PREVIEW-ONLY — Hierarchy-based workflow building is NOT used in
+    /// production. All required business workflow types must have an
+    /// active WorkflowDefinition (see ADR-029). This path is preserved
+    /// only for development/testing scenarios where no definition exists.
+    /// It must not be relied upon for production workflow routing.
+    /// </summary>
     private async Task<OneOf<WorkflowBuildResult, WorkflowBuildError>> BuildFromHierarchyAsync(
         string entityType, EmployeeId requesterEmployeeId, CancellationToken ct)
     {

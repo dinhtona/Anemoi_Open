@@ -31,12 +31,16 @@ public sealed class SubmitSeparationHandler(
             return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
         var id = new EmployeeSeparationId(IdGenerator.NextGuid());
+        // SeparationDate equals LastWorkingDate in the current model.
+        // These are distinct concepts (decision date vs effective date)
+        // but the command omits SeparationDate — when needed, add it to
+        // SubmitSeparationCommand and pass it separately here.
         var separation = EmployeeSeparation.Create(
             id,
             request.EmployeeId,
             request.SeparationType,
-            request.LastWorkingDate,
-            request.LastWorkingDate,
+            separationDate: request.LastWorkingDate,
+            lastWorkingDate: request.LastWorkingDate,
             request.Reason,
             currentUser.UserId);
 
