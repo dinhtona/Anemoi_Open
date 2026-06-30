@@ -4,6 +4,7 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,8 +82,8 @@ public sealed class MonthlyLeaveAccrualWorker(
                     await balances.CreateOneAsync(balance, cancellationToken);
                 }
 
-                balance.AccruedDays += policy.MonthlyAccrualDays;
-                balance.RemainingDays += policy.MonthlyAccrualDays;
+                balance.AccruedDays += policy.AnnualEntitlement / 12;
+                balance.RemainingDays += policy.AnnualEntitlement / 12;
                 balance.UpdatedAt = DateTime.UtcNow;
                 await transactions.CreateOneAsync(new LeaveTransaction
                 {
@@ -91,7 +92,7 @@ public sealed class MonthlyLeaveAccrualWorker(
                     LeavePolicyId = policy.Id,
                     LeaveBalanceId = balance.Id,
                     TransactionTypeCode = "Accrual",
-                    Days = policy.MonthlyAccrualDays,
+                    Days = policy.AnnualEntitlement / 12,
                     BalanceAfterDays = balance.RemainingDays,
                     SourceType = "LeaveAccrualRun",
                     SourceId = yearMonth,
@@ -104,7 +105,7 @@ public sealed class MonthlyLeaveAccrualWorker(
                     EmployeeId = employee.Id,
                     LeavePolicyId = policy.Id,
                     YearMonth = yearMonth,
-                    AccruedDays = policy.MonthlyAccrualDays,
+                    AccruedDays = policy.AnnualEntitlement / 12,
                     CreatedAt = DateTime.UtcNow
                 }, cancellationToken);
             }

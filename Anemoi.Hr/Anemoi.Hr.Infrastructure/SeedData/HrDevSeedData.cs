@@ -5,6 +5,7 @@ using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
@@ -43,6 +44,8 @@ public static class HrDevSeedData
         new(Guid.Parse("30000000-0000-0000-0000-000000000006"));
     private static readonly LeavePolicyId AnnualLeavePolicyId =
         new(Guid.Parse("40000000-0000-0000-0000-000000000001"));
+    private static readonly LeaveTypeId AnnualLeaveTypeId =
+        new(Guid.Parse("50000000-0000-0000-0000-000000000001"));
     private static readonly WorkflowDefinitionId TransferWorkflowDefId =
         new(Guid.Parse("80000000-0000-0000-0000-000000000001"));
     private static readonly WorkflowDefinitionId SeparationWorkflowDefId =
@@ -63,10 +66,14 @@ public static class HrDevSeedData
         var departmentRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Department>>();
         var positionRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Position>>();
         var employeeRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Employee>>();
-        var leavePolicyRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<LeavePolicy>>();
+        var leavePolicyRepository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<Anemoi.Hr.Domain.MasterData.LeavePolicy>>();
         var leaveBalanceRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<LeaveBalance>>();
         var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var now = DateTime.UtcNow;
+
+        var leaveTypeRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<LeaveType>>();
+        await SeedLeaveTypesAsync(leaveTypeRepository, now, cancellationToken);
 
         await SeedDepartmentsAsync(departmentRepository, now, cancellationToken);
         await SeedPositionsAsync(positionRepository, now, cancellationToken);
@@ -274,28 +281,43 @@ public static class HrDevSeedData
         }
     }
 
+    private static async Task SeedLeaveTypesAsync(
+        ISqlRepository<LeaveType> repository,
+        DateTime now,
+        CancellationToken cancellationToken)
+    {
+        const string annualCode = LeaveTypeCode.Annual;
+        if (await repository.ExistByConditionAsync(x => x.Code == annualCode, cancellationToken)) return;
+
+        await repository.CreateOneAsync(LeaveType.Create(
+            AnnualLeaveTypeId,
+            annualCode,
+            "Annual Leave",
+            true,
+            true,
+            15m,
+            true,
+            5m
+        ), cancellationToken);
+    }
+
     private static async Task SeedLeavePolicyAsync(
-        ISqlRepository<LeavePolicy> repository,
+        ISqlRepository<Anemoi.Hr.Domain.MasterData.LeavePolicy> repository,
         DateTime now,
         CancellationToken cancellationToken)
     {
         const string annualLeaveCode = "DEV-ANNUAL";
         if (await repository.ExistByConditionAsync(x => x.Code == annualLeaveCode, cancellationToken)) return;
 
-        await repository.CreateOneAsync(new LeavePolicy
-        {
-            Id = AnnualLeavePolicyId,
-            Code = annualLeaveCode,
-            Name = "Development Annual Leave",
-            LeaveTypeCode = LeaveTypeCode.Annual,
-            MonthlyAccrualDays = 1.25m,
-            AnnualMaxDays = 15m,
-            AllowCarryForward = true,
-            MaxCarryForwardDays = 5m,
-            IsActive = true,
-            CreatedAt = now,
-            UpdatedAt = now
-        }, cancellationToken);
+        await repository.CreateOneAsync(
+            Anemoi.Hr.Domain.MasterData.LeavePolicy.Create(
+                AnnualLeavePolicyId,
+                annualLeaveCode,
+                "Development Annual Leave",
+                AnnualLeaveTypeId,
+                "",
+                15m
+            ), cancellationToken);
     }
 
     private static async Task SeedWorkflowDefinitionsAsync(

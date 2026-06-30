@@ -11,6 +11,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;

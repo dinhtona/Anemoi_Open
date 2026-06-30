@@ -36,7 +36,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<EmployeePositionHistory> EmployeePositionHistories { get; set; }
     public DbSet<EmployeeGradeHistory> EmployeeGradeHistories { get; set; }
     public DbSet<EmployeeManagerHistory> EmployeeManagerHistories { get; set; }
-    public DbSet<Anemoi.Hr.Domain.Leaves.LeavePolicy> LeavePolicies { get; set; }
+    public DbSet<LeavePolicy> LeavePolicies { get; set; }
     public DbSet<LeaveBalance> LeaveBalances { get; set; }
     public DbSet<LeaveRequest> LeaveRequests { get; set; }
     public DbSet<LeaveTransaction> LeaveTransactions { get; set; }
@@ -99,7 +99,6 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<EmployeeHistory> EmployeeHistories { get; set; }
     public DbSet<LeaveType> LeaveTypes { get; set; }
     public DbSet<OvertimeRule> OvertimeRules { get; set; }
-    public DbSet<Anemoi.Hr.Domain.MasterData.LeavePolicy> MasterDataLeavePolicies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

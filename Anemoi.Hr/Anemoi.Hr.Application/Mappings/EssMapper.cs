@@ -47,7 +47,7 @@ public partial class EssMapper
         {
             LeavePolicyId = balance.LeavePolicyId.Value.ToString(),
             LeavePolicyName = balance.LeavePolicy?.Name,
-            LeaveTypeCode = balance.LeavePolicy?.LeaveTypeCode,
+            LeaveTypeCode = balance.LeavePolicy?.LeaveType?.Code,
             Year = balance.Year,
             OpeningDays = balance.OpeningDays,
             AccruedDays = balance.AccruedDays,

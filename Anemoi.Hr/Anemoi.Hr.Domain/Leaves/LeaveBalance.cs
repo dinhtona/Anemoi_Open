@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Leaves;
@@ -20,7 +21,7 @@ public sealed class LeaveBalance : ValueObject
     public DateTime UpdatedAt { get; set; }
 
     public Employee Employee { get; set; }
-    public LeavePolicy LeavePolicy { get; set; }
+    public MasterData.LeavePolicy LeavePolicy { get; set; }
     public List<LeaveTransaction> LeaveTransactions { get; set; } = [];
 
     protected override IEnumerable<object> GetEqualityComponents()

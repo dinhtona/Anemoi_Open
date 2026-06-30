@@ -23,11 +23,11 @@ public sealed class LeaveTypeModelMapping : IEntityTypeConfiguration<LeaveType>
     }
 }
 
-public sealed class MasterDataLeavePolicyModelMapping : IEntityTypeConfiguration<Anemoi.Hr.Domain.MasterData.LeavePolicy>
+public sealed class MasterDataLeavePolicyModelMapping : IEntityTypeConfiguration<LeavePolicy>
 {
-    public void Configure(EntityTypeBuilder<Anemoi.Hr.Domain.MasterData.LeavePolicy> builder)
+    public void Configure(EntityTypeBuilder<LeavePolicy> builder)
     {
-        builder.ToTable("MasterDataLeavePolicies");
+        builder.ToTable("LeavePolicies");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasConversion(x => x.Value, id => new LeavePolicyId(id));
         builder.Property(x => x.Code).HasMaxLength(64).IsRequired();

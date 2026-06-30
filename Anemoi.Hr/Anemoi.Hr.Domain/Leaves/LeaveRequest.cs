@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Leaves;
@@ -21,7 +22,7 @@ public sealed class LeaveRequest : ValueObject
 
     public Employee Employee { get; set; }
     public Employee ApproverEmployee { get; set; }
-    public LeavePolicy LeavePolicy { get; set; }
+    public MasterData.LeavePolicy LeavePolicy { get; set; }
     public List<LeaveTransaction> LeaveTransactions { get; set; } = [];
 
     public void MarkWorkflowApproved(string approverId)

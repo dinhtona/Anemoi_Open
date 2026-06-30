@@ -57,7 +57,7 @@ public sealed class GetDashboardOverviewHandler(
 
         // 2. Near Leave Exhaustion (Annual leave balance <= 3 days)
         var nearExhaustionBalances = await leaveBalanceRepository.GetManyByConditionAsync(
-            x => x.Year == now.Year && x.RemainingDays <= 3m && x.LeavePolicy.LeaveTypeCode == LeaveTypeCode.Annual && x.Employee.EmploymentStatusCode == EmploymentStatusCode.Active,
+            x => x.Year == now.Year && x.RemainingDays <= 3m && x.LeavePolicy.LeaveType.Code == LeaveTypeCode.Annual && x.Employee.EmploymentStatusCode == EmploymentStatusCode.Active,
             q => q.Include(x => x.Employee)
                   .Include(x => x.LeavePolicy)
                   .OrderBy(x => x.RemainingDays),

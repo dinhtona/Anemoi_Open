@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.MasterData;
 using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Domain.Leaves;
@@ -20,7 +21,7 @@ public sealed class LeaveTransaction : ValueObject
     public DateTime CreatedAt { get; set; }
 
     public Employee Employee { get; set; }
-    public LeavePolicy LeavePolicy { get; set; }
+    public MasterData.LeavePolicy LeavePolicy { get; set; }
     public LeaveBalance LeaveBalance { get; set; }
     public LeaveRequest LeaveRequest { get; set; }
 

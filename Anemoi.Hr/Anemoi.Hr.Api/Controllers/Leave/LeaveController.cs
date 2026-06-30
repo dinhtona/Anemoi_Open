@@ -2,8 +2,6 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveBalanceCommands.AdjustLeaveBalance;
-using Anemoi.Hr.Application.Cqrs.Commands.LeavePolicyCommands.CreateLeavePolicy;
-using Anemoi.Hr.Application.Cqrs.Commands.LeavePolicyCommands.UpdateLeavePolicy;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.ApproveLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.CancelLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.ForceApproveLeaveRequest;
@@ -12,8 +10,6 @@ using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.RejectLeaveReques
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.SubmitLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Queries.LeaveBalanceQueries.GetLeaveBalance;
 using Anemoi.Hr.Application.Cqrs.Queries.LeaveBalanceQueries.GetLeaveBalances;
-using Anemoi.Hr.Application.Cqrs.Queries.LeavePolicyQueries.GetLeavePolicies;
-using Anemoi.Hr.Application.Cqrs.Queries.LeavePolicyQueries.GetLeavePolicy;
 using Anemoi.Hr.Application.Cqrs.Queries.LeaveRequestQueries.GetLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Queries.LeaveRequestQueries.GetLeaveRequests;
 using Anemoi.Hr.Application.Cqrs.Queries.LeaveTransactionQueries.GetLeaveTransactions;
@@ -32,44 +28,6 @@ namespace Anemoi.Hr.Api.Controllers.Leave;
 [Produces("application/json")]
 public sealed class LeaveController(ISender sender) : ControllerBase
 {
-    [HttpGet("{id}")]
-    [HasPermission(HrPermissions.LeavePolicyView)]
-    [ProducesResponseType(typeof(LeavePolicyResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetLeavePolicy([FromRoute] LeavePolicyId id, CancellationToken cancellationToken)
-    {
-        var res = await sender.Send(new GetLeavePolicyQuery(id), cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
-    }
-
-    [HttpGet]
-    [HasPermission(HrPermissions.LeavePolicyView)]
-    [ProducesResponseType(typeof(PaginationResponse<LeavePolicyResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetLeavePolicies([FromQuery] GetLeavePoliciesQuery query,
-        CancellationToken cancellationToken)
-    {
-        return Ok(await sender.Send(query, cancellationToken));
-    }
-
-    [HttpPost]
-    [HasPermission(HrPermissions.LeavePolicyCreate)]
-    [ProducesResponseType(typeof(LeavePolicyIdResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateLeavePolicy([FromBody] CreateLeavePolicyCommand command,
-        CancellationToken cancellationToken)
-    {
-        var res = await sender.Send(command, cancellationToken);
-        return res.Match<IActionResult>(Ok, BadRequest);
-    }
-
-    [HttpPatch("{id}")]
-    [HasPermission(HrPermissions.LeavePolicyUpdate)]
-    public async Task<IActionResult> UpdateLeavePolicy([FromRoute] LeavePolicyId id,
-        [FromBody] UpdateLeavePolicyCommand command,
-        CancellationToken cancellationToken)
-    {
-        var res = await sender.Send(command with { Id = id }, cancellationToken);
-        return res.Match<IActionResult>(_ => Ok(), BadRequest);
-    }
-
     [HttpGet("{id}")]
     [HasPermission(HrPermissions.LeaveBalanceView)]
     [ProducesResponseType(typeof(LeaveBalanceResponse), StatusCodes.Status200OK)]

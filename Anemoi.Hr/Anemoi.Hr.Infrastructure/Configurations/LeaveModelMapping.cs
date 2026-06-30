@@ -6,27 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Anemoi.Hr.Infrastructure.Configurations;
 
 public sealed class LeaveModelMapping :
-    IEntityTypeConfiguration<LeavePolicy>,
     IEntityTypeConfiguration<LeaveBalance>,
     IEntityTypeConfiguration<LeaveRequest>,
     IEntityTypeConfiguration<LeaveTransaction>,
     IEntityTypeConfiguration<LeaveAccrualRun>
 {
-    public void Configure(EntityTypeBuilder<LeavePolicy> builder)
-    {
-        builder.ToTable("LeavePolicies");
-        builder.Property(x => x.Id)
-            .HasConversion(x => x.Value, id => new LeavePolicyId(id));
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
-        builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
-        builder.Property(x => x.LeaveTypeCode).HasMaxLength(64).IsRequired();
-        builder.Property(x => x.MonthlyAccrualDays).HasPrecision(9, 2);
-        builder.Property(x => x.AnnualMaxDays).HasPrecision(9, 2);
-        builder.Property(x => x.MaxCarryForwardDays).HasPrecision(9, 2);
-        builder.HasIndex(x => x.Code).IsUnique();
-    }
-
     public void Configure(EntityTypeBuilder<LeaveBalance> builder)
     {
         builder.ToTable("LeaveBalances");
@@ -49,7 +33,7 @@ public sealed class LeaveModelMapping :
             .HasForeignKey(x => x.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.LeavePolicy)
-            .WithMany(x => x.LeaveBalances)
+            .WithMany()
             .HasForeignKey(x => x.LeavePolicyId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.Property<uint>("xmin")
@@ -85,7 +69,7 @@ public sealed class LeaveModelMapping :
             .HasForeignKey(x => x.ApproverEmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.LeavePolicy)
-            .WithMany(x => x.LeaveRequests)
+            .WithMany()
             .HasForeignKey(x => x.LeavePolicyId)
             .OnDelete(DeleteBehavior.Restrict);
     }
@@ -117,7 +101,7 @@ public sealed class LeaveModelMapping :
             .HasForeignKey(x => x.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.LeavePolicy)
-            .WithMany(x => x.LeaveTransactions)
+            .WithMany()
             .HasForeignKey(x => x.LeavePolicyId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.LeaveBalance)
@@ -148,7 +132,7 @@ public sealed class LeaveModelMapping :
             .HasForeignKey(x => x.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(x => x.LeavePolicy)
-            .WithMany(x => x.LeaveAccrualRuns)
+            .WithMany()
             .HasForeignKey(x => x.LeavePolicyId)
             .OnDelete(DeleteBehavior.Restrict);
     }
