@@ -62,7 +62,7 @@ public sealed class LeaveNotificationTests
             c.TitleLocalizationKey == "notification.leave.submitted.title" &&
             c.ContentLocalizationKey == "notification.leave.submitted.content" &&
             c.Category == NotificationConstants.Categories.Leave &&
-            c.ActionUrl == "/hr/leave" &&
+            c.ActionUrl == "/manager/approvals" &&
             c.DeduplicationKey == $"leave:{leaveRequestId}:submitted:{approverUserId}"
         ), Arg.Any<CancellationToken>());
     }

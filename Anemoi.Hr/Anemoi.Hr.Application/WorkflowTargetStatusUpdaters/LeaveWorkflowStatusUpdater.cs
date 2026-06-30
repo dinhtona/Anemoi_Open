@@ -4,6 +4,7 @@ using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
 using Anemoi.Contract.Hr.Events;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
@@ -16,6 +17,7 @@ public sealed class LeaveWorkflowStatusUpdater(
     ISqlRepository<LeaveRequest> leaveRepository,
     ISqlRepository<LeaveBalance> leaveBalanceRepository,
     ISqlRepository<LeaveTransaction> leaveTransactionRepository,
+    ISqlRepository<Employee> employeeRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint)
     : IWorkflowTargetStatusUpdater
@@ -53,7 +55,10 @@ public sealed class LeaveWorkflowStatusUpdater(
             ], ct);
         }
 
-        leave.MarkWorkflowApproved(performedBy);
+        var performerEmployee = await employeeRepository.GetQueryable()
+            .FirstOrDefaultAsync(e => e.IdentityUserId == Guid.Parse(performedBy), ct);
+        if (performerEmployee is not null)
+            leave.MarkWorkflowApproved(performerEmployee.Id.Value.ToString());
         leave.UpdatedAt = DateTime.UtcNow;
 
         await publishEndpoint.Publish(new LeaveRequestApprovedIntegrationEvent(
@@ -115,7 +120,10 @@ public sealed class LeaveWorkflowStatusUpdater(
             }, ct);
         }
 
-        leave.MarkWorkflowRejected(performedBy, reason);
+        var performerEmployee = await employeeRepository.GetQueryable()
+            .FirstOrDefaultAsync(e => e.IdentityUserId == Guid.Parse(performedBy), ct);
+        if (performerEmployee is not null)
+            leave.MarkWorkflowRejected(performerEmployee.Id.Value.ToString(), reason);
         leave.UpdatedAt = DateTime.UtcNow;
 
         await publishEndpoint.Publish(new LeaveRequestRejectedIntegrationEvent(
@@ -150,6 +158,7 @@ public sealed class LeaveWorkflowStatusUpdater(
             BalanceAfterDays = balance.RemainingDays,
             SourceType = LeaveBalanceTransactionType.SourceTypeLeaveRequest,
             SourceId = request.Id.Value.ToString(),
+            Reason = string.Empty,
             CreatedAt = DateTime.UtcNow
         };
     }

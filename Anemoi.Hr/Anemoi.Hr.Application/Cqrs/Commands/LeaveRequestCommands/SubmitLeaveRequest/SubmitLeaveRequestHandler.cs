@@ -86,18 +86,21 @@ public sealed class SubmitLeaveRequestHandler(
             requesterUserId,
             cancellationToken);
 
-        if (workflowResult.TryPickT1(out var workflowError, out _))
+        if (workflowResult.TryPickT1(out var workflowError, out var workflowInstance))
             return workflowError;
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
+        var currentApproverEmployeeId = workflowInstance.Steps
+            .FirstOrDefault(s => s.Sequence == workflowInstance.CurrentStep)
+            ?.ApproverEmployeeId?.Value.ToString();
+
+        if (currentApproverEmployeeId is not null)
+            leaveRequest.ApproverEmployeeId = new EmployeeId(Guid.Parse(currentApproverEmployeeId));
 
         await publishEndpoint.Publish(new LeaveRequestSubmittedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
             leaveRequest.EmployeeId.Value.ToString(),
             leaveRequest.LeavePolicyId.Value.ToString(),
-            null), cancellationToken);
+            currentApproverEmployeeId), cancellationToken);
 
         await publishEndpoint.Publish(new LeaveBalanceChangedIntegrationEvent(
             balance.EmployeeId.Value.ToString(),
@@ -105,6 +108,10 @@ public sealed class SubmitLeaveRequestHandler(
             balance.Year,
             balance.RemainingDays,
             LeaveBalanceTransactionType.PendingReserve), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
 
         return mapper.ToLeaveRequestIdResponse(leaveRequest);
     }

@@ -124,9 +124,8 @@ public sealed class SubmitMyLeaveRequestHandler(
             .FirstOrDefault(s => s.Sequence == workflowInstance.CurrentStep)
             ?.ApproverEmployeeId?.Value.ToString();
 
-        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (saveResult.IsT1)
-            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
+        if (currentApproverEmployeeId is not null)
+            leaveRequest.ApproverEmployeeId = new EmployeeId(Guid.Parse(currentApproverEmployeeId));
 
         await publishEndpoint.Publish(new LeaveRequestSubmittedIntegrationEvent(
             leaveRequest.Id.Value.ToString(),
@@ -139,6 +138,10 @@ public sealed class SubmitMyLeaveRequestHandler(
             balance.Year,
             balance.RemainingDays,
             LeaveBalanceTransactionType.PendingReserve), cancellationToken);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.LeaveBalanceConcurrencyConflict);
 
         return mapper.ToLeaveRequestIdResponse(leaveRequest);
     }

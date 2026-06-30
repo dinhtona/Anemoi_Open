@@ -97,6 +97,9 @@ public sealed class WorkflowInstance : Entity<WorkflowInstanceId>
         else
         {
             CurrentStep = nextSequence;
+            AddEvent(new WorkflowStepApprovedDomainEvent(
+                Id, EntityType, EntityId, performedBy,
+                step.Sequence, nextSequence));
         }
 
         return history;

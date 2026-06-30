@@ -38,8 +38,10 @@ public static class EmployeeRoleSeeder
         "hr.ess.onboarding.view",
         "hr.ess.onboarding.task.complete",
         "notification.view",
+        "notification.manage",
         "notification.preference.manage",
-        "notification.action.execute"
+        "notification.action.execute",
+        "notification.archive"
     ];
 
     private static readonly IReadOnlyCollection<SystemRoleProfile> DefaultProfiles =

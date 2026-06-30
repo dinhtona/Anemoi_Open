@@ -293,13 +293,20 @@ public sealed class WorkflowInstanceTests
     }
 
     [Fact]
-    public void Approve_NonTerminalStep_Should_Not_Raise_DomainEvent()
+    public void Approve_NonTerminalStep_Should_Raise_StepApprovedDomainEvent()
     {
         var (instance, _) = CreatePendingInstance(3);
 
         instance.Approve(HistoryId(), "user-1", null);
 
-        instance.DomainEvents.Should().BeEmpty();
+        instance.DomainEvents.Should().ContainSingle(e =>
+            e is WorkflowStepApprovedDomainEvent);
+        var evt = instance.DomainEvents.OfType<WorkflowStepApprovedDomainEvent>().Single();
+        evt.EntityType.Should().Be("TestEntity");
+        evt.EntityId.Should().Be("entity-1");
+        evt.PerformedBy.Should().Be("user-1");
+        evt.ApprovedStepSequence.Should().Be(1);
+        evt.NextStepSequence.Should().Be(2);
     }
 
     [Fact]

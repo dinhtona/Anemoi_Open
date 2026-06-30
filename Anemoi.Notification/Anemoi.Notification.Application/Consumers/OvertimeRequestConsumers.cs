@@ -53,7 +53,7 @@ public sealed class OvertimeRequestCreatedConsumer(
             TitleLocalizationKey: "notification.overtime.submitted.title",
             ContentLocalizationKey: "notification.overtime.submitted.content",
             Category: NotificationConstants.Categories.Overtime,
-            ActionUrl: "/hr/overtime",
+            ActionUrl: "/manager/approvals",
             DeduplicationKey: $"overtime:{message.OvertimeRequestId}:submitted:{userId}",
             Type: NotificationConstants.Types.Business,
             Severity: NotificationConstants.Severities.Info

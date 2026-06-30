@@ -60,7 +60,7 @@ public sealed class OvertimeNotificationTests
             c.UserId == managerUserId &&
             c.TitleLocalizationKey == "notification.overtime.submitted.title" &&
             c.Category == NotificationConstants.Categories.Overtime &&
-            c.ActionUrl == "/hr/overtime" &&
+            c.ActionUrl == "/manager/approvals" &&
             c.DeduplicationKey == $"overtime:{overtimeRequestId}:submitted:{managerUserId}"
         ), Arg.Any<CancellationToken>());
     }

@@ -56,7 +56,7 @@ public sealed class LeaveRequestSubmittedConsumer(
             TitleLocalizationKey: "notification.leave.submitted.title",
             ContentLocalizationKey: "notification.leave.submitted.content",
             Category: NotificationConstants.Categories.Leave,
-            ActionUrl: "/hr/leave",
+            ActionUrl: "/manager/approvals",
             DeduplicationKey: $"leave:{message.LeaveRequestId}:submitted:{userId}",
             Type: NotificationConstants.Types.Business,
             Severity: NotificationConstants.Severities.Info,
@@ -81,7 +81,7 @@ public sealed class LeaveRequestSubmittedConsumer(
                     ActionCode: NotificationWorkflowConstants.ActionCodes.ViewLeaveRequest,
                     ActionLabel: "View",
                     ActionType: "Navigate",
-                    ActionUrl: "/hr/leave",
+                    ActionUrl: "/manager/approvals",
                     SortOrder: 0)
             ]
         );
