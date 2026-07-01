@@ -8,10 +8,12 @@ Compact project memory for coding agents. Keep this file short; detailed rules l
 2. `docs/README.md`
 3. `docs/ai/README.md`
 4. `docs/ai/core/verification-standard.md`
-5. `ArchitectureGuide.md`
-6. `DEVELOPMENT.md`
-7. `docs/architecture/ARCHITECTURE_DECISIONS.md`
-8. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
+5. `docs/ai/architecture-guard/README.md`
+6. `scripts/README.md`
+7. `ArchitectureGuide.md`
+8. `DEVELOPMENT.md`
+9. `docs/architecture/ARCHITECTURE_DECISIONS.md`
+10. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
 
 If documents conflict, follow approved ADRs first, then architecture/development rules, then module or phase documents.
 
@@ -63,4 +65,15 @@ When the repository workflow applies, stop for review after each step:
 cp .env.example .env
 docker compose up -d --build
 dotnet build Anemoi.sln
+```
+
+Verification scripts (run from repo root):
+
+```powershell
+pwsh ./scripts/verify.ps1
+pwsh ./scripts/verify.ps1 -IncludeArchitectureGuard
+pwsh ./scripts/verify-docs.ps1
+pwsh ./scripts/verify-api.ps1 -ApiBaseUrl http://localhost:5000 -Method GET -Path /api/...
+pwsh ./scripts/verify-workflow.ps1 -EntityType LeaveRequest
+pwsh ./scripts/verify-browser.ps1 -AppBaseUrl http://localhost:3000 -Route /en/...
 ```

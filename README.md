@@ -46,6 +46,8 @@ docs/                    Architecture, AI guidelines, roadmap, plans, reports
 - [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) - approved architectural decisions
 - [docs/architecture/TECHNICAL_DEBT_REGISTER.md](docs/architecture/TECHNICAL_DEBT_REGISTER.md) - known technical debt
 - [docs/ai/README.md](docs/ai/README.md) - mandatory guide for AI agents
+- [docs/ai/architecture-guard/README.md](docs/ai/architecture-guard/README.md) - architecture guard rules and enforcement
+- [scripts/README.md](scripts/README.md) - verification scripts for AI engineering evidence
 - [DEVELOPMENT.md](DEVELOPMENT.md) - development conventions and workflow
 - [AGENTS.md](AGENTS.md) - compact project memory for coding agents
 
