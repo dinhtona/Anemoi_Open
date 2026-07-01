@@ -232,6 +232,8 @@
   <data name="PermissionDescriptionHrLeavePolicySettingsManage" xml:space="preserve"><value>Quản lý cài đặt chính sách nghỉ phép.</value></data>
   <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>Nhân viên</value></data>
   <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>Xem thông tin nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeCreate" xml:space="preserve"><value>Tạo hồ sơ nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeUpdate" xml:space="preserve"><value>Cập nhật hồ sơ nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Liên kết nhân viên với người dùng định danh.</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>

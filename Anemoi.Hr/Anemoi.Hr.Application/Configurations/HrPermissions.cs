@@ -22,6 +22,8 @@ public static class HrPermissions
     public const string LeaveTransactionView =
         BB.HrLeaveTransactionView;
     public const string EmployeeView = BB.HrEmployeeView;
+    public const string EmployeeCreate = BB.HrEmployeeCreate;
+    public const string EmployeeUpdate = BB.HrEmployeeUpdate;
     public const string EmployeeIdentityLink =
         BB.HrEmployeeIdentityLink;
     public const string DepartmentView = BB.HrDepartmentView;
@@ -150,6 +152,8 @@ public static class HrPermissions
         LeaveRequestForceCancel,
         LeaveTransactionView,
         EmployeeView,
+        EmployeeCreate,
+        EmployeeUpdate,
         EmployeeIdentityLink,
         DepartmentView,
         DepartmentManage,

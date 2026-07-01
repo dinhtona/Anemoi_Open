@@ -44,6 +44,8 @@ public static class Permissions
     public const string HrLeavePolicySettingsView = "hr.leave.policy.settings.view";
     public const string HrLeavePolicySettingsManage = "hr.leave.policy.settings.manage";
     public const string HrEmployeeView = "hr.employee.view";
+    public const string HrEmployeeCreate = "hr.employee.create";
+    public const string HrEmployeeUpdate = "hr.employee.update";
     public const string HrEmployeeIdentityLink = "hr.employee.identity_link";
     public const string HrDepartmentView = "hr.department.view";
     public const string HrDepartmentManage = "hr.department.manage";
@@ -200,6 +202,8 @@ public static class Permissions
         new(HrLeavePolicySettingsView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicySettingsView"),
         new(HrLeavePolicySettingsManage, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicySettingsManage"),
         new(HrEmployeeView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeView"),
+        new(HrEmployeeCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeCreate"),
+        new(HrEmployeeUpdate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeUpdate"),
         new(HrEmployeeIdentityLink, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeIdentityLink",
             true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),

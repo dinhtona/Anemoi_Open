@@ -1,3 +1,4 @@
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.Identity.Responses;
 using FluentAssertions;
 using Lambda.Identity.Application.SeedData;
@@ -14,6 +15,8 @@ public sealed class PermissionModelSeparationTests
     {
         EmployeeRoleSeeder.EmployeePermissions.Should().OnlyContain(permission =>
             permission.StartsWith("hr.ess.") ||
+            permission == Permissions.HrOnboardingView ||
+            permission == Permissions.HrOnboardingTaskComplete ||
             permission.StartsWith("notification."));
 
         EmployeeRoleSeeder.EmployeePermissions.Should().NotContain(permission =>
@@ -23,6 +26,8 @@ public sealed class PermissionModelSeparationTests
             permission.StartsWith("hr.recruitment.") ||
             permission.StartsWith("hr.workflow.") ||
             permission.StartsWith("hr.payroll.") ||
+            permission == Permissions.HrOnboardingManage ||
+            permission == Permissions.HrOnboardingTaskManage ||
             permission.Contains(".approve"));
     }
 
@@ -107,6 +112,22 @@ public sealed class PermissionModelSeparationTests
         source.Should().Contain("permissions.some((p) => user.permissions?.includes(p))");
         source.Should().NotContain("user.roles.includes(permission)");
         source.Should().NotContain("user.roles?.includes(p)");
+    }
+
+    [Fact]
+    public void Default_system_role_profiles_reference_only_central_permission_catalog_entries()
+    {
+        var missingEmployeePermissions = EmployeeRoleSeeder.EmployeePermissions
+            .Where(permission => !Permissions.All.Contains(permission))
+            .ToArray();
+        var missingHrPermissions = SystemRoleProfiles.Hr.Permissions
+            .Where(permission => !Permissions.All.Contains(permission))
+            .ToArray();
+
+        missingEmployeePermissions.Should().BeEmpty(
+            "Employee seed permissions must exist in the central Permissions catalog.");
+        missingHrPermissions.Should().BeEmpty(
+            "HR seed permissions must exist in the central Permissions catalog.");
     }
 
     private static string FindRepoFile(string relativePath)

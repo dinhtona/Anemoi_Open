@@ -27,21 +27,21 @@ public static class EmployeeRoleSeeder
 
     public static readonly string[] EmployeePermissions =
     [
-        "hr.ess.profile.view",
-        "hr.ess.leave.view",
-        "hr.ess.leave.request",
-        "hr.ess.attendance.view",
-        "hr.ess.overtime.view",
-        "hr.ess.overtime.create",
-        "hr.ess.payroll.view",
-        "hr.ess.payslip.view",
-        "hr.ess.onboarding.view",
-        "hr.ess.onboarding.task.complete",
-        "notification.view",
-        "notification.manage",
-        "notification.preference.manage",
-        "notification.action.execute",
-        "notification.archive"
+        Permissions.HrEssProfileView,
+        Permissions.HrEssLeaveView,
+        Permissions.HrEssLeaveRequest,
+        Permissions.HrEssAttendanceView,
+        Permissions.HrEssOvertimeView,
+        Permissions.HrEssOvertimeCreate,
+        Permissions.HrEssPayrollView,
+        Permissions.HrEssPayslipView,
+        Permissions.HrOnboardingView,
+        Permissions.HrOnboardingTaskComplete,
+        Permissions.NotificationView,
+        Permissions.NotificationManage,
+        Permissions.NotificationPreferenceManage,
+        Permissions.NotificationActionExecute,
+        Permissions.NotificationArchive
     ];
 
     private static readonly IReadOnlyCollection<SystemRoleProfile> DefaultProfiles =
@@ -74,24 +74,24 @@ public static class SystemRoleProfiles
         "HR",
         "HR operations role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
-            "hr.employee.view",
-            "hr.employee.create",
-            "hr.employee.update",
-            "hr.department.view",
-            "hr.department.manage",
-            "hr.position.view",
-            "hr.position.manage",
-            "hr.attendance.view",
-            "hr.attendance.create",
-            "hr.attendance.update",
-            "hr.attendance.lock",
-            "hr.contract.create",
-            "hr.contract.view",
-            "hr.dashboard.view",
-            "hr.analytics.view",
-            "hr.overtime.manage",
-            "hr.leave.request.approve",
-            "hr.overtime.approve"
+            Permissions.HrEmployeeView,
+            Permissions.HrEmployeeCreate,
+            Permissions.HrEmployeeUpdate,
+            Permissions.HrDepartmentView,
+            Permissions.HrDepartmentManage,
+            Permissions.HrPositionView,
+            Permissions.HrPositionManage,
+            Permissions.HrAttendanceView,
+            Permissions.HrAttendanceCreate,
+            Permissions.HrAttendanceUpdate,
+            Permissions.HrAttendanceLock,
+            Permissions.HrContractCreate,
+            Permissions.HrContractView,
+            Permissions.HrDashboardView,
+            Permissions.HrAnalyticsView,
+            Permissions.HrOvertimeManage,
+            Permissions.HrLeaveRequestApprove,
+            Permissions.HrOvertimeApprove
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile Recruiter = new(
@@ -99,13 +99,13 @@ public static class SystemRoleProfiles
         "Recruiter",
         "Recruitment operations role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
-            "hr.recruitment.view",
-            "hr.recruitment.request.create",
-            "hr.recruitment.request.submit",
-            "hr.recruitment.request.manage",
-            "hr.recruitment.manage",
-            "hr.recruitment.interview",
-            "hr.recruitment.hire"
+            Permissions.HrRecruitmentView,
+            Permissions.HrRecruitmentRequestCreate,
+            Permissions.HrRecruitmentRequestSubmit,
+            Permissions.HrRecruitmentRequestManage,
+            Permissions.HrRecruitmentManage,
+            Permissions.HrRecruitmentInterview,
+            Permissions.HrRecruitmentHire
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile WorkflowAdmin = new(
@@ -113,9 +113,9 @@ public static class SystemRoleProfiles
         "WorkflowAdmin",
         "Workflow configuration role",
         EmployeeRoleSeeder.EmployeePermissions.Concat([
-            "hr.workflow.view",
-            "hr.workflow.manage",
-            "hr.workflow.execute"
+            Permissions.HrWorkflowView,
+            Permissions.HrWorkflowManage,
+            Permissions.HrWorkflowExecute
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile Admin = new(
