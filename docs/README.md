@@ -18,6 +18,7 @@ Technical debt recommendations do not override approved architecture decisions.
 
 ## Start Here
 
+- `AI_ENGINEERING_HANDBOOK.md` - entry point and runtime flow for AI agents
 - `../README.md` - project overview and setup
 - `../ArchitectureGuide.md` - practical architecture guide
 - `../DEVELOPMENT.md` - development conventions
@@ -31,6 +32,7 @@ Technical debt recommendations do not override approved architecture decisions.
 
 ## AI Guidelines
 
+- `AI_ENGINEERING_HANDBOOK.md` - AI engineering entry point, runtime flow, reporting contract, and definition of done
 - `ai/README.md` - reading order, rule precedence, execution policy
 - `ai/core/architecture.md` - core architecture direction
 - `ai/core/backend-rules.md` - backend engineering rules
