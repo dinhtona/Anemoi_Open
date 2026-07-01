@@ -4,13 +4,14 @@ Compact project memory for coding agents. Keep this file short; detailed rules l
 
 ## Read First
 
-1. `docs/README.md`
-2. `docs/ai/README.md`
-3. `docs/ai/core/verification-standard.md`
-4. `ArchitectureGuide.md`
-5. `DEVELOPMENT.md`
-6. `docs/architecture/ARCHITECTURE_DECISIONS.md`
-7. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
+1. `docs/AI_ENGINEERING_HANDBOOK.md`
+2. `docs/README.md`
+3. `docs/ai/README.md`
+4. `docs/ai/core/verification-standard.md`
+5. `ArchitectureGuide.md`
+6. `DEVELOPMENT.md`
+7. `docs/architecture/ARCHITECTURE_DECISIONS.md`
+8. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
 
 If documents conflict, follow approved ADRs first, then architecture/development rules, then module or phase documents.
 
