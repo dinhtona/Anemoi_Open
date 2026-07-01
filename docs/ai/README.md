@@ -117,6 +117,20 @@ For browser UAT, use packs from:
 docs/ai/uat/
 ```
 
+For verification scripts, use:
+
+```text
+scripts/README.md
+```
+
+For Architecture Guard, use:
+
+```text
+docs/ai/architecture-guard/README.md
+scripts/architecture-guard.ps1
+tools/Anemoi.ArchitectureGuard/
+```
+
 # ANEMOI HR
 
 ## Mandatory Reading Before Making Changes
