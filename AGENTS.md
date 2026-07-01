@@ -6,10 +6,11 @@ Compact project memory for coding agents. Keep this file short; detailed rules l
 
 1. `docs/README.md`
 2. `docs/ai/README.md`
-3. `ArchitectureGuide.md`
-4. `DEVELOPMENT.md`
-5. `docs/architecture/ARCHITECTURE_DECISIONS.md`
-6. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
+3. `docs/ai/core/verification-standard.md`
+4. `ArchitectureGuide.md`
+5. `DEVELOPMENT.md`
+6. `docs/architecture/ARCHITECTURE_DECISIONS.md`
+7. `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
 
 If documents conflict, follow approved ADRs first, then architecture/development rules, then module or phase documents.
 
@@ -44,6 +45,7 @@ If documents conflict, follow approved ADRs first, then architecture/development
 - Browser validation is required for frontend-impacting work.
 - Evidence must come from browser, API, database, test execution, or build output.
 - If evidence is missing, report REVIEWED instead of PASS.
+- Detailed status vocabulary and evidence matrix live in `docs/ai/core/verification-standard.md`.
 
 ## Feature Workflow
 
