@@ -2,23 +2,32 @@
 
 This folder is the single source of truth for AI agents working in the Anemoi_Open repository.
 
+For every AI implementation session, start from:
+
+```text
+docs/AI_ENGINEERING_HANDBOOK.md
+```
+
+The handbook defines the runtime flow, reporting contract, verification expectations, and definition of done. This README remains the map for the detailed rules under `docs/ai/`.
+
 ## 1. Mandatory Reading Order
 
 Before implementing any HR-related feature, read files in this order:
 
-1. `docs/ai/core/architecture.md`
-2. `docs/ai/core/backend-rules.md`
-3. `docs/ai/core/frontend-rules.md`
-4. `docs/ai/core/verification-standard.md`
-5. Relevant files under `docs/ai/verification/`
-6. `docs/ai/core/localization.md`
-7. `docs/ai/core/naming-conventions.md`
-8. `docs/ai/security/permission-model.md`
-9. `docs/ai/security/sensitive-permissions.md`
-10. `docs/ai/security/audit-log.md`
-11. `docs/ai/workflows/approval-workflow.md`
-12. All files under `docs/ai/modules/hr/`
-13. The specific phase prompt under `docs/ai/prompts/hr/` or template under `docs/ai/prompts/templates/`
+1. `docs/AI_ENGINEERING_HANDBOOK.md`
+2. `docs/ai/core/architecture.md`
+3. `docs/ai/core/backend-rules.md`
+4. `docs/ai/core/frontend-rules.md`
+5. `docs/ai/core/verification-standard.md`
+6. Relevant files under `docs/ai/verification/`
+7. `docs/ai/core/localization.md`
+8. `docs/ai/core/naming-conventions.md`
+9. `docs/ai/security/permission-model.md`
+10. `docs/ai/security/sensitive-permissions.md`
+11. `docs/ai/security/audit-log.md`
+12. `docs/ai/workflows/approval-workflow.md`
+13. All files under `docs/ai/modules/hr/`
+14. The specific phase prompt under `docs/ai/prompts/hr/` or template under `docs/ai/prompts/templates/`
 
 ## 2. Rule Precedence
 
@@ -78,7 +87,13 @@ Do not:
 
 ## 5. Recommended Use
 
-Start from the documentation map:
+Start from the AI engineering entry point:
+
+```text
+docs/AI_ENGINEERING_HANDBOOK.md
+```
+
+Then use the documentation map:
 
 ```text
 docs/README.md
