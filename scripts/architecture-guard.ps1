@@ -40,19 +40,22 @@ function Add-Violation {
     }) | Out-Null
 }
 
+function Test-IsExcludedPath {
+    param([string]$FullName)
+
+    $normalized = $FullName.Replace('\', '/')
+    return $normalized.Contains('/bin/') `
+        -or $normalized.Contains('/obj/') `
+        -or $normalized.Contains('/.git/') `
+        -or $normalized.Contains('/node_modules/') `
+        -or $normalized.Contains('/Migrations/')
+}
+
 Write-Host 'Architecture Guard - PowerShell regex pre-check' -ForegroundColor Green
 Write-Host "Scan root: $scanRoot"
 
-$excludedSegments = @(
-    "${([IO.Path]::DirectorySeparatorChar)}bin${([IO.Path]::DirectorySeparatorChar)}",
-    "${([IO.Path]::DirectorySeparatorChar)}obj${([IO.Path]::DirectorySeparatorChar)}",
-    "${([IO.Path]::DirectorySeparatorChar)}.git${([IO.Path]::DirectorySeparatorChar)}",
-    "${([IO.Path]::DirectorySeparatorChar)}node_modules${([IO.Path]::DirectorySeparatorChar)}"
-)
-
 Get-ChildItem $scanRoot -Recurse -File -Include *.cs,*.tsx,*.ts | Where-Object {
-    $fullName = $_.FullName
-    -not ($excludedSegments | Where-Object { $fullName.Contains($_) })
+    -not (Test-IsExcludedPath -FullName $_.FullName)
 } | ForEach-Object {
     $relative = Resolve-Path $_.FullName -Relative
     $content = Get-Content $_.FullName -Raw
