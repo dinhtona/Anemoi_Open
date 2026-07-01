@@ -36,6 +36,9 @@ Technical debt recommendations do not override approved architecture decisions.
 - `ai/core/backend-rules.md` - backend engineering rules
 - `ai/core/frontend-rules.md` - frontend engineering rules
 - `ai/core/verification-standard.md` - execution evidence and status rules for AI reports
+- `ai/verification/` - browser, API, database, and workflow verification guides
+- `ai/uat/` - browser UAT packs for product flows
+- `ai/prompts/templates/` - reusable implementation, audit, and bugfix prompt templates
 - `ai/core/localization.md` - localization rules
 - `ai/core/naming-conventions.md` - naming conventions
 - `ai/security/` - permission, sensitive permission, and audit rules
