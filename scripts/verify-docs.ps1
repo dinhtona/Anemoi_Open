@@ -5,6 +5,8 @@
 .DESCRIPTION
   Checks for required AI documentation files and common fake-verification wording in docs/ai.
   This is not a replacement for manual review, but it provides executable evidence for documentation-only phases.
+
+  The fake-verification wording check ignores lines that intentionally document prohibited wording, such as anti-fake-verification rules.
 #>
 
 [CmdletBinding()]
@@ -55,16 +57,44 @@ $forbiddenPatterns = @(
     'assume pass'
 )
 
+$allowedContextPatterns = @(
+    'anti-fake',
+    'fake-verification',
+    'forbidden',
+    'do not',
+    'must not',
+    'invalid evidence',
+    'vague wording',
+    'prohibited wording'
+)
+
 $hits = New-Object System.Collections.Generic.List[object]
 Get-ChildItem $docsPath -Recurse -File -Include *.md | ForEach-Object {
     $path = $_.FullName
-    $content = Get-Content $path -Raw
-    foreach ($pattern in $forbiddenPatterns) {
-        if ($content -match [regex]::Escape($pattern)) {
-            $hits.Add([pscustomobject]@{
-                File = Resolve-Path $path -Relative
-                Pattern = $pattern
-            }) | Out-Null
+    $relativePath = Resolve-Path $path -Relative
+    $lines = Get-Content $path
+
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+        $line = $lines[$index]
+        foreach ($pattern in $forbiddenPatterns) {
+            if ($line -match [regex]::Escape($pattern)) {
+                $lowerLine = $line.ToLowerInvariant()
+                $isAllowedContext = $false
+                foreach ($allowed in $allowedContextPatterns) {
+                    if ($lowerLine.Contains($allowed)) {
+                        $isAllowedContext = $true
+                        break
+                    }
+                }
+
+                if (-not $isAllowedContext) {
+                    $hits.Add([pscustomobject]@{
+                        File = $relativePath
+                        Line = $index + 1
+                        Pattern = $pattern
+                    }) | Out-Null
+                }
+            }
         }
     }
 }
@@ -77,5 +107,5 @@ if ($hits.Count -gt 0) {
 }
 
 Write-Host 'Status: PASS' -ForegroundColor Green
-Write-Host 'Evidence: required AI docs exist and common fake-verification wording was not found under docs/ai.'
+Write-Host 'Evidence: required AI docs exist and common fake-verification wording was not found outside allowed anti-fake-verification context under docs/ai.'
 exit 0
