@@ -51,7 +51,7 @@ public class SubmitTransferHandlerTests
         return new Employee
         {
             Id = new EmployeeId(Guid.NewGuid()),
-            FullName = "Test Employee",
+            DisplayName = "Test Employee",
             EmployeeCode = "EMP-001",
             PrimaryDepartmentId = new DepartmentId(Guid.NewGuid()),
             PrimaryPositionId = new PositionId(Guid.NewGuid()),

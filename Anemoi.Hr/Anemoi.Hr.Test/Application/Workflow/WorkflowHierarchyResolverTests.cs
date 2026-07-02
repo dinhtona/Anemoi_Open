@@ -25,7 +25,7 @@ public sealed class WorkflowHierarchyResolverTests
         {
             Id = managerId,
             IdentityUserId = managerUserId,
-            FullName = "Manager User"
+            DisplayName = "Manager User"
         };
 
         var employee = new Employee

@@ -11,7 +11,11 @@ public sealed class Employee : Entity<EmployeeId>
 {
     public Guid? IdentityUserId { get; set; }
     public string EmployeeCode { get; set; }
-    public string FullName { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string? DisplayName { get; set; }
+    public string? AvatarStorageKey { get; set; }
+    public string FullName => DisplayName ?? $"{FirstName} {LastName}";
     public string WorkEmail { get; set; }
     public string PersonalEmail { get; set; }
     public string PhoneNumber { get; set; }
@@ -30,6 +34,7 @@ public sealed class Employee : Entity<EmployeeId>
     public Position PrimaryPosition { get; set; }
     public Employee? DirectManager { get; set; }
     public List<Employee> DirectReports { get; set; } = [];
+    // Existing navigation only — no new history writes. All new audit events go to EmployeeHistory.
     public List<EmployeeDepartmentHistory> DepartmentHistories { get; set; } = [];
     public List<EmployeePositionHistory> PositionHistories { get; set; } = [];
     public List<EmployeeGradeHistory> GradeHistories { get; set; } = [];

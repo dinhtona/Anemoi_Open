@@ -86,7 +86,9 @@ public sealed class ConvertCandidateToEmployeeHandler(
         {
             Id = employeeId,
             EmployeeCode = request.EmployeeCode,
-            FullName = request.FullName,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            DisplayName = request.DisplayName,
             WorkEmail = request.WorkEmail,
             JoinDate = request.JoinDate,
             EmploymentStatusCode = EmploymentStatusCode.PendingOnboarding,
@@ -104,7 +106,7 @@ public sealed class ConvertCandidateToEmployeeHandler(
                 HrBusinessErrorCodes.ConversionEmployeeCreationFailed);
 
         employee.AddEvent(new EmployeeCreatedDomainEvent(
-            employeeId, request.EmployeeCode, request.FullName, request.ConvertedBy));
+            employeeId, request.EmployeeCode, employee.FullName, request.ConvertedBy));
 
         // Link candidate to employee
         candidate.LinkEmployee(employeeId, request.ConvertedBy, now);
@@ -139,7 +141,7 @@ public sealed class ConvertCandidateToEmployeeHandler(
         await publishEndpoint.Publish(new EmployeeCreatedIntegrationEvent(
             employeeId.Value,
             request.EmployeeCode,
-            request.FullName,
+            employee.FullName,
             request.WorkEmail
         ), cancellationToken);
 

@@ -12,7 +12,9 @@ public sealed class ConvertCandidateToEmployeeValidator : AbstractValidator<Conv
             .RequiredId(HrBusinessErrorCodes.ValCandidateIdRequired);
         RuleFor(x => x.EmployeeCode)
             .NotEmpty().WithMessage(HrBusinessErrorCodes.ValRequisitionCodeRequired);
-        RuleFor(x => x.FullName)
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage(HrBusinessErrorCodes.ValCandidateNameRequired);
+        RuleFor(x => x.LastName)
             .NotEmpty().WithMessage(HrBusinessErrorCodes.ValCandidateNameRequired);
         RuleFor(x => x.DepartmentId)
             .RequiredId(HrBusinessErrorCodes.ValRequisitionIdRequired);

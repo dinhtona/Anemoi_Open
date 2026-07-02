@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Anemoi.Hr.Infrastructure.Configurations;
 
 public sealed class EmployeeOrganizationModelMapping :
-    IEntityTypeConfiguration<Employee>,
     IEntityTypeConfiguration<Department>,
     IEntityTypeConfiguration<Position>,
     IEntityTypeConfiguration<EmployeeDepartmentHistory>,
@@ -19,46 +18,6 @@ public sealed class EmployeeOrganizationModelMapping :
     IEntityTypeConfiguration<EmployeeOrganizationHistory>,
     IEntityTypeConfiguration<EmployeeHistory>
 {
-    public void Configure(EntityTypeBuilder<Employee> builder)
-    {
-        builder.ToTable("Employees");
-        builder.Property(x => x.Id)
-            .HasConversion(x => x.Value, id => new EmployeeId(id));
-        builder.Property(x => x.PrimaryDepartmentId)
-            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new DepartmentId(id.Value));
-        builder.Property(x => x.PrimaryPositionId)
-            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new PositionId(id.Value));
-        builder.Property(x => x.DirectManagerEmployeeId)
-            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
-        builder.HasKey(x => x.Id);
-        builder.HasIndex(x => x.IdentityUserId).IsUnique();
-        builder.Property(x => x.EmployeeCode).HasMaxLength(64).IsRequired();
-        builder.Property(x => x.FullName).HasMaxLength(256).IsRequired();
-        builder.Property(x => x.WorkEmail).HasMaxLength(256);
-        builder.Property(x => x.PersonalEmail).HasMaxLength(256);
-        builder.Property(x => x.PhoneNumber).HasMaxLength(32);
-        builder.Property(x => x.EmploymentStatusCode).HasMaxLength(64).IsRequired();
-        builder.Property(x => x.EmploymentTypeCode).HasMaxLength(64).IsRequired();
-        builder.Property(x => x.GradeCode).HasMaxLength(64);
-        builder.HasIndex(x => x.EmployeeCode).IsUnique();
-        builder.HasIndex(x => x.WorkEmail).IsUnique();
-        builder.HasOne(x => x.PrimaryDepartment)
-            .WithMany(x => x.PrimaryEmployees)
-            .HasForeignKey(x => x.PrimaryDepartmentId)
-            .OnDelete(DeleteBehavior.SetNull);
-        builder.HasOne(x => x.PrimaryPosition)
-            .WithMany(x => x.PrimaryEmployees)
-            .HasForeignKey(x => x.PrimaryPositionId)
-            .OnDelete(DeleteBehavior.SetNull);
-        builder.HasOne(x => x.DirectManager)
-            .WithMany(x => x.DirectReports)
-            .HasForeignKey(x => x.DirectManagerEmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
-        builder.Property<uint>("xmin")
-            .HasColumnName("xmin")
-            .IsRowVersion();
-    }
-
     public void Configure(EntityTypeBuilder<EmployeeIdentityLinkLog> builder)
     {
         builder.ToTable("EmployeeIdentityLinkLogs");

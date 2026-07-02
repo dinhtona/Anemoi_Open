@@ -44,7 +44,7 @@ public class SubmitSeparationHandlerTests
         return new Employee
         {
             Id = new EmployeeId(Guid.NewGuid()),
-            FullName = "Test Employee",
+            DisplayName = "Test Employee",
             EmployeeCode = "EMP-001"
         };
     }

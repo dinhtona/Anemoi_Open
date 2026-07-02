@@ -16,6 +16,10 @@ public static class HrBusinessErrorCodes
     public const string LeaveAdjustmentReasonRequired = "HR_LEAVE_ADJUSTMENT_REASON_REQUIRED";
     public const string PermissionSensitiveConfirmationRequired = "HR_PERMISSION_SENSITIVE_CONFIRMATION_REQUIRED";
     public const string EmployeeNotFound = "HR_EMPLOYEE_NOT_FOUND";
+    public const string EmployeeCodeAlreadyExists = "HR_EMPLOYEE_CODE_ALREADY_EXISTS";
+    public const string WorkEmailAlreadyExists = "HR_WORK_EMAIL_ALREADY_EXISTS";
+    public const string WorkEmailLinkedToIdentity = "HR_WORK_EMAIL_LINKED_TO_IDENTITY";
+    public const string ManagerNotFound = "HR_MANAGER_NOT_FOUND";
     public const string DepartmentNotFound = "HR_DEPARTMENT_NOT_FOUND";
     public const string PositionNotFound = "HR_POSITION_NOT_FOUND";
     public const string LeaveRequestOverlapping = "HR_LEAVE_REQUEST_OVERLAPPING";
@@ -140,6 +144,7 @@ public static class HrBusinessErrorCodes
     public const string CalendarExceptionTypeRequired = "HR_CALENDAR_EXCEPTION_TYPE_REQUIRED";
     public const string CalendarExceptionConcurrencyConflict = "HR_CALENDAR_EXCEPTION_CONCURRENCY_CONFLICT";
 
+    public const string InvalidStatusTransition = "HR_INVALID_STATUS_TRANSITION";
     public const string SaveChangesFailed = "HR_SAVE_CHANGES_FAILED";
 
     // Database persistence error codes
@@ -246,6 +251,7 @@ public static class HrBusinessErrorCodes
     public const string ValLeaveRequestIdRequired = "VAL_LEAVE_REQUEST_ID_REQUIRED";
     public const string ValMaxSalaryMustBeGeMinSalary = "VAL_MAX_SALARY_MUST_BE_GE_MIN_SALARY";
     public const string ValMinSalaryMustBePositive = "VAL_MIN_SALARY_MUST_BE_POSITIVE";
+    public const string ValDepartmentIdRequired = "VAL_DEPARTMENT_ID_REQUIRED";
     public const string ValNewDepartmentIdRequired = "VAL_NEW_DEPARTMENT_ID_REQUIRED";
     public const string ValOvertimeRequestIdRequired = "VAL_OVERTIME_REQUEST_ID_REQUIRED";
     public const string ValPayrollPeriodIdRequired = "VAL_PAYROLL_PERIOD_ID_REQUIRED";
@@ -444,6 +450,20 @@ public static class HrBusinessErrorCodes
     public const string ProbationRecordNotFound = "HR_PROBATION_RECORD_NOT_FOUND";
     public const string TransferNotFound = "HR_TRANSFER_NOT_FOUND";
     public const string SeparationNotFound = "HR_SEPARATION_NOT_FOUND";
+
+    // EmployeeDocument error codes
+    public const string EmployeeDocumentNotFound = "HR_EMPLOYEE_DOCUMENT_NOT_FOUND";
+    public const string DocumentTypeRequired = "VAL_DOCUMENT_TYPE_REQUIRED";
+    public const string DisplayNameRequired = "VAL_DISPLAY_NAME_REQUIRED";
+
+    // EmployeeNote error codes
+    public const string EmployeeNoteNotFound = "HR_EMPLOYEE_NOTE_NOT_FOUND";
+    public const string ContentRequired = "VAL_CONTENT_REQUIRED";
+
+    // EmployeeAsset error codes
+    public const string EmployeeAssetNotFound = "HR_EMPLOYEE_ASSET_NOT_FOUND";
+    public const string AssetTypeRequired = "VAL_ASSET_TYPE_REQUIRED";
+    public const string AssetTagRequired = "VAL_ASSET_TAG_REQUIRED";
 
     // Lifecycle validation error codes
     public const string ValProbationRecordIdRequired = "VAL_PROBATION_RECORD_ID_REQUIRED";

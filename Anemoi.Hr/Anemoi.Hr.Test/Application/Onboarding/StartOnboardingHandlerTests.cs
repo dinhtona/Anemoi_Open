@@ -51,7 +51,7 @@ public class StartOnboardingHandlerTests
         return new Employee
         {
             Id = new EmployeeId(Guid.NewGuid()),
-            FullName = "John Doe",
+            DisplayName = "John Doe",
             EmployeeCode = "EMP-001"
         };
     }

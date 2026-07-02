@@ -2,9 +2,19 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Infrastructure.Authorization;
 using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ActivateEmployee;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ArchiveEmployee;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeEmployeeDepartment;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeEmployeeGrade;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeEmployeeManager;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeEmployeePosition;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.CreateEmployee;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.LinkEmployeesToIdentityUsers;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.PromoteEmployee;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ResumeEmployee;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.SuspendEmployee;
 using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.TransferEmployee;
+using Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.UpdateEmployeeContact;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployee;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeDepartmentHistory;
 using Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeGradeHistory;
@@ -23,11 +33,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace Anemoi.Hr.Api.Controllers.Employee;
 
 [ApiController]
-[Route("api/hr/employee/[controller]/[action]")]
+[Route("api/hr/employees")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
 public sealed class EmployeeController(ISender sender) : ControllerBase
@@ -49,7 +58,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
-    [HttpGet]
+    [HttpGet("search")]
     [HasPermission(HrPermissions.EmployeeView)]
     [ProducesResponseType(typeof(PaginationResponse<EmployeeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchEmployees([FromQuery] SearchEmployeesQuery query, CancellationToken cancellationToken)
@@ -57,7 +66,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return Ok(await sender.Send(query, cancellationToken));
     }
 
-    [HttpGet]
+    [HttpGet("me")]
     [ProducesResponseType(typeof(EmployeeResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
     {
@@ -67,7 +76,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
-    [HttpPost]
+    [HttpPost("link-identity")]
     [HasPermission(HrPermissions.EmployeeIdentityLink)]
     [ProducesResponseType(typeof(EmployeeIdentityLinkResultResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> LinkEmployeesToIdentityUsers(
@@ -78,7 +87,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
-    [HttpPost]
+    [HttpPost("transfer")]
     [HasPermission(HrPermissions.EmployeeTransferCreate)]
     [ProducesResponseType(typeof(EmployeeDepartmentHistoryIdResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> TransferEmployee(
@@ -89,7 +98,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
-    [HttpPost]
+    [HttpPost("promote")]
     [HasPermission(HrPermissions.PromotionCreate)]
     [ProducesResponseType(typeof(PromoteEmployeeResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> PromoteEmployee(
@@ -100,7 +109,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
-    [HttpGet("{employeeId}")]
+    [HttpGet("{employeeId}/department-history")]
     [HasPermission(HrPermissions.EmployeeTransferView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<EmployeeDepartmentHistoryResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeeDepartmentHistory(
@@ -111,7 +120,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return Ok(res);
     }
 
-    [HttpGet("{employeeId}")]
+    [HttpGet("{employeeId}/position-history")]
     [HasPermission(HrPermissions.PositionChangeView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<EmployeePositionHistoryResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeePositionHistory(
@@ -122,7 +131,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return Ok(res);
     }
 
-    [HttpGet("{employeeId}")]
+    [HttpGet("{employeeId}/grade-history")]
     [HasPermission(HrPermissions.GradeChangeView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<EmployeeGradeHistoryResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeeGradeHistory(
@@ -133,7 +142,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         return Ok(res);
     }
 
-    [HttpGet("{employeeId}")]
+    [HttpGet("{employeeId}/promotion-timeline")]
     [HasPermission(HrPermissions.PromotionView)]
     [ProducesResponseType(typeof(IReadOnlyCollection<EmployeePromotionTimelineResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployeePromotionTimeline(
@@ -179,5 +188,117 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         var employeeId = new EmployeeId(Guid.Parse(profile.Id));
         var query = new GetEmployeeTimelineQuery(employeeId, eventType, entityType, dateFrom, dateTo);
         return Ok(await sender.Send(query, cancellationToken));
+    }
+
+    [HasPermission(HrPermissions.EmployeeCreate)]
+    [HttpPost]
+    [ProducesResponseType(typeof(CreateEmployeeResponse), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateEmployee(
+        [FromBody] CreateEmployeeCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(
+            response => CreatedAtAction(nameof(GetEmployeeById), new { id = response.Id.Value }, response),
+            BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeUpdate)]
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateEmployeeContact(
+        Guid id, [FromBody] UpdateEmployeeContactCommand command, CancellationToken cancellationToken)
+    {
+        if (id != command.EmployeeId.Value)
+            return BadRequest("Id mismatch");
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeDepartmentChange)]
+    [HttpPut("{id}/department")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangeEmployeeDepartment(
+        Guid id, [FromBody] ChangeEmployeeDepartmentCommand command, CancellationToken cancellationToken)
+    {
+        if (id != command.EmployeeId.Value)
+            return BadRequest("Id mismatch");
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeePositionChange)]
+    [HttpPut("{id}/position")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangeEmployeePosition(
+        Guid id, [FromBody] ChangeEmployeePositionCommand command, CancellationToken cancellationToken)
+    {
+        if (id != command.EmployeeId.Value)
+            return BadRequest("Id mismatch");
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeGradeChange)]
+    [HttpPut("{id}/grade")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangeEmployeeGrade(
+        Guid id, [FromBody] ChangeEmployeeGradeCommand command, CancellationToken cancellationToken)
+    {
+        if (id != command.EmployeeId.Value)
+            return BadRequest("Id mismatch");
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeManagerChange)]
+    [HttpPut("{id}/manager")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangeEmployeeManager(
+        Guid id, [FromBody] ChangeEmployeeManagerCommand command, CancellationToken cancellationToken)
+    {
+        if (id != command.EmployeeId.Value)
+            return BadRequest("Id mismatch");
+        var result = await sender.Send(command with { CreatedBy = HttpContext.GetUserId() }, cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeActivate)]
+    [HttpPost("{id}/activate")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ActivateEmployee(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new ActivateEmployeeCommand(new EmployeeId(id), CreatedBy: HttpContext.GetUserId()), cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeSuspend)]
+    [HttpPost("{id}/suspend")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> SuspendEmployee(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new SuspendEmployeeCommand(new EmployeeId(id), CreatedBy: HttpContext.GetUserId()), cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeResume)]
+    [HttpPost("{id}/resume")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ResumeEmployee(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new ResumeEmployeeCommand(new EmployeeId(id), CreatedBy: HttpContext.GetUserId()), cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
+    }
+
+    [HasPermission(HrPermissions.EmployeeArchive)]
+    [HttpPost("{id}/archive")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ArchiveEmployee(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new ArchiveEmployeeCommand(new EmployeeId(id), CreatedBy: HttpContext.GetUserId()), cancellationToken);
+        return result.Match<IActionResult>(_ => NoContent(), BadRequest);
     }
 }

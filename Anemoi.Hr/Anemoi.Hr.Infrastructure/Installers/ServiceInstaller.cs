@@ -4,6 +4,7 @@ using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.ApproveLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.CancelLeaveRequest;
 using Anemoi.Hr.Application.Mappings;
+using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Services;
@@ -48,6 +49,9 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<EmployeeTransferMapper>();
         services.AddScoped<EmployeeSeparationMapper>();
         services.AddScoped<EmployeeHistoryMapper>();
+        services.AddScoped<EmployeeDocumentMapper>();
+        services.AddScoped<EmployeeAssetMapper>();
+        services.AddScoped<EmployeeNoteMapper>();
         services.AddScoped<PayrollReportExportService>();
         services.AddScoped<IReportExporter, CsvReportExporter>();
         services.AddScoped<IPayslipDocumentStorage, LocalPayslipDocumentStorage>();

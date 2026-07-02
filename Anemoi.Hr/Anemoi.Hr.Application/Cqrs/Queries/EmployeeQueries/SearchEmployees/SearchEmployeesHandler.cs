@@ -19,7 +19,7 @@ public sealed class SearchEmployeesHandler(ISqlRepository<Employee> repository, 
         var page = await repository.GetManyByConditionWithPaginationAsync(
             x => string.IsNullOrEmpty(request.SearchKey) ||
                  x.EmployeeCode.Contains(request.SearchKey) ||
-                 x.FullName.Contains(request.SearchKey) ||
+                 (x.FirstName + " " + x.LastName).Contains(request.SearchKey) ||
                  x.WorkEmail.Contains(request.SearchKey),
             q => q.Include(x => x.PrimaryDepartment)
                   .Include(x => x.PrimaryPosition)

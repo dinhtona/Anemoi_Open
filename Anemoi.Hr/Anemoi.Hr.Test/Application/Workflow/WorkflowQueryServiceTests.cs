@@ -14,12 +14,12 @@ namespace Anemoi.Hr.Test.Application.Workflow;
 
 public sealed class WorkflowQueryServiceTests
 {
-    private static Employee CreateEmployee(EmployeeId id, string fullName)
+    private static Employee CreateEmployee(EmployeeId id, string displayName)
     {
         return new Employee
         {
             Id = id,
-            FullName = fullName,
+            DisplayName = displayName,
             EmployeeCode = "EMP001",
             WorkEmail = "test@test.com",
             PrimaryDepartmentId = new DepartmentId(Guid.NewGuid()),

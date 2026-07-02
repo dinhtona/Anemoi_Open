@@ -43,8 +43,8 @@ public sealed class GetEmployeeShiftAssignmentsHandler(
             ("workdate", "asc") => query.OrderBy(x => x.WorkDate),
             ("createdat", "desc") => query.OrderByDescending(x => x.CreatedAt),
             ("createdat", "asc") => query.OrderBy(x => x.CreatedAt),
-            ("employeename", "desc") => query.OrderByDescending(x => x.Employee.FullName),
-            ("employeename", "asc") => query.OrderBy(x => x.Employee.FullName),
+            ("employeename", "desc") => query.OrderByDescending(x => x.Employee.FirstName + " " + x.Employee.LastName),
+            ("employeename", "asc") => query.OrderBy(x => x.Employee.FirstName + " " + x.Employee.LastName),
             _ => query.OrderByDescending(x => x.CreatedAt)
         };
 

@@ -380,7 +380,7 @@ public sealed class HrAnalyticsTests
         {
             Id = new EmployeeId(Guid.Parse(id)),
             EmployeeCode = id[..8],
-            FullName = "Employee " + id[..8],
+            DisplayName = "Employee " + id[..8],
             JoinDate = new DateOnly(2025, 1, 1),
             EmploymentStatusCode = status,
             EmploymentTypeCode = "full_time",

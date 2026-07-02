@@ -46,6 +46,20 @@ public static class Permissions
     public const string HrEmployeeView = "hr.employee.view";
     public const string HrEmployeeCreate = "hr.employee.create";
     public const string HrEmployeeUpdate = "hr.employee.update";
+    public const string HrEmployeeActivate = "hr.employee.activate";
+    public const string HrEmployeeSuspend = "hr.employee.suspend";
+    public const string HrEmployeeResume = "hr.employee.resume";
+    public const string HrEmployeeArchive = "hr.employee.archive";
+    public const string HrEmployeeDepartmentChange = "hr.employee.department.change";
+    public const string HrEmployeePositionChange = "hr.employee.position.change";
+    public const string HrEmployeeGradeChange = "hr.employee.grade.change";
+    public const string HrEmployeeManagerChange = "hr.employee.manager.change";
+    public const string HrEmployeeDocumentView = "hr.employee.document.view";
+    public const string HrEmployeeDocumentManage = "hr.employee.document.manage";
+    public const string HrEmployeeAssetView = "hr.employee.asset.view";
+    public const string HrEmployeeAssetManage = "hr.employee.asset.manage";
+    public const string HrEmployeeNoteView = "hr.employee.note.view";
+    public const string HrEmployeeNoteManage = "hr.employee.note.manage";
     public const string HrEmployeeIdentityLink = "hr.employee.identity_link";
     public const string HrDepartmentView = "hr.department.view";
     public const string HrDepartmentManage = "hr.department.manage";
@@ -205,6 +219,21 @@ public static class Permissions
         new(HrEmployeeCreate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeCreate"),
         new(HrEmployeeUpdate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeUpdate"),
         new(HrEmployeeIdentityLink, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeIdentityLink",
+            true, "High"),
+        new(HrEmployeeActivate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeActivate"),
+        new(HrEmployeeSuspend, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeSuspend"),
+        new(HrEmployeeResume, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeResume"),
+        new(HrEmployeeArchive, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeArchive"),
+        new(HrEmployeeDepartmentChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeDepartmentChange"),
+        new(HrEmployeePositionChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeePositionChange"),
+        new(HrEmployeeGradeChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeGradeChange"),
+        new(HrEmployeeManagerChange, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeManagerChange"),
+        new(HrEmployeeDocumentView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeDocumentView"),
+        new(HrEmployeeDocumentManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeDocumentManage"),
+        new(HrEmployeeAssetView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAssetView"),
+        new(HrEmployeeAssetManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeAssetManage"),
+        new(HrEmployeeNoteView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeNoteView"),
+        new(HrEmployeeNoteManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeNoteManage",
             true, "High"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
         new(HrDepartmentManage, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentManage"),

@@ -38,7 +38,7 @@ public sealed class HrPayrollApprovalWorkflowTests
         {
             Id = id,
             EmployeeCode = "EMP-TEST",
-            FullName = "Test Employee",
+            DisplayName = "Test Employee",
             JoinDate = new DateOnly(2025, 1, 1),
             EmploymentStatusCode = "active",
             EmploymentTypeCode = "full_time",

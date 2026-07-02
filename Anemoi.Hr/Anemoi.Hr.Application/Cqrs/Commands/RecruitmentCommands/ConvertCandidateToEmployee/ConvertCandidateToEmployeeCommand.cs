@@ -9,7 +9,9 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.ConvertCandida
 public sealed record ConvertCandidateToEmployeeCommand(
     CandidateId CandidateId,
     string EmployeeCode,
-    string FullName,
+    string FirstName,
+    string LastName,
+    string? DisplayName,
     string WorkEmail,
     DepartmentId DepartmentId,
     PositionId PositionId,

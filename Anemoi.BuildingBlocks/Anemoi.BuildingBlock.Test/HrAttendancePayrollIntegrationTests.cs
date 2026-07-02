@@ -38,7 +38,7 @@ public sealed class HrAttendancePayrollIntegrationTests
         {
             Id = id,
             EmployeeCode = "EMP-" + id.Value.ToString("N")[..6].ToUpper(),
-            FullName = "John Doe",
+            DisplayName = "John Doe",
             JoinDate = new DateOnly(2025, 1, 1),
             EmploymentStatusCode = "active",
             EmploymentTypeCode = "full_time",

@@ -29,17 +29,17 @@ public sealed class GetEmployeeScheduleCalendarHandler(
             assignmentsQuery = assignmentsQuery.Where(x => x.WorkDate <= request.ToDate.Value);
 
         var assignments = await assignmentsQuery
-            .OrderBy(x => x.Employee.FullName)
+            .OrderBy(x => x.Employee.FirstName + " " + x.Employee.LastName)
             .ThenBy(x => x.WorkDate)
             .ToListAsync(cancellationToken);
 
         var grouped = assignments
-            .GroupBy(x => new { x.EmployeeId, x.Employee?.EmployeeCode, x.Employee?.FullName })
+            .GroupBy(x => new { x.EmployeeId, x.Employee?.EmployeeCode, EmployeeFullName = x.Employee.FirstName + " " + x.Employee.LastName })
             .Select(g => new EmployeeScheduleCalendarResponse
             {
                 EmployeeId = g.Key.EmployeeId.Value,
                 EmployeeCode = g.Key.EmployeeCode,
-                EmployeeName = g.Key.FullName,
+                EmployeeName = g.Key.EmployeeFullName,
                 Days = g.Select(a => new CalendarDayResponse
                 {
                     Date = a.WorkDate,

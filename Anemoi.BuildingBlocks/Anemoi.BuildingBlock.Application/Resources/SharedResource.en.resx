@@ -235,6 +235,20 @@
   <data name="PermissionDescriptionHrEmployeeCreate" xml:space="preserve"><value>Create HR employee profiles.</value></data>
   <data name="PermissionDescriptionHrEmployeeUpdate" xml:space="preserve"><value>Update HR employee profiles.</value></data>
   <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Link HR employees to identity users.</value></data>
+  <data name="PermissionDescriptionHrEmployeeActivate" xml:space="preserve"><value>Activate HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeSuspend" xml:space="preserve"><value>Suspend HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeResume" xml:space="preserve"><value>Resume suspended HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeArchive" xml:space="preserve"><value>Archive HR employee records.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDepartmentChange" xml:space="preserve"><value>Change employee department assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeePositionChange" xml:space="preserve"><value>Change employee position assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeGradeChange" xml:space="preserve"><value>Change employee grade assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeManagerChange" xml:space="preserve"><value>Change employee manager assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentView" xml:space="preserve"><value>View employee documents.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentManage" xml:space="preserve"><value>Manage employee documents.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetView" xml:space="preserve"><value>View employee assets.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetManage" xml:space="preserve"><value>Manage employee assets.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteView" xml:space="preserve"><value>View employee notes.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteManage" xml:space="preserve"><value>Manage employee notes (sensitive).</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>HR Department</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>View HR department information.</value></data>
   <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Manage HR department information.</value></data>

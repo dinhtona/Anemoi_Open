@@ -487,7 +487,7 @@ public sealed class HrCompensationStabilizationTests
         {
             Id = id,
             EmployeeCode = id.Value.ToString("N")[..8],
-            FullName = "Test Employee",
+            DisplayName = "Test Employee",
             JoinDate = new DateOnly(2025, 1, 1),
             EmploymentStatusCode = "active",
             EmploymentTypeCode = "full_time",

@@ -4,6 +4,9 @@ using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.EmployeeAssets;
+using Anemoi.Hr.Domain.EmployeeDocuments;
+using Anemoi.Hr.Domain.EmployeeNotes;
 using Anemoi.Hr.Domain.Ess;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.MasterData;
@@ -48,6 +51,9 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<AllowanceType> AllowanceTypes { get; set; }
     public DbSet<PositionAllowance> PositionAllowances { get; set; }
     public DbSet<EmployeeAllowance> EmployeeAllowances { get; set; }
+    public DbSet<EmployeeAsset> EmployeeAssets { get; set; }
+    public DbSet<EmployeeDocument> EmployeeDocuments { get; set; }
+    public DbSet<EmployeeNote> EmployeeNotes { get; set; }
     public DbSet<SalaryValidationBypassLog> SalaryValidationBypassLogs { get; set; }
     public DbSet<PayrollPeriod> PayrollPeriods { get; set; }
     public DbSet<PayrollRun> PayrollRuns { get; set; }
@@ -109,6 +115,9 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
         modelBuilder.Ignore<ProbationRecordId>();
         modelBuilder.Ignore<EmployeeTransferId>();
         modelBuilder.Ignore<EmployeeSeparationId>();
+        modelBuilder.Ignore<EmployeeAssetId>();
+        modelBuilder.Ignore<EmployeeDocumentId>();
+        modelBuilder.Ignore<EmployeeNoteId>();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IHrInfrastructureAssemblyMarker).Assembly);
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();

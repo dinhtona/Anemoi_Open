@@ -78,6 +78,14 @@ public static class HrDevSeedData
         await SeedDepartmentsAsync(departmentRepository, now, cancellationToken);
         await SeedPositionsAsync(positionRepository, now, cancellationToken);
         await SeedEmployeesAsync(employeeRepository, now, cancellationToken);
+
+        // Update department managers to resolve circular dependency!
+        var engDept = await departmentRepository.GetFirstByConditionAsync(x => x.Id == EngineeringDepartmentId, token: cancellationToken);
+        engDept?.UpdateInfo(engDept.Code, engDept.Name, engDept.DepartmentTypeCode, engDept.ParentDepartmentId, EngineeringManagerEmployeeId);
+
+        var peopleDept = await departmentRepository.GetFirstByConditionAsync(x => x.Id == PeopleDepartmentId, token: cancellationToken);
+        peopleDept?.UpdateInfo(peopleDept.Code, peopleDept.Name, peopleDept.DepartmentTypeCode, peopleDept.ParentDepartmentId, HrManagerEmployeeId);
+
         await SeedLeavePolicyAsync(leavePolicyRepository, now, cancellationToken);
         await SeedLeaveBalancesAsync(leaveBalanceRepository, now.Year, now, cancellationToken);
         await SeedWorkflowDefinitionsAsync(serviceScope, cancellationToken);
@@ -94,10 +102,10 @@ public static class HrDevSeedData
         {
             Department.Create(
                 EngineeringDepartmentId, "ENG", "Engineering",
-                DepartmentTypeCode.Functional, null, EngineeringManagerEmployeeId),
+                DepartmentTypeCode.Functional, null, null),
             Department.Create(
                 PeopleDepartmentId, "PEOPLE", "People Operations",
-                DepartmentTypeCode.Functional, null, HrManagerEmployeeId)
+                DepartmentTypeCode.Functional, null, null)
         };
 
         foreach (var department in departments)
@@ -169,7 +177,8 @@ public static class HrDevSeedData
             {
                 Id = EngineeringManagerEmployeeId,
                 EmployeeCode = "DEV-ENG-001",
-                FullName = "Linh Nguyen",
+                FirstName = "Linh",
+                LastName = "Nguyen",
                 WorkEmail = "linh.nguyen@anemoi.test",
                 PersonalEmail = "linh.nguyen.personal@example.com",
                 PhoneNumber = "+84900000001",
@@ -186,7 +195,8 @@ public static class HrDevSeedData
             {
                 Id = SoftwareEngineerEmployeeId,
                 EmployeeCode = "DEV-ENG-002",
-                FullName = "Minh Tran",
+                FirstName = "Minh",
+                LastName = "Tran",
                 WorkEmail = "minh.tran@anemoi.test",
                 PersonalEmail = "minh.tran.personal@example.com",
                 PhoneNumber = "+84900000002",
@@ -204,7 +214,8 @@ public static class HrDevSeedData
             {
                 Id = SeniorEngineerEmployeeId,
                 EmployeeCode = "DEV-ENG-003",
-                FullName = "An Pham",
+                FirstName = "An",
+                LastName = "Pham",
                 WorkEmail = "an.pham@anemoi.test",
                 PersonalEmail = "an.pham.personal@example.com",
                 PhoneNumber = "+84900000003",
@@ -222,7 +233,8 @@ public static class HrDevSeedData
             {
                 Id = HrManagerEmployeeId,
                 EmployeeCode = "DEV-HR-001",
-                FullName = "Mai Le",
+                FirstName = "Mai",
+                LastName = "Le",
                 WorkEmail = "mai.le@anemoi.test",
                 PersonalEmail = "mai.le.personal@example.com",
                 PhoneNumber = "+84900000004",
@@ -239,7 +251,8 @@ public static class HrDevSeedData
             {
                 Id = HrSpecialistEmployeeId,
                 EmployeeCode = "DEV-HR-002",
-                FullName = "Khoa Do",
+                FirstName = "Khoa",
+                LastName = "Do",
                 WorkEmail = "khoa.do@anemoi.test",
                 PersonalEmail = "khoa.do.personal@example.com",
                 PhoneNumber = "+84900000005",
@@ -257,7 +270,8 @@ public static class HrDevSeedData
             {
                 Id = SystemAdministratorEmployeeId,
                 EmployeeCode = "DEV-ADMIN-001",
-                FullName = "Anemoi Admin",
+                FirstName = "Anemoi",
+                LastName = "Admin",
                 WorkEmail = "admin@anemoi.com",
                 PersonalEmail = "admin.personal@example.com",
                 PhoneNumber = "+84900000006",

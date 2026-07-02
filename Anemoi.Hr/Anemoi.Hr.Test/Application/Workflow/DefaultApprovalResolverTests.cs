@@ -19,7 +19,7 @@ namespace Anemoi.Hr.Test.Application.Workflow;
 public sealed class DefaultApprovalResolverTests
 {
     private static Employee CreateEmployee(EmployeeId id, EmployeeId? directManagerId = null,
-        DepartmentId? primaryDepartmentId = null, Guid? identityUserId = null, string fullName = "Test Employee")
+        DepartmentId? primaryDepartmentId = null, Guid? identityUserId = null, string displayName = "Test Employee")
     {
         return new Employee
         {
@@ -28,7 +28,7 @@ public sealed class DefaultApprovalResolverTests
             PrimaryDepartmentId = primaryDepartmentId ?? new DepartmentId(Guid.NewGuid()),
             PrimaryPositionId = new PositionId(Guid.NewGuid()),
             IdentityUserId = identityUserId,
-            FullName = fullName,
+            DisplayName = displayName,
             EmployeeCode = "EMP001",
             WorkEmail = "test@test.com",
             JoinDate = DateOnly.FromDateTime(DateTime.Today),
@@ -45,7 +45,7 @@ public sealed class DefaultApprovalResolverTests
         var managerUserId = Guid.NewGuid();
 
         var requester = CreateEmployee(requesterId, directManagerId: managerId);
-        var manager = CreateEmployee(managerId, identityUserId: managerUserId, fullName: "Manager One");
+        var manager = CreateEmployee(managerId, identityUserId: managerUserId, displayName: "Manager One");
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
         employeeRepo.GetQueryable().Returns(
@@ -98,7 +98,7 @@ public sealed class DefaultApprovalResolverTests
 
         var requester = CreateEmployee(requesterId, primaryDepartmentId: deptId);
         var department = Department.Create(deptId, "DEPT01", "Test Dept", "Division", null, deptManagerId);
-        var manager = CreateEmployee(deptManagerId, identityUserId: managerUserId, fullName: "Dept Manager");
+        var manager = CreateEmployee(deptManagerId, identityUserId: managerUserId, displayName: "Dept Manager");
 
         var employeeRepo = Substitute.For<ISqlRepository<Employee>>();
         employeeRepo.GetQueryable().Returns(

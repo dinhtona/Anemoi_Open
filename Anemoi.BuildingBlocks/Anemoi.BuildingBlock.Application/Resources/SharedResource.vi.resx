@@ -235,6 +235,20 @@
   <data name="PermissionDescriptionHrEmployeeCreate" xml:space="preserve"><value>Tạo hồ sơ nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeUpdate" xml:space="preserve"><value>Cập nhật hồ sơ nhân viên.</value></data>
   <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Liên kết nhân viên với người dùng định danh.</value></data>
+  <data name="PermissionDescriptionHrEmployeeActivate" xml:space="preserve"><value>Kích hoạt tài khoản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeSuspend" xml:space="preserve"><value>Tạm ngưng tài khoản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeResume" xml:space="preserve"><value>Khôi phục tài khoản nhân viên đã tạm ngưng.</value></data>
+  <data name="PermissionDescriptionHrEmployeeArchive" xml:space="preserve"><value>Lưu trữ hồ sơ nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDepartmentChange" xml:space="preserve"><value>Thay đổi phòng ban của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeePositionChange" xml:space="preserve"><value>Thay đổi chức vụ của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeGradeChange" xml:space="preserve"><value>Thay đổi bậc lương của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeManagerChange" xml:space="preserve"><value>Thay đổi quản lý trực tiếp của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentView" xml:space="preserve"><value>Xem tài liệu nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentManage" xml:space="preserve"><value>Quản lý tài liệu nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetView" xml:space="preserve"><value>Xem tài sản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetManage" xml:space="preserve"><value>Quản lý tài sản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteView" xml:space="preserve"><value>Xem ghi chú nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteManage" xml:space="preserve"><value>Quản lý ghi chú nhân viên (nhạy cảm).</value></data>
   <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
   <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
   <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Quản lý thông tin phòng ban.</value></data>

@@ -24,6 +24,20 @@ public static class HrPermissions
     public const string EmployeeView = BB.HrEmployeeView;
     public const string EmployeeCreate = BB.HrEmployeeCreate;
     public const string EmployeeUpdate = BB.HrEmployeeUpdate;
+    public const string EmployeeActivate = BB.HrEmployeeActivate;
+    public const string EmployeeSuspend = BB.HrEmployeeSuspend;
+    public const string EmployeeResume = BB.HrEmployeeResume;
+    public const string EmployeeArchive = BB.HrEmployeeArchive;
+    public const string EmployeeDepartmentChange = BB.HrEmployeeDepartmentChange;
+    public const string EmployeePositionChange = BB.HrEmployeePositionChange;
+    public const string EmployeeGradeChange = BB.HrEmployeeGradeChange;
+    public const string EmployeeManagerChange = BB.HrEmployeeManagerChange;
+    public const string EmployeeDocumentView = BB.HrEmployeeDocumentView;
+    public const string EmployeeDocumentManage = BB.HrEmployeeDocumentManage;
+    public const string EmployeeAssetView = BB.HrEmployeeAssetView;
+    public const string EmployeeAssetManage = BB.HrEmployeeAssetManage;
+    public const string EmployeeNoteView = BB.HrEmployeeNoteView;
+    public const string EmployeeNoteManage = BB.HrEmployeeNoteManage;
     public const string EmployeeIdentityLink =
         BB.HrEmployeeIdentityLink;
     public const string DepartmentView = BB.HrDepartmentView;
@@ -154,6 +168,20 @@ public static class HrPermissions
         EmployeeView,
         EmployeeCreate,
         EmployeeUpdate,
+        EmployeeActivate,
+        EmployeeSuspend,
+        EmployeeResume,
+        EmployeeArchive,
+        EmployeeDepartmentChange,
+        EmployeePositionChange,
+        EmployeeGradeChange,
+        EmployeeManagerChange,
+        EmployeeDocumentView,
+        EmployeeDocumentManage,
+        EmployeeAssetView,
+        EmployeeAssetManage,
+        EmployeeNoteView,
+        EmployeeNoteManage,
         EmployeeIdentityLink,
         DepartmentView,
         DepartmentManage,
@@ -261,6 +289,11 @@ public static class HrPermissions
             [LeaveBalanceAdjust] = new(LeaveBalanceAdjust, "High"),
             [LeaveRequestForceApprove] = new(LeaveRequestForceApprove, "High"),
             [LeaveRequestForceCancel] = new(LeaveRequestForceCancel, "High"),
+            [EmployeeSuspend] = new(EmployeeSuspend, "High"),
+            [EmployeeNoteManage] = new(EmployeeNoteManage, "High"),
+            [EmployeeDepartmentChange] = new(EmployeeDepartmentChange, "High"),
+            [EmployeePositionChange] = new(EmployeePositionChange, "High"),
+            [EmployeeGradeChange] = new(EmployeeGradeChange, "High"),
             [EmployeeIdentityLink] = new(EmployeeIdentityLink, "High"),
             [EmployeeTransferCreate] = new(EmployeeTransferCreate, "High"),
             [PromotionCreate] = new(PromotionCreate, "High"),
