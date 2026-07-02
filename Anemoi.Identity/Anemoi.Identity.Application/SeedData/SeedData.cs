@@ -7,7 +7,9 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Contract.Identity.Commands.UserCommands.CreateUser;
+using Anemoi.Contract.Identity.Events;
 using Anemoi.Contract.Identity.ModelIds;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Anemoi.Identity.Application.Abstractions;
@@ -344,7 +346,43 @@ public static class SeedData
         }
 
         if (hasMappingChanges)
-            await unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
+    }
+
+    private static readonly Dictionary<string, (Guid EmployeeId, string EmployeeCode)> DevTestEmployeeIdsByEmail = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["linh.nguyen@anemoi.test"] = (Guid.Parse("30000000-0000-0000-0000-000000000001"), "DEV-ENG-001"),
+        ["minh.tran@anemoi.test"]   = (Guid.Parse("30000000-0000-0000-0000-000000000002"), "DEV-ENG-002"),
+        ["an.pham@anemoi.test"]     = (Guid.Parse("30000000-0000-0000-0000-000000000003"), "DEV-ENG-003"),
+        ["mai.le@anemoi.test"]      = (Guid.Parse("30000000-0000-0000-0000-000000000004"), "DEV-HR-001"),
+        ["khoa.do@anemoi.test"]     = (Guid.Parse("30000000-0000-0000-0000-000000000005"), "DEV-HR-002"),
+        ["admin@anemoi.com"]        = (Guid.Parse("30000000-0000-0000-0000-000000000006"), "DEV-ADMIN-001"),
+    };
+
+    private static async Task ProvisionDevTestUsersToEmployeesAsync(IServiceScope serviceScope)
+    {
+        var userDbRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<User>>();
+        var publishEndpoint = serviceScope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+
+        var users = await userDbRepository.GetQueryable()
+            .Where(x => x.IsActivated && x.Email != null)
+            .ToListAsync();
+
+        foreach (var user in users)
+        {
+            var email = user.Email?.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(email)) continue;
+            if (!DevTestEmployeeIdsByEmail.TryGetValue(email, out var mapping)) continue;
+
+            await publishEndpoint.Publish(
+                new UserProvisionedForEmployeeIntegrationEvent(
+                    mapping.EmployeeId, user.UserId.Value, user.Email!, mapping.EmployeeCode));
+
+            logger.Information(
+                "[SeedData] Provisioned employee {EmployeeId} ({EmployeeCode}) for user {Email} ({UserId})",
+                mapping.EmployeeId, mapping.EmployeeCode, email, user.UserId);
+        }
     }
 
     private static async Task<bool> EnsureSystemRoleGroupAssignmentAsync(
@@ -412,6 +450,9 @@ public static class SeedData
 
         // Assign roles to dev test users for journey testing
         await AssignDevTestUserRolesAsync(serviceScope);
+
+        // Provision: link Identity users to HR employees by email
+        await ProvisionDevTestUsersToEmployeesAsync(serviceScope);
     }
 
     private static async Task AssignDevTestUserRolesAsync(IServiceScope serviceScope)

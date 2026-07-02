@@ -39,7 +39,7 @@ public sealed class GetPendingApprovalsHandler(
         {
             var result = await roleResolver.ResolveAsync(role, cancellationToken);
             if (result.TryPickT0(out var approvers, out _) &&
-                approvers.Any(a => a.UserId.Value.ToString() == request.UserId))
+                approvers.Any(a => string.Equals(a.UserId.Value.ToString(), request.UserId, StringComparison.OrdinalIgnoreCase)))
             {
                 userRoleValues.Add(role);
             }
@@ -52,8 +52,8 @@ public sealed class GetPendingApprovalsHandler(
 
             return step.ApproverTypeSnapshot switch
             {
-                ApproverType.SpecificUser => step.ApproverValueSnapshot == request.UserId,
-                ApproverType.DirectManager => step.ApproverUserId == request.UserId,
+                ApproverType.SpecificUser => string.Equals(step.ApproverValueSnapshot, request.UserId, StringComparison.OrdinalIgnoreCase),
+                ApproverType.DirectManager => string.Equals(step.ApproverUserId, request.UserId, StringComparison.OrdinalIgnoreCase),
                 ApproverType.Role => userRoleValues.Contains(step.ApproverValueSnapshot),
                 ApproverType.Permission => true,
                 _ => false

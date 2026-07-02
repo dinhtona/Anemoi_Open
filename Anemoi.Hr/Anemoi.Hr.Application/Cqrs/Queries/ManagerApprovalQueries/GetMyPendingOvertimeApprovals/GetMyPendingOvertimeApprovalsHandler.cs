@@ -126,6 +126,8 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
         if (string.IsNullOrEmpty(userId))
             return [];
 
+        var normalizedUserId = userId.Trim();
+
         var roleValues = instances
             .Select(i => i.Steps.FirstOrDefault(s => s.Sequence == i.CurrentStep))
             .Where(s => s?.ApproverTypeSnapshot == ApproverType.Role && s.ApproverValueSnapshot is not null)
@@ -138,7 +140,7 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
         {
             var result = await roleResolver.ResolveAsync(role, ct);
             if (result.TryPickT0(out var approvers, out _) &&
-                approvers.Any(a => a.UserId.Value.ToString() == userId))
+                approvers.Any(a => string.Equals(a.UserId.Value.ToString(), normalizedUserId, StringComparison.OrdinalIgnoreCase)))
             {
                 userRoleValues.Add(role);
             }
@@ -151,10 +153,10 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
 
             return step.ApproverTypeSnapshot switch
             {
-                ApproverType.SpecificUser => step.ApproverValueSnapshot == userId,
-                ApproverType.DirectManager => step.ApproverUserId == userId,
-                ApproverType.DepartmentManager => step.ApproverUserId == userId,
-                ApproverType.HrManager => step.ApproverUserId == userId,
+                ApproverType.SpecificUser => string.Equals(step.ApproverValueSnapshot, normalizedUserId, StringComparison.OrdinalIgnoreCase),
+                ApproverType.DirectManager => string.Equals(step.ApproverUserId, normalizedUserId, StringComparison.OrdinalIgnoreCase),
+                ApproverType.DepartmentManager => string.Equals(step.ApproverUserId, normalizedUserId, StringComparison.OrdinalIgnoreCase),
+                ApproverType.HrManager => string.Equals(step.ApproverUserId, normalizedUserId, StringComparison.OrdinalIgnoreCase),
                 ApproverType.Role => userRoleValues.Contains(step.ApproverValueSnapshot),
                 ApproverType.Permission => true,
                 _ => false

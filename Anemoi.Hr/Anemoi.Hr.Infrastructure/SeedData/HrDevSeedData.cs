@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Application.Configurations;
@@ -10,7 +13,10 @@ using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.Domain.Workflow;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using Serilog;
 
 namespace Anemoi.Hr.Infrastructure.SeedData;
 
@@ -91,6 +97,84 @@ public static class HrDevSeedData
         await SeedWorkflowDefinitionsAsync(serviceScope, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await LinkEmployeeIdentitiesAsync(serviceScope, cancellationToken);
+    }
+
+    private static async Task LinkEmployeeIdentitiesAsync(
+        IServiceScope serviceScope,
+        CancellationToken cancellationToken)
+    {
+        var employeeRepository = serviceScope.ServiceProvider.GetRequiredService<ISqlRepository<Employee>>();
+        var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
+
+        var employees = await employeeRepository.GetQueryable()
+            .Where(e => e.IdentityUserId == null && e.WorkEmail != null)
+            .ToListAsync(cancellationToken);
+
+        if (employees.Count == 0)
+        {
+            logger.Information("[SeedData] All employees already linked to Identity users");
+            return;
+        }
+
+        // Derive identity connection string from HR PostgresDbSetting by swapping database name
+        var hrConnString = config["PostgresDbSetting:ConnectionString"];
+        if (string.IsNullOrWhiteSpace(hrConnString))
+        {
+            logger.Warning("[SeedData] PostgresDbSetting:ConnectionString not configured, skipping identity linking");
+            return;
+        }
+
+        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Identity", Pooling = false };
+        var identityConnString = builder.ConnectionString;
+
+        var emails = employees.Select(e => e.WorkEmail!.Trim().ToLowerInvariant()).ToList();
+        var emailToUserId = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+
+        await using var conn = new NpgsqlConnection(identityConnString);
+        await conn.OpenAsync(cancellationToken);
+
+        await using var cmd = new NpgsqlCommand(
+            "SELECT \"Id\", \"Email\" FROM \"AspNetUsers\" WHERE \"Email\" = ANY(@emails)",
+            conn);
+        cmd.Parameters.AddWithValue("emails", emails);
+
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            var id = reader.GetGuid(0);
+            var email = reader.GetString(1);
+            emailToUserId[email] = id;
+        }
+
+        var linked = 0;
+        foreach (var employee in employees)
+        {
+            var email = employee.WorkEmail!.Trim().ToLowerInvariant();
+            if (emailToUserId.TryGetValue(email, out var userId))
+            {
+                employee.IdentityUserId = userId;
+                linked++;
+                logger.Information(
+                    "[SeedData] Linked employee {EmployeeCode} ({Email}) to Identity user {UserId}",
+                    employee.EmployeeCode, email, userId);
+            }
+            else
+            {
+                logger.Warning(
+                    "[SeedData] No Identity user found for employee {EmployeeCode} ({Email})",
+                    employee.EmployeeCode, email);
+            }
+        }
+
+        if (linked > 0)
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            logger.Information("[SeedData] Linked {Count} employees to Identity users", linked);
+        }
     }
 
     private static async Task SeedDepartmentsAsync(
@@ -187,7 +271,7 @@ public static class HrDevSeedData
                 EmploymentTypeCode = "full_time",
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = EngineeringManagerPositionId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-74be-08ded0d6c9db"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -206,7 +290,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = SoftwareEngineerPositionId,
                 DirectManagerEmployeeId = EngineeringManagerEmployeeId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-9384-08ded0d6c9e1"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -225,7 +309,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = EngineeringDepartmentId,
                 PrimaryPositionId = SoftwareEngineerPositionId,
                 DirectManagerEmployeeId = EngineeringManagerEmployeeId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-32da-08ded0d6c9e7"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -243,7 +327,7 @@ public static class HrDevSeedData
                 EmploymentTypeCode = "full_time",
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = HrManagerPositionId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-e9a2-08ded0d6c9ec"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -262,7 +346,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = HrSpecialistPositionId,
                 DirectManagerEmployeeId = HrManagerEmployeeId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-c22b-08ded0d6c9f2"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             },
@@ -281,7 +365,7 @@ public static class HrDevSeedData
                 PrimaryDepartmentId = PeopleDepartmentId,
                 PrimaryPositionId = SystemAdministratorPositionId,
                 DirectManagerEmployeeId = HrManagerEmployeeId,
-                IdentityUserId = Guid.Parse("01000000-0000-0000-ddad-08ded0d6c9b8"),
+                IdentityUserId = null,
                 CreatedAt = now,
                 UpdatedAt = now
             }
