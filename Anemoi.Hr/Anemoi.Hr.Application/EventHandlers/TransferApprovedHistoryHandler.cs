@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Domain.Employees;
@@ -23,7 +24,10 @@ public sealed class TransferApprovedHistoryHandler(
             EventType = "TransferApproved",
             Title = "Transfer Approved",
             Description = "Transfer Approved",
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                transferId = notification.TransferId
+            }),
             OccurredAt = DateTime.UtcNow,
             CorrelationId = notification.CorrelationId ?? string.Empty
         };

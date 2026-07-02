@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -65,7 +66,16 @@ public sealed class AssignEmployeeAssetHandler(
             EventType = "Assigned",
             Title = "Employee asset assigned",
             Description = request.Name,
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                assetType = request.AssetType,
+                assetTag = request.AssetTag,
+                name = request.Name,
+                brand = request.Brand,
+                model = request.Model,
+                serialNumber = request.SerialNumber,
+                notes = request.Notes
+            }),
             CorrelationId = "",
             OccurredAt = now,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,

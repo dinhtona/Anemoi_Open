@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -44,6 +45,14 @@ public sealed class UpdateEmployeeAssetHandler(
             EventType = "Updated",
             Title = "Employee asset updated",
             Description = request.Name,
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                name = request.Name,
+                brand = request.Brand,
+                model = request.Model,
+                serialNumber = request.SerialNumber,
+                notes = request.Notes
+            }),
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.UpdatedBy, out var actorGuid) ? actorGuid : null,
         };

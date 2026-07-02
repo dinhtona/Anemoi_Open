@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Domain.Employees;
@@ -29,7 +30,11 @@ public sealed class SeparationApprovedHistoryHandler(
             EventType = "SeparationApproved",
             Title = "Separation Approved",
             Description = $"Separation: {typeCode}",
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                separationId = notification.SeparationId,
+                separationTypeCode = typeCode
+            }),
             OccurredAt = DateTime.UtcNow,
             CorrelationId = notification.CorrelationId ?? string.Empty
         };

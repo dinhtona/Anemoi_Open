@@ -364,4 +364,32 @@
   <data name="PermissionGroupHrOrganization" xml:space="preserve"><value>Tổ chức</value></data>
   <data name="PermissionDescriptionHrOrganizationView" xml:space="preserve"><value>Xem cấu trúc tổ chức.</value></data>
   <data name="PermissionDescriptionHrOrganizationManage" xml:space="preserve"><value>Quản lý cấu trúc tổ chức.</value></data>
+  <data name="Timeline.EmployeeCreated.Title" xml:space="preserve"><value>Đã tạo nhân viên</value></data>
+  <data name="Timeline.EmployeeCreated.Description" xml:space="preserve"><value>Đã tạo nhân viên {0} ({1}).</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Title" xml:space="preserve"><value>Trạng thái đã thay đổi</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Description" xml:space="preserve"><value>Trạng thái đã thay đổi từ {2} sang {3}.</value></data>
+  <data name="Timeline.ProbationStatusChanged.Title" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi</value></data>
+  <data name="Timeline.ProbationStatusChanged.Description" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi.</value></data>
+  <data name="Timeline.TransferApproved.Title" xml:space="preserve"><value>Đã phê duyệt điều chuyển</value></data>
+  <data name="Timeline.TransferApproved.Description" xml:space="preserve"><value>Đã phê duyệt điều chuyển.</value></data>
+  <data name="Timeline.SeparationApproved.Title" xml:space="preserve"><value>Đã phê duyệt nghỉ việc</value></data>
+  <data name="Timeline.SeparationApproved.Description" xml:space="preserve"><value>Loại nghỉ việc: {4}.</value></data>
+  <data name="Timeline.Assigned.Title" xml:space="preserve"><value>Đã gán tài sản</value></data>
+  <data name="Timeline.Assigned.Description" xml:space="preserve"><value>Đã gán tài sản {7}.</value></data>
+  <data name="Timeline.Updated.Title" xml:space="preserve"><value>Đã cập nhật tài sản</value></data>
+  <data name="Timeline.Updated.Description" xml:space="preserve"><value>Đã cập nhật tài sản {7}.</value></data>
+  <data name="Timeline.Returned.Title" xml:space="preserve"><value>Đã hoàn trả tài sản</value></data>
+  <data name="Timeline.Returned.Description" xml:space="preserve"><value>Đã hoàn trả tài sản {7}.</value></data>
+  <data name="Timeline.MarkedLost.Title" xml:space="preserve"><value>Đã đánh dấu tài sản thất lạc</value></data>
+  <data name="Timeline.MarkedLost.Description" xml:space="preserve"><value>Đã đánh dấu tài sản {7} là thất lạc.</value></data>
+  <data name="Timeline.MarkedDamaged.Title" xml:space="preserve"><value>Đã đánh dấu tài sản hỏng</value></data>
+  <data name="Timeline.MarkedDamaged.Description" xml:space="preserve"><value>Đã đánh dấu tài sản {7} là hỏng.</value></data>
+  <data name="Timeline.Archived.Title" xml:space="preserve"><value>Đã lưu trữ</value></data>
+  <data name="Timeline.Archived.Description" xml:space="preserve"><value>Đã lưu trữ {7}.</value></data>
+  <data name="Timeline.NoteCreated.Title" xml:space="preserve"><value>Đã tạo ghi chú</value></data>
+  <data name="Timeline.NoteCreated.Description" xml:space="preserve"><value>Đã tạo một ghi chú.</value></data>
+  <data name="Timeline.NoteArchived.Title" xml:space="preserve"><value>Đã lưu trữ ghi chú</value></data>
+  <data name="Timeline.NoteArchived.Description" xml:space="preserve"><value>Đã lưu trữ một ghi chú.</value></data>
+  <data name="Timeline.Created.Title" xml:space="preserve"><value>Đã tạo tài liệu</value></data>
+  <data name="Timeline.Created.Description" xml:space="preserve"><value>Đã tạo tài liệu {9}.</value></data>
 </root>

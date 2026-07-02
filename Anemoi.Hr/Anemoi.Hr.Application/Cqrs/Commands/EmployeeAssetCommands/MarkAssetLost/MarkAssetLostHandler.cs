@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -36,6 +37,7 @@ public sealed class MarkAssetLostHandler(
             EventType = "MarkedLost",
             Title = "Employee asset marked as lost",
             Description = asset.Name,
+            MetadataJson = JsonSerializer.Serialize(new { name = asset.Name }),
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.UpdatedBy, out var actorGuid) ? actorGuid : null,
         };

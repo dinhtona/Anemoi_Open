@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -65,7 +66,20 @@ public sealed class CreateEmployeeDocumentHandler(
             EventType = "Created",
             Title = "Employee document created",
             Description = request.DisplayName,
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                documentType = request.DocumentType,
+                displayName = request.DisplayName,
+                referenceNumber = request.ReferenceNumber,
+                issuedBy = request.IssuedBy,
+                issuedDate = request.IssuedDate,
+                expiryDate = request.ExpiryDate,
+                storageKey = request.StorageKey,
+                fileName = request.FileName,
+                mimeType = request.MimeType,
+                fileSize = request.FileSize,
+                notes = request.Notes
+            }),
             CorrelationId = "",
             OccurredAt = now,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,

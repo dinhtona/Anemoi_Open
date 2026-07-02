@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -61,7 +62,11 @@ public sealed class CreateEmployeeNoteHandler(
             EventType = "NoteCreated",
             Title = "Employee note created",
             Description = request.Content.Length > 200 ? request.Content[..200] : request.Content,
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                content = request.Content,
+                noteCategory = noteCategory.Value
+            }),
             CorrelationId = "",
             OccurredAt = now,
             ActorUserId = Guid.TryParse(request.CreatedByUserId, out var actorGuid) ? actorGuid : null,

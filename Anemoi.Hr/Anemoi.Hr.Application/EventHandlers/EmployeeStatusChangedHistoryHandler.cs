@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Contract.Hr.Events;
@@ -26,7 +27,11 @@ public sealed class EmployeeStatusChangedHistoryHandler(
             EventType = "EmployeeStatusChanged",
             Title = "Status Changed",
             Description = $"Status: {notification.FromStatus} → {notification.ToStatus}",
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                fromStatus = notification.FromStatus,
+                toStatus = notification.ToStatus
+            }),
             OccurredAt = DateTime.UtcNow,
             CorrelationId = notification.CorrelationId ?? string.Empty
         };

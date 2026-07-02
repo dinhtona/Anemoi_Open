@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Domain.Employees;
@@ -23,7 +24,11 @@ public sealed class EmployeeCreatedHistoryHandler(
             EventType = "EmployeeCreated",
             Title = "Employee Created",
             Description = $"Employee {notification.FullName} ({notification.EmployeeCode}) created",
-            MetadataJson = "{}",
+            MetadataJson = JsonSerializer.Serialize(new
+            {
+                fullName = notification.FullName,
+                employeeCode = notification.EmployeeCode
+            }),
             OccurredAt = DateTime.UtcNow,
             CorrelationId = notification.CorrelationId ?? string.Empty
         };
