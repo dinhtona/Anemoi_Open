@@ -1,4 +1,6 @@
+using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Positions;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -38,13 +40,25 @@ public sealed class EmployeeModelMapping : IEntityTypeConfiguration<Employee>
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.UpdatedAt).IsRequired();
 
+        builder.HasIndex(x => x.IdentityUserId).IsUnique().HasDatabaseName("ix_employees_identity_user_id");
         builder.HasIndex(x => x.EmployeeCode).IsUnique().HasDatabaseName("ix_employees_employee_code");
+        builder.HasIndex(x => x.WorkEmail).IsUnique().HasDatabaseName("ix_employees_work_email");
 
         builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
 
-        // No explicit relationship (HasForeignKey/WithMany) configuration here.
-        // Navigation properties (PrimaryDepartment, PrimaryPosition, DirectManager,
-        // DirectReports) are resolved by EF conventions. This avoids circular dependency
-        // issues during seed data batch saves where Department ↔ Employee reference each other.
+        builder.HasOne(x => x.PrimaryDepartment)
+            .WithMany(x => x.PrimaryEmployees)
+            .HasForeignKey(x => x.PrimaryDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.PrimaryPosition)
+            .WithMany(x => x.PrimaryEmployees)
+            .HasForeignKey(x => x.PrimaryPositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.DirectManager)
+            .WithMany(x => x.DirectReports)
+            .HasForeignKey(x => x.DirectManagerEmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

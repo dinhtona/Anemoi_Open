@@ -11,11 +11,11 @@ public sealed class EmployeeHistory : Entity<EmployeeHistoryId>
     public string EventType { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
-    public string MetadataJson { get; set; }
+    public string MetadataJson { get; set; } = "{}";
     public DateTime OccurredAt { get; set; }
     public Guid? ActorUserId { get; set; }
     public EmployeeId? ActorEmployeeId { get; set; }
-    public string CorrelationId { get; set; }
+    public string CorrelationId { get; set; } = string.Empty;
 
     public Employee Employee { get; set; }
 }

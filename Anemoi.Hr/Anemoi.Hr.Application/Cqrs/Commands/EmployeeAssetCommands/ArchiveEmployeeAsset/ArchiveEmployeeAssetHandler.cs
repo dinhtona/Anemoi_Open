@@ -37,7 +37,7 @@ public sealed class ArchiveEmployeeAssetHandler(
             Title = "Employee asset archived",
             Description = asset.Name,
             OccurredAt = DateTime.UtcNow,
-            ActorUserId = Guid.TryParse(request.ArchivedBy, out var actorGuid) ? actorGuid : null,
+            ActorUserId = Guid.TryParse(request.ArchivedBy, out var actorGuid) ? actorGuid : null
         };
         await employeeHistoryRepository.CreateOneAsync(history, ct);
 

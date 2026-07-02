@@ -5,7 +5,6 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Commands.EmployeeDocumentCommands.UpdateDocument;
 
 public sealed record UpdateEmployeeDocumentCommand(
-    EmployeeDocumentId Id,
     string DocumentType,
     string DisplayName,
     string? ReferenceNumber,
@@ -17,5 +16,6 @@ public sealed record UpdateEmployeeDocumentCommand(
     string? MimeType,
     long? FileSize,
     string? Notes,
+    [property: JsonIgnore] EmployeeDocumentId Id = null,
     [property: JsonIgnore] string UpdatedBy = null
 ) : ICommandVoid;

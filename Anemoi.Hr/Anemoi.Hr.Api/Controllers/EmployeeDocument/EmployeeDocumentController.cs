@@ -56,9 +56,7 @@ public sealed class EmployeeDocumentController(ISender mediator) : ControllerBas
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateDocument(Guid employeeId, Guid id, [FromBody] UpdateEmployeeDocumentCommand command, CancellationToken cancellationToken)
     {
-        if (id != command.Id.Value)
-            return BadRequest("Id mismatch");
-        var result = await mediator.Send(command with { UpdatedBy = HttpContext.GetUserId() }, cancellationToken);
+        var result = await mediator.Send(command with { Id = new EmployeeDocumentId(id), UpdatedBy = HttpContext.GetUserId() }, cancellationToken);
         return result.Match<IActionResult>(_ => NoContent(), BadRequest);
     }
 

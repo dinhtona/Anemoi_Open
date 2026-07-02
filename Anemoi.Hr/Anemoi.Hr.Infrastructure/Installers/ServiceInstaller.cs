@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.ApproveLeaveRequest;
 using Anemoi.Hr.Application.Cqrs.Commands.LeaveRequestCommands.CancelLeaveRequest;
 using Anemoi.Hr.Application.Mappings;
-using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Services;

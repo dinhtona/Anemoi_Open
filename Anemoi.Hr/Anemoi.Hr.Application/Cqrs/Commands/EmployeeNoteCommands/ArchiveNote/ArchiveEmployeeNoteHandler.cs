@@ -36,6 +36,8 @@ public sealed class ArchiveEmployeeNoteHandler(
             EventType = "NoteArchived",
             Title = "Employee note archived",
             Description = note.Content.Length > 200 ? note.Content[..200] : note.Content,
+            MetadataJson = "{}",
+            CorrelationId = "",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.ArchivedByUserId, out var actorGuid) ? actorGuid : null,
         };
