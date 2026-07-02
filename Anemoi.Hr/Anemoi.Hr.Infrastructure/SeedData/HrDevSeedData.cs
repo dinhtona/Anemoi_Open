@@ -95,6 +95,7 @@ public static class HrDevSeedData
         await SeedLeavePolicyAsync(leavePolicyRepository, now, cancellationToken);
         await SeedLeaveBalancesAsync(leaveBalanceRepository, now.Year, now, cancellationToken);
         await SeedWorkflowDefinitionsAsync(serviceScope, cancellationToken);
+        await SeedWorkflowRoleAssignmentsAsync(serviceScope, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -490,6 +491,35 @@ public static class HrDevSeedData
             1, steps);
         def.Activate();
         await repository.CreateOneAsync(def, cancellationToken);
+    }
+
+    private static async Task SeedWorkflowRoleAssignmentsAsync(
+        IServiceScope serviceScope,
+        CancellationToken cancellationToken)
+    {
+        var repository = serviceScope.ServiceProvider
+            .GetRequiredService<ISqlRepository<WorkflowRoleAssignment>>();
+        var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        var assignments = new[]
+        {
+            (Role: WorkflowRole.HrManager, EmployeeId: HrManagerEmployeeId)
+        };
+
+        foreach (var (role, employeeId) in assignments)
+        {
+            if (await repository.ExistByConditionAsync(
+                    x => x.Role == role && x.EmployeeId == employeeId, cancellationToken))
+                continue;
+
+            await repository.CreateOneAsync(
+                WorkflowRoleAssignment.Create(
+                    new WorkflowRoleAssignmentId(IdGenerator.NextGuid()),
+                    role, employeeId),
+                cancellationToken);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task SeedLeaveBalancesAsync(
