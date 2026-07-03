@@ -10,11 +10,11 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 19 Approval
+Version: After Phase 34 Iteration 7
 
 Status: Active
 
-Last Updated: 2026-06-15
+Last Updated: 2026-07-03
 
 ---
 
@@ -715,6 +715,52 @@ Resolved:
 
 ---
 
+## TD-P34-PROBATION-01 — Direct Pass/Fail Handlers Return 200 Despite Save Failure
+
+### Priority
+
+P2
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 7
+
+### Context
+
+`PassProbationHandler` and `FailProbationHandler` set `ReviewerEmployeeId = new EmployeeId(Guid.Empty)` (`00000000-0000-0000-0000-000000000000`), which violates `FK_ProbationRecords_Employees_ReviewerEmployeeId` in the database. `SaveChangesAsync` throws `DbUpdateException`, but because the handler constructs the DTO from in-memory entity state AFTER `Pass()`/`Fail()` mutates it, the HTTP response returns 200 with `statusCode: "Passed"` while the database row remains unchanged.
+
+Additionally, FluentValidation runs on `[FromBody] PassProbationCommand` before the controller merges `command with { Id = id }`, requiring `id` to be sent redundantly in the request body.
+
+### Impact
+
+- Direct Pass/Fail buttons return 200 success but the probation record is never updated in the database.
+- Frontend has no indication of failure — the error is silently swallowed.
+- These endpoints bypass the workflow path, which is the intended and verified route per ADR-029.
+
+### Recommended Fix
+
+Choose one:
+
+1. **Remove/deprecate the direct Pass/Fail endpoints** — Workflow is the preferred and verified path per ADR-029. The frontend has already replaced the Pass/Fail buttons with a "Use Workflow" hint.
+2. **Fix the handlers to persist correctly** — Change `new EmployeeId(Guid.Empty)` to an appropriate null/default for the nullable `ReviewerEmployeeId` FK, or use the authenticated user's employee ID.
+
+### Affected Files
+
+- `Anemoi.Hr.Application/Cqrs/Commands/ProbationCommands/PassProbation/PassProbationHandler.cs:26`
+- `Anemoi.Hr.Application/Cqrs/Commands/ProbationCommands/FailProbation/FailProbationHandler.cs:26`
+- `Anemoi.Hr.Application/Cqrs/Commands/ProbationCommands/PassProbation/PassProbationCommand.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/ProbationCommands/FailProbation/FailProbationCommand.cs`
+
+### Suggested Target
+
+Probation cleanup sprint or when direct Pass/Fail is needed
+
+---
+
 # Recommended Cleanup Roadmap
 
 ## Immediate Priority (P1)
@@ -726,6 +772,7 @@ Resolved:
 
 3. TD-003 Frontend testing infrastructure
 4. TD-007 End-to-End automation
+5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
 
 ## Medium-Term Priority (P3)
 
