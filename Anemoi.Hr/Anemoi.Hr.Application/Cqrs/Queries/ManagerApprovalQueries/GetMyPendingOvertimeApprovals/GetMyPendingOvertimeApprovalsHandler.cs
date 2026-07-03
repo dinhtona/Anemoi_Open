@@ -18,7 +18,8 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
     ISqlRepository<WorkflowInstance> instanceRepository,
     ISqlRepository<OvertimeRequest> overtimeRequestRepository,
     ISqlRepository<Employee> employeeRepository,
-    IWorkflowRoleResolver roleResolver)
+    IWorkflowRoleResolver roleResolver,
+    IPermissionResolver permissionResolver)
     : IQueryHandler<GetMyPendingOvertimeApprovalsQuery,
         OneOf<IReadOnlyCollection<ManagerOvertimePendingApprovalResponse>, ErrorDetailResponse>>
 {
@@ -32,7 +33,7 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
             .OrderByDescending(x => x.StartedAt)
             .ToListAsync(cancellationToken);
 
-        var matchedIds = await FilterInstancesForUserAsync(pendingInstances, request.UserId, cancellationToken);
+        var matchedIds = await FilterInstancesForUserAsync(pendingInstances, request, cancellationToken);
         if (matchedIds.Count == 0)
             return Array.Empty<ManagerOvertimePendingApprovalResponse>();
 
@@ -121,12 +122,12 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
     }
 
     private async Task<List<WorkflowInstance>> FilterInstancesForUserAsync(
-        List<WorkflowInstance> instances, string? userId, CancellationToken ct)
+        List<WorkflowInstance> instances, GetMyPendingOvertimeApprovalsQuery request, CancellationToken ct)
     {
-        if (string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(request.UserId))
             return [];
 
-        var normalizedUserId = userId.Trim();
+        var normalizedUserId = request.UserId.Trim();
 
         var roleValues = instances
             .Select(i => i.Steps.FirstOrDefault(s => s.Sequence == i.CurrentStep))
@@ -146,6 +147,20 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
             }
         }
 
+        var permissionValues = instances
+            .Select(i => i.Steps.FirstOrDefault(s => s.Sequence == i.CurrentStep))
+            .Where(s => s?.ApproverTypeSnapshot == ApproverType.Permission && s.ApproverValueSnapshot is not null)
+            .Select(s => s!.ApproverValueSnapshot)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var userPermissionValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var permission in permissionValues)
+        {
+            if (await permissionResolver.HasPermissionAsync(request.RoleGroups, permission, ct))
+                userPermissionValues.Add(permission);
+        }
+
         return instances.Where(instance =>
         {
             var step = instance.Steps.FirstOrDefault(s => s.Sequence == instance.CurrentStep);
@@ -158,7 +173,7 @@ public sealed class GetMyPendingOvertimeApprovalsHandler(
                 ApproverType.DepartmentManager => string.Equals(step.ApproverUserId, normalizedUserId, StringComparison.OrdinalIgnoreCase),
                 ApproverType.HrManager => string.Equals(step.ApproverUserId, normalizedUserId, StringComparison.OrdinalIgnoreCase),
                 ApproverType.Role => userRoleValues.Contains(step.ApproverValueSnapshot),
-                ApproverType.Permission => true,
+                ApproverType.Permission => step.ApproverValueSnapshot is not null && userPermissionValues.Contains(step.ApproverValueSnapshot),
                 _ => false
             };
         }).ToList();
