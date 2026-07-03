@@ -4,5 +4,5 @@ using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.ManagerApprovalQueries.GetMyPendingLeaveApprovals;
 
-public sealed record GetMyPendingLeaveApprovalsQuery(string? UserId)
+public sealed record GetMyPendingLeaveApprovalsQuery(string? UserId, IReadOnlyCollection<string> RoleGroups)
     : IQueryOne<IReadOnlyCollection<ManagerLeavePendingApprovalResponse>>;
