@@ -166,3 +166,25 @@ See `.env.example` for full template. **Required for baseline:**
 
 **GO** for development/staging environments.
 **NOT READY** for production — see unchecked items above, security debts (TD-P34-SEC-04), and performance debts (38 missing indexes, N+1 queries).
+
+Production Baseline Guarantees (v0.34.0)
+
+Verified:
+- Build
+- Tests
+- Docker Runtime
+- Database Migration
+- JWT Authentication
+- Permission Authorization
+- Workflow Engine
+- Notification Pipeline
+- ESS / Approval / HR Scope Separation
+
+Known Exclusions:
+- Bulk Import
+- Attendance ↔ Payroll End-to-End
+- Candidate → Employee Lifecycle
+- Browser E2E
+- Production Infrastructure
+- Secret Management
+- Performance Technical Debt
