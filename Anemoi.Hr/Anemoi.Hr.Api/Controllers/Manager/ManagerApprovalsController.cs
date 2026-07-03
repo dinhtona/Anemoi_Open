@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Cqrs.Queries.ManagerApprovalQueries.GetMyPendingLeaveApprovals;
 using Anemoi.Hr.Application.Cqrs.Queries.ManagerApprovalQueries.GetMyPendingOvertimeApprovals;
@@ -22,7 +23,8 @@ public sealed class ManagerApprovalsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetPendingLeaveApprovals(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
-        var result = await sender.Send(new GetMyPendingLeaveApprovalsQuery(userId), cancellationToken);
+        var roleGroups = GetRoleGroups();
+        var result = await sender.Send(new GetMyPendingLeaveApprovalsQuery(userId, roleGroups), cancellationToken);
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
@@ -32,7 +34,15 @@ public sealed class ManagerApprovalsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetPendingOvertimeApprovals(CancellationToken cancellationToken)
     {
         var userId = HttpContext.GetUserId();
-        var result = await sender.Send(new GetMyPendingOvertimeApprovalsQuery(userId), cancellationToken);
+        var roleGroups = GetRoleGroups();
+        var result = await sender.Send(new GetMyPendingOvertimeApprovalsQuery(userId, roleGroups), cancellationToken);
         return result.Match<IActionResult>(Ok, BadRequest);
     }
+
+    private IReadOnlyCollection<string> GetRoleGroups() =>
+        User.FindAll(AuthorizationClaimTypes.RoleGroup)
+            .Select(claim => claim.Value)
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 }
