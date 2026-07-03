@@ -5,6 +5,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
 using Serilog;
@@ -12,6 +13,7 @@ using Serilog;
 namespace Anemoi.Notification.Application.Consumers;
 
 public sealed class EmployeeCreatedConsumer(
+    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -32,8 +34,15 @@ public sealed class EmployeeCreatedConsumer(
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
 
+        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.EmployeeId.ToString(), context.CancellationToken);
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.Warning("Could not resolve Employee User ID for EmployeeId: {EmployeeId}. Skipping notification.", message.EmployeeId);
+            return;
+        }
+
         var command = new CreateNotificationCommand(
-            UserId: message.EmployeeId.ToString(),
+            UserId: userId,
             Title: "Employee Created",
             Content: $"Employee {message.FullName} ({message.EmployeeCode}) has been created",
             Category: "HR",
@@ -44,11 +53,12 @@ public sealed class EmployeeCreatedConsumer(
         );
 
         await mediator.Send(command, context.CancellationToken);
-        logger.Information("Processed EmployeeCreated notification for Employee ID: {EmployeeId}", message.EmployeeId);
+        logger.Information("Processed EmployeeCreated notification for Employee User ID: {UserId}", userId);
     }
 }
 
 public sealed class TransferApprovedConsumer(
+    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -69,23 +79,31 @@ public sealed class TransferApprovedConsumer(
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
 
+        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.EmployeeId.ToString(), context.CancellationToken);
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.Warning("Could not resolve Employee User ID for EmployeeId: {EmployeeId}. Skipping notification.", message.EmployeeId);
+            return;
+        }
+
         var command = new CreateNotificationCommand(
-            UserId: message.EmployeeId.ToString(),
+            UserId: userId,
             Title: "Transfer Approved",
             Content: "Your transfer has been approved",
             Category: "HR",
             ActionUrl: $"/hr/employees/transfers/{message.TransferId}",
-            DeduplicationKey: $"transfer:{message.TransferId}:approved:{message.EmployeeId}",
+            DeduplicationKey: $"transfer:{message.TransferId}:approved:{userId}",
             Type: NotificationConstants.Types.Business,
             Severity: NotificationConstants.Severities.Info
         );
 
         await mediator.Send(command, context.CancellationToken);
-        logger.Information("Processed TransferApproved notification for Employee ID: {EmployeeId}", message.EmployeeId);
+        logger.Information("Processed TransferApproved notification for Employee User ID: {UserId}", userId);
     }
 }
 
 public sealed class SeparationApprovedConsumer(
+    INotificationRecipientResolver recipientResolver,
     IMediator mediator,
     IPublishEndpoint publishEndpoint,
     ILogger logger)
@@ -106,18 +124,25 @@ public sealed class SeparationApprovedConsumer(
             OccurredAt = DateTime.UtcNow
         }, context.CancellationToken);
 
+        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.EmployeeId.ToString(), context.CancellationToken);
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.Warning("Could not resolve Employee User ID for EmployeeId: {EmployeeId}. Skipping notification.", message.EmployeeId);
+            return;
+        }
+
         var command = new CreateNotificationCommand(
-            UserId: message.EmployeeId.ToString(),
+            UserId: userId,
             Title: "Separation Approved",
             Content: "Your separation has been approved",
             Category: "HR",
             ActionUrl: $"/hr/employees/separations/{message.SeparationId}",
-            DeduplicationKey: $"separation:{message.SeparationId}:approved:{message.EmployeeId}",
+            DeduplicationKey: $"separation:{message.SeparationId}:approved:{userId}",
             Type: NotificationConstants.Types.Business,
             Severity: NotificationConstants.Severities.Info
         );
 
         await mediator.Send(command, context.CancellationToken);
-        logger.Information("Processed SeparationApproved notification for Employee ID: {EmployeeId}", message.EmployeeId);
+        logger.Information("Processed SeparationApproved notification for Employee User ID: {UserId}", userId);
     }
 }

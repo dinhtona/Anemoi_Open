@@ -10,7 +10,7 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 34 Iteration 7
+Version: After Phase 34 Iteration 8C
 
 Status: Active
 
@@ -761,6 +761,50 @@ Probation cleanup sprint or when direct Pass/Fail is needed
 
 ---
 
+## TD-P34-EMPLOYEE-02 — CreateEmployeeHandler Writes EmployeeHistory with Null EntityId
+
+### Priority
+
+P2
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 8C
+
+### Context
+
+`CreateEmployeeHandler` persists an `EmployeeHistory` row with `EntityId = null`, which violates the `NOT NULL` constraint on `Hr.EmployeeHistories.EntityId`. `SaveChangesAsync` throws `DbUpdateException` (SqlState 23502), and the API returns `HR_SAVE_CHANGES_FAILED`. Employee creation is completely blocked — no employee can be created through the API.
+
+The handler constructs the `EmployeeHistory` entry at line (approx. 72-80) with `new CreateEmployeeHistorySpec(employee.Id, ...)` but the `EntityId` and `EntityType` fields are not set before save.
+
+### Impact
+
+- `POST /api/hr/employees` always returns 400 with `HR_SAVE_CHANGES_FAILED`.
+- Blocks runtime verification of `EmployeeCreatedConsumer` fix (TD-P34-NOTIFICATION-01) — the `EmployeeCreatedIntegrationEvent` is never fired because persistence fails before event publication.
+- Blocked employee creation prevents onboarding, recruitment-to-employee conversion testing, and new hire workflows.
+
+### Recommended Fix
+
+1. Audit `CreateEmployeeHistorySpec` to ensure `EntityId` and `EntityType` are populated before save.
+2. Verify that `EmployeeHistories` schema requires `EntityId` (NOT NULL) — if the entity is the employee itself, `EntityId = employee.Id.ToString()` and `EntityType = "Employee"` is appropriate.
+3. Add a unit test that verifies `SaveChangesAsync` succeeds for the CreateEmployee flow.
+
+### Affected Files
+
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/CreateEmployee/CreateEmployeeHandler.cs`
+- `Anemoi.Hr.Infrastructure/Persistence/Configurations/EmployeeHistoryConfiguration.cs` (schema constraints)
+- `Hr.EmployeeHistories` table (NOT NULL constraint on `EntityId`)
+
+### Suggested Target
+
+Phase 34 Iteration 9 or first employee-creation milestone in remaining Phase 34 scope
+
+---
+
 # Recommended Cleanup Roadmap
 
 ## Immediate Priority (P1)
@@ -773,6 +817,7 @@ Probation cleanup sprint or when direct Pass/Fail is needed
 3. TD-003 Frontend testing infrastructure
 4. TD-007 End-to-End automation
 5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
+6. TD-P34-EMPLOYEE-02 CreateEmployeeHandler null EntityId in EmployeeHistory
 
 ## Medium-Term Priority (P3)
 
