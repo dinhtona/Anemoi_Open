@@ -49,31 +49,31 @@ public sealed class GetWorkflowInstancesHandler(
         {
             var defIds = items
                 .Where(x => x.WorkflowDefinitionId is not null)
-                .Select(x => x.WorkflowDefinitionId!.Value)
+                .Select(x => x.WorkflowDefinitionId!)
                 .Distinct()
                 .ToList();
             if (defIds.Count > 0)
             {
                 var filteredDefs = await definitionRepository.GetQueryable()
-                    .Where(d => defIds.Contains(d.Id.Value))
+                    .Where(d => defIds.Contains(d.Id))
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
                 defNames = filteredDefs.ToDictionary(d => d.Id.Value, d => d.Name);
             }
 
-            var employeeIds = new HashSet<Guid>();
+            var employeeIds = new HashSet<EmployeeId>();
             foreach (var item in items)
             {
-                employeeIds.Add(item.RequesterEmployeeId.Value);
+                employeeIds.Add(item.RequesterEmployeeId);
                 var currentStep = item.Steps.FirstOrDefault(s => s.Sequence == item.CurrentStep);
                 if (currentStep?.ApproverEmployeeId is not null)
-                    employeeIds.Add(currentStep.ApproverEmployeeId.Value);
+                    employeeIds.Add(currentStep.ApproverEmployeeId);
             }
 
             if (employeeIds.Count > 0)
             {
                 var filteredEmployees = await employeeRepository.GetQueryable()
-                    .Where(e => employeeIds.Contains(e.Id.Value))
+                    .Where(e => employeeIds.Contains(e.Id))
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
                 empNames = filteredEmployees.ToDictionary(e => e.Id.Value, e => e.FullName);

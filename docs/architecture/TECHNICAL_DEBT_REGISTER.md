@@ -10,7 +10,7 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 34 Iteration 10
+Version: After Phase 34 Iteration 11
 
 Status: Active
 

@@ -69,11 +69,11 @@ public sealed class GetPendingApprovalsHandler(
 
         var defIds = pageItems
             .Where(x => x.WorkflowDefinitionId is not null)
-            .Select(x => x.WorkflowDefinitionId!.Value)
+            .Select(x => x.WorkflowDefinitionId!)
             .Distinct()
             .ToList();
         var filteredDefs = await definitionRepository.GetQueryable()
-            .Where(d => defIds.Contains(d.Id.Value))
+            .Where(d => defIds.Contains(d.Id))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
         var defNames = filteredDefs.ToDictionary(d => d.Id.Value, d => d.Name);
