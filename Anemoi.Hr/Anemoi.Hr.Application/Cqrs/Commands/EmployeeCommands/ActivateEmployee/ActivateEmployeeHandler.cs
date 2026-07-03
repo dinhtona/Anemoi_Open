@@ -39,8 +39,10 @@ public sealed class ActivateEmployeeHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = request.EmployeeId,
             EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
             EventType = "Activated",
             Title = "Employee activated",
+            Description = "Employee activated",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
         };

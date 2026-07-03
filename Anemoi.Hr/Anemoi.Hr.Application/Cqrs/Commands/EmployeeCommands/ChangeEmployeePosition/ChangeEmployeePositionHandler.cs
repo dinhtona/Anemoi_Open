@@ -39,8 +39,10 @@ public sealed class ChangeEmployeePositionHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = request.EmployeeId,
             EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
             EventType = "PositionChanged",
             Title = "Employee position changed",
+            Description = "Position changed",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
         };

@@ -50,8 +50,10 @@ public sealed class UpdateEmployeeContactHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = request.EmployeeId,
             EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
             EventType = "ContactUpdated",
             Title = "Employee contact updated",
+            Description = "Contact information updated",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
         };

@@ -39,8 +39,10 @@ public sealed class ArchiveEmployeeHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = request.EmployeeId,
             EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
             EventType = "Archived",
             Title = "Employee archived",
+            Description = "Employee archived",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
         };

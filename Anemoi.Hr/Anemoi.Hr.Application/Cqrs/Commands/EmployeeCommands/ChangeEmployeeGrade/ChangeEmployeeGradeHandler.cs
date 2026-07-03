@@ -32,8 +32,10 @@ public sealed class ChangeEmployeeGradeHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = request.EmployeeId,
             EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
             EventType = "GradeChanged",
             Title = "Employee grade changed",
+            Description = "Grade changed",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
         };

@@ -84,6 +84,7 @@ public sealed class CreateEmployeeHandler(
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = employeeId,
             EntityType = "Employee",
+            EntityId = employeeId.Value.ToString(),
             EventType = "Created",
             Title = "Employee created",
             Description = $"{request.FirstName} {request.LastName} ({request.EmployeeCode})",

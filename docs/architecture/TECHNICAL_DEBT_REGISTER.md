@@ -10,7 +10,7 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 34 Iteration 8C
+Version: After Phase 34 Iteration 9
 
 Status: Active
 
@@ -773,35 +773,33 @@ Medium
 
 ### Status
 
-⚠️ Active — discovered Phase 34 Iteration 8C
+✅ **Resolved** — July 2026 (Phase 34 Iteration 9)
 
-### Context
+### Fix Applied
 
-`CreateEmployeeHandler` persists an `EmployeeHistory` row with `EntityId = null`, which violates the `NOT NULL` constraint on `Hr.EmployeeHistories.EntityId`. `SaveChangesAsync` throws `DbUpdateException` (SqlState 23502), and the API returns `HR_SAVE_CHANGES_FAILED`. Employee creation is completely blocked — no employee can be created through the API.
+1. **Added `EntityId` to all 10 EmployeeCommands handlers** — `CreateEmployeeHandler`, `ActivateEmployeeHandler`, `ArchiveEmployeeHandler`, `ChangeEmployeeDepartmentHandler`, `ChangeEmployeeGradeHandler`, `ChangeEmployeeManagerHandler`, `ChangeEmployeePositionHandler`, `ResumeEmployeeHandler`, `SuspendEmployeeHandler`, and `UpdateEmployeeContactHandler` now set `EntityId = employeeId.Value.ToString()` matching the event handler pattern.
+2. **Added `Description` to all 10 handlers** — `Description` is also `.IsRequired()` in the schema. Previously only `CreateEmployeeHandler` set it; the other 9 were missing it.
+3. **Audit confirmed**: Asset (6), Document (3), Note (2), and Event (4) handlers already correctly set `EntityId`.
 
-The handler constructs the `EmployeeHistory` entry at line (approx. 72-80) with `new CreateEmployeeHistorySpec(employee.Id, ...)` but the `EntityId` and `EntityType` fields are not set before save.
+### Verification
 
-### Impact
-
-- `POST /api/hr/employees` always returns 400 with `HR_SAVE_CHANGES_FAILED`.
-- Blocks runtime verification of `EmployeeCreatedConsumer` fix (TD-P34-NOTIFICATION-01) — the `EmployeeCreatedIntegrationEvent` is never fired because persistence fails before event publication.
-- Blocked employee creation prevents onboarding, recruitment-to-employee conversion testing, and new hire workflows.
-
-### Recommended Fix
-
-1. Audit `CreateEmployeeHistorySpec` to ensure `EntityId` and `EntityType` are populated before save.
-2. Verify that `EmployeeHistories` schema requires `EntityId` (NOT NULL) — if the entity is the employee itself, `EntityId = employee.Id.ToString()` and `EntityType = "Employee"` is appropriate.
-3. Add a unit test that verifies `SaveChangesAsync` succeeds for the CreateEmployee flow.
+```txt
+dotnet build → 0 errors, 73 warnings (all pre-existing)
+dotnet test  → 575/575 passed (250 HR + 325 BuildingBlock)
+```
 
 ### Affected Files
 
 - `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/CreateEmployee/CreateEmployeeHandler.cs`
-- `Anemoi.Hr.Infrastructure/Persistence/Configurations/EmployeeHistoryConfiguration.cs` (schema constraints)
-- `Hr.EmployeeHistories` table (NOT NULL constraint on `EntityId`)
-
-### Suggested Target
-
-Phase 34 Iteration 9 or first employee-creation milestone in remaining Phase 34 scope
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ActivateEmployee/ActivateEmployeeHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ArchiveEmployee/ArchiveEmployeeHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ChangeEmployeeDepartment/ChangeEmployeeDepartmentHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ChangeEmployeeGrade/ChangeEmployeeGradeHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ChangeEmployeeManager/ChangeEmployeeManagerHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ChangeEmployeePosition/ChangeEmployeePositionHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/ResumeEmployee/ResumeEmployeeHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/SuspendEmployee/SuspendEmployeeHandler.cs`
+- `Anemoi.Hr.Application/Cqrs/Commands/EmployeeCommands/UpdateEmployeeContact/UpdateEmployeeContactHandler.cs`
 
 ---
 
@@ -817,7 +815,6 @@ Phase 34 Iteration 9 or first employee-creation milestone in remaining Phase 34 
 3. TD-003 Frontend testing infrastructure
 4. TD-007 End-to-End automation
 5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
-6. TD-P34-EMPLOYEE-02 CreateEmployeeHandler null EntityId in EmployeeHistory
 
 ## Medium-Term Priority (P3)
 
