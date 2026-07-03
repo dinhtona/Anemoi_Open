@@ -54,7 +54,8 @@ public sealed class SubmitRecruitmentRequestHandler(
             OldStatus = oldStatus,
             NewStatus = recruitmentRequest.Status,
             PerformedBy = request.SubmittedBy,
-            PerformedAt = now
+            PerformedAt = now,
+            Comment = string.Empty
         };
         var historyResult = await historyRepository.CreateOneAsync(history, cancellationToken);
         if (historyResult.TryPickT1(out var histException, out _))

@@ -31,6 +31,37 @@ public sealed class RecruitmentRequest : Entity<RecruitmentRequestId>
     public Position Position { get; set; }
     public ICollection<RecruitmentRequestHistory> Histories { get; set; } = new List<RecruitmentRequestHistory>();
 
+    public static RecruitmentRequest Create(
+        RecruitmentRequestId id,
+        string requestNumber,
+        DepartmentId departmentId,
+        PositionId positionId,
+        int requestedHeadcount,
+        string reason,
+        string priorityCode,
+        string requestedBy,
+        DateTime now)
+    {
+        return new RecruitmentRequest
+        {
+            Id = id,
+            RequestNumber = requestNumber,
+            DepartmentId = departmentId,
+            PositionId = positionId,
+            RequestedHeadcount = requestedHeadcount,
+            Reason = reason,
+            PriorityCode = priorityCode,
+            RequestedBy = requestedBy,
+            RequestedAt = now,
+            Status = RecruitmentRequestStatusCode.Draft,
+            ApprovedBy = string.Empty,
+            RejectedBy = string.Empty,
+            Comment = string.Empty,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+    }
+
     public bool Submit(string actor, DateTime now)
     {
         if (Status != RecruitmentRequestStatusCode.Draft)
@@ -54,7 +85,7 @@ public sealed class RecruitmentRequest : Entity<RecruitmentRequestId>
         Status = RecruitmentRequestStatusCode.Approved;
         ApprovedBy = actor;
         ApprovedAt = now;
-        Comment = comment;
+        Comment = comment ?? string.Empty;
         UpdatedAt = now;
 
         AddEvent(new RecruitmentRequestApprovedDomainEvent(Id.Value, RequestNumber, actor));
@@ -70,7 +101,7 @@ public sealed class RecruitmentRequest : Entity<RecruitmentRequestId>
         Status = RecruitmentRequestStatusCode.Rejected;
         RejectedBy = actor;
         RejectedAt = now;
-        Comment = comment;
+        Comment = comment ?? string.Empty;
         UpdatedAt = now;
 
         AddEvent(new RecruitmentRequestRejectedDomainEvent(Id.Value, RequestNumber, actor, comment ?? string.Empty));

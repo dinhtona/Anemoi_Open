@@ -31,18 +31,16 @@ public sealed class CreateRecruitmentRequestHandler(
 
         var requestNumber = await GenerateRequestNumber(now, cancellationToken);
 
-        var recruitmentRequest = new RecruitmentRequest
-        {
-            Id = requestId,
-            RequestNumber = requestNumber,
-            DepartmentId = new DepartmentId(Guid.Parse(request.DepartmentId)),
-            PositionId = new PositionId(Guid.Parse(request.PositionId)),
-            RequestedHeadcount = request.RequestedHeadcount,
-            Reason = request.Reason,
-            PriorityCode = request.PriorityCode,
-            CreatedAt = now,
-            UpdatedAt = now
-        };
+        var recruitmentRequest = RecruitmentRequest.Create(
+            requestId,
+            requestNumber,
+            new DepartmentId(Guid.Parse(request.DepartmentId)),
+            new PositionId(Guid.Parse(request.PositionId)),
+            request.RequestedHeadcount,
+            request.Reason,
+            request.PriorityCode,
+            request.CreatedBy,
+            now);
 
         var createResult = await requestRepository.CreateOneAsync(recruitmentRequest, cancellationToken);
         if (createResult.TryPickT1(out var exception, out _))
