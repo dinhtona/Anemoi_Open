@@ -10,7 +10,7 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 34 Iteration 9 Security Audit
+Version: After Phase 34 Iteration 10
 
 Status: Active
 
@@ -958,6 +958,596 @@ DevOps/Security hardening sprint before production deployment.
 
 ---
 
+## TD-P34-PERF-01 — N+1 Queries in Recruitment/Analytics Handlers
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Three recruitment handlers and one analytics handler execute DB queries inside foreach loops, producing O(N) additional round-trips:
+
+1. **`GetHiringByDepartmentHandler`** — 3 DB calls per department (requisition count, application count, hire count). With 20 departments = 60+ round-trips.
+2. **`GetCandidateSourceEffectivenessHandler`** — 3 DB calls per candidate source. With 10 sources = ~40 round-trips.
+3. **`GetTimeToHireHandler`** — loads all `HireDecision` entities then computes min/max/avg/median in memory.
+4. **`GetRecruitmentDashboardWidgetsHandler`** — loads all `RecruitmentOpening` rows, then counts/filters in memory instead of `CountAsync()`.
+
+### Impact
+
+- Recruitment dashboard loads grow linearly with department/source count.
+- Each deployment with more departments or sources silently degrades.
+
+### Recommended Fix
+
+Use SQL-level `GroupBy` with aggregation (`.CountAsync()`, `.SumAsync()`) in a single query instead of per-entity loops. For `GetTimeToHireHandler`, compute the date difference in SQL using `EF.Functions.DateDiffDay`.
+
+### Affected Files
+
+- `GetHiringByDepartmentHandler.cs:27-51`
+- `GetCandidateSourceEffectivenessHandler.cs:28-43`
+- `GetTimeToHireHandler.cs:29-37`
+- `GetRecruitmentDashboardWidgetsHandler.cs:33-36`
+
+---
+
+## TD-P34-PERF-02 — N+1 Role/Permission Resolution in Approval Handlers
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Three approval handlers iterate over workflow roles and permissions, calling external resolvers inside foreach loops:
+
+1. **`GetMyPendingLeaveApprovalsHandler`** — `roleResolver.ResolveAsync()` per role (lines 143-151), `permissionResolver.HasPermissionAsync()` per permission (lines 161-165).
+2. **`GetMyPendingOvertimeApprovalsHandler`** — identical pattern (lines 140-148, 158-162).
+3. **`GetPendingApprovalsHandler`** — `roleResolver.ResolveAsync()` per role (lines 38-44).
+
+Each resolver call likely hits an external service or DB. With many workflow instances each having distinct roles, a single request could trigger dozens of external calls.
+
+### Impact
+
+- Approval inbox page load degrades linearly with the number of distinct roles.
+- Each role adds a sequential network round-trip.
+
+### Recommended Fix
+
+Add batch overloads (`ResolveManyAsync`, `HasPermissionsAsync`) to the resolver interfaces that accept collections and resolve all roles/permissions in a single call.
+
+### Affected Files
+
+- `GetMyPendingLeaveApprovalsHandler.cs:143-165`
+- `GetMyPendingOvertimeApprovalsHandler.cs:140-162`
+- `GetPendingApprovalsHandler.cs:38-44`
+
+---
+
+## TD-P34-PERF-03 — MonthlyLeaveAccrualWorker N+1 per Employee×Policy
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`MonthlyLeaveAccrualWorker` loads all active employees and active policies, then executes 2 DB calls per employee×policy pair (accrual run existence check + balance lookup). For 500 employees × 5 policies = 5,000+ DB round-trips per monthly run.
+
+### Impact
+
+- Monthly accrual run time grows quadratically with employee count.
+- Worker may time out or block other DB operations for extended periods.
+
+### Recommended Fix
+
+Batch-load all existing balances and accrual runs for the current year/month upfront in 2 queries, then process all logic in-memory using dictionary lookups.
+
+### Affected Files
+
+- `MonthlyLeaveAccrualWorker.cs:52-112`
+
+---
+
+## TD-P34-PERF-04 — Full Table Loads in Analytics Handlers
+
+### Priority
+
+P2
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Five analytics handlers materialize entire tables to compute aggregates in memory:
+
+1. **`GetCompensationDashboardHandler`** — loads all employees, active salaries, and active allowances (AsNoTracking added in Iteration 10, but still materializes full tables).
+2. **`GetOvertimeAnalyticsHandler`** — loads all `OvertimeRequest` rows, computes hours/totals/averages in C#.
+3. **`GetPayrollAnalyticsHandler`** — loads all finalized `PayrollItem` rows (no date filter), computes aggregates in C#.
+4. **`GetDepartmentCostAnalyticsHandler`** — loads all finalized `PayrollItem` rows (no date filter), groups by department in C#.
+5. **`GetHeadcountTrendHandler`** — loads all employees, re-scans in-memory for each month.
+
+### Impact
+
+- Dashboard and analytics queries degrade linearly with total org history.
+- For 10,000 employees and 5 years of payroll, queries load 60,000+ rows into memory.
+
+### Recommended Fix
+
+Push aggregation to SQL using `.GroupBy()`, `.SumAsync()`, `.CountAsync()`, `.AverageAsync()`. Add date range parameters to analytics queries and filter at the database level.
+
+### Affected Files
+
+- `GetCompensationDashboardHandler.cs:32-41` (AsNoTracking added, full scan remains)
+- `GetOvertimeAnalyticsHandler.cs:26-44`
+- `GetPayrollAnalyticsHandler.cs:20-38`
+- `GetDepartmentCostAnalyticsHandler.cs:21-35`
+- `GetHeadcountTrendHandler.cs:23-41`
+
+---
+
+## TD-P34-PERF-05 — Missing AsNoTracking in 16+ Query Handlers
+
+### Priority
+
+P3
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+~16 query handlers load entities with tracking enabled (EF change tracker snapshots) but map results to DTOs without ever modifying or saving the entities. Tracking overhead is pure memory/CPU waste.
+
+Handlers include: `GetTransfersHandler`, `GetSeparationsHandler`, `GetProbationsHandler`, `GetAttendanceRecordsHandler`, `GetWorkflowDefinitionsHandler`, `GetWorkflowInstanceByIdHandler`, `GetLeaveRequestsHandler`, `GetRecruitmentRequestsHandler`, `GetMyProfileHandler`, `GetMyLeaveBalancesHandler`, `GetMyLeaveRequestsHandler`, `GetMyOvertimeRequestsHandler`, `GetMyApproverPreviewHandler`, `GetEmployeeAllowancesHandler`, `GetCompensationTimelineHandler`, `GetCompensationSnapshotHandler`, `GetEmployeePromotionTimelineHandler`.
+
+(3 highest-impact handlers were fixed with AsNoTracking in Iteration 10: `GetCompensationDashboardHandler`, `GetWorkflowInstancesHandler`, `GetPendingApprovalsHandler`.)
+
+### Impact
+
+- Memory overhead from EF change tracker proxies for read-only query results.
+- For handlers loading collections (e.g., dashboard returns 500+ entities), adds measurable GC pressure.
+
+### Recommended Fix
+
+Add `.AsNoTracking()` to all query handlers that map to DTOs. Audit via Roslyn analyzer rule or code review checklist.
+
+### Affected Files
+
+- 16+ files listed above.
+
+---
+
+## TD-P34-PERF-06 — Expensive Include Chains Without AsSplitQuery
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Three handlers use multiple `.Include()` calls that produce Cartesian explosion in a single JOIN query:
+
+1. **`GetTransferByIdHandler`** — 5 Includes (Employee, SourceDepartment, TargetDepartment, SourcePosition, TargetPosition).
+2. **`GetTransfersHandler`** — same 5 Includes, paginated (worse: each page generates a Cartesian product).
+3. **`GetInterviewByIdHandler`** — 4 Includes including collections (Feedbacks).
+4. **`SearchInterviewsHandler`** — 3 Includes.
+
+None use `.AsSplitQuery()` to break the query into separate round-trips that avoid the Cartesian product.
+
+### Impact
+
+- Single transfer query generates a 5-table cross-join result set that grows exponentially.
+- Network transfer of redundant data, CPU to deduplicate on the client side.
+
+### Recommended Fix
+
+Add `.AsSplitQuery()` after `.Include()` chains for handlers loading multiple navigation properties, especially when collections are involved.
+
+### Affected Files
+
+- `GetTransferByIdHandler.cs:21-27`
+- `GetTransfersHandler.cs:19-25`
+- `GetInterviewByIdHandler.cs:25-30`
+- `SearchInterviewsHandler.cs:31-33`
+
+---
+
+## TD-P34-PERF-07 — Redundant Employee Loading in Approval Handlers
+
+### Priority
+
+P3
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`GetMyPendingLeaveApprovalsHandler` and `GetMyPendingOvertimeApprovalsHandler` each execute two separate employee queries:
+
+1. First query loads employees with department Includes for name+department lookup.
+2. Second query loads employees again (just for FullName) for approver display.
+
+Both load full Employee entities instead of projecting only `Id`, `FullName`, and `Department.Name`.
+
+### Impact
+
+- Duplicate data transfer and entity materialization for the same Employee IDs.
+- Loads all columns of the Employee table when only 2-3 are needed.
+
+### Recommended Fix
+
+Merge into a single query matching all required employee IDs, project with `.Select()` to return only needed columns.
+
+### Affected Files
+
+- `GetMyPendingLeaveApprovalsHandler.cs:55-58,79-84`
+- `GetMyPendingOvertimeApprovalsHandler.cs:55-58,79-84`
+
+---
+
+## TD-P34-PERF-08 — Missing Pagination on Unbounded Endpoints
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Several endpoints return unbounded collections without pagination:
+
+1. **`GetAttendancePeriodsHandler`** — loads all attendance periods ever created (120+ after 10 years).
+2. **`GetInsuranceRuleSetsHandler`** — loads all insurance rule sets with nested contribution rules.
+3. **`GetInsuranceCalculationSnapshotsHandler`** — loads all snapshots without pagination.
+4. **`GetInsuranceContributionReportHandler`** — loads all matching snapshots for a period without row cap.
+5. **ESS handlers** — `GetMyAttendanceRecords`, `GetMyLeaveRequests`, `GetMyOvertimeRequests`, `GetMyPayslips`, `GetMyPayrollHistory` — unbounded per employee.
+6. **Compensation history handlers** — `GetCompensationTimeline`, `GetEmployeeSalaryHistory`, `GetEmployeeAllowances` — unbounded per employee.
+7. **Employee history handlers** — `GetEmployeeDepartmentHistory`, `GetEmployeePositionHistory`, `GetEmployeePromotionTimeline` — unbounded per employee.
+
+### Impact
+
+- API responses grow unboundedly over time for long-tenured employees.
+- No client-side pagination support for history views.
+
+### Recommended Fix
+
+Add pagination query parameters (Page/PageSize or Offset/Limit) to all unbounded list endpoints. For ESS endpoints, add `.Take(50)` as a safe default.
+
+### Affected Files
+
+- 11+ handlers listed above.
+
+---
+
+## TD-P34-PERF-09 — GetDashboardOverviewHandler 6 Independent List Loads
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`GetDashboardOverviewHandler` executes 6 independent `GetManyByConditionAsync` calls loading: near-exhaustion balances, active departments, active positions, out-today leave requests, out-this-week leave requests, and expiring contracts. While each query is individually bounded, 6 sequential DB round-trips add latency to the dashboard.
+
+### Impact
+
+- Dashboard load time is sum of 6 sequential queries.
+- Each query could return hundreds of rows at scale.
+
+### Recommended Fix
+
+Consider parallel queries via `Task.WhenAll` for independent loads. Add result cap (`.Take(50)`) where appropriate.
+
+### Affected Files
+
+- `GetDashboardOverviewHandler.cs:59-160`
+
+---
+
+## TD-P34-PERF-10 — Identity GetUsersHandler N+1 Post-Materialization
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`GetUsersHandler` maps paginated user results, then iterates each user to execute:
+- 1 DB call for role groups per user
+- 2 DB calls for direct roles + effective roles per user
+
+For a page of 20 users = 60 additional round-trips.
+
+### Impact
+
+- User list page slows linearly with page size.
+
+### Recommended Fix
+
+Pre-load role groups and role data for all paginated user IDs in batch queries before the mapping loop.
+
+### Affected Files
+
+- `Anemoi.Identity/.../GetUsers/GetUsersHandler.cs:73-97`
+
+---
+
+## TD-P34-PERF-11 — GetOnboardingDashboardHandler Loads All Instances with Tasks
+
+### Priority
+
+P3
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Loads all active onboarding instances with all tasks (via EF navigation properties), then computes task counts in C#. For 200 concurrent onboardings × 20 tasks each = 4,000 task entities materialized.
+
+### Impact
+
+- Moderate memory usage for large concurrent onboarding cohorts.
+
+### Recommended Fix
+
+Run SQL aggregates with `.SelectMany()`/`.GroupBy()` to compute pending/overdue/upcoming counts in a single query.
+
+### Affected Files
+
+- `GetOnboardingDashboardHandler.cs:25-43`
+
+---
+
+## TD-P34-PERF-12 — ContractExpirationWorker No Batching
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Loads all expired contracts, updates them in a foreach loop, then saves all changes in a single `SaveChangesAsync`. For large historical datasets on first run, this could load thousands of contracts.
+
+### Impact
+
+- High memory usage on first run after historical data import.
+- Single large SaveChanges batch may hit transaction timeout.
+
+### Recommended Fix
+
+Add batching with `.Chunk(500)` for large contract sets.
+
+### Affected Files
+
+- `ContractExpirationWorker.cs:40-43`
+
+---
+
+## TD-P34-PERF-13 — IdentityPolicyController PageSize = int.MaxValue
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`IdentityPolicyController` sets `PageSize = int.MaxValue` when calling `GetUserRolesQuery`, circumventing all pagination safeguards. While role counts are typically small (dozens), this ignores infrastructure limits.
+
+### Impact
+
+- If roles grow unexpectedly, this endpoint could attempt to load unbounded data.
+
+### Recommended Fix
+
+Set a reasonable maximum (e.g., `PageSize = 200`) or implement a dedicated non-paginated query.
+
+### Affected Files
+
+- `IdentityPolicyController.cs:40`
+
+---
+
+## TD-P34-PERF-14 — Database Index Gap Analysis (38 Findings)
+
+### Priority
+
+P2 (12 HIGH, 18 MEDIUM, 8 LOW)
+
+### Severity
+
+Medium-High
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+Comprehensive review of all 26 entity mapping configurations against query patterns revealed 38 missing indexes:
+
+**HIGH priority (12)**:
+- `Employees(EmploymentStatusCode, PrimaryDepartmentId)` — composite for dashboard/employee list filtering
+- `Employees(EmploymentStatusCode, PrimaryPositionId)` — composite for dashboard/employee list filtering
+- `Employees` GIN trigram on `EmployeeCode`, `WorkEmail`, `DisplayName` — for `LIKE '%term%'` search
+- `PayrollRuns(Status, FinalizedAt)` — composite for analytics queries
+- `OvertimeRequests(Status, ApprovedAt)` — composite for payslip calculation scan
+- `JobRequisitions(DepartmentId)`, `JobRequisitions(PositionId)`, `JobRequisitions(Status)` — recruitment filter indexes
+- `WorkflowInstances(Status, StartedAt)` — composite for pending approvals ordering
+- `LeaveRequests(EmployeeId, StatusCode, StartDate, EndDate)` — merged composite for 4-filter query
+
+**MEDIUM priority (18)**:
+FK indexes: `WorkflowInstanceStep.ApproverUserId`, `WorkflowInstanceStep.ApproverEmployeeId`, `Position.DepartmentId`, `Department.ParentDepartmentId`, `SalaryRange.SalaryGradeId`, `LeaveRequest.ApproverEmployeeId`, `Employee.DirectManagerEmployeeId`
+Composite: `ProbationRecord(StatusCode, EndDate)`, `ProbationRecord(EmployeeId, StatusCode, StartDate)`
+IsArchived composite: `EmployeeAssets`, `EmployeeDocuments`, `EmployeeNotes`
+CreatedAt sort indexes: `EmployeeSeparation`, `EmployeeTransfer`
+
+**LOW priority (8)**:
+Minor FK indexes, `RefreshToken.UserId` etc.
+
+### Impact
+
+- Every analytics query, employee search, and recruitment filter currently performs sequential scans or uses suboptimal index strategies.
+- `LIKE '%term%'` search on EmployeeCode/Name/Email cannot use B-tree indexes at all (requires full scan without GIN trigram).
+
+### Recommended Fix
+
+Add index definitions in entity configuration files using `HasIndex()` and create EF Core migrations. GIN trigram indexes require raw SQL migration:
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX ix_employees_employee_code_trgm ON "Employees" USING gin ("EmployeeCode" gin_trgm_ops);
+```
+
+### Affected Files
+
+- `EmployeeModelMapping.cs` (5 indexes)
+- `PayrollModelMapping.cs` (1 composite)
+- `OvertimeRequestModelMapping.cs` (1 composite)
+- `RecruitmentModelMapping.cs` (3 indexes)
+- `WorkflowInstanceModelMapping.cs` (1 composite, 2 FK)
+- `LeaveModelMapping.cs` (1 composite, 1 FK)
+- `EmployeeOrganizationModelMapping.cs` (2 FK)
+- `CompensationModelMapping.cs` (1 FK)
+- `ProbationModelMapping.cs` (2 composite, 1 FK)
+- `EmployeeAssetModelMapping.cs` (IsArchived composite)
+- `EmployeeDocumentModelMapping.cs` (IsArchived composite)
+- `EmployeeNoteModelMapping.cs` (IsArchived composite)
+- `SeparationModelMapping.cs` (CreatedAt, SeparationTypeCode)
+- `TransferModelMapping.cs` (CreatedAt)
+
+### Suggested Target
+
+Dedicated database optimization sprint with EXPLAIN ANALYZE verification for each new index.
+
+---
+
+## TD-P34-PERF-15 — GetPendingApprovalsHandler In-Memory Pagination After Full Load
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 10 Performance Audit
+
+### Context
+
+`GetPendingApprovalsHandler` loads ALL pending workflow instances (with Steps + Histories) from the database, then filters by current user's roles in memory, and finally applies `Skip/Take` in memory. The pagination happens AFTER the full dataset is materialized.
+
+### Impact
+
+- As pending approvals accumulate, every request loads all pending instances regardless of page size.
+- With 1,000+ pending instances across the organization, each approval-inbox page load materializes all of them.
+
+### Recommended Fix
+
+Restructure to paginate at the database level: resolve user's applicable roles first, then query workflow instances with database-level pagination using the resolved role set. Requires batch role resolution (see TD-P34-PERF-02).
+
+### Affected Files
+
+- `GetPendingApprovalsHandler.cs:23-67`
+
+---
+
 # Recommended Cleanup Roadmap
 
 ## Immediate Priority (P1)
@@ -971,6 +1561,11 @@ DevOps/Security hardening sprint before production deployment.
 4. TD-007 End-to-End automation
 5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
 6. TD-P34-SEC-04 Hardcoded credentials in appsettings.json
+7. TD-P34-PERF-01 N+1 queries in recruitment/analytics handlers
+8. TD-P34-PERF-02 N+1 role resolution in approval handlers
+9. TD-P34-PERF-03 MonthlyLeaveAccrualWorker N+1
+10. TD-P34-PERF-14 Database index gap analysis
+11. TD-P34-PERF-15 GetPendingApprovalsHandler in-memory pagination
 
 ## Medium-Term Priority (P3)
 
@@ -978,12 +1573,22 @@ DevOps/Security hardening sprint before production deployment.
 6. TD-009 Permission audit
 7. TD-P34-SEC-02 OrganizationHierarchyController returns domain entities
 8. TD-P34-SEC-03 Latent FromSqlRaw injection surface
+9. TD-P34-PERF-04 Full table loads in analytics handlers
+10. TD-P34-PERF-05 Missing AsNoTracking in 16+ handlers
+11. TD-P34-PERF-06 Expensive Include chains without AsSplitQuery
+12. TD-P34-PERF-07 Redundant employee loading in approval handlers
+13. TD-P34-PERF-08 Missing pagination on unbounded endpoints
+14. TD-P34-PERF-09 GetDashboardOverviewHandler 6 independent loads
+15. TD-P34-PERF-10 Identity GetUsersHandler N+1
+16. TD-P34-PERF-11 GetOnboardingDashboardHandler full instance load
 
 ## Long-Term Priority (P4-P5)
 
 7. TD-005 Localization audit
 8. TD-008 Snapshot storage optimization
 9. TD-011 Validation localization strategy cleanup
+10. TD-P34-PERF-12 ContractExpirationWorker batching
+11. TD-P34-PERF-13 IdentityPolicyController PageSize = int.MaxValue
 
 ---
 

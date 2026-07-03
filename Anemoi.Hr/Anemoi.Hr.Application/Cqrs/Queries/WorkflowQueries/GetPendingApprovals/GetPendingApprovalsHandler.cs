@@ -23,6 +23,7 @@ public sealed class GetPendingApprovalsHandler(
         var pendingInstances = await instanceRepository.GetQueryable()
             .Include(x => x.Steps)
             .Include(x => x.Histories)
+            .AsNoTracking()
             .Where(x => x.Status == WorkflowStatusCode.Pending)
             .OrderByDescending(x => x.StartedAt)
             .ToListAsync(cancellationToken);
@@ -71,10 +72,11 @@ public sealed class GetPendingApprovalsHandler(
             .Select(x => x.WorkflowDefinitionId!.Value)
             .Distinct()
             .ToList();
-        var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
-        var defNames = allDefs
+        var filteredDefs = await definitionRepository.GetQueryable()
             .Where(d => defIds.Contains(d.Id.Value))
-            .ToDictionary(d => d.Id.Value, d => d.Name);
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        var defNames = filteredDefs.ToDictionary(d => d.Id.Value, d => d.Name);
 
         var page = request.Page < 1 ? 1 : request.Page;
         var pageSize = request.PageSize < 1 ? 10 : request.PageSize;

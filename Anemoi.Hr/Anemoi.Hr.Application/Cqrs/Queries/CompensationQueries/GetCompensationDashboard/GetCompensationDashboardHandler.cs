@@ -29,13 +29,17 @@ public sealed class GetCompensationDashboardHandler(
     {
         var today = GetBusinessToday();
 
-        var employees = await employeeRepository.GetQueryable().ToListAsync(cancellationToken);
+        var employees = await employeeRepository.GetQueryable()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
         var activeSalaries = await salaryRepository.GetQueryable()
+            .AsNoTracking()
             .Where(x => x.EffectiveFrom <= today && (x.EffectiveTo == null || x.EffectiveTo >= today))
             .ToListAsync(cancellationToken);
 
         var activeAllowances = await allowanceRepository.GetQueryable()
+            .AsNoTracking()
             .Include(x => x.AllowanceType)
             .Where(x => x.EffectiveFrom <= today && (x.EffectiveTo == null || x.EffectiveTo >= today))
             .ToListAsync(cancellationToken);

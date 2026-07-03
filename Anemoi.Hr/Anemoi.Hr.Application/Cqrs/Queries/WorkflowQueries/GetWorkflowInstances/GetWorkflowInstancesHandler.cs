@@ -23,6 +23,7 @@ public sealed class GetWorkflowInstancesHandler(
         var query = instanceRepository.GetQueryable()
             .Include(x => x.Steps)
             .Include(x => x.Histories)
+            .AsNoTracking()
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(request.Status))
@@ -53,10 +54,11 @@ public sealed class GetWorkflowInstancesHandler(
                 .ToList();
             if (defIds.Count > 0)
             {
-                var allDefs = await definitionRepository.GetQueryable().ToListAsync(cancellationToken);
-                defNames = allDefs
+                var filteredDefs = await definitionRepository.GetQueryable()
                     .Where(d => defIds.Contains(d.Id.Value))
-                    .ToDictionary(d => d.Id.Value, d => d.Name);
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+                defNames = filteredDefs.ToDictionary(d => d.Id.Value, d => d.Name);
             }
 
             var employeeIds = new HashSet<Guid>();
@@ -70,10 +72,11 @@ public sealed class GetWorkflowInstancesHandler(
 
             if (employeeIds.Count > 0)
             {
-                var allEmployees = await employeeRepository.GetQueryable().ToListAsync(cancellationToken);
-                empNames = allEmployees
+                var filteredEmployees = await employeeRepository.GetQueryable()
                     .Where(e => employeeIds.Contains(e.Id.Value))
-                    .ToDictionary(e => e.Id.Value, e => e.FullName);
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+                empNames = filteredEmployees.ToDictionary(e => e.Id.Value, e => e.FullName);
             }
         }
 
