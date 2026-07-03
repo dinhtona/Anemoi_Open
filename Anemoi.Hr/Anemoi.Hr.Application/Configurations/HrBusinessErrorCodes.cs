@@ -465,6 +465,14 @@ public static class HrBusinessErrorCodes
     public const string AssetTypeRequired = "VAL_ASSET_TYPE_REQUIRED";
     public const string AssetTagRequired = "VAL_ASSET_TAG_REQUIRED";
 
+    // Bulk Import error codes
+    public const string ImportJobNotFound = "HR_IMPORT_JOB_NOT_FOUND";
+    public const string ImportFileEmpty = "HR_IMPORT_FILE_EMPTY";
+    public const string InvalidFileFormat = "HR_INVALID_FILE_FORMAT";
+    public const string FileTooLarge = "HR_FILE_TOO_LARGE";
+    public const string FileParseFailed = "HR_FILE_PARSE_FAILED";
+    public const string ImportTooManyRows = "HR_IMPORT_TOO_MANY_ROWS";
+
     // Lifecycle validation error codes
     public const string ValProbationRecordIdRequired = "VAL_PROBATION_RECORD_ID_REQUIRED";
     public const string ValProbationResultRequired = "VAL_PROBATION_RESULT_REQUIRED";

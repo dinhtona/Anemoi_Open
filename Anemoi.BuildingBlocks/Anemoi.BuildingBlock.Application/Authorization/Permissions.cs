@@ -54,6 +54,10 @@ public static class Permissions
     public const string HrEmployeePositionChange = "hr.employee.position.change";
     public const string HrEmployeeGradeChange = "hr.employee.grade.change";
     public const string HrEmployeeManagerChange = "hr.employee.manager.change";
+    public const string HrEmployeeImport = "hr.employee.import";
+    public const string HrEmployeeImportHistory = "hr.employee.import.history";
+    public const string HrEmployeeImportDownload = "hr.employee.import.download";
+    public const string HrEmployeeImportTemplate = "hr.employee.import.template";
     public const string HrEmployeeDocumentView = "hr.employee.document.view";
     public const string HrEmployeeDocumentManage = "hr.employee.document.manage";
     public const string HrEmployeeAssetView = "hr.employee.asset.view";
@@ -235,6 +239,10 @@ public static class Permissions
         new(HrEmployeeNoteView, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeNoteView"),
         new(HrEmployeeNoteManage, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeNoteManage",
             true, "High"),
+        new(HrEmployeeImport, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeImport"),
+        new(HrEmployeeImportHistory, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeImportHistory"),
+        new(HrEmployeeImportDownload, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeImportDownload"),
+        new(HrEmployeeImportTemplate, "PermissionGroupHrEmployee", "PermissionDescriptionHrEmployeeImportTemplate"),
         new(HrDepartmentView, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentView"),
         new(HrDepartmentManage, "PermissionGroupHrDepartment", "PermissionDescriptionHrDepartmentManage"),
         new(HrPositionView, "PermissionGroupHrPosition", "PermissionDescriptionHrPositionView"),

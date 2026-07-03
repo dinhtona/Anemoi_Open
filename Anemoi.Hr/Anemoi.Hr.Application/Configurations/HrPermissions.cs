@@ -32,6 +32,10 @@ public static class HrPermissions
     public const string EmployeePositionChange = BB.HrEmployeePositionChange;
     public const string EmployeeGradeChange = BB.HrEmployeeGradeChange;
     public const string EmployeeManagerChange = BB.HrEmployeeManagerChange;
+    public const string EmployeeImport = BB.HrEmployeeImport;
+    public const string EmployeeImportHistory = BB.HrEmployeeImportHistory;
+    public const string EmployeeImportDownload = BB.HrEmployeeImportDownload;
+    public const string EmployeeImportTemplate = BB.HrEmployeeImportTemplate;
     public const string EmployeeDocumentView = BB.HrEmployeeDocumentView;
     public const string EmployeeDocumentManage = BB.HrEmployeeDocumentManage;
     public const string EmployeeAssetView = BB.HrEmployeeAssetView;
@@ -178,6 +182,10 @@ public static class HrPermissions
         EmployeeManagerChange,
         EmployeeDocumentView,
         EmployeeDocumentManage,
+        EmployeeImport,
+        EmployeeImportHistory,
+        EmployeeImportDownload,
+        EmployeeImportTemplate,
         EmployeeAssetView,
         EmployeeAssetManage,
         EmployeeNoteView,

@@ -12,11 +12,11 @@ Before changing an existing pattern, verify whether an Architecture Decision Rec
 
 # ANEMOI HR - Architecture Decisions Record (ADR)
 
-Version: After ADR-028 Approval
+Version: After ADR-035 Approval
 
 Status: Active
 
-Last Updated: 2026-06-24
+Last Updated: 2026-07-03
 
 ---
 
@@ -881,6 +881,42 @@ Two independent guards protect the definition-bound rule:
 - Changes to `RequiresDefinition` / `IsRequiredEntityType` logic require architecture review.
 - The `DefaultPolicy.GetStepCount` values are informational only (used for the preview-only hierarchy path).
 - `BuildFromHierarchyAsync` may be removed in a future phase if no non-required entity types need it.
+
+---
+
+## ADR-035 — Bulk Import Architecture
+
+### Status
+
+Approved (2026-07-03)
+
+### Context
+
+Phase 35 introduces a generic Bulk Import Framework. Multiple business modules (Employee, Department, Position, Salary Grade, Leave Balance, etc.) need import capability with consistent UX, validation, and audit.
+
+### Decision
+
+1. **Generic Pipeline + Strategy Pattern**: Interfaces in BuildingBlocks, entity-specific implementations in modules (Anemoi.Hr first).
+2. **Synchronous Only (Phase 35)**: No background jobs, SignalR, or async queues. Interface design allows future async extension.
+3. **Upload → Parse → Validate (3 stages) → Preview → Execute → Reference + Resolve**:
+   - **Upload** runs Stages 1-3 for user-friendly preview:
+     - Stage 1: Syntax validation (format, required, types)
+     - Stage 2: Business validation (domain enums, status transitions)
+     - Stage 3: Duplicate validation (in-file + in-database)
+   - **Execute** re-runs Stages 1-2, then runs Stage 4 before SaveChanges:
+     - Stage 4: Reference validation + FK resolution (department, position, manager)
+   - Reference validation is deferred to Execute because reference data (departments, positions, managers) may change between Upload and Execute. This guarantees data integrity at the moment of persistence.
+4. **No raw file bytes in database**: Parsed preview stored as JSON. Error files generated on demand from preview data + re-validation.
+5. **Single SaveChanges ownership**: Import orchestrator owns SaveChanges. Entity handlers add to change tracker only.
+6. **All-or-nothing transaction**: Import all rows or rollback entirely. No partial success.
+7. **BulkImportJob is an audit record**: Not a rich aggregate. Properties for tracking, JSON for preview data.
+8. **Permissions**: 4 new permissions (import, history, download, template).
+
+### Implications
+
+- Storage: jsonb columns replace bytea for uploaded files
+- Error file generation requires re-validation (acceptable trade-off)
+- Future modules only need: row DTO, validator, handler, template provider
 
 ---
 

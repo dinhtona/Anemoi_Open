@@ -1,4 +1,5 @@
 using Anemoi.Hr.Domain.Attendance;
+using Anemoi.Hr.Domain.BulkImport;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Contracts;
@@ -103,6 +104,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
     public DbSet<EmployeeSeparation> EmployeeSeparations { get; set; }
     public DbSet<EmployeeOrganizationHistory> EmployeeOrganizationHistories { get; set; }
     public DbSet<EmployeeHistory> EmployeeHistories { get; set; }
+    public DbSet<BulkImportJob> BulkImportJobs { get; set; }
     public DbSet<LeaveType> LeaveTypes { get; set; }
     public DbSet<OvertimeRule> OvertimeRules { get; set; }
 
@@ -118,6 +120,7 @@ public sealed class HrDbContext(DbContextOptions<HrDbContext> options) : DbConte
         modelBuilder.Ignore<EmployeeAssetId>();
         modelBuilder.Ignore<EmployeeDocumentId>();
         modelBuilder.Ignore<EmployeeNoteId>();
+        modelBuilder.Ignore<BulkImportJobId>();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IHrInfrastructureAssemblyMarker).Assembly);
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();

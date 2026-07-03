@@ -392,4 +392,8 @@
   <data name="Timeline.NoteArchived.Description" xml:space="preserve"><value>Đã lưu trữ một ghi chú.</value></data>
   <data name="Timeline.Created.Title" xml:space="preserve"><value>Đã tạo tài liệu</value></data>
   <data name="Timeline.Created.Description" xml:space="preserve"><value>Đã tạo tài liệu {9}.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImport" xml:space="preserve"><value>Nhập nhân viên từ file.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportHistory" xml:space="preserve"><value>Xem lịch sử nhập.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportDownload" xml:space="preserve"><value>Tải file lỗi nhập.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportTemplate" xml:space="preserve"><value>Tải file mẫu nhập.</value></data>
 </root>
