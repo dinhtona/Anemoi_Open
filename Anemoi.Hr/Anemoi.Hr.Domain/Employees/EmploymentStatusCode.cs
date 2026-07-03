@@ -13,14 +13,14 @@ public static class EmploymentStatusCode
 
     public static readonly Dictionary<string, HashSet<string>> ValidTransitions = new()
     {
-        [Draft] = { PendingOnboarding },
-        [PendingOnboarding] = { Onboarding },
-        [Onboarding] = { Active },
-        [Active] = { Suspended, Resigned, Terminated },
-        [Suspended] = { Active },
-        [Resigned] = { Archived },
-        [Terminated] = { Archived },
-        [Archived] = { }
+        [Draft] = new HashSet<string> { PendingOnboarding },
+        [PendingOnboarding] = new HashSet<string> { Onboarding },
+        [Onboarding] = new HashSet<string> { Active },
+        [Active] = new HashSet<string> { Suspended, Resigned, Terminated },
+        [Suspended] = new HashSet<string> { Active },
+        [Resigned] = new HashSet<string> { Archived },
+        [Terminated] = new HashSet<string> { Archived },
+        [Archived] = new HashSet<string> { }
     };
 
     public static bool IsValidTransition(string from, string to) =>
