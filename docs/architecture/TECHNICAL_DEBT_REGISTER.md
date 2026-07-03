@@ -10,7 +10,7 @@ Architectural decisions take precedence over technical debt recommendations.
 
 # ANEMOI HR - Technical Debt Register
 
-Version: After Phase 34 Iteration 9
+Version: After Phase 34 Iteration 9 Security Audit
 
 Status: Active
 
@@ -803,6 +803,161 @@ dotnet test  → 575/575 passed (250 HR + 325 BuildingBlock)
 
 ---
 
+## TD-P34-SEC-01 — Missing [HasPermission] on 7 Controller Endpoints
+
+### Priority
+
+P1
+
+### Severity
+
+High
+
+### Status
+
+✅ **Resolved** — July 2026 (Phase 34 Iteration 9 Security Audit)
+
+### Fix Applied
+
+1. **WorkflowInstancesController** (4 endpoints): `ApproveWorkflowStep`, `RejectWorkflowStep`, `CancelWorkflow`, `ReturnWorkflow` were using plain `[Authorize]` (redundant — class already has `[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]`). Changed to `[HasPermission(HrPermissions.WorkflowApprove)]` for approve/reject/return, and `[HasPermission(HrPermissions.WorkflowManage)]` for cancel.
+2. **ManagerApprovalsController** (2 endpoints): `GetPendingLeaveApprovals`, `GetPendingOvertimeApprovals` using `[Authorize]`. Changed to `[HasPermission(HrPermissions.WorkflowApprove)]`.
+3. **EmployeeController** (1 endpoint): `GetMyProfile` (`GET /api/hr/employees/me`) had no `[HasPermission]` — any authenticated user could access. Changed to `[HasPermission(HrPermissions.EssProfileView)]`.
+
+### Verification
+
+```txt
+dotnet build → 0 errors, 8 warnings (pre-existing)
+dotnet test  → 575/575 passed
+```
+
+### Affected Files
+
+- `Anemoi.Hr.Api/Controllers/Workflow/WorkflowInstancesController.cs`
+- `Anemoi.Hr.Api/Controllers/Manager/ManagerApprovalsController.cs`
+- `Anemoi.Hr.Api/Controllers/Employee/EmployeeController.cs`
+
+---
+
+## TD-P34-SEC-02 — OrganizationHierarchyController Returns Domain Entities
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 9 Security Audit
+
+### Context
+
+`OrganizationHierarchyController.GetOrganizationTree` returns `IReadOnlyCollection<Domain.Organization.OrganizationNode>` and `GetReportingChain` returns `IReadOnlyCollection<Domain.Organization.ReportingRelationship>` — raw domain types instead of dedicated DTOs. This violates Clean Architecture and could expose internal domain modeling details or sensitive navigation properties via JSON serialization.
+
+### Impact
+
+- Potential data exposure if domain entities gain navigation properties in the future.
+- Inconsistent with the rest of the API, which consistently uses response DTOs.
+
+### Recommended Fix
+
+Create dedicated response DTOs (e.g., `OrganizationNodeResponse`, `ReportingRelationshipResponse`) and map from domain entities via Mapperly before returning.
+
+### Affected Files
+
+- `Anemoi.Hr.Api/Controllers/Organization/OrganizationHierarchyController.cs`
+
+### Suggested Target
+
+Next HR module cleanup sprint.
+
+---
+
+## TD-P34-SEC-03 — Latent FromSqlRaw Injection Surface in Generic Repository
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — discovered Phase 34 Iteration 9 Security Audit
+
+### Context
+
+`EfRepository.GetQueryableFromRawQuery` accepts a raw `sql` string passed to EF Core's `FromSqlRaw`. While the method accepts parameterized arguments (`params object[] parameters`), the `sql` string itself is not protected from injection if callers concatenate user input. No production code currently calls this method (only test mock implementations exist), but it remains publicly available.
+
+### Recommended Fix
+
+Either:
+1. Remove the method from the public `ISqlRepository` interface entirely.
+2. Mark it `[Obsolete]` with a message directing to typed queries.
+3. Add XML doc comments warning about SQL injection risk.
+
+### Affected Files
+
+- `Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Repositories/EfRepository.cs`
+
+### Suggested Target
+
+Next platform cleanup sprint.
+
+---
+
+## TD-P34-SEC-04 — Hardcoded Credentials in appsettings.json Files
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Active (partially mitigated by docker-compose + .env.example) — discovered Phase 34 Iteration 9 Security Audit
+
+### Context
+
+Multiple `appsettings.json` files contain hardcoded credentials:
+- **Connection strings with passwords** in 5 services (Hr, Identity, MasterData, Notification, Workspace)
+- **Seed user passwords** (`Admin@12345`, `Password1`) in Identity WorkerService
+- **S3 credentials** (`AccessKey: "secret"`, `SecretKey: "secret"`) in Centralize API
+- **RabbitMQ `guest/guest`** credentials in 6 services
+- **SFTP password** (`123456`) in Centralize API
+
+These are development defaults used with Docker Compose. The `.env.example` and `docker-compose.yml` already provision proper environment variables, but the appsettings.json files still contain fallback values that would be used if environment variables are not set.
+
+### Impact
+
+- Credentials are visible to anyone with repository access.
+- If deployed without proper environment variable overrides, services would use weak/guessable credentials.
+- Violates security best practices for credential management.
+
+### Recommended Fix
+
+1. Remove default passwords from appsettings.json; use environment variable placeholders only.
+2. Move seed user passwords to `dotnet user-secrets` or environment variables.
+3. Document that development credentials are set via `docker-compose.yml` environment variables, not appsettings fallbacks.
+4. Enable HTTPS redirection + HSTS for all services in non-development environments.
+
+### Affected Files
+
+- All `appsettings.json` and `appsettings.Development.json` files across 6 service projects.
+
+### Suggested Target
+
+DevOps/Security hardening sprint before production deployment.
+
+---
+
 # Recommended Cleanup Roadmap
 
 ## Immediate Priority (P1)
@@ -815,11 +970,14 @@ dotnet test  → 575/575 passed (250 HR + 325 BuildingBlock)
 3. TD-003 Frontend testing infrastructure
 4. TD-007 End-to-End automation
 5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
+6. TD-P34-SEC-04 Hardcoded credentials in appsettings.json
 
 ## Medium-Term Priority (P3)
 
 5. TD-006 OpenAPI-generated contracts
 6. TD-009 Permission audit
+7. TD-P34-SEC-02 OrganizationHierarchyController returns domain entities
+8. TD-P34-SEC-03 Latent FromSqlRaw injection surface
 
 ## Long-Term Priority (P4-P5)
 

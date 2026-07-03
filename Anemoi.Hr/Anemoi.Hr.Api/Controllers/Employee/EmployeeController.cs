@@ -67,6 +67,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
     }
 
     [HttpGet("me")]
+    [HasPermission(HrPermissions.EssProfileView)]
     [ProducesResponseType(typeof(EmployeeResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
     {
