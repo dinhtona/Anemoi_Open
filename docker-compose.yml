@@ -176,6 +176,7 @@ services:
         condition: service_healthy
     networks:
       - anemoi_network
+    restart: always      
 
   # Master Data service
   anemoi_masterdata:
@@ -198,6 +199,7 @@ services:
         condition: service_healthy
     networks:
       - anemoi_network
+    restart: always      
 
   # Notification service
   anemoi_notification:
@@ -394,6 +396,7 @@ services:
       - caddy
     networks:
       - anemoi_network
+    restart: always
 
 networks:
   anemoi_network:
