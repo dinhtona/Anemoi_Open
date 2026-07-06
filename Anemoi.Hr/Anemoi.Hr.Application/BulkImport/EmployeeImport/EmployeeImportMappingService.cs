@@ -25,10 +25,6 @@ public sealed class EmployeeImportMappingService
         if (DateOnly.TryParse(row.HireDateStr, out var parsedHire))
             joinDate = parsedHire;
 
-        var statusCode = string.IsNullOrWhiteSpace(row.StatusValue)
-            ? EmploymentStatusCode.Draft
-            : row.StatusValue;
-
         return new Employee
         {
             Id = employeeId,
@@ -40,7 +36,7 @@ public sealed class EmployeeImportMappingService
             PhoneNumber = row.Phone ?? string.Empty,
             DateOfBirth = dob,
             JoinDate = joinDate,
-            EmploymentStatusCode = statusCode,
+            EmploymentStatusCode = EmploymentStatusCode.Draft,
             EmploymentTypeCode = row.EmploymentType ?? "FullTime",
             GradeCode = row.GradeName,
             PrimaryDepartmentId = department.Id,

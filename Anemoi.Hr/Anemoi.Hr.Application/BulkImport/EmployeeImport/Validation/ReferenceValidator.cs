@@ -34,13 +34,13 @@ public sealed class ReferenceValidator
         var deptNames = rows.Where(r => r.DepartmentName != null)
             .Select(r => r.DepartmentName!).Distinct().ToList();
         var departments = await _deptRepo.GetQueryable()
-            .Where(d => deptNames.Contains(d.Name))
+            .Where(d => deptNames.Contains(d.Name) && d.IsActive)
             .ToDictionaryAsync(d => d.Name, ct);
 
         var posNames = rows.Where(r => r.PositionName != null)
             .Select(r => r.PositionName!).Distinct().ToList();
         var positions = await _posRepo.GetQueryable()
-            .Where(p => posNames.Contains(p.Name))
+            .Where(p => posNames.Contains(p.Name) && p.IsActive)
             .ToDictionaryAsync(p => p.Name, ct);
 
         var mgrCodes = rows.Where(r => r.ManagerCode != null)
@@ -64,7 +64,7 @@ public sealed class ReferenceValidator
 
             if (row.ManagerCode != null && !managers.ContainsKey(row.ManagerCode))
                 errors.Add(new BulkImportValidationError(i, "Manager", row.ManagerCode,
-                    $"Manager with code '{row.ManagerCode}' not found", "Warning"));
+                    $"Manager with code '{row.ManagerCode}' not found", "Error"));
         }
 
         return (errors, departments, positions, managers);

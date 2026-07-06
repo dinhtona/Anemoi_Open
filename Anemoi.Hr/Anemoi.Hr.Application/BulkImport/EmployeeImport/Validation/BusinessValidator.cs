@@ -7,7 +7,7 @@ public sealed class BusinessValidator
     private static readonly HashSet<string> ValidEmploymentTypes =
         ["FullTime", "PartTime", "Contract", "Intern", "Probation"];
     private static readonly HashSet<string> ValidStatuses =
-        ["Active", "Onboarding", "Suspended", "Resigned", "Terminated", "Archived", "Draft"];
+        ["Active", "Onboarding", "PendingOnboarding", "Suspended", "Resigned", "Terminated", "Archived", "Draft"];
 
     public Task<IReadOnlyCollection<BulkImportValidationError>> ValidateAsync(
         EmployeeImportRowDto row, int rowIndex, CancellationToken ct)
@@ -22,7 +22,7 @@ public sealed class BusinessValidator
         if (!string.IsNullOrWhiteSpace(row.StatusValue) &&
             !ValidStatuses.Contains(row.StatusValue))
             errors.Add(new BulkImportValidationError(rowIndex, "Status",
-                row.StatusValue!, $"Must be: {string.Join(", ", ValidStatuses)}", "Warning"));
+                row.StatusValue!, $"Must be: {string.Join(", ", ValidStatuses)}", "Error"));
 
         return Task.FromResult<IReadOnlyCollection<BulkImportValidationError>>(errors);
     }

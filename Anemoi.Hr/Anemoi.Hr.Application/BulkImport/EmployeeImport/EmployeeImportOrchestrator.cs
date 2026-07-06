@@ -15,6 +15,7 @@ public sealed class EmployeeImportOrchestrator(
     EmployeeImportHandler handler,
     SyntaxValidator syntaxValidator,
     BusinessValidator businessValidator,
+    DuplicateValidator duplicateValidator,
     ISqlRepository<BulkImportJob> jobRepository,
     IUnitOfWork unitOfWork)
     : IImportOrchestrator
@@ -39,6 +40,9 @@ public sealed class EmployeeImportOrchestrator(
             allErrors.AddRange(await syntaxValidator.ValidateAsync(rows[i], i, ct));
             allErrors.AddRange(await businessValidator.ValidateAsync(rows[i], i, ct));
         }
+
+        allErrors.AddRange(duplicateValidator.ValidateInFile(rows));
+        allErrors.AddRange(await duplicateValidator.ValidateAgainstDatabaseAsync(rows, ct));
 
         var validRows = new List<EmployeeImportRowDto>();
         for (var i = 0; i < rows.Count; i++)
