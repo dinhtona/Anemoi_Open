@@ -9,7 +9,7 @@ public sealed class BulkImportJobConfiguration : IEntityTypeConfiguration<BulkIm
 {
     public void Configure(EntityTypeBuilder<BulkImportJob> builder)
     {
-        builder.ToTable("bulk_import_jobs", "hr");
+        builder.ToTable("BulkImportJobs", "Hr");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasConversion(id => id.Value, v => new BulkImportJobId(v))

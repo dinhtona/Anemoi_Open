@@ -112,7 +112,6 @@ services:
 
   # Aggregation and Controllers service
   anemoi_centralize:
-    user: root
     image: anemoi/centralize
     build:
       context: .
@@ -143,7 +142,7 @@ services:
     volumes:
       - centralize_keys:/root/.aspnet/DataProtection-Keys
       - jwt_keys:/home/app/.anemoi/jwt
-      - /var/run/docker.sock:/var/run/docker.sock
+      # /var/run/docker.sock mount removed — Docker management API is Dev-only and not safe for production
       - ./local_env/env_data:/app/env_data
       - ./local_env/sftp_data:/app/sftp_data
       - ./local_env/sftp_keys:/app/sftp_keys

@@ -18,26 +18,32 @@ public sealed class GetDepartmentCostAnalyticsHandler(
         GetDepartmentCostAnalyticsQuery request,
         CancellationToken cancellationToken)
     {
-        var result = await payrollItemRepository.GetQueryable()
+        var items = await payrollItemRepository.GetQueryable()
             .Where(x => x.PayrollRun.Status == PayrollRunStatus.Finalized)
             .AsNoTracking()
-            .GroupBy(x => new
+            .Select(x => new
             {
+                x.BasePayAmount,
                 DeptId = x.DepartmentIdSnapshot != null
                     ? x.DepartmentIdSnapshot.Value
                     : x.PayrollRun.Employee.PrimaryDepartmentId.Value,
                 DeptName = x.DepartmentNameSnapshot != null
                     ? x.DepartmentNameSnapshot
-                    : x.PayrollRun.Employee.PrimaryDepartment.Name
+                    : x.PayrollRun.Employee.PrimaryDepartment.Name,
+                x.PayrollRun.EmployeeId
             })
+            .ToListAsync(cancellationToken);
+
+        var result = items
+            .GroupBy(x => new { x.DeptId, x.DeptName })
             .Select(g => new DepartmentCostItem(
                 g.Key.DeptId,
                 g.Key.DeptName,
                 g.Sum(x => x.BasePayAmount),
-                g.Select(x => x.PayrollRun.EmployeeId).Distinct().Count()
+                g.Select(x => x.EmployeeId).Distinct().Count()
             ))
             .OrderByDescending(x => x.PayrollCost)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return result;
     }

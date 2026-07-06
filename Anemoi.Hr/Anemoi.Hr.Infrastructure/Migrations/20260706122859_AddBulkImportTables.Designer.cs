@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Anemoi.Hr.Infrastructure.Migrations
 {
     [DbContext(typeof(HrDbContext))]
-    [Migration("20260703143557_AddBulkImportTables")]
+    [Migration("20260706122859_AddBulkImportTables")]
     partial class AddBulkImportTables
     {
         /// <inheritdoc />
@@ -284,7 +284,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("StatusCode");
 
-                    b.ToTable("bulk_import_jobs", "hr");
+                    b.ToTable("BulkImportJobs", "Hr");
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.CalendarManagement.CalendarException", b =>

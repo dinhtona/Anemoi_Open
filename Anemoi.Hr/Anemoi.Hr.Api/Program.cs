@@ -3,6 +3,8 @@ using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.BuildingBlock.Infrastructure.GeneralMiddlewares;
 using Anemoi.Hr.Api.Services;
 using Anemoi.Hr.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Anemoi.Hr.Infrastructure.SeedData;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -80,6 +82,24 @@ builder.Host.ConfigureServices((context, services) =>
     services.AddHostedService<MonthlyLeaveAccrualWorker>();
     services.AddHostedService<DepartmentTransferWorker>();
     services.AddHostedService<ContractExpirationWorker>();
+
+    services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
+        .AddCheck("rabbitmq", () =>
+        {
+            var host = context.Configuration.GetValue<string>("MassTransitSetting:Host") ?? "localhost";
+            try
+            {
+                using var tcp = new System.Net.Sockets.TcpClient(host, 5672);
+                return tcp.Connected
+                    ? HealthCheckResult.Healthy()
+                    : HealthCheckResult.Unhealthy("RabbitMQ port unreachable");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("RabbitMQ unreachable", ex);
+            }
+        }, tags: ["ready"]);
 });
 
 var app = builder.Build();
@@ -96,6 +116,17 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
 app.MapControllers();
 
 await Anemoi.BuildingBlock.Infrastructure.RunSqlMigration.MigrationDatabase.MigrationDatabaseAsync<Anemoi.Hr.Infrastructure.Persistence.HrDbContext>(app);

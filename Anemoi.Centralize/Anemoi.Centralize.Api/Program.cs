@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.SignalR;
 using Anemoi.Centralize.Api.Hubs;
 using Anemoi.BuildingBlock.Application.Resources;
 using Anemoi.BuildingBlock.Application.Responses;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,8 +41,53 @@ builder.Host.ConfigureServices((context, services) =>
     services.AddHostedService<Anemoi.Centralize.Api.Services.Smtp4DevMonitoringWorker>();
     services.AddSignalR();
     services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
-    services.AddHttpLogging(options
-        => options.LoggingFields = HttpLoggingFields.All);
+
+    services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
+        .AddCheck("redis", () =>
+        {
+            try
+            {
+                using var redis = StackExchange.Redis.ConnectionMultiplexer.Connect(
+                    context.Configuration.GetValue<string>("RedisSetting:ConnectionString") ?? "localhost:6379");
+                return redis.GetDatabase().Ping() != default
+                    ? HealthCheckResult.Healthy()
+                    : HealthCheckResult.Unhealthy("Redis ping failed");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("Redis unreachable", ex);
+            }
+        }, tags: ["ready"])
+        .AddCheck("rabbitmq", () =>
+        {
+            var host = context.Configuration.GetValue<string>("MassTransitSetting:Host") ?? "localhost";
+            try
+            {
+                using var tcp = new System.Net.Sockets.TcpClient(host, 5672);
+                return tcp.Connected
+                    ? HealthCheckResult.Healthy()
+                    : HealthCheckResult.Unhealthy("RabbitMQ port unreachable");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("RabbitMQ unreachable", ex);
+            }
+        }, tags: ["ready"]);
+
+    if (context.HostingEnvironment.IsDevelopment())
+    {
+        services.AddHttpLogging(options
+            => options.LoggingFields = HttpLoggingFields.All);
+    }
+    else
+    {
+        services.AddHttpLogging(options
+            => options.LoggingFields = HttpLoggingFields.RequestPath
+                                       | HttpLoggingFields.RequestMethod
+                                       | HttpLoggingFields.ResponseStatusCode
+                                       | HttpLoggingFields.Duration);
+    }
     services.AddRateLimiter(options =>
     {
         // Strict limit for authentication endpoints (login, register, password reset)
@@ -82,7 +129,7 @@ var app = builder.Build();
 if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
-if (builder.Environment.IsDevelopment() || builder.Environment.IsStaging())
+if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -111,6 +158,16 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notification");

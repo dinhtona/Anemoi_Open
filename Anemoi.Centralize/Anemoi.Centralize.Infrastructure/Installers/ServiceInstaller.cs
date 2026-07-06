@@ -45,6 +45,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IEnvironmentNotificationService, EnvironmentNotificationService>();
 
         // Dev environments integration services
+        // DOCKER SOCKET: Docker management API is Dev-only — not safe for production.
+        // The service handles missing socket gracefully (returns "Docker daemon unreachable").
         services.AddSingleton<IDockerService, DockerService>();
         services.AddSingleton<ISftpFileManager, SftpFileManager>();
         services.AddSingleton<IMockRouteRepository, MockRouteRepository>();

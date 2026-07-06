@@ -23,21 +23,16 @@ public sealed class GetOvertimeAnalyticsHandler(
         var approvedCount = await query.CountAsync(x => x.Status == OvertimeStatusCode.Approved, cancellationToken);
         var rejectedCount = await query.CountAsync(x => x.Status == OvertimeStatusCode.Rejected, cancellationToken);
 
-        var hourStats = await query
-            .GroupBy(_ => 1)
-            .Select(g => new
-            {
-                TotalTicks = g.Sum(x => x.EndTime.Ticks - x.StartTime.Ticks),
-                AvgTicks = g.Average(x => (double)(x.EndTime.Ticks - x.StartTime.Ticks))
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        var allDurations = await query
+            .Select(x => x.EndTime.Ticks - x.StartTime.Ticks)
+            .ToListAsync(cancellationToken);
 
         double totalHours = 0;
         double avgHours = 0;
-        if (hourStats is not null)
+        if (allDurations.Count > 0)
         {
-            totalHours = new TimeSpan((long)hourStats.TotalTicks).TotalHours;
-            avgHours = new TimeSpan((long)hourStats.AvgTicks).TotalHours;
+            totalHours = new TimeSpan(allDurations.Sum()).TotalHours;
+            avgHours = new TimeSpan((long)allDurations.Average()).TotalHours;
         }
 
         return new OvertimeAnalyticsResponse(

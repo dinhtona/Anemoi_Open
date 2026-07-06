@@ -11,12 +11,9 @@ namespace Anemoi.Hr.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "hr");
-
             migrationBuilder.CreateTable(
-                name: "bulk_import_jobs",
-                schema: "hr",
+                name: "BulkImportJobs",
+                schema: "Hr",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -36,25 +33,25 @@ namespace Anemoi.Hr.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_bulk_import_jobs", x => x.Id);
+                    table.PrimaryKey("PK_BulkImportJobs", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_bulk_import_jobs_CreatedAt",
-                schema: "hr",
-                table: "bulk_import_jobs",
+                name: "IX_BulkImportJobs_CreatedAt",
+                schema: "Hr",
+                table: "BulkImportJobs",
                 column: "CreatedAt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_bulk_import_jobs_EntityType",
-                schema: "hr",
-                table: "bulk_import_jobs",
+                name: "IX_BulkImportJobs_EntityType",
+                schema: "Hr",
+                table: "BulkImportJobs",
                 column: "EntityType");
 
             migrationBuilder.CreateIndex(
-                name: "IX_bulk_import_jobs_StatusCode",
-                schema: "hr",
-                table: "bulk_import_jobs",
+                name: "IX_BulkImportJobs_StatusCode",
+                schema: "Hr",
+                table: "BulkImportJobs",
                 column: "StatusCode");
         }
 
@@ -62,8 +59,8 @@ namespace Anemoi.Hr.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "bulk_import_jobs",
-                schema: "hr");
+                name: "BulkImportJobs",
+                schema: "Hr");
         }
     }
 }

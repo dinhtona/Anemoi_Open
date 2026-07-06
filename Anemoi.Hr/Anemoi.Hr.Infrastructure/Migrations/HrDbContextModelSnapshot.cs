@@ -281,7 +281,7 @@ namespace Anemoi.Hr.Infrastructure.Migrations
 
                     b.HasIndex("StatusCode");
 
-                    b.ToTable("bulk_import_jobs", "hr");
+                    b.ToTable("BulkImportJobs", "Hr");
                 });
 
             modelBuilder.Entity("Anemoi.Hr.Domain.CalendarManagement.CalendarException", b =>
