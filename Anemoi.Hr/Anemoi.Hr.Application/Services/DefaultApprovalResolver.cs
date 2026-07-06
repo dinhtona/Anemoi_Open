@@ -37,7 +37,9 @@ public sealed class DefaultApprovalResolver(
         ApprovalRoutingContext context, CancellationToken ct)
     {
         var employee = await employeeRepository.GetQueryable()
-            .FirstOrDefaultAsync(e => e.Id == context.RequesterEmployeeId, ct);
+            .Where(e => e.Id == context.RequesterEmployeeId)
+            .Select(e => new { e.DirectManagerEmployeeId })
+            .FirstOrDefaultAsync(ct);
 
         if (employee is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
@@ -46,14 +48,16 @@ public sealed class DefaultApprovalResolver(
             return new List<ResolvedApprover>();
 
         var manager = await employeeRepository.GetQueryable()
-            .FirstOrDefaultAsync(e => e.Id == employee.DirectManagerEmployeeId, ct);
+            .Where(e => e.Id == employee.DirectManagerEmployeeId && e.IdentityUserId != null)
+            .Select(e => new { e.Id, e.IdentityUserId, e.FullName, e.WorkEmail })
+            .FirstOrDefaultAsync(ct);
 
-        if (manager is null || manager.IdentityUserId is null)
+        if (manager is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
 
         return new List<ResolvedApprover>
         {
-            new(new UserId(manager.IdentityUserId.Value), manager.Id,
+            new(new UserId(manager.IdentityUserId!.Value), manager.Id,
                 manager.FullName, manager.WorkEmail, "DirectManager")
         };
     }
@@ -61,34 +65,31 @@ public sealed class DefaultApprovalResolver(
     private async Task<OneOf<IReadOnlyList<ResolvedApprover>, ErrorDetailResponse>> ResolveDepartmentManagerAsync(
         ApprovalRoutingContext context, CancellationToken ct)
     {
-        var employee = await employeeRepository.GetQueryable()
-            .FirstOrDefaultAsync(e => e.Id == context.RequesterEmployeeId, ct);
+        var employeeInfo = await employeeRepository.GetQueryable()
+            .Where(e => e.Id == context.RequesterEmployeeId)
+            .Select(e => new { e.PrimaryDepartmentId })
+            .FirstOrDefaultAsync(ct);
 
-        if (employee is null)
+        if (employeeInfo is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
 
-        var deptId = context.DepartmentId ?? employee.PrimaryDepartmentId;
+        var deptId = context.DepartmentId ?? employeeInfo.PrimaryDepartmentId;
         if (deptId is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
 
-        var department = await departmentRepository.GetQueryable()
-            .FirstOrDefaultAsync(d => d.Id == deptId, ct);
+        var manager = await departmentRepository.GetQueryable()
+            .Where(d => d.Id == deptId && d.ManagerEmployeeId != null)
+            .SelectMany(d => employeeRepository.GetQueryable()
+                .Where(e => e.Id == d.ManagerEmployeeId && e.IdentityUserId != null)
+                .Select(e => new { e.Id, e.IdentityUserId, e.FullName, e.WorkEmail }))
+            .FirstOrDefaultAsync(ct);
 
-        if (department is null)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
-
-        if (department.ManagerEmployeeId is null)
-            return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
-
-        var manager = await employeeRepository.GetQueryable()
-            .FirstOrDefaultAsync(e => e.Id == department.ManagerEmployeeId, ct);
-
-        if (manager is null || manager.IdentityUserId is null)
+        if (manager is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
 
         return new List<ResolvedApprover>
         {
-            new(new UserId(manager.IdentityUserId.Value), manager.Id,
+            new(new UserId(manager.IdentityUserId!.Value), manager.Id,
                 manager.FullName, manager.WorkEmail, "DepartmentManager")
         };
     }

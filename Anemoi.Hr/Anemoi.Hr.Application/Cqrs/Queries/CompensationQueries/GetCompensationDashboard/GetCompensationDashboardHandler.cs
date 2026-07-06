@@ -29,10 +29,6 @@ public sealed class GetCompensationDashboardHandler(
     {
         var today = GetBusinessToday();
 
-        var employees = await employeeRepository.GetQueryable()
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
         var activeSalaries = await salaryRepository.GetQueryable()
             .AsNoTracking()
             .Where(x => x.EffectiveFrom <= today && (x.EffectiveTo == null || x.EffectiveTo >= today))
@@ -48,6 +44,23 @@ public sealed class GetCompensationDashboardHandler(
             .OrderByDescending(x => x.CreatedAt)
             .Take(10)
             .ToListAsync(cancellationToken);
+
+        // Find employees without active salaries
+        var salaryEmployeeIds = activeSalaries.Select(s => s.EmployeeId.Value).Distinct().ToList();
+        var missingSalaryEmployeeIds = salaryEmployeeIds.Count > 0
+            ? await employeeRepository.GetQueryable()
+                .Where(e => e.EmploymentStatusCode == EmploymentStatusCode.Active
+                    && !salaryEmployeeIds.Contains(e.Id.Value))
+                .OrderBy(e => e.FullName)
+                .Take(50)
+                .Select(e => e.Id.Value.ToString())
+                .ToListAsync(cancellationToken)
+            : await employeeRepository.GetQueryable()
+                .Where(e => e.EmploymentStatusCode == EmploymentStatusCode.Active)
+                .OrderBy(e => e.FullName)
+                .Take(50)
+                .Select(e => e.Id.Value.ToString())
+                .ToListAsync(cancellationToken);
 
         var costByGrade = new Dictionary<string, decimal>();
         var projectionByCurrency = new Dictionary<string, PayrollProjectionByCurrencyResponse>(StringComparer.OrdinalIgnoreCase);
@@ -107,13 +120,6 @@ public sealed class GetCompensationDashboardHandler(
             })
             .OrderBy(x => x.AllowanceTypeCode)
             .ThenBy(x => x.Currency)
-            .ToList();
-
-        // Find employees without salaries
-        var employeesWithSalaryIds = activeSalaries.Select(s => s.EmployeeId).ToHashSet();
-        var missingSalaryEmployeeIds = employees
-            .Where(e => !employeesWithSalaryIds.Contains(e.Id))
-            .Select(e => e.Id.Value.ToString())
             .ToList();
 
         return new CompensationDashboardResponse

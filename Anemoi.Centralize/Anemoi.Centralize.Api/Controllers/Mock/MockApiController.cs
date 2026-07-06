@@ -6,6 +6,7 @@ using Anemoi.Centralize.Application.Abstractions;
 using Anemoi.Centralize.Application.Cqrs.Environments.Queries;
 using Anemoi.BuildingBlock.Application.Resources;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -13,6 +14,7 @@ namespace Anemoi.Centralize.Api.Controllers.Mock;
 
 [ApiController]
 [Route("api/mock")]
+[Authorize]
 public sealed class MockApiController(
     ISender sender,
     IStringLocalizer<SharedResource> localizer) : ControllerBase

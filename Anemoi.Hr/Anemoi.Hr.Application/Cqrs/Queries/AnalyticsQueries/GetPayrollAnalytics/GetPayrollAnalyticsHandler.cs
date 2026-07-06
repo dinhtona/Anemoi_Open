@@ -21,37 +21,33 @@ public sealed class GetPayrollAnalyticsHandler(
             .Where(x => x.PayrollRun.Status == PayrollRunStatus.Finalized)
             .AsNoTracking();
 
-        var runCosts = await finalizedItems
-            .Select(x => new { x.PayrollRunId, x.PayrollRun.NetAmount })
+        var totalPayrollCost = await finalizedItems
+            .Select(x => x.PayrollRun.NetAmount)
             .Distinct()
-            .ToListAsync(cancellationToken);
+            .SumAsync(cancellationToken);
 
-        var totalPayrollCost = runCosts.Sum(x => x.NetAmount);
-
-        var employeeSalaries = await finalizedItems
-            .Select(x => new
+        var salaryStats = await finalizedItems
+            .Select(x => x.BaseSalarySnapshot)
+            .Distinct()
+            .GroupBy(_ => 1)
+            .Select(g => new
             {
-                EmployeeId = x.PayrollRun.EmployeeId,
-                x.BaseSalarySnapshot
+                Count = g.Count(),
+                Average = g.Average(),
+                Max = g.Max(),
+                Min = g.Min()
             })
-            .Distinct()
-            .ToListAsync(cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
 
-        var employeeCount = employeeSalaries.Count;
-
-        if (employeeCount == 0)
+        if (salaryStats is null || salaryStats.Count == 0)
             return new PayrollAnalyticsResponse(0, 0, 0, 0, 0);
-
-        var averageSalary = employeeSalaries.Average(x => x.BaseSalarySnapshot);
-        var highestSalary = employeeSalaries.Max(x => x.BaseSalarySnapshot);
-        var lowestSalary = employeeSalaries.Min(x => x.BaseSalarySnapshot);
 
         return new PayrollAnalyticsResponse(
             totalPayrollCost,
-            averageSalary,
-            highestSalary,
-            lowestSalary,
-            employeeCount
+            salaryStats.Average,
+            salaryStats.Max,
+            salaryStats.Min,
+            salaryStats.Count
         );
     }
 }

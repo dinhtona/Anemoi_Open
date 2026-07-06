@@ -135,6 +135,7 @@ public static class SystemRoleProfiles
             Permissions.HrWorkflowView,
             Permissions.HrWorkflowManage,
             Permissions.HrWorkflowExecute,
+            Permissions.HrWorkflowApprove,
             Permissions.HrOrganizationView,
             Permissions.HrWorkflowOverride,
             Permissions.HrLeavePolicyView,
@@ -179,7 +180,8 @@ public static class SystemRoleProfiles
         EmployeeRoleSeeder.EmployeePermissions.Concat([
             Permissions.HrWorkflowView,
             Permissions.HrWorkflowManage,
-            Permissions.HrWorkflowExecute
+            Permissions.HrWorkflowExecute,
+            Permissions.HrWorkflowApprove
         ]).Distinct().ToArray());
 
     public static readonly SystemRoleProfile Admin = new(

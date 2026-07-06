@@ -19,23 +19,20 @@ public sealed class GetHeadcountTrendHandler(
         GetHeadcountTrendQuery request,
         CancellationToken cancellationToken)
     {
-        var endDate = new DateTime(request.ToDate.Year, request.ToDate.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(1);
-        var monthlyJoins = await employeeRepository.GetQueryable()
-            .Where(x => x.CreatedAt < endDate)
-            .Select(x => new { x.CreatedAt, x.EmploymentStatusCode })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        var trend = new List<HeadcountTrendItem>();
         var current = new DateOnly(request.FromDate.Year, request.FromDate.Month, 1);
         var end = new DateOnly(request.ToDate.Year, request.ToDate.Month, 1);
 
+        var trend = new List<HeadcountTrendItem>();
         while (current <= end)
         {
             var monthEnd = current.AddMonths(1);
-            var headcount = monthlyJoins.Count(e =>
-                DateOnly.FromDateTime(e.CreatedAt) < monthEnd &&
-                e.EmploymentStatusCode == EmploymentStatusCode.Active);
+            var monthEndDateTime = new DateTime(monthEnd.Year, monthEnd.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            var headcount = await employeeRepository.GetQueryable()
+                .CountAsync(x => x.CreatedAt < monthEndDateTime
+                    && x.EmploymentStatusCode == EmploymentStatusCode.Active,
+                    cancellationToken);
+
             trend.Add(new HeadcountTrendItem(current, headcount));
             current = current.AddMonths(1);
         }

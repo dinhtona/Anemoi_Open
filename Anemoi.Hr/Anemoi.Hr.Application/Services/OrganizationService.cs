@@ -44,16 +44,23 @@ public sealed class OrganizationService(
 
         var employeeMap = employees.ToDictionary(e => e.Id);
 
+        var childrenByManager = employees
+            .Where(e => e.DirectManagerEmployeeId is not null)
+            .GroupBy(e => e.DirectManagerEmployeeId!.Value)
+            .ToDictionary(g => new EmployeeId(g.Key), g => g.OrderBy(e => e.FullName).ToList());
+
         var roots = employees
             .Where(e => e.DirectManagerEmployeeId is null)
             .OrderBy(e => e.FullName)
             .ToList();
 
-        var tree = roots.Select(r => BuildNode(r, employees, departments)).ToList();
+        var tree = roots.Select(r => BuildNode(r, employeeMap, childrenByManager, departments)).ToList();
         return tree;
     }
 
-    private OrganizationNode BuildNode(Employee employee, List<Employee> allEmployees,
+    private OrganizationNode BuildNode(Employee employee,
+        Dictionary<EmployeeId, Employee> employeeMap,
+        Dictionary<EmployeeId, List<Employee>> childrenByManager,
         Dictionary<DepartmentId, Department> departments)
     {
         var dept = employee.PrimaryDepartmentId is not null
@@ -61,13 +68,11 @@ public sealed class OrganizationService(
             : null;
 
         var manager = employee.DirectManagerEmployeeId is not null
-            ? allEmployees.FirstOrDefault(e => e.Id == employee.DirectManagerEmployeeId)
+            ? employeeMap.GetValueOrDefault(employee.DirectManagerEmployeeId)
             : null;
 
-        var directReports = allEmployees
-            .Where(e => e.DirectManagerEmployeeId == employee.Id)
-            .OrderBy(e => e.FullName)
-            .ToList();
+        var directReports = childrenByManager.GetValueOrDefault(employee.Id)
+            ?? new List<Employee>();
 
         return new OrganizationNode(
             employee.Id,
@@ -79,16 +84,22 @@ public sealed class OrganizationService(
             dept?.Name ?? string.Empty,
             employee.PrimaryPosition?.Name ?? string.Empty,
             employee.GradeCode,
-            directReports.Select(r => BuildNode(r, allEmployees, departments)).ToList());
+            directReports.Select(r => BuildNode(r, employeeMap, childrenByManager, departments)).ToList());
     }
 
     public async Task<List<ReportingRelationship>> GetReportingChainAsync(
         EmployeeId employeeId, CancellationToken ct)
     {
-        var employees = await employeeRepository.GetQueryable()
+        var allEmployees = await employeeRepository.GetQueryable()
+            .Select(e => new
+            {
+                e.Id,
+                e.FullName,
+                e.DirectManagerEmployeeId
+            })
             .ToDictionaryAsync(e => e.Id, ct);
 
-        if (!employees.TryGetValue(employeeId, out var current))
+        if (!allEmployees.TryGetValue(employeeId, out var current))
             return [];
 
         var chain = new List<ReportingRelationship>();
@@ -98,7 +109,7 @@ public sealed class OrganizationService(
             HierarchyLevel.DepartmentManager, HierarchyLevel.HrManager };
         chain.Add(new ReportingRelationship(current.Id, current.FullName,
             current.DirectManagerEmployeeId,
-            current.DirectManagerEmployeeId is not null && employees.TryGetValue(current.DirectManagerEmployeeId, out var dm) ? dm.FullName : null,
+            current.DirectManagerEmployeeId is not null && allEmployees.TryGetValue(current.DirectManagerEmployeeId, out var dm) ? dm.FullName : null,
             level < levels.Length ? levels[level] : $"Level{level}"));
 
         var visited = new HashSet<EmployeeId> { current.Id };
@@ -108,12 +119,12 @@ public sealed class OrganizationService(
         while (managerId is not null && !visited.Contains(managerId))
         {
             visited.Add(managerId);
-            if (!employees.TryGetValue(managerId, out var manager))
+            if (!allEmployees.TryGetValue(managerId, out var manager))
                 break;
 
             chain.Add(new ReportingRelationship(manager.Id, manager.FullName,
                 manager.DirectManagerEmployeeId,
-                manager.DirectManagerEmployeeId is not null && employees.TryGetValue(manager.DirectManagerEmployeeId, out var mgr) ? mgr.FullName : null,
+                manager.DirectManagerEmployeeId is not null && allEmployees.TryGetValue(manager.DirectManagerEmployeeId, out var mgr) ? mgr.FullName : null,
                 level < levels.Length ? levels[level] : $"Level{level}"));
 
             managerId = manager.DirectManagerEmployeeId;
@@ -134,24 +145,26 @@ public sealed class OrganizationService(
 
         if (managerId is not null)
         {
+            if (managerId == employeeId)
+                return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
             var manager = await employeeRepository.GetQueryable()
                 .FirstOrDefaultAsync(e => e.Id == managerId, ct);
             if (manager is null)
                 return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
 
-            if (managerId == employeeId)
-                return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+            // Load full manager chain in one query to detect circular hierarchy
+            var managerChain = await employeeRepository.GetQueryable()
+                .Select(e => new { e.Id, e.DirectManagerEmployeeId })
+                .ToDictionaryAsync(e => e.Id, ct);
 
-            // Detect circular hierarchy
             var visited = new HashSet<EmployeeId> { employeeId };
             var currentManagerId = manager.DirectManagerEmployeeId;
             while (currentManagerId is not null)
             {
                 if (!visited.Add(currentManagerId))
                     return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
-                var mgr = await employeeRepository.GetQueryable()
-                    .FirstOrDefaultAsync(e => e.Id == currentManagerId, ct);
-                if (mgr is null) break;
+                if (!managerChain.TryGetValue(currentManagerId, out var mgr)) break;
                 currentManagerId = mgr.DirectManagerEmployeeId;
             }
         }
