@@ -3,12 +3,11 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Queries;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Contract.Workspace.Queries.MemberQueries.GetMembers;
 using Anemoi.Contract.Workspace.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
@@ -16,10 +15,10 @@ namespace Anemoi.Workspace.Application.Cqrs.Queries.MemberQueries.GetMembers;
 
 public sealed class GetMembersHandler(
     ISqlRepository<Member> sqlRepository,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger,
     IWorkspaceIdGetter workspaceIdGetter)
-    : EfQueryPaginationHandler<Member, GetMembersQuery, MemberResponse>(sqlRepository, mapper, logger)
+    : EfQueryPaginationHandler<Member, GetMembersQuery, MemberResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<Member, MemberResponse> BuildQueryFlow(
         IQueryListFilter<Member, MemberResponse> fromFlow, GetMembersQuery query)
@@ -46,7 +45,7 @@ public sealed class GetMembersHandler(
 
         return fromFlow
             .WithFilter(finalFilter)
-            .WithSpecialAction(a => a.ProjectTo<MemberResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToMemberResponse)
             .WithSortFieldWhenNotSet(x => x.CreatedTime)
             .WithSortedDirectionWhenNotSet(SortedDirection.Descending);
     }

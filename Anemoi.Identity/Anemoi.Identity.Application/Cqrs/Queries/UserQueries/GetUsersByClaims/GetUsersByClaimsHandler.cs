@@ -4,23 +4,22 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.Identity.Queries.UserQueries.GetUsersByClaims;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Queries.UserQueries.GetUsersByClaims;
 
 public sealed class GetUsersByClaimsHandler(
     ISqlRepository<User> sqlRepository,
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     IUserClaimRepository userClaimRepository)
-    : EfQueryPaginationHandler<User, GetUsersByClaimsQuery, UserResponse>(sqlRepository, mapper, logger)
+    : EfQueryPaginationHandler<User, GetUsersByClaimsQuery, UserResponse>(sqlRepository, logger)
 {
     public override async Task<PaginationResponse<UserResponse>> Handle(
         GetUsersByClaimsQuery request, CancellationToken cancellationToken)
@@ -35,7 +34,7 @@ public sealed class GetUsersByClaimsHandler(
         GetUsersByClaimsQuery query)
         => fromFlow
             .WithFilter(a => query.UserIds.Contains(a.Id))
-            .WithSpecialAction(a => a.ProjectTo<UserResponse>(Mapper.ConfigurationProvider))
+            .WithSpecialAction(mapper.ProjectToUserResponse)
             .WithSortFieldWhenNotSet(a => a.FirstName)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
 }

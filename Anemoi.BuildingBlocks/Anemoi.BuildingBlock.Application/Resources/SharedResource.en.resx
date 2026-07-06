@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="UnhandledError" xml:space="preserve">
+    <value>An unhandled error occurred.</value>
+  </data>
+  <data name="SSE_04" xml:space="preserve">
+    <value>Seed server name already exists!</value>
+  </data>
+  <data name="PEE_04" xml:space="preserve">
+    <value>Province already exists!</value>
+  </data>
+  <data name="RefreshTokenInvalid" xml:space="preserve">
+    <value>Refresh token is missing or invalid.</value>
+  </data>
+  <data name="FailedToStartEnvironment" xml:space="preserve">
+    <value>Failed to start environment service.</value>
+  </data>
+  <data name="FailedToStopEnvironment" xml:space="preserve">
+    <value>Failed to stop environment service.</value>
+  </data>
+  <data name="NoFileUploaded" xml:space="preserve">
+    <value>No file uploaded.</value>
+  </data>
+  <data name="EnvironmentNotFound" xml:space="preserve">
+    <value>Environment service not found.</value>
+  </data>
+  <data name="MockRouteNotFound" xml:space="preserve">
+    <value>Mock route not found.</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>File not found.</value>
+  </data>
+  <data name="ROE_06" xml:space="preserve">
+    <value>Administrator is a reserved system role and cannot be assigned through a system role group.</value>
+  </data>
+  <data name="AUE_12" xml:space="preserve"><value>User is already a system administrator.</value></data>
+  <data name="AUE_13" xml:space="preserve"><value>User is not a system administrator.</value></data>
+  <data name="AUE_14" xml:space="preserve"><value>A system administrator cannot demote their own account.</value></data>
+  <data name="AUE_15" xml:space="preserve"><value>The last system administrator cannot be demoted.</value></data>
+  <data name="RateLimitExceeded" xml:space="preserve"><value>Too many requests. Please try again later.</value></data>
+  <data name="HubJoinForbidden" xml:space="preserve"><value>You are not allowed to join this group.</value></data>
+  <data name="HubUnknownGroup" xml:space="preserve"><value>Unknown group.</value></data>
+  <data name="FileOperationFailed" xml:space="preserve"><value>The file operation failed.</value></data>
+  <data name="S3OperationFailed" xml:space="preserve"><value>The storage operation failed.</value></data>
+  <data name="ExternalAuthFailed" xml:space="preserve"><value>Social login verification failed.</value></data>
+  <data name="ProviderNotSupported" xml:space="preserve"><value>This social login provider is not supported.</value></data>
+  <data name="ExternalAuthException" xml:space="preserve"><value>Social login failed.</value></data>
+  <data name="EmailEmpty" xml:space="preserve"><value>Could not retrieve an email address from the social login provider.</value></data>
+  <data name="TokenGenerationFailed" xml:space="preserve"><value>Failed to generate access tokens.</value></data>
+  <data name="VAL_REQUIRED" xml:space="preserve"><value>This field is required.</value></data>
+  <data name="VAL_EMAIL_INVALID" xml:space="preserve"><value>The email address is invalid.</value></data>
+  <data name="VAL_MAX_LENGTH" xml:space="preserve"><value>The value exceeds the maximum length.</value></data>
+  <data name="VAL_MIN_LENGTH" xml:space="preserve"><value>The value does not meet the minimum length.</value></data>
+  <data name="VAL_FORMAT_INVALID" xml:space="preserve"><value>The value format is invalid.</value></data>
+  <data name="VAL_INVALID" xml:space="preserve"><value>The value is invalid.</value></data>
+  <data name="VAL_REFRESH_TOKEN_REQUIRED" xml:space="preserve"><value>Refresh token is required.</value></data>
+  <data name="VAL_IDS_NOT_EMPTY" xml:space="preserve"><value>Identifiers must not be empty.</value></data>
+  <data name="VAL_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Identifiers must not be duplicated.</value></data>
+  <data name="VAL_ROLE_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Role identifiers must not be duplicated.</value></data>
+  <data name="VAL_LOCK_UNTIL_FUTURE" xml:space="preserve"><value>The lock expiration must be in the future.</value></data>
+  <data name="VAL_USER_ID_REQUIRED" xml:space="preserve"><value>User identifier is required.</value></data>
+  <data name="VAL_PROVINCE_ID_REQUIRED" xml:space="preserve"><value>Province identifier is required.</value></data>
+  <data name="VAL_DISTRICT_ID_REQUIRED" xml:space="preserve"><value>District identifier is required.</value></data>
+  <data name="VAL_ORGANIZATION_ID_REQUIRED" xml:space="preserve"><value>Organization identifier is required.</value></data>
+  <data name="VAL_PRIMARY_KEY_CONDITION_INVALID" xml:space="preserve"><value>The primary key condition is invalid.</value></data>
+  <data name="IDE_01" xml:space="preserve"><value>User is locked out.</value></data>
+  <data name="IDE_02" xml:space="preserve"><value>User is not allowed to log in.</value></data>
+  <data name="IDE_03" xml:space="preserve"><value>Two-factor authentication is required.</value></data>
+  <data name="IDE_04" xml:space="preserve"><value>Failed to log out.</value></data>
+  <data name="IDE_05" xml:space="preserve"><value>Failed to change password.</value></data>
+  <data name="IDE_06" xml:space="preserve"><value>Password is incorrect.</value></data>
+  <data name="IDE_07" xml:space="preserve"><value>Failed to log in.</value></data>
+  <data name="IDE_08" xml:space="preserve"><value>Failed to lock user.</value></data>
+  <data name="IDE_09" xml:space="preserve"><value>Failed to reset user password.</value></data>
+  <data name="IDE_10" xml:space="preserve"><value>Password must be changed on first login.</value></data>
+  <data name="IDE_12" xml:space="preserve"><value>User email has not been verified.</value></data>
+  <data name="IDE_15" xml:space="preserve"><value>Password rehash is required.</value></data>
+  <data name="TEE_01" xml:space="preserve"><value>The refresh token has already been used.</value></data>
+  <data name="TEE_02" xml:space="preserve"><value>The token has not expired.</value></data>
+  <data name="TEE_03" xml:space="preserve"><value>Refresh token was not found.</value></data>
+  <data name="TEE_04" xml:space="preserve"><value>Failed to create a refresh token.</value></data>
+  <data name="TEE_05" xml:space="preserve"><value>The token is invalid.</value></data>
+  <data name="TEE_07" xml:space="preserve"><value>The session has expired.</value></data>
+  <data name="TEE_08" xml:space="preserve"><value>The refresh token is invalid.</value></data>
+  <data name="TEE_09" xml:space="preserve"><value>The token has expired.</value></data>
+  <data name="AUE_01" xml:space="preserve"><value>User was not found.</value></data>
+  <data name="AUE_02" xml:space="preserve"><value>Failed to create user.</value></data>
+  <data name="AUE_03" xml:space="preserve"><value>Failed to update user.</value></data>
+  <data name="AUE_04" xml:space="preserve"><value>Failed to remove user.</value></data>
+  <data name="AUE_05" xml:space="preserve"><value>User account has already been confirmed.</value></data>
+  <data name="AUE_06" xml:space="preserve"><value>User already exists.</value></data>
+  <data name="AUE_11" xml:space="preserve"><value>Password is invalid.</value></data>
+  <data name="ROE_01" xml:space="preserve"><value>Requested roles must not be duplicated.</value></data>
+  <data name="ROE_02" xml:space="preserve"><value>One or more roles do not exist.</value></data>
+  <data name="ROE_03" xml:space="preserve"><value>Failed to remove roles.</value></data>
+  <data name="ROE_04" xml:space="preserve"><value>Failed to add roles.</value></data>
+  <data name="ROE_05" xml:space="preserve"><value>Requested roles are required.</value></data>
+  <data name="RGE_01" xml:space="preserve"><value>Role group was not found.</value></data>
+  <data name="RGE_02" xml:space="preserve"><value>Failed to create role group.</value></data>
+  <data name="RGE_03" xml:space="preserve"><value>Failed to update role group.</value></data>
+  <data name="RGE_04" xml:space="preserve"><value>Failed to remove role group.</value></data>
+  <data name="RGE_05" xml:space="preserve"><value>Role group name already exists.</value></data>
+  <data name="RGE_06" xml:space="preserve"><value>Role group has already been applied.</value></data>
+  <data name="RGE_08" xml:space="preserve"><value>The default role group cannot be modified.</value></data>
+  <data name="RGE_09" xml:space="preserve"><value>A workspace role group cannot be managed as a system role group.</value></data>
+  <data name="RGE_10" xml:space="preserve"><value>Role group does not belong to the current workspace.</value></data>
+  <data name="APE_01" xml:space="preserve"><value>Application policy was not found.</value></data>
+  <data name="APE_02" xml:space="preserve"><value>Failed to create application policy.</value></data>
+  <data name="APE_03" xml:space="preserve"><value>Failed to update application policy.</value></data>
+  <data name="APE_04" xml:space="preserve"><value>Failed to remove application policy.</value></data>
+  <data name="UMG_01" xml:space="preserve"><value>User role-group mapping was not found.</value></data>
+  <data name="UMG_02" xml:space="preserve"><value>Failed to create user role-group mapping.</value></data>
+  <data name="UMG_03" xml:space="preserve"><value>Failed to update user role-group mapping.</value></data>
+  <data name="UMG_04" xml:space="preserve"><value>Failed to remove user role-group mapping.</value></data>
+  <data name="UMG_05" xml:space="preserve"><value>Role-group identifiers must not be duplicated.</value></data>
+  <data name="PEE_01" xml:space="preserve"><value>Failed to create province.</value></data>
+  <data name="PEE_02" xml:space="preserve"><value>Failed to update province.</value></data>
+  <data name="PEE_03" xml:space="preserve"><value>Province was not found.</value></data>
+  <data name="DIE_01" xml:space="preserve"><value>Failed to create district.</value></data>
+  <data name="DIE_02" xml:space="preserve"><value>Failed to update district.</value></data>
+  <data name="DIE_03" xml:space="preserve"><value>District was not found.</value></data>
+  <data name="SSE_01" xml:space="preserve"><value>Failed to create seed server.</value></data>
+  <data name="SSE_02" xml:space="preserve"><value>Failed to update seed server.</value></data>
+  <data name="SSE_03" xml:space="preserve"><value>Seed server was not found.</value></data>
+  <data name="SSE_05" xml:space="preserve"><value>Database connection test failed.</value></data>
+  <data name="SFE_01" xml:space="preserve"><value>Failed to create seed function.</value></data>
+  <data name="SFE_02" xml:space="preserve"><value>Failed to update seed function.</value></data>
+  <data name="SFE_03" xml:space="preserve"><value>Seed function was not found.</value></data>
+  <data name="SFE_04" xml:space="preserve"><value>Seed function name already exists.</value></data>
+  <data name="STE_01" xml:space="preserve"><value>Failed to create seed template.</value></data>
+  <data name="STE_02" xml:space="preserve"><value>Failed to update seed template.</value></data>
+  <data name="STE_03" xml:space="preserve"><value>Seed template was not found.</value></data>
+  <data name="STE_04" xml:space="preserve"><value>Seed template name already exists.</value></data>
+  <data name="SEE_01" xml:space="preserve"><value>Seed execution failed.</value></data>
+  <data name="SEE_02" xml:space="preserve"><value>Template configuration is missing.</value></data>
+  <data name="SEE_03" xml:space="preserve"><value>Template configuration is invalid.</value></data>
+  <data name="SEE_04" xml:space="preserve"><value>The table was not found in the template.</value></data>
+  <data name="SEE_05" xml:space="preserve"><value>The table was not found in the target database.</value></data>
+  <data name="SEE_06" xml:space="preserve"><value>A seed function or seed server is required.</value></data>
+  <data name="SEE_07" xml:space="preserve"><value>Failed to generate sample data.</value></data>
+  <data name="NTE_01" xml:space="preserve"><value>Failed to create notification.</value></data>
+  <data name="NTE_02" xml:space="preserve"><value>Failed to update notification.</value></data>
+  <data name="NTE_03" xml:space="preserve"><value>Notification was not found.</value></data>
+  <data name="NSE_01" xml:space="preserve"><value>Failed to save notification settings.</value></data>
+  <data name="WKE_01" xml:space="preserve"><value>Failed to create workspace.</value></data>
+  <data name="WKE_02" xml:space="preserve"><value>Failed to update workspace.</value></data>
+  <data name="WKE_03" xml:space="preserve"><value>Workspace was not found.</value></data>
+  <data name="WKE_04" xml:space="preserve"><value>Workspace already exists.</value></data>
+  <data name="WKE_05" xml:space="preserve"><value>Workspace domain already exists.</value></data>
+  <data name="WKE_06" xml:space="preserve"><value>Workspace limit has been exceeded.</value></data>
+  <data name="OGE_01" xml:space="preserve"><value>Failed to create organization.</value></data>
+  <data name="OGE_02" xml:space="preserve"><value>Failed to update organization.</value></data>
+  <data name="OGE_03" xml:space="preserve"><value>Organization was not found.</value></data>
+  <data name="OGE_06" xml:space="preserve"><value>Organization already exists.</value></data>
+  <data name="OGE_07" xml:space="preserve"><value>Organization domain already exists.</value></data>
+  <data name="MIE_01" xml:space="preserve"><value>Failed to create member invitation.</value></data>
+  <data name="MIE_02" xml:space="preserve"><value>Failed to update member invitation.</value></data>
+  <data name="MIE_03" xml:space="preserve"><value>Member invitation was not found.</value></data>
+  <data name="MIE_04" xml:space="preserve"><value>Member invitation already exists.</value></data>
+  <data name="MIE_05" xml:space="preserve"><value>Failed to remove member invitation.</value></data>
+  <data name="MME_01" xml:space="preserve"><value>Failed to create member.</value></data>
+  <data name="MME_02" xml:space="preserve"><value>Failed to update member.</value></data>
+  <data name="MME_03" xml:space="preserve"><value>Member was not found.</value></data>
+  <data name="MME_04" xml:space="preserve"><value>Member already exists.</value></data>
+  <data name="MME_05" xml:space="preserve"><value>Failed to remove member.</value></data>
+  <data name="MME_06" xml:space="preserve"><value>User was not found.</value></data>
+  <data name="MMG_01" xml:space="preserve"><value>Failed to create member role-group mapping.</value></data>
+  <data name="MMG_02" xml:space="preserve"><value>Failed to update member role-group mapping.</value></data>
+  <data name="MMG_03" xml:space="preserve"><value>Member role-group mapping was not found.</value></data>
+  <data name="MMG_04" xml:space="preserve"><value>Failed to remove member role-group mapping.</value></data>
+  <data name="MockRouteNotConfigured" xml:space="preserve"><value>No active mock response is configured for {0} /{1}. Define it in the developer dashboard Environments tab.</value></data>
+  <data name="EnvironmentActivityTitle" xml:space="preserve"><value>Environment call: {0}</value></data>
+  <data name="EnvironmentServiceSftp" xml:space="preserve"><value>SFTP for Dev</value></data>
+  <data name="EnvironmentServiceMockApi" xml:space="preserve"><value>API Mock</value></data>
+  <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Mail Test</value></data>
+  <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Uploaded file: {0} to path: {1}</value></data>
+  <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Deleted item: {0}</value></data>
+  <data name="EnvironmentSftpDirectoryCreated" xml:space="preserve"><value>Created directory: {0} at path: {1}</value></data>
+  <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Downloaded file: {0} from path: {1}</value></data>
+  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>Mock API matched: {0} /{1} - returned {2}</value></data>
+  <data name="EnvironmentMailReceived" xml:space="preserve"><value>New email received from {0} to {1} with subject: "{2}"</value></data>
+  <data name="PermissionGroupUsers" xml:space="preserve"><value>Users</value></data>
+  <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Role groups</value></data>
+  <data name="PermissionGroupSeedGenerator" xml:space="preserve"><value>Seed generator</value></data>
+  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Environments</value></data>
+  <data name="PermissionGroupOther" xml:space="preserve"><value>Other</value></data>
+  <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>View users and their assigned role groups.</value></data>
+  <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Create, update and manage user access.</value></data>
+  <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>View role groups and their assigned permissions.</value></data>
+  <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Create, update and remove role groups.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorRead" xml:space="preserve"><value>View seed servers, templates and functions.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorManage" xml:space="preserve"><value>Create and update seed servers, templates and functions.</value></data>
+  <data name="PermissionDescriptionSeedExecutionRun" xml:space="preserve"><value>Run automatic data generation tasks.</value></data>
+  <data name="PermissionDescriptionSeedExecutionManualWrite" xml:space="preserve"><value>Insert manually prepared rows into target databases.</value></data>
+  <data name="PermissionDescriptionSeedExecutionDeleteRow" xml:space="preserve"><value>Delete generated rows from target databases.</value></data>
+  <data name="PermissionDescriptionSeedExecutionLogClear" xml:space="preserve"><value>Clear generated-row history logs.</value></data>
+  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>View development environment services.</value></data>
+  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Start and stop development environment services.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Browse and download files from development SFTP storage.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Upload, create and delete items in development SFTP storage.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>View development mock API routes.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Create, update and delete development mock API routes.</value></data>
+  <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Unmapped permission: {0}. Add metadata to the permission catalog.</value></data>
+  <data name="PermissionGroupHrLeave" xml:space="preserve"><value>HR Leave</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyView" xml:space="preserve"><value>View HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyCreate" xml:space="preserve"><value>Create HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyUpdate" xml:space="preserve"><value>Update HR leave policies.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceView" xml:space="preserve"><value>View HR leave balances.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceAdjust" xml:space="preserve"><value>Adjust HR leave balances.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestView" xml:space="preserve"><value>View HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCreate" xml:space="preserve"><value>Create HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestApprove" xml:space="preserve"><value>Approve HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCancel" xml:space="preserve"><value>Cancel HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Force approve HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Force cancel HR leave requests.</value></data>
+  <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>View HR leave transactions.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeView" xml:space="preserve"><value>View HR leave types.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeManage" xml:space="preserve"><value>Manage HR leave types.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsView" xml:space="preserve"><value>View HR leave policy settings.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsManage" xml:space="preserve"><value>Manage HR leave policy settings.</value></data>
+  <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>HR Employee</value></data>
+  <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>View HR employee profiles.</value></data>
+  <data name="PermissionDescriptionHrEmployeeCreate" xml:space="preserve"><value>Create HR employee profiles.</value></data>
+  <data name="PermissionDescriptionHrEmployeeUpdate" xml:space="preserve"><value>Update HR employee profiles.</value></data>
+  <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Link HR employees to identity users.</value></data>
+  <data name="PermissionDescriptionHrEmployeeActivate" xml:space="preserve"><value>Activate HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeSuspend" xml:space="preserve"><value>Suspend HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeResume" xml:space="preserve"><value>Resume suspended HR employee accounts.</value></data>
+  <data name="PermissionDescriptionHrEmployeeArchive" xml:space="preserve"><value>Archive HR employee records.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDepartmentChange" xml:space="preserve"><value>Change employee department assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeePositionChange" xml:space="preserve"><value>Change employee position assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeGradeChange" xml:space="preserve"><value>Change employee grade assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeManagerChange" xml:space="preserve"><value>Change employee manager assignment.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentView" xml:space="preserve"><value>View employee documents.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentManage" xml:space="preserve"><value>Manage employee documents.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetView" xml:space="preserve"><value>View employee assets.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetManage" xml:space="preserve"><value>Manage employee assets.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteView" xml:space="preserve"><value>View employee notes.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteManage" xml:space="preserve"><value>Manage employee notes (sensitive).</value></data>
+  <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>HR Department</value></data>
+  <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>View HR department information.</value></data>
+  <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Manage HR department information.</value></data>
+  <data name="PermissionGroupHrPosition" xml:space="preserve"><value>HR Position</value></data>
+  <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>View HR position information.</value></data>
+  <data name="PermissionDescriptionHrPositionManage" xml:space="preserve"><value>Manage HR position information.</value></data>
+  <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>View HR dashboard.</value></data>
+  <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>View HR analytics.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>View employee department transfer history.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Execute department transfers for employees.</value></data>
+  <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>View employee promotion history.</value></data>
+  <data name="PermissionDescriptionHrPromotionCreate" xml:space="preserve"><value>Execute employee promotions.</value></data>
+  <data name="PermissionDescriptionHrPositionChangeView" xml:space="preserve"><value>View employee position change history.</value></data>
+  <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Execute employee position changes.</value></data>
+  <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>View employee grade change history.</value></data>
+  <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Execute employee grade changes.</value></data>
+  <data name="PermissionDescriptionHrContractView" xml:space="preserve"><value>View employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractCreate" xml:space="preserve"><value>Create employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractUpdate" xml:space="preserve"><value>Update employee contracts.</value></data>
+  <data name="PermissionDescriptionHrContractTerminate" xml:space="preserve"><value>Terminate employee contracts.</value></data>
+  <data name="PermissionDescriptionHrSalaryView" xml:space="preserve"><value>View employee salary information.</value></data>
+  <data name="PermissionDescriptionHrSalaryChange" xml:space="preserve"><value>Change employee salary information.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeView" xml:space="preserve"><value>View salary grades.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeManage" xml:space="preserve"><value>Manage salary grades.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeView" xml:space="preserve"><value>View allowance types.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeManage" xml:space="preserve"><value>Manage allowance types.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceView" xml:space="preserve"><value>View employee allowances.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceChange" xml:space="preserve"><value>Change employee allowances.</value></data>
+  <data name="PermissionDescriptionHrCompensationDashboardView" xml:space="preserve"><value>View compensation dashboard.</value></data>
+  <data name="PermissionGroupHrAttendance" xml:space="preserve"><value>HR Attendance</value></data>
+  <data name="PermissionDescriptionHrAttendanceView" xml:space="preserve"><value>View attendance records.</value></data>
+  <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Create attendance records.</value></data>
+  <data name="PermissionDescriptionHrAttendanceUpdate" xml:space="preserve"><value>Update attendance records.</value></data>
+  <data name="PermissionDescriptionHrAttendanceLock" xml:space="preserve"><value>Lock attendance periods.</value></data>
+  <data name="PermissionGroupHrOvertime" xml:space="preserve"><value>HR Overtime</value></data>
+  <data name="PermissionDescriptionHrOvertimeView" xml:space="preserve"><value>View overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Create and cancel overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Approve and reject overtime requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Manage overtime configuration and all requests.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleView" xml:space="preserve"><value>View HR overtime rules.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleManage" xml:space="preserve"><value>Manage HR overtime rules.</value></data>
+  <data name="PermissionGroupHrShift" xml:space="preserve"><value>HR Shift Management</value></data>
+  <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>View shift templates, assignments and schedule calendar.</value></data>
+  <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Create, update, activate and deactivate shift templates.</value></data>
+  <data name="PermissionDescriptionHrShiftAssign" xml:space="preserve"><value>Assign and bulk assign shifts to employees.</value></data>
+  <data name="PermissionDescriptionHrShiftCancel" xml:space="preserve"><value>Cancel employee shift assignments.</value></data>
+  <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>HR Calendar</value></data>
+  <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>View calendar and holidays</value></data>
+  <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Manage calendar settings, holidays, and exceptions</value></data>
+  <data name="PermissionGroupHrPayroll" xml:space="preserve"><value>HR Payroll</value></data>
+  <data name="PermissionDescriptionHrPayrollView" xml:space="preserve"><value>View payroll periods and runs.</value></data>
+  <data name="PermissionDescriptionHrPayrollCalculate" xml:space="preserve"><value>Calculate payroll runs.</value></data>
+  <data name="PermissionDescriptionHrPayrollApprove" xml:space="preserve"><value>Approve and reject payroll runs.</value></data>
+  <data name="PermissionDescriptionHrPayrollLock" xml:space="preserve"><value>Lock payroll periods.</value></data>
+  <data name="PermissionDescriptionHrPayrollExport" xml:space="preserve"><value>Export payroll data.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentView" xml:space="preserve"><value>View payslip documents.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentGenerate" xml:space="preserve"><value>Generate payslip PDF documents.</value></data>
+  <data name="PermissionDescriptionHrPayslipEmailSend" xml:space="preserve"><value>Send payslip emails.</value></data>
+  <data name="PermissionGroupHrEss" xml:space="preserve"><value>Employee Self Service</value></data>
+  <data name="PermissionDescriptionHrEssProfileView" xml:space="preserve"><value>View own profile via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveView" xml:space="preserve"><value>View own leave requests via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveRequest" xml:space="preserve"><value>Submit and cancel own leave requests via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssAttendanceView" xml:space="preserve"><value>View own attendance records via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeView" xml:space="preserve"><value>View own overtime requests via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeCreate" xml:space="preserve"><value>Submit overtime requests via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayrollView" xml:space="preserve"><value>View own payroll history via ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>View own payslips via ESS.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>View advanced payroll reports.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Export advanced payroll reports to CSV format.</value></data>
+  <data name="PermissionGroupHrRecruitment" xml:space="preserve"><value>HR Recruitment</value></data>
+  <data name="PermissionDescriptionHrRecruitmentView" xml:space="preserve"><value>View recruitment records.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentManage" xml:space="preserve"><value>Manage recruitment configuration and records.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestView" xml:space="preserve"><value>View recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestCreate" xml:space="preserve"><value>Create recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestSubmit" xml:space="preserve"><value>Submit recruitment requests for approval.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestApprove" xml:space="preserve"><value>Approve recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestManage" xml:space="preserve"><value>Manage recruitment requests.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentInterview" xml:space="preserve"><value>Manage recruitment interviews.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentHire" xml:space="preserve"><value>Complete candidate hiring actions.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentAnalytics" xml:space="preserve"><value>View recruitment analytics.</value></data>
+  <data name="PermissionGroupHrWorkflow" xml:space="preserve"><value>HR Workflow</value></data>
+  <data name="PermissionDescriptionHrWorkflowView" xml:space="preserve"><value>View HR workflow definitions and instances.</value></data>
+  <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Manage HR workflow definitions.</value></data>
+  <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Approve HR workflow tasks.</value></data>
+  <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Execute HR workflow tasks.</value></data>
+  <data name="PermissionDescriptionHrWorkflowOverride" xml:space="preserve"><value>Override HR workflow steps and approvers.</value></data>
+  <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>HR Onboarding</value></data>
+  <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>View onboarding plans and instances.</value></data>
+  <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Manage onboarding plans and instances.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskManage" xml:space="preserve"><value>Manage onboarding tasks.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskComplete" xml:space="preserve"><value>Complete onboarding tasks.</value></data>
+  <data name="PermissionDescriptionHrProbationView" xml:space="preserve"><value>View probation records.</value></data>
+  <data name="PermissionDescriptionHrProbationManage" xml:space="preserve"><value>Manage probation records.</value></data>
+  <data name="PermissionDescriptionHrSeparationView" xml:space="preserve"><value>View separation records.</value></data>
+  <data name="PermissionDescriptionHrSeparationCreate" xml:space="preserve"><value>Create separation records.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTimelineView" xml:space="preserve"><value>View employee timeline.</value></data>
+  <data name="PermissionGroupHrInsurance" xml:space="preserve"><value>HR Insurance</value></data>
+  <data name="PermissionDescriptionHrInsuranceView" xml:space="preserve"><value>View insurance records.</value></data>
+  <data name="PermissionDescriptionHrInsuranceManage" xml:space="preserve"><value>Manage insurance records.</value></data>
+  <data name="PermissionDescriptionHrInsuranceCalculate" xml:space="preserve"><value>Calculate insurance contributions.</value></data>
+  <data name="PermissionDescriptionHrInsuranceReport" xml:space="preserve"><value>View insurance reports.</value></data>
+  <data name="PermissionGroupHrTax" xml:space="preserve"><value>HR Tax</value></data>
+  <data name="PermissionDescriptionHrTaxView" xml:space="preserve"><value>View tax records.</value></data>
+  <data name="PermissionDescriptionHrTaxManage" xml:space="preserve"><value>Manage tax records.</value></data>
+  <data name="PermissionDescriptionHrTaxCalculate" xml:space="preserve"><value>Calculate tax amounts.</value></data>
+  <data name="PermissionGroupNotifications" xml:space="preserve"><value>Notifications</value></data>
+  <data name="PermissionDescriptionNotificationView" xml:space="preserve"><value>View notifications.</value></data>
+  <data name="PermissionDescriptionNotificationActionExecute" xml:space="preserve"><value>Execute notification actions.</value></data>
+  <data name="PermissionDescriptionNotificationArchive" xml:space="preserve"><value>Archive notifications.</value></data>
+  <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Manage notifications.</value></data>
+  <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>View notification audit records.</value></data>
+  <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Manage notification preferences.</value></data>
+  <data name="PermissionGroupHrOrganization" xml:space="preserve"><value>HR Organization</value></data>
+  <data name="PermissionDescriptionHrOrganizationView" xml:space="preserve"><value>View HR organization structure.</value></data>
+  <data name="PermissionDescriptionHrOrganizationManage" xml:space="preserve"><value>Manage HR organization structure.</value></data>
+  <data name="Timeline.EmployeeCreated.Title" xml:space="preserve"><value>Employee created</value></data>
+  <data name="Timeline.EmployeeCreated.Description" xml:space="preserve"><value>Employee {0} ({1}) was created.</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Title" xml:space="preserve"><value>Status changed</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Description" xml:space="preserve"><value>Status changed from {2} to {3}.</value></data>
+  <data name="Timeline.ProbationStatusChanged.Title" xml:space="preserve"><value>Probation status changed</value></data>
+  <data name="Timeline.ProbationStatusChanged.Description" xml:space="preserve"><value>Probation status changed.</value></data>
+  <data name="Timeline.TransferApproved.Title" xml:space="preserve"><value>Transfer approved</value></data>
+  <data name="Timeline.TransferApproved.Description" xml:space="preserve"><value>Transfer was approved.</value></data>
+  <data name="Timeline.SeparationApproved.Title" xml:space="preserve"><value>Separation approved</value></data>
+  <data name="Timeline.SeparationApproved.Description" xml:space="preserve"><value>Separation type: {4}.</value></data>
+  <data name="Timeline.Assigned.Title" xml:space="preserve"><value>Asset assigned</value></data>
+  <data name="Timeline.Assigned.Description" xml:space="preserve"><value>Assigned asset {7}.</value></data>
+  <data name="Timeline.Updated.Title" xml:space="preserve"><value>Asset updated</value></data>
+  <data name="Timeline.Updated.Description" xml:space="preserve"><value>Updated asset {7}.</value></data>
+  <data name="Timeline.Returned.Title" xml:space="preserve"><value>Asset returned</value></data>
+  <data name="Timeline.Returned.Description" xml:space="preserve"><value>Returned asset {7}.</value></data>
+  <data name="Timeline.MarkedLost.Title" xml:space="preserve"><value>Asset marked lost</value></data>
+  <data name="Timeline.MarkedLost.Description" xml:space="preserve"><value>Marked asset {7} as lost.</value></data>
+  <data name="Timeline.MarkedDamaged.Title" xml:space="preserve"><value>Asset marked damaged</value></data>
+  <data name="Timeline.MarkedDamaged.Description" xml:space="preserve"><value>Marked asset {7} as damaged.</value></data>
+  <data name="Timeline.Archived.Title" xml:space="preserve"><value>Archived</value></data>
+  <data name="Timeline.Archived.Description" xml:space="preserve"><value>Archived {7}.</value></data>
+  <data name="Timeline.NoteCreated.Title" xml:space="preserve"><value>Note created</value></data>
+  <data name="Timeline.NoteCreated.Description" xml:space="preserve"><value>Created a note.</value></data>
+  <data name="Timeline.NoteArchived.Title" xml:space="preserve"><value>Note archived</value></data>
+  <data name="Timeline.NoteArchived.Description" xml:space="preserve"><value>Archived a note.</value></data>
+  <data name="Timeline.Created.Title" xml:space="preserve"><value>Document created</value></data>
+  <data name="Timeline.Created.Description" xml:space="preserve"><value>Created document {9}.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImport" xml:space="preserve"><value>Import employees from file.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportHistory" xml:space="preserve"><value>View import history.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportDownload" xml:space="preserve"><value>Download import error files.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportTemplate" xml:space="preserve"><value>Download import template.</value></data>
+</root>

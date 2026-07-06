@@ -10,6 +10,8 @@ public sealed class PipelineInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TimeMeasuringBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>));
     }
 }

@@ -1,0 +1,274 @@
+using Anemoi.Hr.Domain.Departments;
+using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Positions;
+using Anemoi.Hr.ModelIds.ModelIds;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Anemoi.Hr.Infrastructure.Configurations;
+
+public sealed class EmployeeOrganizationModelMapping :
+    IEntityTypeConfiguration<Department>,
+    IEntityTypeConfiguration<Position>,
+    IEntityTypeConfiguration<EmployeeDepartmentHistory>,
+    IEntityTypeConfiguration<EmployeePositionHistory>,
+    IEntityTypeConfiguration<EmployeeGradeHistory>,
+    IEntityTypeConfiguration<EmployeeManagerHistory>,
+    IEntityTypeConfiguration<EmployeeIdentityLinkLog>,
+    IEntityTypeConfiguration<EmployeeOrganizationHistory>,
+    IEntityTypeConfiguration<EmployeeHistory>
+{
+    public void Configure(EntityTypeBuilder<EmployeeIdentityLinkLog> builder)
+    {
+        builder.ToTable("EmployeeIdentityLinkLogs");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeIdentityLinkLogId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.WorkEmail).HasMaxLength(256);
+        builder.Property(x => x.MatchStatus).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.Property(x => x.IsDryRun).IsRequired();
+        builder.HasIndex(x => x.EmployeeId);
+        builder.HasIndex(x => x.IdentityUserId);
+        builder.HasIndex(x => x.MatchStatus);
+        builder.HasIndex(x => x.CreatedAt);
+        builder.HasIndex(x => x.IsDryRun);
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
+
+    public void Configure(EntityTypeBuilder<Department> builder)
+    {
+        builder.ToTable("Departments");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new DepartmentId(id));
+        builder.Property(x => x.ParentDepartmentId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new DepartmentId(id.Value));
+        builder.Property(x => x.ManagerEmployeeId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
+        builder.HasKey(x => x.Id);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+        builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.DepartmentTypeCode).HasMaxLength(64).IsRequired();
+        builder.HasIndex(x => x.Code).IsUnique();
+        builder.HasOne(x => x.ParentDepartment)
+            .WithMany(x => x.ChildDepartments)
+            .HasForeignKey(x => x.ParentDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.ManagerEmployee)
+            .WithMany()
+            .HasForeignKey(x => x.ManagerEmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
+
+    public void Configure(EntityTypeBuilder<Position> builder)
+    {
+        builder.ToTable("Positions");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new PositionId(id));
+        builder.Property(x => x.DepartmentId)
+            .HasConversion(x => x.Value, id => new DepartmentId(id));
+        builder.HasKey(x => x.Id);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+        builder.Property(x => x.Code).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.Name).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.PositionTypeCode).HasMaxLength(64).IsRequired();
+        builder.HasIndex(x => x.Code).IsUnique();
+        builder.HasOne(x => x.Department)
+            .WithMany(x => x.Positions)
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeDepartmentHistory> builder)
+    {
+        builder.ToTable("EmployeeDepartmentHistories");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeDepartmentHistoryId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.Property(x => x.DepartmentId)
+            .HasConversion(x => x.Value, id => new DepartmentId(id));
+        builder.Property(x => x.OldDepartmentId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new DepartmentId(id.Value));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.ReasonCode).HasMaxLength(64);
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
+        builder.HasOne(x => x.Employee)
+            .WithMany(x => x.DepartmentHistories)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Department)
+            .WithMany()
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.OldDepartment)
+            .WithMany()
+            .HasForeignKey(x => x.OldDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeePositionHistory> builder)
+    {
+        builder.ToTable("EmployeePositionHistories");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeePositionHistoryId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.Property(x => x.PositionId)
+            .HasConversion(x => x.Value, id => new PositionId(id));
+        builder.Property(x => x.OldPositionId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new PositionId(id.Value));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.ReasonCode).HasMaxLength(64);
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
+        builder.HasOne(x => x.Employee)
+            .WithMany(x => x.PositionHistories)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Position)
+            .WithMany()
+            .HasForeignKey(x => x.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.OldPosition)
+            .WithMany()
+            .HasForeignKey(x => x.OldPositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeGradeHistory> builder)
+    {
+        builder.ToTable("EmployeeGradeHistories");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeGradeHistoryId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.GradeCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.OldGradeCode).HasMaxLength(64);
+        builder.Property(x => x.ReasonCode).HasMaxLength(64);
+        builder.Property(x => x.CreatedBy).HasMaxLength(128);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom }).IsUnique();
+        builder.HasOne(x => x.Employee)
+            .WithMany(x => x.GradeHistories)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion();
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeManagerHistory> builder)
+    {
+        builder.ToTable("EmployeeManagerHistories");
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeManagerHistoryId(id));
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.Property(x => x.ManagerEmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.ReasonCode).HasMaxLength(64);
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveFrom });
+        builder.HasOne(x => x.Employee)
+            .WithMany(x => x.ManagerHistories)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.ManagerEmployee)
+            .WithMany()
+            .HasForeignKey(x => x.ManagerEmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeOrganizationHistory> builder)
+    {
+        builder.ToTable("EmployeeOrganizationHistories", "Hr");
+
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeOrganizationHistoryId(id));
+
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.Property(x => x.DepartmentId)
+            .HasConversion(x => x.Value, id => new DepartmentId(id));
+        builder.Property(x => x.PositionId)
+            .HasConversion(x => x.Value, id => new PositionId(id));
+        builder.Property(x => x.ManagerEmployeeId)
+            .HasConversion(x => x == null ? default(Guid?) : x.Value, id => id == null ? null : new EmployeeId(id.Value));
+        builder.Property(x => x.GradeCode).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.ChangeReasonCode).HasMaxLength(64).IsRequired();
+
+        builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
+
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Department)
+            .WithMany()
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Position)
+            .WithMany()
+            .HasForeignKey(x => x.PositionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.ManagerEmployee)
+            .WithMany()
+            .HasForeignKey(x => x.ManagerEmployeeId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(x => new { x.EmployeeId, x.EffectiveDate });
+        builder.HasIndex(x => x.EndDate);
+    }
+
+    public void Configure(EntityTypeBuilder<EmployeeHistory> builder)
+    {
+        builder.ToTable("EmployeeHistories", "Hr");
+
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id)
+            .HasConversion(x => x.Value, id => new EmployeeHistoryId(id));
+
+        builder.Property(x => x.EmployeeId)
+            .HasConversion(x => x.Value, id => new EmployeeId(id));
+        builder.Property(x => x.EntityType).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.EntityId).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.EventType).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.Title).HasMaxLength(500).IsRequired();
+        builder.Property(x => x.Description).HasMaxLength(2000);
+        builder.Property(x => x.MetadataJson).HasColumnType("jsonb");
+        builder.Property(x => x.CorrelationId).HasMaxLength(100).IsRequired();
+
+        builder.Property<uint>("xmin").HasColumnName("xmin").IsRowVersion();
+
+        builder.HasOne(x => x.Employee)
+            .WithMany()
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => new { x.EmployeeId, x.OccurredAt });
+        builder.HasIndex(x => x.EntityType);
+        builder.HasIndex(x => x.CorrelationId);
+    }
+}

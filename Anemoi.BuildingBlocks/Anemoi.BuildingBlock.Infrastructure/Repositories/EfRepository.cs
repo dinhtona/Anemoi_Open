@@ -60,8 +60,11 @@ public class EfRepository<T> : ISqlRepository<T> where T : class
         Expression<Func<T, bool>> conditionExpression = null, Func<IQueryable<T>, IQueryable<T>> specialAction = null,
         CancellationToken token = default)
     {
+        // COUNT must NOT include Skip/Take from specialAction — otherwise total count will be wrong.
+        // specialAction typically contains OrderBy + Skip + Take for paging.
+        var totalRecord = await CountByConditionAsync(conditionExpression, null, token);
+        // SELECT applies specialAction in full (includes OrderBy, Skip, Take)
         var items = await GetManyByConditionAsync(conditionExpression, specialAction, token);
-        var totalRecord = await CountByConditionAsync(conditionExpression, specialAction, token);
         return new Pagination<T> { Items = items, TotalRecord = totalRecord };
     }
 

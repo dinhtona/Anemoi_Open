@@ -10,6 +10,6 @@ public sealed class UpdateProvinceValidator : AbstractValidator<UpdateProvinceCo
             () => RuleFor(x => x.Name).NotEmpty());
         RuleFor(x => x.Id)
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("ProvinceId cannot be empty!");
+            .WithMessage("VAL_PROVINCE_ID_REQUIRED");
     }
 }

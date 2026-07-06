@@ -24,6 +24,7 @@ public static class MigrationDatabase
         catch (Exception e)
         {
             logger.Error("Error while migrations {@DbName} Database: {@Message}!", typeof(T).Name, e.Message);
+            throw;
         }
     }
 }

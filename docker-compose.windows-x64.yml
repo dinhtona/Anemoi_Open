@@ -1,0 +1,10 @@
+# Override for Docker Desktop on Windows x64 using Linux containers.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.windows-x64.yml up -d --build
+
+services:
+  mssql:
+    platform: linux/amd64
+    image: mcr.microsoft.com/mssql/server:2022-latest
+

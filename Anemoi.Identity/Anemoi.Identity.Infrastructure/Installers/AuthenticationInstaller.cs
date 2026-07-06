@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Application.Helpers;
@@ -17,7 +16,11 @@ public sealed class AuthenticationInstaller : IInstaller
         var jwtSetting = configuration.GetSection(nameof(JwtSetting)).Get<JwtSetting>()!;
         services.AddSingleton(jwtSetting);
 
-        var privateKeyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jwtSetting.PrivateKeyPath);
+        var privateKeyPath = JwtSecurity.ResolveKeyPath(jwtSetting.PrivateKeyPath,
+            JwtSecurity.DevelopmentPrivateKeyRelativePath);
+        var publicKeyPath = JwtSecurity.ResolveKeyPath(jwtSetting.PublicKeyPath,
+            JwtSecurity.DevelopmentPublicKeyRelativePath);
+        JwtSecurity.EnsureDevelopmentKeyPair(privateKeyPath, publicKeyPath);
         var privateSecurityKey = JwtSecurity.GetPrivateSecurityKey(privateKeyPath);
         var privateSigningCredential = JwtSecurity.GetPrivateSigningCredential(privateSecurityKey);
         services.AddSingleton(privateSigningCredential);
@@ -26,11 +29,14 @@ public sealed class AuthenticationInstaller : IInstaller
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = privateSecurityKey,
-            ValidateAudience = false,
+            ValidateAudience = true,
+            ValidAudience = jwtSetting.Audience,
             ValidateLifetime = true,
-            ValidateIssuer = false,
+            ValidateIssuer = true,
+            ValidIssuer = jwtSetting.Issuer,
             ClockSkew = TimeSpan.Zero
         };
+        // System-to-system token: no lifetime check but still validates iss/aud
         var tokenValidationParametersForSystem = tokenValidationParameters.Clone();
         tokenValidationParametersForSystem.ValidateLifetime = false;
 

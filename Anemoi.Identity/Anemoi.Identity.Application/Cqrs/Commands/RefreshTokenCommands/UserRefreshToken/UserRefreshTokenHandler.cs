@@ -9,15 +9,15 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.UserRefreshToken;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Application.IdentityResults;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,7 +27,7 @@ using Serilog;
 namespace Anemoi.Identity.Application.Cqrs.Commands.RefreshTokenCommands.UserRefreshToken;
 
 public sealed class UserRefreshTokenHandler(
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     TokenValidationParameters tokenValidationParameters,
     ISqlRepository<RefreshToken> sqlRepository,
@@ -35,7 +35,7 @@ public sealed class UserRefreshTokenHandler(
     IUnitOfWork unitOfWork,
     ISqlRepository<User> userDbRepository)
     : EfCommandOneResultHandler<RefreshToken, UserRefreshTokenCommand, AuthenticationSuccessResponse>(
-        sqlRepository, unitOfWork, mapper, logger)
+        sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<RefreshToken, AuthenticationSuccessResponse> BuildCommand(
         IStartOneCommandResult<RefreshToken, AuthenticationSuccessResponse> fromFlow,
@@ -51,12 +51,12 @@ public sealed class UserRefreshTokenHandler(
                 return authResult.MapT0(success =>
                 {
                     oldRefreshToken.IsUsed = true;
-                    Mapper.Map(success, refreshToken);
+                    mapper.UpdateRefreshToken(success, refreshToken);
                     return None.Value;
                 });
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.TokenError.CreateRefreshTokenFailed())
-            .WithResultIfSucceed(Mapper.Map<AuthenticationSuccessResponse>);
+            .WithResultIfSucceed(mapper.ToAuthenticationSuccessResponse);
 
     private async Task<OneOf<IdentitySuccess, ErrorDetail>> RefreshTokenAsync(RefreshToken refreshToken,
         CancellationToken cancellationToken = default)
@@ -84,11 +84,8 @@ public sealed class UserRefreshTokenHandler(
         if (validateToken is null) return IdentityErrorDetail.TokenError.InvalidToken();
 
         if (!long.TryParse(validateToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value,
-                out var expiryDateUnix)) return IdentityErrorDetail.TokenError.InvalidToken();
+                out _)) return IdentityErrorDetail.TokenError.InvalidToken();
 
-        var expiryTimeUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(expiryDateUnix);
-        if (expiryTimeUtc > DateTime.UtcNow)
-            return IdentityErrorDetail.TokenError.TokenIsNotExpired();
         return validateToken;
     }
 

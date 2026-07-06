@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-06-19T12:46:20.374Z",
+  "sections": [
+    {
+      "name": "Login Page - Initial Redirect",
+      "url": "http://localhost:3000/vi/login"
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 403 ()",
+    "[GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+    "Failed to load resource: the server responded with a status of 403 ()",
+    "[GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "Failed to load resource: the server responded with a status of 403 ()",
+    "[GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "Failed to load resource: the server responded with a status of 403 ()",
+    "[GSI_LOGGER]: The given origin is not allowed for the given client ID."
+  ],
+  "warnings": [],
+  "consoleLogs": [
+    "[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[log] [HMR] connected",
+    "[error] Failed to load resource: the server responded with a status of 403 ()",
+    "[error] [GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "[error] Failed to load resource: the server responded with a status of 400 (Bad Request)",
+    "[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[log] [HMR] connected",
+    "[error] Failed to load resource: the server responded with a status of 403 ()",
+    "[error] [GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[log] [HMR] connected",
+    "[error] Failed to load resource: the server responded with a status of 403 ()",
+    "[error] [GSI_LOGGER]: The given origin is not allowed for the given client ID.",
+    "[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+    "[log] [HMR] connected",
+    "[error] Failed to load resource: the server responded with a status of 403 ()",
+    "[error] [GSI_LOGGER]: The given origin is not allowed for the given client ID."
+  ],
+  "networkFailures": [
+    "403 GET https://accounts.google.com/gsi/button?theme=outline&size=large&width=320&is_fedcm_supported=true&client_id=148136744531-m3ptaoet52ou6l6k7s28nm5jjqr6sk63.apps.googleusercontent.com&iframe_id=gsi_181236_314846&cas=JLzbFIynlLI0AszqxLwLyM9pVZ4PW737zo%2FXUI7Yujk",
+    "400 POST http://localhost:3000/api/identity/Identity/Login",
+    "403 GET https://accounts.google.com/gsi/button?theme=outline&size=large&width=320&is_fedcm_supported=true&client_id=148136744531-m3ptaoet52ou6l6k7s28nm5jjqr6sk63.apps.googleusercontent.com&iframe_id=gsi_192163_137935&cas=m3GG86boCVuWt1xwbLeWSNqJtcv5P1PYSo3tstdzs1U",
+    "403 GET https://accounts.google.com/gsi/button?theme=outline&size=large&width=320&is_fedcm_supported=true&client_id=148136744531-m3ptaoet52ou6l6k7s28nm5jjqr6sk63.apps.googleusercontent.com&iframe_id=gsi_194999_53437&cas=Kx2QMkYliQr%2Bahk%2F46vORpgt2Vgr8t0mrBsUPM4yZ9Y",
+    "403 GET https://accounts.google.com/gsi/button?theme=outline&size=large&width=320&is_fedcm_supported=true&client_id=148136744531-m3ptaoet52ou6l6k7s28nm5jjqr6sk63.apps.googleusercontent.com&iframe_id=gsi_197753_720011&cas=jm%2B%2F5Nky4BBxRfUYd4r%2B6MntU1v6bX3tKSWvmH3Fy7c"
+  ],
+  "screenshots": [
+    {
+      "name": "01-login-page",
+      "filename": "1-01-login-page.png"
+    },
+    {
+      "name": "02-login-validation-empty",
+      "filename": "2-02-login-validation-empty.png"
+    },
+    {
+      "name": "03-login-filled",
+      "filename": "3-03-login-filled.png"
+    },
+    {
+      "name": "04-login-invalid-credentials",
+      "filename": "4-04-login-invalid-credentials.png"
+    },
+    {
+      "name": "05-unauthenticated-access",
+      "filename": "5-05-unauthenticated-access.png"
+    },
+    {
+      "name": "07-en-locale-login",
+      "filename": "6-07-en-locale-login.png"
+    }
+  ]
+}

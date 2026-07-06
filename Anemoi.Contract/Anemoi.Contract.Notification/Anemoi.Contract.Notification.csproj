@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="ModelIds\**\*.cs" />
+      <ProjectReference Include="..\Anemoi.Contract.Notification.ModelIds\Anemoi.Contract.Notification.ModelIds.csproj" />
+      <ProjectReference Include="..\Anemoi.Contract.CrossCuttingConcern\Anemoi.Contract.CrossCuttingConcern.csproj" />
+    </ItemGroup>
+</Project>

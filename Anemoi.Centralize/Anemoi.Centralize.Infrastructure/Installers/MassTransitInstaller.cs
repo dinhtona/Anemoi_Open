@@ -1,4 +1,4 @@
-﻿using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +17,7 @@ public sealed class MassTransitInstaller : IInstaller
         {
             configurator.SetKebabCaseEndpointNameFormatter();
             configurator.AddConsumersFromNamespaceContaining<ICentralizeApplicationAssemblyMarker>();
+            configurator.AddConsumers(System.Reflection.Assembly.GetEntryAssembly());
             configurator.AddActivitiesFromNamespaceContaining<ICentralizeApplicationAssemblyMarker>();
             configurator.UsingRabbitMq((context, bus) =>
             {

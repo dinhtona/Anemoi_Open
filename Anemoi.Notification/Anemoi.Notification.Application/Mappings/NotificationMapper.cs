@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Anemoi.BuildingBlock.Application.Errors;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Notification.Responses;
+using Anemoi.Notification.Domain.Models;
+using Riok.Mapperly.Abstractions;
+
+namespace Anemoi.Notification.Application.Mappings;
+
+[Mapper]
+public partial class NotificationMapper
+{
+    public NotificationResponse ToNotificationResponse(NotificationHistory history)
+    {
+        if (history == null) return null;
+        return new NotificationResponse
+        {
+            Id = history.Id.Value.ToString(),
+            UserId = history.UserId.ToString(),
+            WorkspaceId = history.WorkspaceId?.ToString(),
+            Title = history.Title,
+            Content = history.Content,
+            Category = history.Category,
+            IsRead = history.IsRead,
+            CreatedTime = history.CreatedTime,
+            ReadTime = history.ReadTime,
+            TitleLocalizationKey = history.TitleLocalizationKey,
+            TitleLocalizationArgs = history.TitleLocalizationArgs,
+            ContentLocalizationKey = history.ContentLocalizationKey,
+            ContentLocalizationArgs = history.ContentLocalizationArgs,
+            ActionUrl = history.ActionUrl,
+            ActionType = history.ActionType,
+            DeduplicationKey = history.DeduplicationKey,
+            CorrelationId = history.CorrelationId,
+            CausationId = history.CausationId,
+            Type = history.Type,
+            Severity = history.Severity,
+            IsHidden = history.IsHidden,
+            IsArchived = history.IsArchived,
+            AggregateType = history.AggregateType,
+            AggregateId = history.AggregateId,
+            WorkflowType = history.WorkflowType,
+            WorkflowState = history.WorkflowState,
+            Actions = history.Actions?.Select(ToNotificationActionResponse).ToList() ?? []
+        };
+    }
+
+    public NotificationActionResponse ToNotificationActionResponse(NotificationAction action)
+    {
+        if (action == null) return null;
+        return new NotificationActionResponse
+        {
+            Id = action.Id.Value.ToString(),
+            Label = action.ActionLabel,
+            ActionType = action.ActionType,
+            RequiresConfirmation = action.RequiresConfirmation
+        };
+    }
+
+    public NotificationSettingResponse ToSettingResponse(NotificationSubscription subscription)
+    {
+        if (subscription == null) return null;
+        return new NotificationSettingResponse
+        {
+            Category = subscription.Category,
+            IsEnabled = subscription.IsEnabled
+        };
+    }
+
+    public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)
+    {
+        return new ErrorDetailResponse
+        {
+            Code = errorDetail.Code,
+            Messages = errorDetail.Messages
+        };
+    }
+
+    public NotificationPreferenceResponse ToPreferenceResponse(
+        NotificationPreference preference,
+        List<NotificationSubscription> subscriptions)
+    {
+        return new NotificationPreferenceResponse
+        {
+            EnableInApp = preference.EnableInApp,
+            EnableEmail = preference.EnableEmail,
+            Subscriptions = subscriptions.Select(ToSubscriptionResponse).ToList()
+        };
+    }
+
+    public NotificationPreferenceResponse ToDefaultPreferenceResponse(
+        List<NotificationSubscription> subscriptions)
+    {
+        return new NotificationPreferenceResponse
+        {
+            EnableInApp = true,
+            EnableEmail = true,
+            Subscriptions = subscriptions.Select(ToSubscriptionResponse).ToList()
+        };
+    }
+
+    public NotificationSubscriptionResponse ToSubscriptionResponse(
+        NotificationSubscription subscription)
+    {
+        return new NotificationSubscriptionResponse
+        {
+            Category = subscription.Category,
+            IsEnabled = subscription.IsEnabled
+        };
+    }
+}

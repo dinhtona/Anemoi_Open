@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="FluentAssertions" Version="7.2.2" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Anemoi.Hr.Domain\Anemoi.Hr.Domain.csproj" />
+    <ProjectReference Include="..\Anemoi.Hr.ModelIds\Anemoi.Hr.ModelIds.csproj" />
+    <ProjectReference Include="..\Anemoi.Hr.Application\Anemoi.Hr.Application.csproj" />
+    <ProjectReference Include="..\Anemoi.Hr.Infrastructure\Anemoi.Hr.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Anemoi.Identity\Anemoi.Identity.Application\Anemoi.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.Identity\Anemoi.Contract.Identity.csproj" />
+  </ItemGroup>
+
+</Project>

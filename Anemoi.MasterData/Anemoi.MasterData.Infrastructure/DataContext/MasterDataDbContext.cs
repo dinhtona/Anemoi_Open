@@ -7,6 +7,11 @@ public sealed class MasterDataDbContext(DbContextOptions<MasterDataDbContext> op
 {
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
+    public DbSet<SeedServer> SeedServers { get; set; }
+    public DbSet<SeedFunction> SeedFunctions { get; set; }
+    public DbSet<SeedTemplate> SeedTemplates { get; set; }
+    public DbSet<SeedRowLog> SeedRowLogs { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,13 +1,12 @@
 using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.ChangePasswordWithoutOldPassword;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.ChangePasswordWithToken;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
-using AutoMapper;
 using MediatR;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
@@ -17,12 +16,11 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.ChangePassw
 public sealed class ChangePasswordWithTokenHandler(
     ISqlRepository<User> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISender sender)
     : EfCommandOneResultHandler<User, ChangePasswordWithTokenCommand, UserIdResponse>(
-        sqlRepository, unitOfWork, mapper, logger)
+        sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<User, UserIdResponse> BuildCommand(
         IStartOneCommandResult<User, UserIdResponse> fromFlow,

@@ -9,6 +9,6 @@ public sealed class GetProvinceValidator : AbstractValidator<GetProvinceQuery>
         RuleFor(x => x.Id)
             .NotNull()
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("ProvinceId cannot be empty!");
+            .WithMessage("VAL_PROVINCE_ID_REQUIRED");
     }
 }

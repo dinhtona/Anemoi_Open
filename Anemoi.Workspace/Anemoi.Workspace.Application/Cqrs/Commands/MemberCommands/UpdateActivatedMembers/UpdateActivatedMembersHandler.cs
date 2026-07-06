@@ -1,11 +1,10 @@
 ﻿using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Workspace.Commands.MemberCommands.UpdateActivatedMembers;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.ModelIds;
-using AutoMapper;
 using Serilog;
 using Anemoi.Workspace.Domain.Models;
 
@@ -15,9 +14,8 @@ public sealed class UpdateActivatedMembersHandler(
     ISqlRepository<Member> sqlRepository,
     IWorkspaceIdGetter workspaceIdGetter,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandManyVoidHandler<Member, UpdateActivatedMembersCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandManyVoidHandler<Member, UpdateActivatedMembersCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandManyFlowBuilderVoid<Member> BuildCommand(IStartManyCommandVoid<Member> fromFlow,
         UpdateActivatedMembersCommand command, CancellationToken cancellationToken)

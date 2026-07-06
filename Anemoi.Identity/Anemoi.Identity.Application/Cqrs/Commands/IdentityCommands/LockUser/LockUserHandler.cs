@@ -2,23 +2,21 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.LockUser;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.LockUser;
 
 public sealed class LockUserHandler(
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork)
-    : EfCommandOneVoidHandler<User, LockUserCommand>(userDbRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, LockUserCommand>(userDbRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(
         IStartOneCommandVoid<User> fromFlow, LockUserCommand command,

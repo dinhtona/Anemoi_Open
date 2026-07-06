@@ -3,18 +3,17 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries.QueryFlow.QueryManyFlow;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Queries;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Queries.EntityFramework.EfQueryMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Queries.EntityFramework.EfQueryMany;
 using Anemoi.Contract.MasterData.Queries.ProvinceQueries.GetProvinces;
 using Anemoi.Contract.MasterData.Responses;
+using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain.Models;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Serilog;
 
 namespace Anemoi.MasterData.Application.Cqrs.Queries.ProvinceQueries.GetProvinces;
 
-public sealed class GetProvincesHandler(ISqlRepository<Province> sqlRepository, IMapper mapper, ILogger logger)
-    : EfQueryPaginationHandler<Province, GetProvincesQuery, ProvinceResponse>(sqlRepository, mapper, logger)
+public sealed class GetProvincesHandler(ISqlRepository<Province> sqlRepository, MasterDataMapper mapper, ILogger logger)
+    : EfQueryPaginationHandler<Province, GetProvincesQuery, ProvinceResponse>(sqlRepository, logger)
 {
     protected override IQueryListFlowBuilder<Province, ProvinceResponse> BuildQueryFlow(
         IQueryListFilter<Province, ProvinceResponse> fromFlow, GetProvincesQuery query)
@@ -26,10 +25,9 @@ public sealed class GetProvincesHandler(ISqlRepository<Province> sqlRepository, 
         };
         return fromFlow
             .WithFilter(searchKeyFilter)
-            .WithSpecialAction(x => x
+            .WithSpecialAction(x => mapper.ProjectToProvinceResponse(x
                 .OrderBy(p => p.Priority)
-                .ThenBy(p => p.Name)
-                .ProjectTo<ProvinceResponse>(Mapper.ConfigurationProvider))
+                .ThenBy(p => p.Name)))
             .WithSortFieldWhenNotSet(x => x.Priority)
             .WithSortedDirectionWhenNotSet(SortedDirection.Ascending);
     }

@@ -1,4 +1,4 @@
-﻿using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -10,7 +10,11 @@ public sealed class ControllerInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers(c => c.Filters.Add<AutoMapDataFilter>())
+        services.AddControllers(c => 
+            {
+                c.Filters.Add<AutoMapDataFilter>();
+                c.Filters.Add<LocalizedErrorFilter>();
+            })
             .AddNewtonsoftJson(opts => opts.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc);
     }
 }

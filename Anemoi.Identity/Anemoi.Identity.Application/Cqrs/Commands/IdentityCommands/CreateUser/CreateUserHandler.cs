@@ -3,32 +3,30 @@ using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.UserCommands.CreateUser;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
-using MassTransit;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.CreateUser;
 
 public sealed class CreateUserHandler(
     ILogger logger,
-    IMapper mapper,
+    IdentityMapper mapper,
     IUnitOfWork unitOfWork,
     IUserRepository userRepository,
-    IPublishEndpoint publishEndpoint,
     ISqlRepository<User> sqlRepository)
-    : EfCommandOneResultHandler<User, CreateUserCommand, UserIdResponse>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneResultHandler<User, CreateUserCommand, UserIdResponse>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<User, UserIdResponse> BuildCommand(
         IStartOneCommandResult<User, UserIdResponse> fromFlow,
         CreateUserCommand command, CancellationToken cancellationToken)
         => fromFlow
-            .CreateOne(Mapper.Map<User>(command))
+            .CreateOne(mapper.ToUser(command))
             .WithCondition(async user =>
             {
                 var isPasswordValid = await userRepository

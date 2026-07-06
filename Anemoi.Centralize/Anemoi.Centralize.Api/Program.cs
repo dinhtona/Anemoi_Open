@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
 using Serilog.Events;
 using Anemoi.Centralize.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
+using Anemoi.Centralize.Api.Hubs;
+using Anemoi.BuildingBlock.Application.Resources;
+using Anemoi.BuildingBlock.Application.Responses;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,16 +38,89 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
 builder.Host.ConfigureServices((context, services) =>
 {
     services.InstallServicesInAssembly<ICentralizeInfrastructureAssemblyMarker>(context.Configuration);
-    services.AddHttpLogging(options
-        => options.LoggingFields = HttpLoggingFields.All);
+    services.AddHostedService<Anemoi.Centralize.Api.Services.Smtp4DevMonitoringWorker>();
+    services.AddSignalR();
+    services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
+    services.AddHealthChecks()
+        .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
+        .AddCheck("redis", () =>
+        {
+            try
+            {
+                using var redis = StackExchange.Redis.ConnectionMultiplexer.Connect(
+                    context.Configuration.GetValue<string>("RedisSetting:ConnectionString") ?? "localhost:6379");
+                return redis.GetDatabase().Ping() != default
+                    ? HealthCheckResult.Healthy()
+                    : HealthCheckResult.Unhealthy("Redis ping failed");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("Redis unreachable", ex);
+            }
+        }, tags: ["ready"])
+        .AddCheck("rabbitmq", () =>
+        {
+            var host = context.Configuration.GetValue<string>("MassTransitSetting:Host") ?? "localhost";
+            try
+            {
+                using var tcp = new System.Net.Sockets.TcpClient(host, 5672);
+                return tcp.Connected
+                    ? HealthCheckResult.Healthy()
+                    : HealthCheckResult.Unhealthy("RabbitMQ port unreachable");
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("RabbitMQ unreachable", ex);
+            }
+        }, tags: ["ready"]);
+
+    if (context.HostingEnvironment.IsDevelopment())
+    {
+        services.AddHttpLogging(options
+            => options.LoggingFields = HttpLoggingFields.All);
+    }
+    else
+    {
+        services.AddHttpLogging(options
+            => options.LoggingFields = HttpLoggingFields.RequestPath
+                                       | HttpLoggingFields.RequestMethod
+                                       | HttpLoggingFields.ResponseStatusCode
+                                       | HttpLoggingFields.Duration);
+    }
     services.AddRateLimiter(options =>
     {
-        options.AddFixedWindowLimiter("FixedLimiter", opt =>
+        // Strict limit for authentication endpoints (login, register, password reset)
+        // Protects against brute-force and credential-stuffing attacks
+        options.AddSlidingWindowLimiter("auth-limit", opt =>
         {
             opt.Window = TimeSpan.FromSeconds(60);
-            opt.PermitLimit = 3;
+            opt.SegmentsPerWindow = 6;
+            opt.PermitLimit = 5;
+            opt.QueueLimit = 0;
         });
+
+        // General limit for all other API endpoints
+        options.AddFixedWindowLimiter("general-limit", opt =>
+        {
+            opt.Window = TimeSpan.FromSeconds(60);
+            opt.PermitLimit = 100;
+            opt.QueueLimit = 10;
+        });
+
         options.RejectionStatusCode = 429;
+        options.OnRejected = async (ctx, token) =>
+        {
+            ctx.HttpContext.Response.StatusCode = 429;
+            ctx.HttpContext.Response.ContentType = "application/json";
+            var localizer = ctx.HttpContext.RequestServices
+                .GetRequiredService<IStringLocalizer<SharedResource>>();
+            await ctx.HttpContext.Response.WriteAsJsonAsync(new ErrorDetailResponse
+            {
+                Code = "RateLimitExceeded",
+                Messages = [localizer["RateLimitExceeded"].Value]
+            }, cancellationToken: token);
+        };
     });
 });
 
@@ -49,7 +129,7 @@ var app = builder.Build();
 if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
-if (builder.Environment.IsDevelopment() || builder.Environment.IsStaging())
+if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -64,10 +144,32 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
+// Setup Localization
+var supportedCultures = new[] { "en-US", "vi-VN" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("vi-VN")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+// Automatically extract language from Accept-Language header
+localizationOptions.ApplyCurrentCultureToResponseHeaders = true;
+app.UseRequestLocalization(localizationOptions);
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notification");
 
 await app.RunAsync();

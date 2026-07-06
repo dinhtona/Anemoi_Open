@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.Contract.MasterData.Commands.SampleAddressCommands.CreateSampleAddress;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +22,7 @@ public sealed class AdminController(ISender sender) : ControllerBase
     /// Either an Ok or BadRequest
     /// </returns>
     [HttpPost]
-    [Authorize(Policy = "Internal", Roles = "Administrator")]
+    [Authorize(Policy = AuthorizationPolicies.Internal, Roles = SystemRoles.Administrator)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetailResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

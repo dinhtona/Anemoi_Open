@@ -1,11 +1,10 @@
 using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.ConfirmEmail;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Application.Abstractions;
-using AutoMapper;
 using Serilog;
 using Anemoi.Identity.Domain.Models;
 
@@ -14,10 +13,9 @@ namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.ConfirmEmai
 public sealed class ConfirmEmailHandler(
     ISqlRepository<User> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository)
-    : EfCommandOneVoidHandler<User, ConfirmEmailCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, ConfirmEmailCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(
         IStartOneCommandVoid<User> fromFlow, ConfirmEmailCommand command,

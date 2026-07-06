@@ -1,4 +1,4 @@
-﻿using Amazon.Runtime;
+using Amazon.Runtime;
 using Amazon.S3;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
@@ -6,8 +6,10 @@ using Anemoi.BuildingBlock.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Anemoi.Centralize.Application.Abstractions;
+using Anemoi.Centralize.Application.Configurations;
 using Anemoi.Centralize.Application.ContractAssemblies;
 using Anemoi.Centralize.Application.Filters;
+using Anemoi.Centralize.Application.Mappings;
 using Anemoi.Centralize.Infrastructure.Services;
 
 namespace Anemoi.Centralize.Infrastructure.Installers;
@@ -18,6 +20,7 @@ public sealed class ServiceInstaller : IInstaller
     {
         services.AddHttpContextAccessor();
         services.AddHttpClient();
+        services.AddScoped<CentralizeMapper>();
         services.AddTransient<IRequestClientService, RequestClientService>();
         services.AddScoped<AutoMapDataFilter>();
         services.AddScoped<IFileService, S3FileService>();
@@ -36,5 +39,25 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ICustomUserIdGetter>(sp => sp.GetRequiredService<ICustomUserIdSetter>() as CustomUserIdService);
         services.AddScoped<ICustomWorkspaceIdSetter, CustomWorkspaceIdService>();
         services.AddScoped<ICustomWorkspaceIdGetter>(sp => sp.GetRequiredService<ICustomWorkspaceIdSetter>() as CustomWorkspaceIdService);
+
+        // Active SignalR developer registry
+        services.AddSingleton<IConnectedUsersRegistry, ConnectedUsersRegistry>();
+        services.AddScoped<IEnvironmentNotificationService, EnvironmentNotificationService>();
+
+        // Dev environments integration services
+        // DOCKER SOCKET: Docker management API is Dev-only — not safe for production.
+        // The service handles missing socket gracefully (returns "Docker daemon unreachable").
+        services.AddSingleton<IDockerService, DockerService>();
+        services.AddSingleton<ISftpFileManager, SftpFileManager>();
+        services.AddSingleton<IMockRouteRepository, MockRouteRepository>();
+
+        // Ensure SFTP SSH keys exist at startup
+        var devSettings = configuration.GetSection(nameof(DevEnvironmentsSetting)).Get<DevEnvironmentsSetting>() ?? new DevEnvironmentsSetting();
+        var sftpKeysPath = "/app/sftp_keys";
+        if (!System.IO.Directory.Exists(sftpKeysPath))
+        {
+            sftpKeysPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), devSettings.LocalEnvDir, "sftp_keys");
+        }
+        SshKeyGenerator.EnsureKeysExist(sftpKeysPath);
     }
 }

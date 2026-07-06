@@ -4,7 +4,6 @@ using Anemoi.BuildingBlock.Infrastructure.RunSqlMigration;
 using Lambda.Identity.Application.SeedData;
 using Anemoi.Identity.Infrastructure;
 using Anemoi.Identity.Infrastructure.DataContext;
-using Anemoi.Identity.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
@@ -41,9 +40,20 @@ var serviceScope = app.Services.CreateScope();
 
 await SeedData.SeedRolesAsync(serviceScope);
 
+await EmployeeRoleSeeder.SeedDefaultRoleGroupsAsync(serviceScope);
+
 await SeedData.SeedApplicationPoliciesAsync(serviceScope);
 
 await SeedData.RegisterAdministratorAsync(serviceScope);
+
+if (app.Environment.IsDevelopment())
+{
+    await SeedData.RegisterDevTestUsersAsync(serviceScope);
+}
+
+await SeedData.NormalizeAuthorizationAssignmentsAsync(serviceScope);
+
+await SeedData.RemoveReservedApplicationPolicyClaimsAsync(serviceScope);
 
 app.UseCors("CorsPolicy");
 
@@ -59,8 +69,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.MapGrpcService<IdentityGrpcService>();
 
 app.MapGraphQL();
 

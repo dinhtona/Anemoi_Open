@@ -5,8 +5,7 @@ using System.Linq.Expressions;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Anemoi.Identity.Application.Mappings;
 using HotChocolate;
 using HotChocolate.Data;
 using Anemoi.Identity.Domain.Models;
@@ -18,15 +17,13 @@ public sealed class IdentityQueries
     [UseProjection]
     public IQueryable<UserResponse> GetUsers(
         [Service] ISqlRepository<User> sqlRepository,
-        [Service] IMapper mapper, List<Guid> ids)
+        [Service] IdentityMapper mapper, List<Guid> ids)
     {
         Expression<Func<User, bool>> idsFilter = ids switch
         {
             { } val => p => val.Select(a => new UserId(a)).Contains(p.UserId),
             _ => _ => true
         };
-        return sqlRepository
-            .GetQueryable(idsFilter)
-            .ProjectTo<UserResponse>(mapper.ConfigurationProvider);
+        return mapper.ProjectToUserResponse(sqlRepository.GetQueryable(idsFilter));
     }
 }

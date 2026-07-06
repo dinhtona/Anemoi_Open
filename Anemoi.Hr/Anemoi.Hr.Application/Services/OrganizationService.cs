@@ -1,0 +1,273 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
+using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Application.Models;
+using Anemoi.Hr.Domain.Departments;
+using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Organization;
+using Anemoi.Hr.Domain.Workflow;
+using Anemoi.Hr.ModelIds.ModelIds;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
+
+namespace Anemoi.Hr.Application.Services;
+
+public interface IOrganizationService
+{
+    Task<List<OrganizationNode>> GetOrganizationTreeAsync(CancellationToken ct);
+    Task<List<ReportingRelationship>> GetReportingChainAsync(EmployeeId employeeId, CancellationToken ct);
+    Task<OneOf<bool, ErrorDetailResponse>> UpdateManagerAsync(EmployeeId employeeId, EmployeeId? managerId, CancellationToken ct);
+    Task<List<WorkflowApproverCandidate>> GetApproversPreviewAsync(EmployeeId employeeId, string entityType, CancellationToken ct);
+    Task<List<WorkflowApproverCandidate>> GetWorkflowRoutePreviewAsync(EmployeeId employeeId, string entityType, CancellationToken ct);
+}
+
+public sealed class OrganizationService(
+    ISqlRepository<Employee> employeeRepository,
+    ISqlRepository<Department> departmentRepository,
+    ISqlRepository<WorkflowDefinition> definitionRepository,
+    IApprovalResolver approvalResolver,
+    IWorkflowHierarchyResolver hierarchyResolver,
+    IUnitOfWork unitOfWork)
+    : IOrganizationService
+{
+    public async Task<List<OrganizationNode>> GetOrganizationTreeAsync(CancellationToken ct)
+    {
+        var employees = await employeeRepository.GetQueryable()
+            .Include(e => e.PrimaryDepartment)
+            .Include(e => e.PrimaryPosition)
+            .ToListAsync(ct);
+
+        var departments = await departmentRepository.GetQueryable()
+            .ToDictionaryAsync(d => d.Id, ct);
+
+        var employeeMap = employees.ToDictionary(e => e.Id);
+
+        var childrenByManager = employees
+            .Where(e => e.DirectManagerEmployeeId is not null)
+            .GroupBy(e => e.DirectManagerEmployeeId!.Value)
+            .ToDictionary(g => new EmployeeId(g.Key), g => g.OrderBy(e => e.FullName).ToList());
+
+        var roots = employees
+            .Where(e => e.DirectManagerEmployeeId is null)
+            .OrderBy(e => e.FullName)
+            .ToList();
+
+        var tree = roots.Select(r => BuildNode(r, employeeMap, childrenByManager, departments)).ToList();
+        return tree;
+    }
+
+    private OrganizationNode BuildNode(Employee employee,
+        Dictionary<EmployeeId, Employee> employeeMap,
+        Dictionary<EmployeeId, List<Employee>> childrenByManager,
+        Dictionary<DepartmentId, Department> departments)
+    {
+        var dept = employee.PrimaryDepartmentId is not null
+            ? departments.GetValueOrDefault(employee.PrimaryDepartmentId)
+            : null;
+
+        var manager = employee.DirectManagerEmployeeId is not null
+            ? employeeMap.GetValueOrDefault(employee.DirectManagerEmployeeId)
+            : null;
+
+        var directReports = childrenByManager.GetValueOrDefault(employee.Id)
+            ?? new List<Employee>();
+
+        return new OrganizationNode(
+            employee.Id,
+            employee.FullName,
+            employee.EmployeeCode,
+            employee.DirectManagerEmployeeId,
+            manager?.FullName,
+            employee.PrimaryDepartmentId,
+            dept?.Name ?? string.Empty,
+            employee.PrimaryPosition?.Name ?? string.Empty,
+            employee.GradeCode,
+            directReports.Select(r => BuildNode(r, employeeMap, childrenByManager, departments)).ToList());
+    }
+
+    public async Task<List<ReportingRelationship>> GetReportingChainAsync(
+        EmployeeId employeeId, CancellationToken ct)
+    {
+        var allEmployees = await employeeRepository.GetQueryable()
+            .Select(e => new
+            {
+                e.Id,
+                e.FullName,
+                e.DirectManagerEmployeeId
+            })
+            .ToDictionaryAsync(e => e.Id, ct);
+
+        if (!allEmployees.TryGetValue(employeeId, out var current))
+            return [];
+
+        var chain = new List<ReportingRelationship>();
+
+        var level = 0;
+        var levels = new[] { HierarchyLevel.Employee, HierarchyLevel.DirectManager,
+            HierarchyLevel.DepartmentManager, HierarchyLevel.HrManager };
+        chain.Add(new ReportingRelationship(current.Id, current.FullName,
+            current.DirectManagerEmployeeId,
+            current.DirectManagerEmployeeId is not null && allEmployees.TryGetValue(current.DirectManagerEmployeeId, out var dm) ? dm.FullName : null,
+            level < levels.Length ? levels[level] : $"Level{level}"));
+
+        var visited = new HashSet<EmployeeId> { current.Id };
+        var managerId = current.DirectManagerEmployeeId;
+        level++;
+
+        while (managerId is not null && !visited.Contains(managerId))
+        {
+            visited.Add(managerId);
+            if (!allEmployees.TryGetValue(managerId, out var manager))
+                break;
+
+            chain.Add(new ReportingRelationship(manager.Id, manager.FullName,
+                manager.DirectManagerEmployeeId,
+                manager.DirectManagerEmployeeId is not null && allEmployees.TryGetValue(manager.DirectManagerEmployeeId, out var mgr) ? mgr.FullName : null,
+                level < levels.Length ? levels[level] : $"Level{level}"));
+
+            managerId = manager.DirectManagerEmployeeId;
+            level++;
+        }
+
+        return chain;
+    }
+
+    public async Task<OneOf<bool, ErrorDetailResponse>> UpdateManagerAsync(
+        EmployeeId employeeId, EmployeeId? managerId, CancellationToken ct)
+    {
+        var employee = await employeeRepository.GetQueryable()
+            .FirstOrDefaultAsync(e => e.Id == employeeId, ct);
+
+        if (employee is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
+        if (managerId is not null)
+        {
+            if (managerId == employeeId)
+                return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+
+            var manager = await employeeRepository.GetQueryable()
+                .FirstOrDefaultAsync(e => e.Id == managerId, ct);
+            if (manager is null)
+                return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
+            // Load full manager chain in one query to detect circular hierarchy
+            var managerChain = await employeeRepository.GetQueryable()
+                .Select(e => new { e.Id, e.DirectManagerEmployeeId })
+                .ToDictionaryAsync(e => e.Id, ct);
+
+            var visited = new HashSet<EmployeeId> { employeeId };
+            var currentManagerId = manager.DirectManagerEmployeeId;
+            while (currentManagerId is not null)
+            {
+                if (!visited.Add(currentManagerId))
+                    return HrErrorResponses.Create(HrBusinessErrorCodes.WorkflowApproverNotFound);
+                if (!managerChain.TryGetValue(currentManagerId, out var mgr)) break;
+                currentManagerId = mgr.DirectManagerEmployeeId;
+            }
+        }
+
+        employee.DirectManagerEmployeeId = managerId;
+        employee.UpdatedAt = DateTime.UtcNow;
+        await unitOfWork.SaveChangesAsync(ct);
+
+        return true;
+    }
+
+    public async Task<List<WorkflowApproverCandidate>> GetApproversPreviewAsync(
+        EmployeeId employeeId, string entityType, CancellationToken ct)
+    {
+        var employee = await employeeRepository.GetQueryable()
+            .Include(e => e.PrimaryDepartment)
+            .FirstOrDefaultAsync(e => e.Id == employeeId, ct);
+        if (employee is null) return [];
+
+        var context = new ApprovalRoutingContext(
+            employeeId, employee.PrimaryDepartmentId, null, entityType, null);
+
+        var candidates = new List<WorkflowApproverCandidate>();
+
+        var hierarchy = await hierarchyResolver.ResolveHierarchyAsync(employeeId, ct);
+        var maxSteps = WorkflowConstants.DefaultPolicy.GetStepCount(entityType);
+        var selected = hierarchy.Take(maxSteps > 0 ? maxSteps : 10).ToList();
+
+        foreach (var step in selected)
+        {
+            var result = await approvalResolver.ResolveApproversAsync(
+                step.ApproverType, step.ApproverValue, context, ct);
+
+            if (result.TryPickT0(out var approvers, out _) && approvers.Count > 0)
+            {
+                candidates.Add(new WorkflowApproverCandidate(
+                    step.StepOrder,
+                    step.ApproverType,
+                    step.ApproverValue,
+                    approvers[0].EmployeeId,
+                    approvers[0].FullName,
+                    approvers[0].Email));
+            }
+            else
+            {
+                candidates.Add(new WorkflowApproverCandidate(
+                    step.StepOrder,
+                    step.ApproverType,
+                    step.ApproverValue,
+                    null, "Unable to resolve", null));
+            }
+        }
+
+        return candidates;
+    }
+
+    public async Task<List<WorkflowApproverCandidate>> GetWorkflowRoutePreviewAsync(
+        EmployeeId employeeId, string entityType, CancellationToken ct)
+    {
+        var employee = await employeeRepository.GetQueryable()
+            .Include(e => e.PrimaryDepartment)
+            .FirstOrDefaultAsync(e => e.Id == employeeId, ct);
+        if (employee is null) return [];
+
+        var definition = await definitionRepository.GetQueryable()
+            .Include(d => d.Steps)
+            .Where(d => d.TargetEntityType == entityType && d.IsActive)
+            .FirstOrDefaultAsync(ct);
+
+        var context = new ApprovalRoutingContext(
+            employeeId, employee.PrimaryDepartmentId, null, entityType, null);
+
+        var candidates = new List<WorkflowApproverCandidate>();
+
+        if (definition is not null)
+        {
+            var sortedSteps = definition.Steps.OrderBy(s => s.Sequence).ToList();
+            foreach (var step in sortedSteps)
+            {
+                var result = await approvalResolver.ResolveApproversAsync(
+                    step.ApproverType, step.ApproverValue, context, ct);
+
+                if (result.TryPickT0(out var approvers, out _) && approvers.Count > 0)
+                {
+                    candidates.Add(new WorkflowApproverCandidate(
+                        step.Sequence,
+                        step.ApproverType,
+                        step.ApproverValue,
+                        approvers[0].EmployeeId,
+                        approvers[0].FullName,
+                        approvers[0].Email));
+                }
+                else
+                {
+                    candidates.Add(new WorkflowApproverCandidate(
+                        step.Sequence,
+                        step.ApproverType,
+                        step.ApproverValue,
+                        null, "Unable to resolve", null));
+                }
+            }
+        }
+
+        return candidates;
+    }
+}

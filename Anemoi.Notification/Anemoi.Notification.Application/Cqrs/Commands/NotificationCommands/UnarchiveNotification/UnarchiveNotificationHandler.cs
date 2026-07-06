@@ -1,0 +1,60 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Extensions;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Contract.Identity.ModelIds;
+using Anemoi.Contract.Notification.Commands.NotificationCommands.UnarchiveNotification;
+using Anemoi.Contract.Notification.Errors;
+using Anemoi.Notification.Domain.Models;
+using MediatR;
+using OneOf;
+using Serilog;
+
+namespace Anemoi.Notification.Application.Cqrs.Commands.NotificationCommands.UnarchiveNotification;
+
+public sealed class UnarchiveNotificationHandler(
+    ISqlRepository<NotificationHistory> sqlRepository,
+    IUnitOfWork unitOfWork,
+    ILogger logger)
+    : IRequestHandler<UnarchiveNotificationCommand, OneOf<None, ErrorDetailResponse>>
+{
+    public async Task<OneOf<None, ErrorDetailResponse>> Handle(
+        UnarchiveNotificationCommand request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = new UserId(Guid.Parse(request.UserId));
+            var notification = await sqlRepository
+                .GetFirstByConditionAsync(
+                    x => x.Id == request.Id && x.UserId == userId,
+                    token: cancellationToken);
+
+            if (notification == null)
+                return NotificationErrorDetail.NotificationError.NotFound().ToErrorDetailResponse();
+
+            if (!notification.IsArchived)
+                return NotificationErrorDetail.ArchiveError.NotArchived().ToErrorDetailResponse();
+
+            notification.Unarchive();
+
+            var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+            return saveResult.Match<OneOf<None, ErrorDetailResponse>>(
+                _ => None.Value,
+                ex =>
+                {
+                    logger.Error(ex, "Failed to unarchive notification {NotificationId}", request.Id);
+                    return NotificationErrorDetail.ArchiveError.UnarchiveFailed().ToErrorDetailResponse();
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "Error in UnarchiveNotificationHandler for {NotificationId}", request.Id);
+            return NotificationErrorDetail.ArchiveError.UnarchiveFailed().ToErrorDetailResponse();
+        }
+    }
+}

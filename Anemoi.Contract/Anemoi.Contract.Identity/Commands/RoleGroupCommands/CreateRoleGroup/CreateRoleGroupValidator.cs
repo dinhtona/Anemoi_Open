@@ -12,6 +12,6 @@ public sealed class CreateRoleGroupValidator : AbstractValidator<CreateRoleGroup
         RuleFor(x => x.IdentityRoleIds)
             .NotEmpty()
             .Must(ids => ids.Count == ids.Distinct().Count())
-            .WithMessage("Role Ids must not be duplicated!");
+            .WithMessage("VAL_ROLE_IDS_NOT_DUPLICATED");
     }
 }

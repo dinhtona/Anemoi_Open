@@ -9,10 +9,10 @@ public sealed class UpdateDistrictValidator : AbstractValidator<UpdateDistrictCo
         When(x => x.Name is { }, () => RuleFor(x => x.Name).NotEmpty());
         When(x => x.ProvinceId is { }, () => RuleFor(x => x.ProvinceId)
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("ProvinceId cannot be empty!"));
+            .WithMessage("VAL_PROVINCE_ID_REQUIRED"));
         When(x => x.Id is { }, () => RuleFor(x => x.Id)
             .Must(x => x is { } && x.Value != Guid.Empty)
-            .WithMessage("DistrictId cannot be empty!"));
+            .WithMessage("VAL_DISTRICT_ID_REQUIRED"));
         ;
     }
 }

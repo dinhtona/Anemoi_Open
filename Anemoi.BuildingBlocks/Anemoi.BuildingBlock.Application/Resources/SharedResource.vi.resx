@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="UnhandledError" xml:space="preserve">
+    <value>Đã xảy ra một lỗi hệ thống không lường trước.</value>
+  </data>
+  <data name="SSE_04" xml:space="preserve">
+    <value>Tên máy chủ gieo mầm đã tồn tại!</value>
+  </data>
+  <data name="PEE_04" xml:space="preserve">
+    <value>Tỉnh/Thành phố này đã tồn tại trong hệ thống!</value>
+  </data>
+  <data name="RefreshTokenInvalid" xml:space="preserve">
+    <value>Refresh token không hợp lệ hoặc không tồn tại.</value>
+  </data>
+  <data name="FailedToStartEnvironment" xml:space="preserve">
+    <value>Không thể khởi động dịch vụ môi trường.</value>
+  </data>
+  <data name="FailedToStopEnvironment" xml:space="preserve">
+    <value>Không thể dừng dịch vụ môi trường.</value>
+  </data>
+  <data name="NoFileUploaded" xml:space="preserve">
+    <value>Không có tệp tin nào được tải lên.</value>
+  </data>
+  <data name="EnvironmentNotFound" xml:space="preserve">
+    <value>Không tìm thấy dịch vụ môi trường.</value>
+  </data>
+  <data name="MockRouteNotFound" xml:space="preserve">
+    <value>Không tìm thấy Mock API.</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>Không tìm thấy tệp tin.</value>
+  </data>
+  <data name="ROE_06" xml:space="preserve">
+    <value>Administrator là vai trò hệ thống đặc biệt và không thể được gán thông qua nhóm vai trò hệ thống.</value>
+  </data>
+  <data name="AUE_12" xml:space="preserve"><value>Người dùng đã là quản trị viên hệ thống.</value></data>
+  <data name="AUE_13" xml:space="preserve"><value>Người dùng không phải là quản trị viên hệ thống.</value></data>
+  <data name="AUE_14" xml:space="preserve"><value>Quản trị viên hệ thống không thể tự hạ quyền tài khoản của mình.</value></data>
+  <data name="AUE_15" xml:space="preserve"><value>Không thể hạ quyền quản trị viên hệ thống cuối cùng.</value></data>
+  <data name="RateLimitExceeded" xml:space="preserve"><value>Có quá nhiều yêu cầu. Vui lòng thử lại sau.</value></data>
+  <data name="HubJoinForbidden" xml:space="preserve"><value>Bạn không có quyền tham gia nhóm này.</value></data>
+  <data name="HubUnknownGroup" xml:space="preserve"><value>Nhóm không tồn tại.</value></data>
+  <data name="FileOperationFailed" xml:space="preserve"><value>Thao tác với tệp tin thất bại.</value></data>
+  <data name="S3OperationFailed" xml:space="preserve"><value>Thao tác với kho lưu trữ thất bại.</value></data>
+  <data name="ExternalAuthFailed" xml:space="preserve"><value>Xác thực đăng nhập mạng xã hội thất bại.</value></data>
+  <data name="ProviderNotSupported" xml:space="preserve"><value>Nhà cung cấp đăng nhập mạng xã hội này chưa được hỗ trợ.</value></data>
+  <data name="ExternalAuthException" xml:space="preserve"><value>Đăng nhập mạng xã hội thất bại.</value></data>
+  <data name="EmailEmpty" xml:space="preserve"><value>Không thể lấy địa chỉ email từ nhà cung cấp đăng nhập.</value></data>
+  <data name="TokenGenerationFailed" xml:space="preserve"><value>Không thể tạo access token.</value></data>
+  <data name="VAL_REQUIRED" xml:space="preserve"><value>Trường này là bắt buộc.</value></data>
+  <data name="VAL_EMAIL_INVALID" xml:space="preserve"><value>Địa chỉ email không hợp lệ.</value></data>
+  <data name="VAL_MAX_LENGTH" xml:space="preserve"><value>Giá trị vượt quá độ dài tối đa.</value></data>
+  <data name="VAL_MIN_LENGTH" xml:space="preserve"><value>Giá trị chưa đạt độ dài tối thiểu.</value></data>
+  <data name="VAL_FORMAT_INVALID" xml:space="preserve"><value>Định dạng giá trị không hợp lệ.</value></data>
+  <data name="VAL_INVALID" xml:space="preserve"><value>Giá trị không hợp lệ.</value></data>
+  <data name="VAL_REFRESH_TOKEN_REQUIRED" xml:space="preserve"><value>Refresh token là bắt buộc.</value></data>
+  <data name="VAL_IDS_NOT_EMPTY" xml:space="preserve"><value>Danh sách định danh không được chứa giá trị rỗng.</value></data>
+  <data name="VAL_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Danh sách định danh không được trùng lặp.</value></data>
+  <data name="VAL_ROLE_IDS_NOT_DUPLICATED" xml:space="preserve"><value>Danh sách định danh vai trò không được trùng lặp.</value></data>
+  <data name="VAL_LOCK_UNTIL_FUTURE" xml:space="preserve"><value>Thời điểm khóa phải nằm trong tương lai.</value></data>
+  <data name="VAL_USER_ID_REQUIRED" xml:space="preserve"><value>Định danh người dùng là bắt buộc.</value></data>
+  <data name="VAL_PROVINCE_ID_REQUIRED" xml:space="preserve"><value>Định danh tỉnh/thành phố là bắt buộc.</value></data>
+  <data name="VAL_DISTRICT_ID_REQUIRED" xml:space="preserve"><value>Định danh quận/huyện là bắt buộc.</value></data>
+  <data name="VAL_ORGANIZATION_ID_REQUIRED" xml:space="preserve"><value>Định danh tổ chức là bắt buộc.</value></data>
+  <data name="VAL_PRIMARY_KEY_CONDITION_INVALID" xml:space="preserve"><value>Điều kiện khóa chính không hợp lệ.</value></data>
+  <data name="IDE_01" xml:space="preserve"><value>Người dùng đang bị khóa.</value></data>
+  <data name="IDE_02" xml:space="preserve"><value>Người dùng không được phép đăng nhập.</value></data>
+  <data name="IDE_03" xml:space="preserve"><value>Yêu cầu xác thực hai bước.</value></data>
+  <data name="IDE_04" xml:space="preserve"><value>Đăng xuất thất bại.</value></data>
+  <data name="IDE_05" xml:space="preserve"><value>Đổi mật khẩu thất bại.</value></data>
+  <data name="IDE_06" xml:space="preserve"><value>Mật khẩu không chính xác.</value></data>
+  <data name="IDE_07" xml:space="preserve"><value>Đăng nhập thất bại.</value></data>
+  <data name="IDE_08" xml:space="preserve"><value>Khóa người dùng thất bại.</value></data>
+  <data name="IDE_09" xml:space="preserve"><value>Đặt lại mật khẩu thất bại.</value></data>
+  <data name="IDE_10" xml:space="preserve"><value>Phải đổi mật khẩu trong lần đăng nhập đầu tiên.</value></data>
+  <data name="IDE_12" xml:space="preserve"><value>Email người dùng chưa được xác minh.</value></data>
+  <data name="IDE_15" xml:space="preserve"><value>Cần tạo lại mã băm mật khẩu.</value></data>
+  <data name="TEE_01" xml:space="preserve"><value>Refresh token đã được sử dụng.</value></data>
+  <data name="TEE_02" xml:space="preserve"><value>Token chưa hết hạn.</value></data>
+  <data name="TEE_03" xml:space="preserve"><value>Không tìm thấy refresh token.</value></data>
+  <data name="TEE_04" xml:space="preserve"><value>Tạo refresh token thất bại.</value></data>
+  <data name="TEE_05" xml:space="preserve"><value>Token không hợp lệ.</value></data>
+  <data name="TEE_07" xml:space="preserve"><value>Phiên đăng nhập đã hết hạn.</value></data>
+  <data name="TEE_08" xml:space="preserve"><value>Refresh token không hợp lệ.</value></data>
+  <data name="TEE_09" xml:space="preserve"><value>Token đã hết hạn.</value></data>
+  <data name="AUE_01" xml:space="preserve"><value>Không tìm thấy người dùng.</value></data>
+  <data name="AUE_02" xml:space="preserve"><value>Tạo người dùng thất bại.</value></data>
+  <data name="AUE_03" xml:space="preserve"><value>Cập nhật người dùng thất bại.</value></data>
+  <data name="AUE_04" xml:space="preserve"><value>Xóa người dùng thất bại.</value></data>
+  <data name="AUE_05" xml:space="preserve"><value>Tài khoản người dùng đã được xác nhận.</value></data>
+  <data name="AUE_06" xml:space="preserve"><value>Người dùng đã tồn tại.</value></data>
+  <data name="AUE_11" xml:space="preserve"><value>Mật khẩu không hợp lệ.</value></data>
+  <data name="ROE_01" xml:space="preserve"><value>Danh sách vai trò không được trùng lặp.</value></data>
+  <data name="ROE_02" xml:space="preserve"><value>Một hoặc nhiều vai trò không tồn tại.</value></data>
+  <data name="ROE_03" xml:space="preserve"><value>Xóa vai trò thất bại.</value></data>
+  <data name="ROE_04" xml:space="preserve"><value>Thêm vai trò thất bại.</value></data>
+  <data name="ROE_05" xml:space="preserve"><value>Danh sách vai trò là bắt buộc.</value></data>
+  <data name="RGE_01" xml:space="preserve"><value>Không tìm thấy nhóm vai trò.</value></data>
+  <data name="RGE_02" xml:space="preserve"><value>Tạo nhóm vai trò thất bại.</value></data>
+  <data name="RGE_03" xml:space="preserve"><value>Cập nhật nhóm vai trò thất bại.</value></data>
+  <data name="RGE_04" xml:space="preserve"><value>Xóa nhóm vai trò thất bại.</value></data>
+  <data name="RGE_05" xml:space="preserve"><value>Tên nhóm vai trò đã tồn tại.</value></data>
+  <data name="RGE_06" xml:space="preserve"><value>Nhóm vai trò đã được áp dụng.</value></data>
+  <data name="RGE_08" xml:space="preserve"><value>Không thể chỉnh sửa nhóm vai trò mặc định.</value></data>
+  <data name="RGE_09" xml:space="preserve"><value>Không thể quản lý nhóm vai trò workspace như nhóm vai trò hệ thống.</value></data>
+  <data name="RGE_10" xml:space="preserve"><value>Nhóm vai trò không thuộc workspace hiện tại.</value></data>
+  <data name="APE_01" xml:space="preserve"><value>Không tìm thấy chính sách ứng dụng.</value></data>
+  <data name="APE_02" xml:space="preserve"><value>Tạo chính sách ứng dụng thất bại.</value></data>
+  <data name="APE_03" xml:space="preserve"><value>Cập nhật chính sách ứng dụng thất bại.</value></data>
+  <data name="APE_04" xml:space="preserve"><value>Xóa chính sách ứng dụng thất bại.</value></data>
+  <data name="UMG_01" xml:space="preserve"><value>Không tìm thấy ánh xạ người dùng và nhóm vai trò.</value></data>
+  <data name="UMG_02" xml:space="preserve"><value>Tạo ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_03" xml:space="preserve"><value>Cập nhật ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_04" xml:space="preserve"><value>Xóa ánh xạ người dùng và nhóm vai trò thất bại.</value></data>
+  <data name="UMG_05" xml:space="preserve"><value>Danh sách định danh nhóm vai trò không được trùng lặp.</value></data>
+  <data name="PEE_01" xml:space="preserve"><value>Tạo tỉnh/thành phố thất bại.</value></data>
+  <data name="PEE_02" xml:space="preserve"><value>Cập nhật tỉnh/thành phố thất bại.</value></data>
+  <data name="PEE_03" xml:space="preserve"><value>Không tìm thấy tỉnh/thành phố.</value></data>
+  <data name="DIE_01" xml:space="preserve"><value>Tạo quận/huyện thất bại.</value></data>
+  <data name="DIE_02" xml:space="preserve"><value>Cập nhật quận/huyện thất bại.</value></data>
+  <data name="DIE_03" xml:space="preserve"><value>Không tìm thấy quận/huyện.</value></data>
+  <data name="SSE_01" xml:space="preserve"><value>Tạo máy chủ seed thất bại.</value></data>
+  <data name="SSE_02" xml:space="preserve"><value>Cập nhật máy chủ seed thất bại.</value></data>
+  <data name="SSE_03" xml:space="preserve"><value>Không tìm thấy máy chủ seed.</value></data>
+  <data name="SSE_05" xml:space="preserve"><value>Kiểm tra kết nối cơ sở dữ liệu thất bại.</value></data>
+  <data name="SFE_01" xml:space="preserve"><value>Tạo hàm seed thất bại.</value></data>
+  <data name="SFE_02" xml:space="preserve"><value>Cập nhật hàm seed thất bại.</value></data>
+  <data name="SFE_03" xml:space="preserve"><value>Không tìm thấy hàm seed.</value></data>
+  <data name="SFE_04" xml:space="preserve"><value>Tên hàm seed đã tồn tại.</value></data>
+  <data name="STE_01" xml:space="preserve"><value>Tạo mẫu seed thất bại.</value></data>
+  <data name="STE_02" xml:space="preserve"><value>Cập nhật mẫu seed thất bại.</value></data>
+  <data name="STE_03" xml:space="preserve"><value>Không tìm thấy mẫu seed.</value></data>
+  <data name="STE_04" xml:space="preserve"><value>Tên mẫu seed đã tồn tại.</value></data>
+  <data name="SEE_01" xml:space="preserve"><value>Thực thi seed thất bại.</value></data>
+  <data name="SEE_02" xml:space="preserve"><value>Thiếu cấu hình mẫu seed.</value></data>
+  <data name="SEE_03" xml:space="preserve"><value>Cấu hình mẫu seed không hợp lệ.</value></data>
+  <data name="SEE_04" xml:space="preserve"><value>Không tìm thấy bảng trong mẫu seed.</value></data>
+  <data name="SEE_05" xml:space="preserve"><value>Không tìm thấy bảng trong cơ sở dữ liệu đích.</value></data>
+  <data name="SEE_06" xml:space="preserve"><value>Cần cung cấp hàm seed hoặc máy chủ seed.</value></data>
+  <data name="SEE_07" xml:space="preserve"><value>Tạo dữ liệu mẫu thất bại.</value></data>
+  <data name="NTE_01" xml:space="preserve"><value>Tạo thông báo thất bại.</value></data>
+  <data name="NTE_02" xml:space="preserve"><value>Cập nhật thông báo thất bại.</value></data>
+  <data name="NTE_03" xml:space="preserve"><value>Không tìm thấy thông báo.</value></data>
+  <data name="NSE_01" xml:space="preserve"><value>Lưu cấu hình thông báo thất bại.</value></data>
+  <data name="WKE_01" xml:space="preserve"><value>Tạo workspace thất bại.</value></data>
+  <data name="WKE_02" xml:space="preserve"><value>Cập nhật workspace thất bại.</value></data>
+  <data name="WKE_03" xml:space="preserve"><value>Không tìm thấy workspace.</value></data>
+  <data name="WKE_04" xml:space="preserve"><value>Workspace đã tồn tại.</value></data>
+  <data name="WKE_05" xml:space="preserve"><value>Tên miền workspace đã tồn tại.</value></data>
+  <data name="WKE_06" xml:space="preserve"><value>Đã vượt quá giới hạn workspace.</value></data>
+  <data name="OGE_01" xml:space="preserve"><value>Tạo tổ chức thất bại.</value></data>
+  <data name="OGE_02" xml:space="preserve"><value>Cập nhật tổ chức thất bại.</value></data>
+  <data name="OGE_03" xml:space="preserve"><value>Không tìm thấy tổ chức.</value></data>
+  <data name="OGE_06" xml:space="preserve"><value>Tổ chức đã tồn tại.</value></data>
+  <data name="OGE_07" xml:space="preserve"><value>Tên miền tổ chức đã tồn tại.</value></data>
+  <data name="MIE_01" xml:space="preserve"><value>Tạo lời mời thành viên thất bại.</value></data>
+  <data name="MIE_02" xml:space="preserve"><value>Cập nhật lời mời thành viên thất bại.</value></data>
+  <data name="MIE_03" xml:space="preserve"><value>Không tìm thấy lời mời thành viên.</value></data>
+  <data name="MIE_04" xml:space="preserve"><value>Lời mời thành viên đã tồn tại.</value></data>
+  <data name="MIE_05" xml:space="preserve"><value>Xóa lời mời thành viên thất bại.</value></data>
+  <data name="MME_01" xml:space="preserve"><value>Tạo thành viên thất bại.</value></data>
+  <data name="MME_02" xml:space="preserve"><value>Cập nhật thành viên thất bại.</value></data>
+  <data name="MME_03" xml:space="preserve"><value>Không tìm thấy thành viên.</value></data>
+  <data name="MME_04" xml:space="preserve"><value>Thành viên đã tồn tại.</value></data>
+  <data name="MME_05" xml:space="preserve"><value>Xóa thành viên thất bại.</value></data>
+  <data name="MME_06" xml:space="preserve"><value>Không tìm thấy người dùng.</value></data>
+  <data name="MMG_01" xml:space="preserve"><value>Tạo ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MMG_02" xml:space="preserve"><value>Cập nhật ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MMG_03" xml:space="preserve"><value>Không tìm thấy ánh xạ thành viên và nhóm vai trò.</value></data>
+  <data name="MMG_04" xml:space="preserve"><value>Xóa ánh xạ thành viên và nhóm vai trò thất bại.</value></data>
+  <data name="MockRouteNotConfigured" xml:space="preserve"><value>Chưa cấu hình phản hồi mock đang hoạt động cho {0} /{1}. Hãy cấu hình tại tab Environments trong developer dashboard.</value></data>
+  <data name="EnvironmentActivityTitle" xml:space="preserve"><value>Thao tác môi trường: {0}</value></data>
+  <data name="EnvironmentServiceSftp" xml:space="preserve"><value>SFTP cho môi trường phát triển</value></data>
+  <data name="EnvironmentServiceMockApi" xml:space="preserve"><value>API Mock</value></data>
+  <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Kiểm thử email</value></data>
+  <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Đã tải lên tệp: {0} vào đường dẫn: {1}</value></data>
+  <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Đã xóa mục: {0}</value></data>
+  <data name="EnvironmentSftpDirectoryCreated" xml:space="preserve"><value>Đã tạo thư mục: {0} tại đường dẫn: {1}</value></data>
+  <data name="EnvironmentSftpDownloaded" xml:space="preserve"><value>Đã tải xuống tệp: {0} từ đường dẫn: {1}</value></data>
+  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>API Mock khớp yêu cầu: {0} /{1} - trả về {2}</value></data>
+  <data name="EnvironmentMailReceived" xml:space="preserve"><value>Nhận email mới từ {0} đến {1} với tiêu đề: "{2}"</value></data>
+  <data name="PermissionGroupUsers" xml:space="preserve"><value>Người dùng</value></data>
+  <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Nhóm vai trò</value></data>
+  <data name="PermissionGroupSeedGenerator" xml:space="preserve"><value>Tạo dữ liệu mẫu</value></data>
+  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Môi trường</value></data>
+  <data name="PermissionGroupOther" xml:space="preserve"><value>Khác</value></data>
+  <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>Xem người dùng và các nhóm vai trò đã được gán.</value></data>
+  <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Tạo, cập nhật và quản lý quyền truy cập của người dùng.</value></data>
+  <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>Xem nhóm vai trò và các quyền đã được gán.</value></data>
+  <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Tạo, cập nhật và xóa nhóm vai trò.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorRead" xml:space="preserve"><value>Xem máy chủ, mẫu cấu hình và tác vụ tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedGeneratorManage" xml:space="preserve"><value>Tạo và cập nhật máy chủ, mẫu cấu hình và tác vụ tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedExecutionRun" xml:space="preserve"><value>Chạy tác vụ tự động tạo dữ liệu.</value></data>
+  <data name="PermissionDescriptionSeedExecutionManualWrite" xml:space="preserve"><value>Chèn thủ công các dòng dữ liệu đã chuẩn bị vào cơ sở dữ liệu đích.</value></data>
+  <data name="PermissionDescriptionSeedExecutionDeleteRow" xml:space="preserve"><value>Xóa các dòng dữ liệu đã tạo khỏi cơ sở dữ liệu đích.</value></data>
+  <data name="PermissionDescriptionSeedExecutionLogClear" xml:space="preserve"><value>Xóa lịch sử các dòng dữ liệu đã tạo.</value></data>
+  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>Xem các dịch vụ trong môi trường phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Khởi động và dừng các dịch vụ trong môi trường phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Duyệt và tải xuống tệp từ kho lưu trữ SFTP phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Tải lên, tạo và xóa nội dung trong kho lưu trữ SFTP phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>Xem các route API giả lập phục vụ phát triển.</value></data>
+  <data name="PermissionDescriptionEnvironmentMockRouteManage" xml:space="preserve"><value>Tạo, cập nhật và xóa các route API giả lập phục vụ phát triển.</value></data>
+  <data name="PermissionDescriptionUnmapped" xml:space="preserve"><value>Quyền chưa được ánh xạ: {0}. Hãy bổ sung metadata vào danh mục quyền.</value></data>
+  <data name="PermissionGroupHrLeave" xml:space="preserve"><value>Nghỉ phép</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyView" xml:space="preserve"><value>Xem chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyCreate" xml:space="preserve"><value>Tạo chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicyUpdate" xml:space="preserve"><value>Cập nhật chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceView" xml:space="preserve"><value>Xem số dư nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveBalanceAdjust" xml:space="preserve"><value>Điều chỉnh số dư nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestView" xml:space="preserve"><value>Xem yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCreate" xml:space="preserve"><value>Tạo yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestApprove" xml:space="preserve"><value>Phê duyệt yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestCancel" xml:space="preserve"><value>Hủy yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceApprove" xml:space="preserve"><value>Bắt buộc phê duyệt yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveRequestForceCancel" xml:space="preserve"><value>Bắt buộc hủy yêu cầu nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTransactionView" xml:space="preserve"><value>Xem giao dịch nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeView" xml:space="preserve"><value>Xem loại nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeaveTypeManage" xml:space="preserve"><value>Quản lý loại nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsView" xml:space="preserve"><value>Xem cài đặt chính sách nghỉ phép.</value></data>
+  <data name="PermissionDescriptionHrLeavePolicySettingsManage" xml:space="preserve"><value>Quản lý cài đặt chính sách nghỉ phép.</value></data>
+  <data name="PermissionGroupHrEmployee" xml:space="preserve"><value>Nhân viên</value></data>
+  <data name="PermissionDescriptionHrEmployeeView" xml:space="preserve"><value>Xem thông tin nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeCreate" xml:space="preserve"><value>Tạo hồ sơ nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeUpdate" xml:space="preserve"><value>Cập nhật hồ sơ nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeIdentityLink" xml:space="preserve"><value>Liên kết nhân viên với người dùng định danh.</value></data>
+  <data name="PermissionDescriptionHrEmployeeActivate" xml:space="preserve"><value>Kích hoạt tài khoản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeSuspend" xml:space="preserve"><value>Tạm ngưng tài khoản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeResume" xml:space="preserve"><value>Khôi phục tài khoản nhân viên đã tạm ngưng.</value></data>
+  <data name="PermissionDescriptionHrEmployeeArchive" xml:space="preserve"><value>Lưu trữ hồ sơ nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDepartmentChange" xml:space="preserve"><value>Thay đổi phòng ban của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeePositionChange" xml:space="preserve"><value>Thay đổi chức vụ của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeGradeChange" xml:space="preserve"><value>Thay đổi bậc lương của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeManagerChange" xml:space="preserve"><value>Thay đổi quản lý trực tiếp của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentView" xml:space="preserve"><value>Xem tài liệu nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeDocumentManage" xml:space="preserve"><value>Quản lý tài liệu nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetView" xml:space="preserve"><value>Xem tài sản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAssetManage" xml:space="preserve"><value>Quản lý tài sản nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteView" xml:space="preserve"><value>Xem ghi chú nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeNoteManage" xml:space="preserve"><value>Quản lý ghi chú nhân viên (nhạy cảm).</value></data>
+  <data name="PermissionGroupHrDepartment" xml:space="preserve"><value>Phòng ban</value></data>
+  <data name="PermissionDescriptionHrDepartmentView" xml:space="preserve"><value>Xem thông tin phòng ban.</value></data>
+  <data name="PermissionDescriptionHrDepartmentManage" xml:space="preserve"><value>Quản lý thông tin phòng ban.</value></data>
+  <data name="PermissionGroupHrPosition" xml:space="preserve"><value>Chức vụ</value></data>
+  <data name="PermissionDescriptionHrPositionView" xml:space="preserve"><value>Xem thông tin chức vụ.</value></data>
+  <data name="PermissionDescriptionHrPositionManage" xml:space="preserve"><value>Quản lý thông tin chức vụ.</value></data>
+  <data name="PermissionDescriptionHrDashboardView" xml:space="preserve"><value>Xem bảng điều khiển nhân sự.</value></data>
+  <data name="PermissionDescriptionHrAnalyticsView" xml:space="preserve"><value>Xem phân tích nhân sự.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferView" xml:space="preserve"><value>Xem lịch sử chuyển phòng ban của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTransferCreate" xml:space="preserve"><value>Thực hiện chuyển phòng ban cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPromotionView" xml:space="preserve"><value>Xem lịch sử thăng chức của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPromotionCreate" xml:space="preserve"><value>Thực hiện thăng chức cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPositionChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi chức vụ của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrPositionChange" xml:space="preserve"><value>Thực hiện thay đổi chức vụ cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrGradeChangeView" xml:space="preserve"><value>Xem lịch sử thay đổi cấp bậc của nhân viên.</value></data>
+  <data name="PermissionDescriptionHrGradeChange" xml:space="preserve"><value>Thực hiện thay đổi cấp bậc cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractView" xml:space="preserve"><value>Xem hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractCreate" xml:space="preserve"><value>Tạo hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractUpdate" xml:space="preserve"><value>Cập nhật hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrContractTerminate" xml:space="preserve"><value>Chấm dứt hợp đồng nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryView" xml:space="preserve"><value>Xem thông tin lương nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryChange" xml:space="preserve"><value>Thay đổi thông tin lương nhân viên.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeView" xml:space="preserve"><value>Xem cấp bậc lương.</value></data>
+  <data name="PermissionDescriptionHrSalaryGradeManage" xml:space="preserve"><value>Quản lý cấp bậc lương.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeView" xml:space="preserve"><value>Xem loại phụ cấp.</value></data>
+  <data name="PermissionDescriptionHrAllowanceTypeManage" xml:space="preserve"><value>Quản lý loại phụ cấp.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceView" xml:space="preserve"><value>Xem phụ cấp nhân viên.</value></data>
+  <data name="PermissionDescriptionHrEmployeeAllowanceChange" xml:space="preserve"><value>Thay đổi phụ cấp nhân viên.</value></data>
+  <data name="PermissionDescriptionHrCompensationDashboardView" xml:space="preserve"><value>Xem bảng điều khiển đãi ngộ.</value></data>
+  <data name="PermissionGroupHrAttendance" xml:space="preserve"><value>Chấm công</value></data>
+  <data name="PermissionDescriptionHrAttendanceView" xml:space="preserve"><value>Xem dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceCreate" xml:space="preserve"><value>Tạo dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceUpdate" xml:space="preserve"><value>Cập nhật dữ liệu chấm công.</value></data>
+  <data name="PermissionDescriptionHrAttendanceLock" xml:space="preserve"><value>Khóa chu kỳ chấm công.</value></data>
+  <data name="PermissionGroupHrOvertime" xml:space="preserve"><value>Làm thêm giờ</value></data>
+  <data name="PermissionDescriptionHrOvertimeView" xml:space="preserve"><value>Xem yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRequest" xml:space="preserve"><value>Tạo và hủy yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeApprove" xml:space="preserve"><value>Phê duyệt và từ chối yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeManage" xml:space="preserve"><value>Quản lý cấu hình và tất cả yêu cầu làm thêm giờ.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleView" xml:space="preserve"><value>Xem quy tắc tăng ca.</value></data>
+  <data name="PermissionDescriptionHrOvertimeRuleManage" xml:space="preserve"><value>Quản lý quy tắc tăng ca.</value></data>
+  <data name="PermissionGroupHrShift" xml:space="preserve"><value>Quản lý Ca làm</value></data>
+  <data name="PermissionDescriptionHrShiftView" xml:space="preserve"><value>Xem mẫu ca, phân ca và lịch làm việc.</value></data>
+  <data name="PermissionDescriptionHrShiftManage" xml:space="preserve"><value>Tạo, cập nhật, kích hoạt và vô hiệu hóa mẫu ca.</value></data>
+  <data name="PermissionDescriptionHrShiftAssign" xml:space="preserve"><value>Phân ca cho nhân viên.</value></data>
+  <data name="PermissionDescriptionHrShiftCancel" xml:space="preserve"><value>Hủy phân ca cho nhân viên.</value></data>
+  <data name="PermissionGroupHrCalendar" xml:space="preserve"><value>Lịch</value></data>
+  <data name="PermissionDescriptionHrCalendarView" xml:space="preserve"><value>Xem lịch và ngày lễ</value></data>
+  <data name="PermissionDescriptionHrCalendarManage" xml:space="preserve"><value>Quản lý lịch, ngày lễ và ngoại lệ</value></data>
+  <data name="PermissionGroupHrPayroll" xml:space="preserve"><value>Bảng lương</value></data>
+  <data name="PermissionDescriptionHrPayrollView" xml:space="preserve"><value>Xem kỳ lương và bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollCalculate" xml:space="preserve"><value>Tính toán bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollApprove" xml:space="preserve"><value>Phê duyệt và từ chối bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollLock" xml:space="preserve"><value>Khóa kỳ lương.</value></data>
+  <data name="PermissionDescriptionHrPayrollExport" xml:space="preserve"><value>Xuất dữ liệu bảng lương.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentView" xml:space="preserve"><value>Xem phiếu lương.</value></data>
+  <data name="PermissionDescriptionHrPayslipDocumentGenerate" xml:space="preserve"><value>Tạo phiếu lương PDF.</value></data>
+  <data name="PermissionDescriptionHrPayslipEmailSend" xml:space="preserve"><value>Gửi email phiếu lương.</value></data>
+  <data name="PermissionGroupHrEss" xml:space="preserve"><value>Tự phục vụ nhân viên</value></data>
+  <data name="PermissionDescriptionHrEssProfileView" xml:space="preserve"><value>Xem hồ sơ cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveView" xml:space="preserve"><value>Xem đơn nghỉ phép của bản thân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssLeaveRequest" xml:space="preserve"><value>Gửi và hủy đơn nghỉ phép qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssAttendanceView" xml:space="preserve"><value>Xem dữ liệu chấm công cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeView" xml:space="preserve"><value>Xem yêu cầu làm thêm giờ của bản thân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssOvertimeCreate" xml:space="preserve"><value>Gửi yêu cầu làm thêm giờ qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayrollView" xml:space="preserve"><value>Xem lịch sử lương cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrEssPayslipView" xml:space="preserve"><value>Xem phiếu lương cá nhân qua ESS.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingView" xml:space="preserve"><value>Xem các báo cáo lương nâng cao.</value></data>
+  <data name="PermissionDescriptionHrPayrollReportingExport" xml:space="preserve"><value>Xuất các báo cáo lương nâng cao ra file CSV.</value></data>
+  <data name="PermissionGroupHrRecruitment" xml:space="preserve"><value>Tuyển dụng</value></data>
+  <data name="PermissionDescriptionHrRecruitmentView" xml:space="preserve"><value>Xem hồ sơ tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentManage" xml:space="preserve"><value>Quản lý cấu hình và hồ sơ tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestView" xml:space="preserve"><value>Xem yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestCreate" xml:space="preserve"><value>Tạo yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestSubmit" xml:space="preserve"><value>Gửi yêu cầu tuyển dụng để phê duyệt.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestApprove" xml:space="preserve"><value>Phê duyệt yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentRequestManage" xml:space="preserve"><value>Quản lý yêu cầu tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentInterview" xml:space="preserve"><value>Quản lý phỏng vấn tuyển dụng.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentHire" xml:space="preserve"><value>Hoàn tất thao tác tuyển dụng ứng viên.</value></data>
+  <data name="PermissionDescriptionHrRecruitmentAnalytics" xml:space="preserve"><value>Xem phân tích tuyển dụng.</value></data>
+  <data name="PermissionGroupHrWorkflow" xml:space="preserve"><value>Quy trình nhân sự</value></data>
+  <data name="PermissionDescriptionHrWorkflowView" xml:space="preserve"><value>Xem định nghĩa và phiên bản quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowManage" xml:space="preserve"><value>Quản lý định nghĩa quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowApprove" xml:space="preserve"><value>Phê duyệt tác vụ quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowExecute" xml:space="preserve"><value>Thực hiện tác vụ quy trình nhân sự.</value></data>
+  <data name="PermissionDescriptionHrWorkflowOverride" xml:space="preserve"><value>Ghi đè bước và người phê duyệt workflow.</value></data>
+  <data name="PermissionGroupHrOnboarding" xml:space="preserve"><value>Hội nhập nhân viên</value></data>
+  <data name="PermissionDescriptionHrOnboardingView" xml:space="preserve"><value>Xem kế hoạch và phiên bản hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingManage" xml:space="preserve"><value>Quản lý kế hoạch và phiên bản hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskManage" xml:space="preserve"><value>Quản lý tác vụ hội nhập.</value></data>
+  <data name="PermissionDescriptionHrOnboardingTaskComplete" xml:space="preserve"><value>Hoàn thành tác vụ hội nhập.</value></data>
+  <data name="PermissionDescriptionHrProbationView" xml:space="preserve"><value>Xem hồ sơ thử việc.</value></data>
+  <data name="PermissionDescriptionHrProbationManage" xml:space="preserve"><value>Quản lý hồ sơ thử việc.</value></data>
+  <data name="PermissionDescriptionHrSeparationView" xml:space="preserve"><value>Xem hồ sơ nghỉ việc.</value></data>
+  <data name="PermissionDescriptionHrSeparationCreate" xml:space="preserve"><value>Tạo hồ sơ nghỉ việc.</value></data>
+  <data name="PermissionDescriptionHrEmployeeTimelineView" xml:space="preserve"><value>Xem dòng thời gian nhân viên.</value></data>
+  <data name="PermissionGroupHrInsurance" xml:space="preserve"><value>Bảo hiểm</value></data>
+  <data name="PermissionDescriptionHrInsuranceView" xml:space="preserve"><value>Xem hồ sơ bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceManage" xml:space="preserve"><value>Quản lý hồ sơ bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceCalculate" xml:space="preserve"><value>Tính khoản đóng bảo hiểm.</value></data>
+  <data name="PermissionDescriptionHrInsuranceReport" xml:space="preserve"><value>Xem báo cáo bảo hiểm.</value></data>
+  <data name="PermissionGroupHrTax" xml:space="preserve"><value>Thuế</value></data>
+  <data name="PermissionDescriptionHrTaxView" xml:space="preserve"><value>Xem hồ sơ thuế.</value></data>
+  <data name="PermissionDescriptionHrTaxManage" xml:space="preserve"><value>Quản lý hồ sơ thuế.</value></data>
+  <data name="PermissionDescriptionHrTaxCalculate" xml:space="preserve"><value>Tính số tiền thuế.</value></data>
+  <data name="PermissionGroupNotifications" xml:space="preserve"><value>Thông báo</value></data>
+  <data name="PermissionDescriptionNotificationView" xml:space="preserve"><value>Xem thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationActionExecute" xml:space="preserve"><value>Thực hiện hành động thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationArchive" xml:space="preserve"><value>Lưu trữ thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationManage" xml:space="preserve"><value>Quản lý thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationAuditView" xml:space="preserve"><value>Xem nhật ký kiểm tra thông báo.</value></data>
+  <data name="PermissionDescriptionNotificationPreferenceManage" xml:space="preserve"><value>Quản lý tùy chọn thông báo.</value></data>
+  <data name="PermissionGroupHrOrganization" xml:space="preserve"><value>Tổ chức</value></data>
+  <data name="PermissionDescriptionHrOrganizationView" xml:space="preserve"><value>Xem cấu trúc tổ chức.</value></data>
+  <data name="PermissionDescriptionHrOrganizationManage" xml:space="preserve"><value>Quản lý cấu trúc tổ chức.</value></data>
+  <data name="Timeline.EmployeeCreated.Title" xml:space="preserve"><value>Đã tạo nhân viên</value></data>
+  <data name="Timeline.EmployeeCreated.Description" xml:space="preserve"><value>Đã tạo nhân viên {0} ({1}).</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Title" xml:space="preserve"><value>Trạng thái đã thay đổi</value></data>
+  <data name="Timeline.EmployeeStatusChanged.Description" xml:space="preserve"><value>Trạng thái đã thay đổi từ {2} sang {3}.</value></data>
+  <data name="Timeline.ProbationStatusChanged.Title" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi</value></data>
+  <data name="Timeline.ProbationStatusChanged.Description" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi.</value></data>
+  <data name="Timeline.TransferApproved.Title" xml:space="preserve"><value>Đã phê duyệt điều chuyển</value></data>
+  <data name="Timeline.TransferApproved.Description" xml:space="preserve"><value>Đã phê duyệt điều chuyển.</value></data>
+  <data name="Timeline.SeparationApproved.Title" xml:space="preserve"><value>Đã phê duyệt nghỉ việc</value></data>
+  <data name="Timeline.SeparationApproved.Description" xml:space="preserve"><value>Loại nghỉ việc: {4}.</value></data>
+  <data name="Timeline.Assigned.Title" xml:space="preserve"><value>Đã gán tài sản</value></data>
+  <data name="Timeline.Assigned.Description" xml:space="preserve"><value>Đã gán tài sản {7}.</value></data>
+  <data name="Timeline.Updated.Title" xml:space="preserve"><value>Đã cập nhật tài sản</value></data>
+  <data name="Timeline.Updated.Description" xml:space="preserve"><value>Đã cập nhật tài sản {7}.</value></data>
+  <data name="Timeline.Returned.Title" xml:space="preserve"><value>Đã hoàn trả tài sản</value></data>
+  <data name="Timeline.Returned.Description" xml:space="preserve"><value>Đã hoàn trả tài sản {7}.</value></data>
+  <data name="Timeline.MarkedLost.Title" xml:space="preserve"><value>Đã đánh dấu tài sản thất lạc</value></data>
+  <data name="Timeline.MarkedLost.Description" xml:space="preserve"><value>Đã đánh dấu tài sản {7} là thất lạc.</value></data>
+  <data name="Timeline.MarkedDamaged.Title" xml:space="preserve"><value>Đã đánh dấu tài sản hỏng</value></data>
+  <data name="Timeline.MarkedDamaged.Description" xml:space="preserve"><value>Đã đánh dấu tài sản {7} là hỏng.</value></data>
+  <data name="Timeline.Archived.Title" xml:space="preserve"><value>Đã lưu trữ</value></data>
+  <data name="Timeline.Archived.Description" xml:space="preserve"><value>Đã lưu trữ {7}.</value></data>
+  <data name="Timeline.NoteCreated.Title" xml:space="preserve"><value>Đã tạo ghi chú</value></data>
+  <data name="Timeline.NoteCreated.Description" xml:space="preserve"><value>Đã tạo một ghi chú.</value></data>
+  <data name="Timeline.NoteArchived.Title" xml:space="preserve"><value>Đã lưu trữ ghi chú</value></data>
+  <data name="Timeline.NoteArchived.Description" xml:space="preserve"><value>Đã lưu trữ một ghi chú.</value></data>
+  <data name="Timeline.Created.Title" xml:space="preserve"><value>Đã tạo tài liệu</value></data>
+  <data name="Timeline.Created.Description" xml:space="preserve"><value>Đã tạo tài liệu {9}.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImport" xml:space="preserve"><value>Nhập nhân viên từ file.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportHistory" xml:space="preserve"><value>Xem lịch sử nhập.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportDownload" xml:space="preserve"><value>Tải file lỗi nhập.</value></data>
+  <data name="PermissionDescriptionHrEmployeeImportTemplate" xml:space="preserve"><value>Tải file mẫu nhập.</value></data>
+</root>

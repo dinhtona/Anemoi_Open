@@ -2,21 +2,19 @@ using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.UserForgetPassword;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.UserForgetPassword;
 
 public sealed class UserForgetPasswordHandler(
     ILogger logger,
-    IMapper mapper,
     IUnitOfWork unitOfWork,
     ISqlRepository<User> userDbRepository)
-    : EfCommandOneVoidHandler<User, UserForgetPasswordCommand>(userDbRepository, unitOfWork, mapper, logger)
+    : EfCommandOneVoidHandler<User, UserForgetPasswordCommand>(userDbRepository, unitOfWork, logger)
 {
 
     protected override ICommandOneFlowBuilderVoid<User> BuildCommand(

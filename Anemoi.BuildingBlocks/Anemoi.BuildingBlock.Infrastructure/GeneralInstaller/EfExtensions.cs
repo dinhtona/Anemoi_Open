@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -16,7 +17,7 @@ public static class EfExtensions
 {
     public static void AddEfRepositoriesAsScope<TDbContext>(this IServiceCollection services, Assembly modelAssembly)
         where TDbContext : DbContext => modelAssembly.ExportedTypes
-        .Where(x => typeof(ValueObject).IsAssignableFrom(x) && x is { IsInterface: false, IsAbstract: false })
+        .Where(x => IsPersistedDomainType(x) && x is { IsInterface: false, IsAbstract: false })
         .ForEach(x =>
         {
             var assemblyName = new AssemblyName
@@ -43,6 +44,20 @@ public static class EfExtensions
             services.TryAddScoped(implementationType, repositoryType);
         });
 
+    private static bool IsPersistedDomainType(Type type)
+    {
+        if (typeof(ValueObject).IsAssignableFrom(type))
+            return true;
+
+        for (var current = type.BaseType; current is not null; current = current.BaseType)
+        {
+            if (current.IsGenericType && current.GetGenericTypeDefinition() == typeof(Entity<>))
+                return true;
+        }
+
+        return false;
+    }
+
     public static void AddEfUnitOfWorkAsScope<TDbContext>(this IServiceCollection services) where TDbContext : DbContext
     {
         var assemblyName = new AssemblyName
@@ -52,16 +67,18 @@ public static class EfExtensions
         var efUnitOfWorkType = typeof(EfUnitOfWork);
         var typeBuilder = newModule.DefineType("UnitOfWork", TypeAttributes.Public, efUnitOfWorkType);
         var ctorTypes = efUnitOfWorkType
-            .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, [typeof(TDbContext), typeof(ILogger)])!;
+            .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance,
+                [typeof(TDbContext), typeof(ILogger), typeof(MediatR.IMediator)])!;
         // Define the constructor for the dynamic class
         var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
-            CallingConventions.Standard, [typeof(TDbContext), typeof(ILogger)]);
+            CallingConventions.Standard, [typeof(TDbContext), typeof(ILogger), typeof(MediatR.IMediator)]);
         // Generate the constructor IL code
         var ilGenerator = constructorBuilder.GetILGenerator();
         ilGenerator.Emit(OpCodes.Ldarg_0); // Load "this" onto the stack
         ilGenerator.Emit(OpCodes.Ldarg_1); // Load the TDbContext argument onto the stack
         ilGenerator.Emit(OpCodes.Ldarg_2); // Load the ILogger argument onto the stack
-        // Call the base constructor with the TDbContext and ILogger arguments
+        ilGenerator.Emit(OpCodes.Ldarg_3); // Load the IMediator argument onto the stack
+        // Call the base constructor with the TDbContext, ILogger and IMediator arguments
         ilGenerator.Emit(OpCodes.Call, ctorTypes);
         ilGenerator.Emit(OpCodes.Ret); // Return from the constructor
         var unitOfWorkType = typeBuilder.CreateType();

@@ -1,11 +1,11 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Errors;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.UserLogin;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
@@ -13,8 +13,8 @@ using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Application.IdentityResults;
+using Anemoi.Identity.Application.Mappings;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using OneOf;
@@ -24,7 +24,7 @@ using SignInResult = Anemoi.Identity.Application.ApplicationModels.Enums.SignInR
 namespace Anemoi.Identity.Application.Cqrs.Commands.RefreshTokenCommands.UserLogin;
 
 public sealed class UserLoginHandler(
-    IMapper mapper,
+    IdentityMapper mapper,
     ILogger logger,
     ISender sender,
     ISignInRepository signInRepository,
@@ -33,7 +33,7 @@ public sealed class UserLoginHandler(
     ISqlRepository<User> userRepository,
     IPasswordHasher<User> passwordHasher)
     : EfCommandOneResultHandler<RefreshToken, UserLoginCommand, AuthenticationSuccessResponse>(refreshTokenRepository,
-        unitOfWork, mapper, logger)
+        unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<RefreshToken, AuthenticationSuccessResponse> BuildCommand(
         IStartOneCommandResult<RefreshToken, AuthenticationSuccessResponse> fromFlow,
@@ -52,11 +52,11 @@ public sealed class UserLoginHandler(
                     return IdentityErrorDetail.IdentityError.FirstTimePasswordWasNotChanged();
                 var authResponse = await SignInAsync(user, command.Password);
                 if (authResponse.IsT1) return authResponse.AsT1;
-                Mapper.Map(authResponse.AsT0, refreshToken);
+                mapper.UpdateRefreshToken(authResponse.AsT0, refreshToken);
                 return None.Value;
             })
             .WithErrorIfSaveChange(IdentityErrorDetail.IdentityError.LoginFailed())
-            .WithResultIfSucceed(Mapper.Map<AuthenticationSuccessResponse>);
+            .WithResultIfSucceed(mapper.ToAuthenticationSuccessResponse);
 
     private async Task<OneOf<IdentitySuccess, ErrorDetail>> SignInAsync(User user, string password)
     {
@@ -65,8 +65,12 @@ public sealed class UserLoginHandler(
             return IdentityErrorDetail.IdentityError.PasswordNotCorrect();
         if (passwordCheckResult == PasswordVerificationResult.SuccessRehashNeeded)
             return IdentityErrorDetail.IdentityError.PasswordSuccessRehashNeeded();
+        // Use CheckPasswordSignInAsync instead of PasswordSignInAsync:
+        // PasswordSignInAsync writes authentication cookies and requires an active HttpContext,
+        // which is NOT available when the command is handled inside a MassTransit consumer.
+        // CheckPasswordSignInAsync only validates the password and lockout state — no HttpContext needed.
         var signInResult = await signInRepository
-            .PasswordSignInAsync(user, password, false, true);
+            .CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
         return signInResult switch
         {
             SignInResult.IsLockedOut => IdentityErrorDetail.IdentityError.UserLockedOut(),

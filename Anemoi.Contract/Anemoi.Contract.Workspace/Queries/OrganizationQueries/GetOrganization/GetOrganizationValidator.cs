@@ -8,6 +8,6 @@ public sealed class GetOrganizationValidator : AbstractValidator<GetOrganization
     {
         RuleFor(x => x.Id)
             .NotEmpty()
-            .WithMessage("Organization Id can not be empty!");
+            .WithMessage("VAL_ORGANIZATION_ID_REQUIRED");
     }
 }

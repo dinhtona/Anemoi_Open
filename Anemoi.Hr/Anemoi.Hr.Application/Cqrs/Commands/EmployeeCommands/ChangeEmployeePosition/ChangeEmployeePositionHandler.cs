@@ -1,0 +1,57 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Commands;
+using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.BuildingBlock.Application.Results;
+using Anemoi.Hr.Application.Configurations;
+using Anemoi.Hr.Domain.Employees;
+using Anemoi.Hr.Domain.Positions;
+using Anemoi.Hr.ModelIds.ModelIds;
+using OneOf;
+
+namespace Anemoi.Hr.Application.Cqrs.Commands.EmployeeCommands.ChangeEmployeePosition;
+
+public sealed class ChangeEmployeePositionHandler(
+    ISqlRepository<Employee> employeeRepository,
+    ISqlRepository<Position> positionRepository,
+    ISqlRepository<EmployeeHistory> employeeHistoryRepository,
+    IUnitOfWork unitOfWork)
+    : ICommandHandler<ChangeEmployeePositionCommand, OneOf<None, ErrorDetailResponse>>
+{
+    public async Task<OneOf<None, ErrorDetailResponse>> Handle(
+        ChangeEmployeePositionCommand request, CancellationToken ct)
+    {
+        var employee = await employeeRepository.GetFirstByConditionAsync(
+            x => x.Id == request.EmployeeId, null, ct);
+        if (employee is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
+        var position = await positionRepository.GetFirstByConditionAsync(
+            x => x.Id == request.NewPositionId, null, ct);
+        if (position is null || !position.IsActive)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.PositionNotFound);
+
+        employee.PrimaryPositionId = request.NewPositionId;
+        employee.UpdatedAt = DateTime.UtcNow;
+
+        var history = new EmployeeHistory
+        {
+            Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
+            EmployeeId = request.EmployeeId,
+            EntityType = "Employee",
+            EntityId = request.EmployeeId.Value.ToString(),
+            EventType = "PositionChanged",
+            Title = "Employee position changed",
+            Description = "Position changed",
+            OccurredAt = DateTime.UtcNow,
+            ActorUserId = Guid.TryParse(request.CreatedBy, out var actorGuid) ? actorGuid : null,
+        };
+        await employeeHistoryRepository.CreateOneAsync(history, ct);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(ct);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
+
+        return None.Value;
+    }
+}

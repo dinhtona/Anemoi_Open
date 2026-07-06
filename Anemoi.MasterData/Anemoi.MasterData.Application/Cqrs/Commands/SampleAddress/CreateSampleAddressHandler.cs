@@ -3,25 +3,24 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.MasterData.Commands.SampleAddressCommands.CreateSampleAddress;
 using Anemoi.Contract.MasterData.Errors;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.MasterData.Application.Configurations;
+using Anemoi.MasterData.Application.Mappings;
 using Anemoi.MasterData.Domain.Models;
-using AutoMapper;
-using Newtonsoft.Json;
 using Serilog;
+using Newtonsoft.Json;
 
 namespace Anemoi.MasterData.Application.Cqrs.Commands.SampleAddress;
 
 public sealed class CreateSampleAddressHandler(
     ISqlRepository<Province> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger,
     ISqlRepository<Province> provinceRepository)
-    : EfCommandManyVoidHandler<Province, CreateSampleAddressCommand>(sqlRepository, unitOfWork, mapper, logger)
+    : EfCommandManyVoidHandler<Province, CreateSampleAddressCommand>(sqlRepository, unitOfWork, logger)
 {
     protected override ICommandManyFlowBuilderVoid<Province> BuildCommand(
         IStartManyCommandVoid<Province> fromFlow, CreateSampleAddressCommand command,

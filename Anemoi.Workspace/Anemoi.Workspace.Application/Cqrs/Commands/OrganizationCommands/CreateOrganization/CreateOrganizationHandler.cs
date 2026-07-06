@@ -1,11 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
 using Anemoi.Contract.Workspace.Commands.OrganizationCommands.CreateOrganization;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
+using Anemoi.Workspace.Application.Mappings;
 using Serilog;
 
 namespace Anemoi.Workspace.Application.Cqrs.Commands.OrganizationCommands.CreateOrganization;
@@ -13,16 +13,16 @@ namespace Anemoi.Workspace.Application.Cqrs.Commands.OrganizationCommands.Create
 public sealed class CreateOrganizationHandler(
     ISqlRepository<Organization> sqlRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
+    WorkspaceMapper mapper,
     ILogger logger)
-    : EfCommandOneVoidHandler<Organization, CreateOrganizationCommand>(sqlRepository, unitOfWork, mapper,
+    : EfCommandOneVoidHandler<Organization, CreateOrganizationCommand>(sqlRepository, unitOfWork,
         logger)
 {
     protected override ICommandOneFlowBuilderVoid<Organization> BuildCommand(
         IStartOneCommandVoid<Organization> fromFlow, CreateOrganizationCommand command,
         CancellationToken cancellationToken)
         => fromFlow
-            .CreateOne(Mapper.Map<Organization>(command))
+            .CreateOne(mapper.ToOrganization(command))
             .WithCondition(async organization =>
             {
                 if (command.SubDomain is null) return None.Value;

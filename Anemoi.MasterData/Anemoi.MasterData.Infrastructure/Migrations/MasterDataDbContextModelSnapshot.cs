@@ -80,6 +80,123 @@ namespace Anemoi.MasterData.Infrastructure.Migrations
                     b.ToTable("Provinces");
                 });
 
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedFunction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid?>("SeedServerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SeedTemplateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TablesJson")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("SeedServerId");
+
+                    b.HasIndex("SeedTemplateId");
+
+                    b.ToTable("SeedFunctions");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedRowLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PrimaryKeyCondition")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RowDataJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("RunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("SeedServerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeedServerId");
+
+                    b.ToTable("SeedRowLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedServer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConnectionString")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Environment")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("SeedServers");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConfigJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("SeedTemplates");
+                });
+
             modelBuilder.Entity("Anemoi.MasterData.Domain.Models.District", b =>
                 {
                     b.HasOne("Anemoi.MasterData.Domain.Models.Province", "Province")
@@ -90,9 +207,46 @@ namespace Anemoi.MasterData.Infrastructure.Migrations
                     b.Navigation("Province");
                 });
 
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedFunction", b =>
+                {
+                    b.HasOne("Anemoi.MasterData.Domain.Models.SeedServer", "SeedServer")
+                        .WithMany("SeedFunctions")
+                        .HasForeignKey("SeedServerId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Anemoi.MasterData.Domain.Models.SeedTemplate", "SeedTemplate")
+                        .WithMany("RelatedFunctions")
+                        .HasForeignKey("SeedTemplateId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("SeedServer");
+
+                    b.Navigation("SeedTemplate");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedRowLog", b =>
+                {
+                    b.HasOne("Anemoi.MasterData.Domain.Models.SeedServer", "SeedServer")
+                        .WithMany()
+                        .HasForeignKey("SeedServerId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("SeedServer");
+                });
+
             modelBuilder.Entity("Anemoi.MasterData.Domain.Models.Province", b =>
                 {
                     b.Navigation("Districts");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedServer", b =>
+                {
+                    b.Navigation("SeedFunctions");
+                });
+
+            modelBuilder.Entity("Anemoi.MasterData.Domain.Models.SeedTemplate", b =>
+                {
+                    b.Navigation("RelatedFunctions");
                 });
 #pragma warning restore 612, 618
         }

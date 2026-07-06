@@ -1,18 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Anemoi.MasterData.Domain\Anemoi.MasterData.Domain.csproj" />
+        <ProjectReference Include="..\..\Anemoi.Contract\Anemoi.Contract.MasterData\Anemoi.Contract.MasterData.csproj" />
+        <ProjectReference Include="..\..\Anemoi.BuildingBlocks\Anemoi.BuildingBlock.Application\Anemoi.BuildingBlock.Application.csproj" />
 
 
 
 
 
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="35.6.5" />
+      <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
     </ItemGroup>
 
 

@@ -8,6 +8,6 @@ public sealed class LockUserValidator : AbstractValidator<LockUserCommand>
     {
         RuleFor(x => x.LockUntil)
             .Must((lockCommand, time) => !lockCommand.EnableLock || time is { } && time > DateTime.UtcNow)
-            .WithMessage("Lock until must be larger than current time!");
+            .WithMessage("VAL_LOCK_UNTIL_FUTURE");
     }
 }

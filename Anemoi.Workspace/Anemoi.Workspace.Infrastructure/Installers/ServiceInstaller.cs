@@ -1,6 +1,7 @@
 ﻿using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.BuildingBlock.Infrastructure.Services;
+using Anemoi.Workspace.Application.Mappings;
 using Anemoi.Workspace.Domain;
 using Anemoi.Workspace.Infrastructure.DataContext;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddHttpClient();
         services.AddEfRepositoriesAsScope<WorkspaceDbContext>(typeof(IWorkspaceDomainAssemblyMarker).Assembly);
         services.AddEfUnitOfWorkAsScope<WorkspaceDbContext>();
+        services.AddScoped<WorkspaceMapper>();
         services.AddScoped<IUserIdSetter, UserService>();
         services.AddScoped<IUserIdGetter>(sp => sp.GetRequiredService<IUserIdSetter>() as UserService);
         services.AddScoped<IWorkspaceIdSetter, WorkspaceService>();

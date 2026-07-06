@@ -2,27 +2,27 @@
 using System.Threading;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandOneFlow;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandOne;
+using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Contract.Identity.Commands.IdentityCommands.UserChangePassword;
 using Anemoi.Contract.Identity.Errors;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Domain.Models;
-using AutoMapper;
 using Serilog;
 
 namespace Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.UserChangePassword;
 
 public sealed class UserChangePasswordHandler(
-    IMapper mapper,
     ILogger logger,
     IUserRepository userRepository,
     ISqlRepository<User> userDbRepository,
     IUnitOfWork unitOfWork,
-    IUserIdGetter userIdGetter)
+    IUserIdGetter userIdGetter,
+    IUserSessionRevocationService sessionRevocationService)
     : EfCommandOneResultHandler<User, UserChangePasswordCommand, UserIdResponse>(
-        userDbRepository, unitOfWork, mapper, logger)
+        userDbRepository, unitOfWork, logger)
 {
     protected override ICommandOneFlowBuilderResult<User, UserIdResponse> BuildCommand(
         IStartOneCommandResult<User, UserIdResponse> fromFlow,
@@ -34,9 +34,24 @@ public sealed class UserChangePasswordHandler(
             {
                 var changePasswordResult = await userRepository
                     .ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+                if (changePasswordResult.IsT1)
+                    return IdentityErrorDetail.IdentityError.FailedToChangePassword();
+
                 user.ChangedPasswordTime = DateTime.UtcNow;
-                return changePasswordResult.MapT1(_ =>
-                    IdentityErrorDetail.IdentityError.FailedToChangePassword());
+
+                var prepareResult = await sessionRevocationService.PrepareAsync(
+                    [user.UserId], cancellationToken);
+                if (prepareResult.IsT1)
+                {
+                    Logger.Warning("Failed to prepare session revocation for user {UserId} after password change",
+                        user.UserId);
+                }
+                else
+                {
+                    await sessionRevocationService.PublishAsync(prepareResult.AsT0, cancellationToken);
+                }
+
+                return None.Value;
             })
             .WithModify(_ => { })
             .WithErrorIfNull(IdentityErrorDetail.UserError.NotFound())

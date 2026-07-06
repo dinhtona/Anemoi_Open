@@ -2,12 +2,11 @@ using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands.CommandFlow.CommandManyFlow;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Results;
-using Anemoi.BuildingBlock.Infrastructure.RequestHandlers.Commands.EntityFramework.EfCommandMany;
+using Anemoi.BuildingBlock.Application.RequestHandlers.Commands.EntityFramework.EfCommandMany;
 using Anemoi.Contract.Workspace.Commands.MemberMapRoleGroupCommands.UpdateMemberByUserId;
 using Anemoi.Contract.Workspace.Errors;
 using Anemoi.Contract.Workspace.ModelIds;
 using Anemoi.Workspace.Domain.Models;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -17,9 +16,8 @@ public sealed class UpdateMemberByUserIdHandler(
     ISqlRepository<MemberMapRoleGroup> sqlRepository,
     ISqlRepository<Member> memberRepository,
     IUnitOfWork unitOfWork,
-    IMapper mapper,
     ILogger logger)
-    : EfCommandManyVoidHandler<MemberMapRoleGroup, UpdateMemberByUserIdCommand>(sqlRepository, unitOfWork, mapper,
+    : EfCommandManyVoidHandler<MemberMapRoleGroup, UpdateMemberByUserIdCommand>(sqlRepository, unitOfWork,
         logger)
 {
     protected override ICommandManyFlowBuilderVoid<MemberMapRoleGroup> BuildCommand(

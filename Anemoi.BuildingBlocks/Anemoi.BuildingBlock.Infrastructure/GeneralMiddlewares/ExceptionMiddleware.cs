@@ -1,15 +1,18 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
+using Anemoi.BuildingBlock.Application.Resources;
+using Anemoi.BuildingBlock.Application.Responses;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Localization;
 using Serilog;
-using Anemoi.BuildingBlock.Application.Errors;
 
 namespace Anemoi.BuildingBlock.Infrastructure.GeneralMiddlewares;
 
-public sealed class ExceptionMiddleware(RequestDelegate next, IHostEnvironment env, ILogger logger)
+public sealed class ExceptionMiddleware(
+    RequestDelegate next,
+    ILogger logger,
+    IStringLocalizer<SharedResource> localizer)
 {
     public async Task Invoke(HttpContext context)
     {
@@ -19,7 +22,7 @@ public sealed class ExceptionMiddleware(RequestDelegate next, IHostEnvironment e
         }
         catch (Exception ex)
         {
-            logger.Error("Error while executing a request: {Error}", ex.Message);
+            logger.Error(ex, "Error while executing a request");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -31,19 +34,38 @@ public sealed class ExceptionMiddleware(RequestDelegate next, IHostEnvironment e
         response.StatusCode = StatusCodes.Status500InternalServerError;
         if (exception is ValidationException validationException)
         {
-            logger.Error("Validation Error stackTrace: {@StackTrace}", validationException.StackTrace);
             response.StatusCode = StatusCodes.Status400BadRequest;
+            foreach (var error in validationException.Errors)
+            {
+                var key = GetValidationResourceKey(error.ErrorCode, error.ErrorMessage);
+                error.ErrorMessage = localizer[key].Value;
+            }
             await response.WriteAsJsonAsync(new { validationException.Errors });
             return;
         }
 
-        var isDevelopment = env.IsDevelopment();
-        if (isDevelopment)
+        await response.WriteAsJsonAsync(new ErrorDetailResponse
         {
-            await response.WriteAsync(JsonConvert.SerializeObject(exception));
-            return;
-        }
+            Code = "500",
+            Messages = [localizer["UnhandledError"].Value]
+        });
+    }
 
-        await response.WriteAsync(JsonConvert.SerializeObject(GlobalErrors.UnexpectedError()));
+    private static string GetValidationResourceKey(string errorCode, string errorMessage)
+    {
+        if (errorMessage.StartsWith("VAL_", StringComparison.Ordinal))
+            return errorMessage;
+
+        return errorCode switch
+        {
+            "NotEmptyValidator" => "VAL_REQUIRED",
+            "NotNullValidator" => "VAL_REQUIRED",
+            "EmailValidator" => "VAL_EMAIL_INVALID",
+            "MaximumLengthValidator" => "VAL_MAX_LENGTH",
+            "MinimumLengthValidator" => "VAL_MIN_LENGTH",
+            "RegularExpressionValidator" => "VAL_FORMAT_INVALID",
+            "PredicateValidator" => "VAL_INVALID",
+            _ => "VAL_INVALID"
+        };
     }
 }

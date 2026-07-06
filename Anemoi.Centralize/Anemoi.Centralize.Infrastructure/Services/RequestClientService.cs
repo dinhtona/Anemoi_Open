@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.EventDriven;
 using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -121,7 +122,7 @@ public sealed class RequestClientService(
     private string SetAdministrator()
     {
         var roles = httpContextAccessor.HttpContext.GetUserRoles();
-        var isSystemRoles = roles?.Contains("Administrator") ?? false;
+        var isSystemRoles = roles?.Contains(SystemRoles.Administrator) ?? false;
         return $"{isSystemRoles}";
     }
 

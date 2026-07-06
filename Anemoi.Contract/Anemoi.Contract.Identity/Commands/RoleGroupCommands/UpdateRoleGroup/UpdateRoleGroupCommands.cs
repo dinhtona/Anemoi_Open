@@ -5,4 +5,6 @@ using Newtonsoft.Json;
 namespace Anemoi.Contract.Identity.Commands.RoleGroupCommands.UpdateRoleGroup;
 
 public sealed record UpdateRoleGroupCommand([property: JsonIgnore] RoleGroupId Id,
-    string Name, string Description, List<RoleId> IdentityRoleIds) : ICommandVoid;
+    string Name, string Description, List<RoleId> IdentityRoleIds,
+    [property: JsonIgnore] bool RequireSystemWide = false,
+    [property: JsonIgnore] string WorkspaceId = null) : ICommandVoid;

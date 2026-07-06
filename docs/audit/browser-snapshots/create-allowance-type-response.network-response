@@ -1,0 +1,1 @@
+{"errors":[{"propertyName":"SensitivePermissionConfirmed","errorMessage":"The value is invalid.","attemptedValue":false,"customState":null,"severity":0,"errorCode":"EqualValidator","formattedMessagePlaceholderValues":{"ComparisonValue":true,"ComparisonProperty":"","PropertyName":"Sensitive Permission Confirmed","PropertyValue":false}}]}
