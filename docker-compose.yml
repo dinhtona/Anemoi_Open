@@ -396,6 +396,20 @@ services:
       - caddy
     networks:
       - anemoi_network
+
+  # Optional stable public entrypoint. Create one Cloudflare Tunnel whose
+  # published application targets http://caddy:80, then start profile "public".
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    profiles:
+      - public
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - caddy
+    networks:
+      - anemoi_network
     restart: always
 
 networks:
