@@ -14,8 +14,6 @@ Each service maintains its own PostgreSQL database within a single PostgreSQL co
 | Notification | Notification       |
 | Workspace    | Workspace          |
 
-MongoDB is used for notification persistence and structured logs (`Notification` collection).
-
 RabbitMQ holds transient messages only; it is not a persistent data store.
 
 Redis is used as a cache and SignalR backplane; it is not a persistent data store.
@@ -36,13 +34,6 @@ docker exec postgres pg_dumpall -U postgres > anemoi_backup_$(date +%Y%m%d_%H%M%
 docker exec postgres pg_dump -U postgres -d Hr > anemoi_hr_backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
-### MongoDB Backup
-
-```bash
-docker exec mongodb mongodump --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --out /data/backup
-docker cp mongodb:/data/backup ./mongo_backup_$(date +%Y%m%d_%H%M%S)
-```
-
 ### Recommended Backup Schedule
 
 | Frequency | What                                  |
@@ -54,7 +45,6 @@ docker cp mongodb:/data/backup ./mongo_backup_$(date +%Y%m%d_%H%M%S)
 ### Pre-Deploy Backup Checklist
 
 - [ ] Full `pg_dumpall` completed successfully
-- [ ] MongoDB backup completed
 - [ ] Backup file is accessible outside container
 - [ ] Backup size is consistent with expectations
 - [ ] Backup checksum verified (`sha256sum`)
@@ -76,13 +66,6 @@ cat anemoi_backup_YYYYMMDD_HHMMSS.sql | docker exec -i postgres psql -U postgres
 
 ```bash
 cat anemoi_hr_backup_YYYYMMDD_HHMMSS.sql | docker exec -i postgres psql -U postgres -d Hr
-```
-
-### MongoDB Restore
-
-```bash
-docker cp ./mongo_backup_YYYYMMDD_HHMMSS mongodb:/data/restore
-docker exec mongodb mongorestore --username $MONGO_INITDB_ROOT_USERNAME --password $MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin /data/restore
 ```
 
 ### Post-Restore Verification Checklist
@@ -141,7 +124,7 @@ The following data must be backed up before any restore/deploy operation:
 | Leave requests/balances| PostgreSQL  | Critical    |
 | Attendance records     | PostgreSQL  | High        |
 | Workflow instances     | PostgreSQL  | High        |
-| Notification records   | PostgreSQL + MongoDB | Medium |
+| Notification records   | PostgreSQL | Medium   |
 | Seed data ID constants | Source code | Always preserved in repo |
 
 ## 6. Data Recoverability Notes
@@ -155,7 +138,6 @@ The following data must be backed up before any restore/deploy operation:
 
 1. Stop all application containers: `docker compose stop anemoi_centralize anemoi_identity anemoi_hr ...`
 2. Restore PostgreSQL from latest backup (see Section 3)
-3. Restore MongoDB from latest backup
-4. Restart all containers: `docker compose up -d`
+3. Restart all containers: `docker compose up -d`
 5. Run post-restore verification checklist
 6. Monitor logs for errors

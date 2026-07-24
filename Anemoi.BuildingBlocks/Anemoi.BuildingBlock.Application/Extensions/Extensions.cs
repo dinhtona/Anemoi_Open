@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
-using MongoDB.Driver;
 using OneOf;
 using Polly;
 using Polly.Retry;
@@ -197,28 +196,6 @@ public static class Extensions
         try
         {
             var interpreter = new Interpreter(InterpreterOptions.DefaultCaseInsensitive);
-            var expressionStr = $"x.{fieldName}";
-            var expressionFilter = interpreter.ParseAsExpression<Func<T, object>>(expressionStr, "x");
-            return getOrdered.Invoke(expressionFilter, sortedDirection);
-        }
-        catch (Exception)
-        {
-            return getOrdered.Invoke(defaultOrError, sortedDirection);
-        }
-    }
-
-    public static IFindFluent<T, T> OrderByWithDynamic<T>(this IFindFluent<T, T> src, string fieldName,
-        Expression<Func<T, object>> defaultOrError,
-        SortedDirection sortedDirection)
-    {
-        Func<Expression<Func<T, object>>, SortedDirection?, IFindFluent<T, T>> getOrdered =
-            (expression, direction) => direction is null or SortedDirection.Ascending
-                ? src.SortBy(expression)
-                : src.SortByDescending(expression);
-        if (string.IsNullOrEmpty(fieldName)) return getOrdered.Invoke(defaultOrError, sortedDirection);
-        try
-        {
-            var interpreter = new Interpreter();
             var expressionStr = $"x.{fieldName}";
             var expressionFilter = interpreter.ParseAsExpression<Func<T, object>>(expressionStr, "x");
             return getOrdered.Invoke(expressionFilter, sortedDirection);

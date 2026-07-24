@@ -139,8 +139,6 @@ See `.env.example` for full template. **Required for baseline:**
 | `POSTGRES_PASSWORD` | PostgreSQL password |
 | `RABBITMQ_DEFAULT_USER` | RabbitMQ user |
 | `RABBITMQ_DEFAULT_PASS` | RabbitMQ password |
-| `MONGO_INITDB_ROOT_USERNAME` | MongoDB root user |
-| `MONGO_INITDB_ROOT_PASSWORD` | MongoDB root password |
 | `JWT_ISSUER` | `anemoi-identity` |
 | `JWT_AUDIENCE` | `anemoi-services` |
 

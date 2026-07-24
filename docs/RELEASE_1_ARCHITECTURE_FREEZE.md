@@ -122,7 +122,7 @@ Rules:
 - Notifications follow the pattern: Entity + Event → Queue → Notification Service → Persist + WebSocket
 - SignalR hub: `/hubs/notification`
 - Real-time delivery via SignalR WebSocket
-- Persistence in PostgreSQL + MongoDB
+- Persistence in PostgreSQL
 - Notification types: workflow approval, assignment, status changes, system alerts
 
 ## 8. Employee Lifecycle Model

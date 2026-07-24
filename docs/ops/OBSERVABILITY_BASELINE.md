@@ -142,7 +142,7 @@ Not yet implemented for Release 1. Planned:
 | Slow API responses             | RabbitMQ management UI — message queue depth |
 | Authentication failures        | Identity service logs                 |
 | Workflow submission fails      | WorkflowDefinitions table — definitions present? |
-| Notification not delivered     | Notification service logs + MongoDB   |
+| Notification not delivered     | Notification service logs             |
 | Leave accrual not updating     | HR MonthlyLeaveAccrualWorker logs     |
 
 ### Key Diagnostic Commands

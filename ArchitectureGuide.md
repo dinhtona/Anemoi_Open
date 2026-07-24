@@ -15,7 +15,7 @@ The `Anemoi_Open` project is designed based on a **Microservices** architecture,
 **Infrastructure Components:**
 - **RabbitMQ**: Message Broker (asynchronous Pub/Sub communication).
 - **PostgreSQL**: Primary relational database for most services.
-- **MongoDB**: NoSQL database (used primarily within the Orchestrator).
+- **PostgreSQL**: Primary relational database for all services (including Saga state persistence for the Orchestrator via MassTransit EF Core).
 
 ---
 

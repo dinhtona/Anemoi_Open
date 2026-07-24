@@ -7,7 +7,7 @@ All notable changes to the Anemoi HR platform.
 ### Architecture
 - Modular monolith / independently deployable services (.NET 10)
 - Clean Architecture + CQRS + Event-Driven (MassTransit + RabbitMQ)
-- PostgreSQL (16-alpine) relational storage, MongoDB for orchestrator
+- PostgreSQL (16-alpine) relational storage
 - Redis for JWT revocation, Caddy as HTTPS reverse proxy
 - Centralize (gateway), Identity (auth), MasterData, Notification, HR, Workspace
 - Strongly-typed IDs, Mapperly, FluentValidation, OneOf, Serilog, Polly

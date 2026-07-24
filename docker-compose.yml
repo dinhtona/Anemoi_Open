@@ -96,20 +96,6 @@ services:
   #     retries: 10
   #     start_period: 90s
 
-  # MongoDB service for NoSQL data storage
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - anemoi_network
-
   # Aggregation and Controllers service
   anemoi_centralize:
     image: anemoi/centralize
@@ -264,7 +250,6 @@ services:
   #   environment:
   #     - ASPNETCORE_ENVIRONMENT=Development
   #     - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Orchestrator
-  #     - ConnectionStrings__MongoDb=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
   #     - MassTransitSetting__Host=rabbitmq
   #     - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
   #     - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
@@ -273,8 +258,6 @@ services:
   #       condition: service_healthy
   #     postgres:
   #       condition: service_healthy
-  #     mongodb:
-  #       condition: service_started
   #   networks:
   #     - anemoi_network
 
@@ -410,7 +393,6 @@ volumes:
   jwt_keys:
   # mssql_data:
   postgres_data:
-  mongodb_data:
   redis_data:
   # sftp_host_keys:
   caddy_data:

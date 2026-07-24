@@ -9,7 +9,7 @@ Anemoi_Open is based on:
 - Clean Architecture
 - CQRS
 - PostgreSQL for most services
-- MongoDB mainly for orchestration/Saga if needed
+- PostgreSQL for all services including Saga persistence (MassTransit EF Core)
 
 ## Existing Conceptual Services
 
