@@ -16,6 +16,7 @@ COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/Anemoi.BuildingBlo
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Domain.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/"]
 # COPY ["Anemoi.Orchestration/Anemoi.Orchestration.Contract/Anemoi.Orchestration.Contract.csproj", "Anemoi.Orchestration/Anemoi.Orchestration.Contract/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj", "Anemoi.Contract/Anemoi.Contract.Identity/"]
+COPY Directory.Build.props .
 RUN dotnet restore "Anemoi.Workspace/Anemoi.Workspace.WorkerService/Anemoi.Workspace.WorkerService.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Workspace/Anemoi.Workspace.WorkerService"

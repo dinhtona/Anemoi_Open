@@ -1,11 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER root
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:8080/health/live || exit 1
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -23,6 +19,7 @@ COPY ["Anemoi.Contract/Anemoi.Contract.MasterData.ModelIds/Anemoi.Contract.Maste
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Anemoi.BuildingBlock.Infrastructure.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/Anemoi.BuildingBlock.Application.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/"]
 COPY ["Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/Anemoi.BuildingBlock.Domain.csproj", "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Domain/"]
+COPY Directory.Build.props .
 RUN dotnet restore "Anemoi.Hr/Anemoi.Hr.Api/Anemoi.Hr.Api.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Hr/Anemoi.Hr.Api"

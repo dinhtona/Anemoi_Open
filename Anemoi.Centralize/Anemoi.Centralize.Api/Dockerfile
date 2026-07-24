@@ -1,11 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER root
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:8080/health/live || exit 1
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -22,6 +18,7 @@ COPY ["Anemoi.Contract/Anemoi.Contract.Identity/Anemoi.Contract.Identity.csproj"
 COPY ["Anemoi.Contract/Anemoi.Contract.MasterData/Anemoi.Contract.MasterData.csproj", "Anemoi.Contract/Anemoi.Contract.MasterData/"]
 COPY ["Anemoi.Contract/Anemoi.Contract.Workspace/Anemoi.Contract.Workspace.csproj", "Anemoi.Contract/Anemoi.Contract.Workspace/"]
 COPY ["Anemoi.Centralize/Anemoi.Centralize.Domain/Anemoi.Centralize.Domain.csproj", "Anemoi.Centralize/Anemoi.Centralize.Domain/"]
+COPY Directory.Build.props .
 RUN dotnet restore "Anemoi.Centralize/Anemoi.Centralize.Api/Anemoi.Centralize.Api.csproj"
 COPY . .
 WORKDIR "/src/Anemoi.Centralize/Anemoi.Centralize.Api"
