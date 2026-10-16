@@ -1,31 +1,48 @@
+using System.Reflection;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.BuildingBlock.Infrastructure.RunSqlMigration;
 using Anemoi.MasterData.Infrastructure;
 using Anemoi.MasterData.Infrastructure.DataContext;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Serilog.Events;
 
-var builder = Host.CreateDefaultBuilder(args);
-builder.UseDefaultServiceProvider((context, provider) =>
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseDefaultServiceProvider((context, provider) =>
     provider.ValidateScopes = provider.ValidateOnBuild = context.HostingEnvironment.IsDevelopment());
 
-builder.ConfigureAppConfiguration(configuration => configuration
-    .AddUserSecrets<Program>()
+builder.Configuration
+    .AddUserSecrets(Assembly.GetExecutingAssembly())
     .AddEnvironmentVariables()
-    .AddJsonFile("serilogConfiguration.json"));
+    .AddJsonFile("serilogConfiguration.json");
 
-builder.UseSerilog((host, configuration) => configuration.Enrich
+builder.Host.UseSerilog((host, configuration) => configuration.Enrich
     .FromLogContext()
     .ReadFrom.Configuration(host.Configuration)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .MinimumLevel.Override("System", LogEventLevel.Information)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning));
 
-builder.ConfigureServices((context, service) =>
-    service.InstallServicesInAssembly<IMasterDataInfrastructureAssemblyMarker>(context.Configuration));
+builder.Services.InstallServicesInAssembly<IMasterDataInfrastructureAssemblyMarker>(builder.Configuration);
+builder.Services.AddHealthChecks();
 
-using var host = builder.Build();
+var app = builder.Build();
 
-await MigrationDatabase.MigrationDatabaseAsync<MasterDataDbContext>(host);
+await MigrationDatabase.MigrationDatabaseAsync<MasterDataDbContext>(app);
 
-await host.RunAsync();
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
+
+await app.RunAsync();

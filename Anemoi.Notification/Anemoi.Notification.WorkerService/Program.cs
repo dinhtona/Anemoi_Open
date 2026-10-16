@@ -4,7 +4,10 @@ using Anemoi.BuildingBlock.Infrastructure.RunSqlMigration;
 using Anemoi.Notification.Infrastructure;
 using Anemoi.Notification.Infrastructure.DataContext;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Serilog.Events;
 
@@ -25,6 +28,7 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
 );
 
 builder.Services.InstallServicesInAssembly<INotificationInfrastructureAssemblyMarker>(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -33,6 +37,17 @@ await MigrationDatabase.MigrationDatabaseAsync<NotificationDbContext>(app);
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
 });
 
 await app.RunAsync();

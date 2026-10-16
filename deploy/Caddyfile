@@ -1,0 +1,69 @@
+# ==============================================================================
+# Anemoi_Open — Production Caddy Configuration
+# Single HTTPS entry point. Caddy auto-manages Let's Encrypt certificates.
+# ==============================================================================
+
+{$APP_DOMAIN:localhost} {
+    # ── Automatic HTTPS ─────────────────────────────────────────────────────
+    # Caddy obtains and renews certificates automatically when APP_DOMAIN is
+    # a real public domain. Falls back to HTTP on localhost.
+
+    # ── Compression ─────────────────────────────────────────────────────────
+    encode zstd gzip
+
+    # ── Request Body Limits ─────────────────────────────────────────────────
+    request_body {
+        max_size 100MB
+    }
+
+    # ── Logging ─────────────────────────────────────────────────────────────
+    log {
+        output stdout
+        format json
+    }
+
+    # ── HR API ──────────────────────────────────────────────────────────────
+    @hr_api path /api/hr /api/hr/*
+    handle @hr_api {
+        reverse_proxy anemoi_hr:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # ── SignalR / WebSocket ─────────────────────────────────────────────────
+    @signalr path /hubs /hubs/*
+    handle @signalr {
+        reverse_proxy anemoi_centralize:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up Upgrade {header.Upgrade}
+            header_up Connection {header.Connection}
+        }
+    }
+
+    # ── Centralize API ──────────────────────────────────────────────────────
+    @api path /api /api/*
+    handle @api {
+        reverse_proxy anemoi_centralize:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # ── Frontend ────────────────────────────────────────────────────────────
+    handle {
+        reverse_proxy anemoi_web:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+}

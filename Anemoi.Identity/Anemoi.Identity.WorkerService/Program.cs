@@ -5,9 +5,12 @@ using Lambda.Identity.Application.SeedData;
 using Anemoi.Identity.Infrastructure;
 using Anemoi.Identity.Infrastructure.DataContext;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -31,6 +34,7 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning));
 
 builder.Services.InstallServicesInAssembly<IIdentityInfrastructureAssemblyMarker>(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -69,6 +73,17 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
 
 app.MapGraphQL();
 
