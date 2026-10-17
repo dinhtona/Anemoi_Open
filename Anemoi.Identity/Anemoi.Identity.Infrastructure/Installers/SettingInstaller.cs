@@ -9,6 +9,9 @@ public sealed class SettingInstaller : IInstaller
 {
     public void InstallerServices(IServiceCollection services, IConfiguration configuration)
     {
+        // ADR-017: localization is mandatory — required by seed routines that surface
+        // localized startup errors (e.g. MissingRequiredConfiguration).
+        services.AddLocalization();
         services.AddSingleton(configuration.GetSection(nameof(PasswordConfiguration)).Get<PasswordConfiguration>()!);
         services.AddSingleton(configuration.GetSection(nameof(SeedUserData)).Get<SeedUserData>()!);
         services.AddSingleton(configuration.GetSection(nameof(DefaultApplicationPolices)).Get<DefaultApplicationPolices>()!);

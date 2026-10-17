@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -8,4 +9,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchJobPosting
 public sealed record SearchJobPostingsQuery(
     string? SearchTerm,
     string? Status,
-    JobRequisitionId? JobRequisitionId) : GetManyQuery, IQueryPaged<JobPostingResponse>;
+    JobRequisitionId? JobRequisitionId) : GetManyQuery, IQueryOne<PaginationResponse<JobPostingResponse>>;

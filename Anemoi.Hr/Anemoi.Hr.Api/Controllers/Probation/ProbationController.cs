@@ -73,11 +73,12 @@ public sealed class ProbationController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.ProbationView)]
     [ProducesResponseType(typeof(PaginationResponse<ProbationRecordDto>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<ProbationRecordDto>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] GetProbationsQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

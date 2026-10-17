@@ -26,10 +26,11 @@ public sealed class PositionController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.PositionView)]
     [ProducesResponseType(typeof(PaginationResponse<PositionResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<PositionResponse>> GetPositions(
+    public async Task<IActionResult> GetPositions(
         [FromQuery] GetPositionsQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

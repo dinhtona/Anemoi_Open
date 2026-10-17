@@ -8,4 +8,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.TaxationQueries.GetTaxCalculationSn
 public sealed record GetTaxCalculationSnapshotsQuery(
     string? EmployeeId = null,
     string? SourceModule = null,
-    Guid? SourceReferenceId = null) : IQuery<IReadOnlyCollection<TaxCalculationSnapshotResponse>>;
+    Guid? SourceReferenceId = null) : IQueryOne<IReadOnlyCollection<TaxCalculationSnapshotResponse>>;

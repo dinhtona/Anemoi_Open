@@ -67,7 +67,7 @@ public sealed class OvertimeController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetById([FromRoute] OvertimeRequestId id, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetOvertimeRequestByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpGet]
@@ -76,6 +76,7 @@ public sealed class OvertimeController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetPaged([FromQuery] GetOvertimeRequestsQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

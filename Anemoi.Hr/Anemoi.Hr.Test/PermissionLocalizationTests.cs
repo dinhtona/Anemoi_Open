@@ -205,6 +205,72 @@ public sealed class PermissionLocalizationTests
         }
     }
 
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("vi-VN")]
+    public void Localizer_does_not_fabricate_display_names_for_unknown_roles(string cultureName)
+    {
+        // Regression guard for CODE-005: the old controller "prettified" unknown
+        // permission codes via ToDisplayName ("some.unknown.role" -> "Some Unknown Role"),
+        // hiding missing catalog entries. The production localizer must never do that.
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+        var localizer = new PermissionMetadataLocalizer();
+
+        var metadata = localizer.Localize("some.unknown.role", culture);
+
+        metadata.Description.Should().NotBe("Some Unknown Role");
+        metadata.Description.Should().Contain("some.unknown.role");
+        metadata.HasMissingKey.Should().BeFalse(
+            "the PermissionDescriptionUnmapped template resource must exist");
+    }
+
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("vi-VN")]
+    public void Localizer_surfaces_missing_resource_keys_as_raw_keys(string cultureName)
+    {
+        // A missing resource key must be surfaced as the raw key itself (visible,
+        // caught by catalog tests) — never converted into a readable display name.
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+        var localizer = new PermissionMetadataLocalizer();
+
+        var value = localizer.ResolveKey("PermissionDescriptionDoesNotExist", culture, out var isMissing);
+
+        isMissing.Should().BeTrue();
+        value.Should().Be("PermissionDescriptionDoesNotExist");
+    }
+
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("vi-VN")]
+    public void Localizer_reports_no_missing_keys_for_full_permission_catalog(string cultureName)
+    {
+        // The exact production lookup path used by IdentityPolicy roles endpoint:
+        // every catalogued permission must resolve without missing keys.
+        var culture = CultureInfo.GetCultureInfo(cultureName);
+        var localizer = new PermissionMetadataLocalizer();
+
+        var withMissingKeys = Permissions.Definitions
+            .Select(d => (d.Key, Metadata: localizer.Localize(d.Key, culture)))
+            .Where(x => x.Metadata.HasMissingKey)
+            .Select(x => x.Key)
+            .ToArray();
+
+        withMissingKeys.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void IdentityPolicyController_contains_no_permission_name_fallback()
+    {
+        // Guards the CODE-005 fix: the controller must not contain a ToDisplayName-style
+        // sanitizer/fallback that hides missing localization keys.
+        var controllerSource = File.ReadAllText(FindRepoFile(
+            "Anemoi.Centralize/Anemoi.Centralize.Api/Controllers/Identity/IdentityPolicyController.cs"));
+
+        controllerSource.Should().NotContain("ToDisplayName");
+        controllerSource.Should().NotContain("ResourceNotFound");
+    }
+
     private static string GetPermissionDescription(string cultureName, string permissionCode)
     {
         var permission = Permissions.Find(permissionCode);

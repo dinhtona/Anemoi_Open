@@ -7,13 +7,14 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.SearchEmployees;
 
 public sealed class SearchEmployeesHandler(ISqlRepository<Employee> repository, EmployeeMapper mapper)
-    : IQueryHandler<SearchEmployeesQuery, PaginationResponse<EmployeeResponse>>
+    : IQueryHandler<SearchEmployeesQuery, OneOf<PaginationResponse<EmployeeResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeResponse>> Handle(SearchEmployeesQuery request,
+    public async Task<OneOf<PaginationResponse<EmployeeResponse>, ErrorDetailResponse>> Handle(SearchEmployeesQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

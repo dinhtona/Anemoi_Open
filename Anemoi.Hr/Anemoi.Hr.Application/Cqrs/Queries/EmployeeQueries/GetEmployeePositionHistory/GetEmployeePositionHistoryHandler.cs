@@ -1,18 +1,20 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePositionHistory;
 
 public sealed class GetEmployeePositionHistoryHandler(
     ISqlRepository<EmployeePositionHistory> repository,
     EmployeeMapper mapper)
-    : IQueryHandler<GetEmployeePositionHistoryQuery, IReadOnlyCollection<EmployeePositionHistoryResponse>>
+    : IQueryHandler<GetEmployeePositionHistoryQuery, OneOf<IReadOnlyCollection<EmployeePositionHistoryResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<EmployeePositionHistoryResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<EmployeePositionHistoryResponse>, ErrorDetailResponse>> Handle(
         GetEmployeePositionHistoryQuery request,
         CancellationToken cancellationToken)
     {

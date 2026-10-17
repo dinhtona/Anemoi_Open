@@ -49,7 +49,7 @@ public sealed class CancelRecruitmentRequestHandler(
         {
             Id = new RecruitmentRequestHistoryId(IdGenerator.NextGuid()),
             RecruitmentRequestId = recruitmentRequest.Id,
-            ActionCode = "Cancelled",
+            ActionCode = RecruitmentRequestStatusCode.Cancelled,
             OldStatus = oldStatus,
             NewStatus = recruitmentRequest.Status,
             PerformedBy = request.CancelledBy,

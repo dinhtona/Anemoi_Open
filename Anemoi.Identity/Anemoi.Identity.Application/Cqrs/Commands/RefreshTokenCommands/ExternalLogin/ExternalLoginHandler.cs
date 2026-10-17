@@ -1,6 +1,6 @@
 using System;
-using System.Net.Http;
-using System.Text.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
@@ -11,7 +11,7 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.Contract.Identity.Commands.RefreshTokenCommands.ExternalLogin;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Contract.Identity.Responses;
-using Anemoi.Identity.Application.Configurations;
+using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.Cqrs.Commands.IdentityCommands.TokenGenerators;
 using Anemoi.Identity.Domain.Models;
 using Lambda.Identity.Application.SeedData;
@@ -21,98 +21,42 @@ using OneOf;
 namespace Anemoi.Identity.Application.Cqrs.Commands.RefreshTokenCommands.ExternalLogin;
 
 public sealed class ExternalLoginHandler(
-    IHttpClientFactory httpClientFactory,
+    IEnumerable<IExternalAuthVerifier> externalAuthVerifiers,
     ISqlRepository<User> userRepository,
     ISqlRepository<RefreshToken> refreshTokenRepository,
     ISqlRepository<RoleGroup> roleGroupRepository,
     ISqlRepository<UserMapRoleGroup> userMapRoleGroupRepository,
     IUnitOfWork unitOfWork,
-    ISender sender,
-    ExternalAuthSetting externalAuthSetting)
+    ISender sender)
     : ICommandHandler<ExternalLoginCommand, OneOf<AuthenticationSuccessResponse, ErrorDetailResponse>>
 {
     public async Task<OneOf<AuthenticationSuccessResponse, ErrorDetailResponse>> Handle(ExternalLoginCommand request,
         CancellationToken cancellationToken)
     {
-        string email = null;
-        string firstName = "";
-        string lastName = "";
+        var verifier = externalAuthVerifiers.FirstOrDefault(v => v.CanHandle(request.Provider));
+        if (verifier is null)
+        {
+            return CreateError("ProviderNotSupported");
+        }
 
+        ExternalAuthVerificationResult verified;
         try
         {
-            var httpClient = httpClientFactory.CreateClient();
-
-            if (request.Provider.Equals("Google", StringComparison.OrdinalIgnoreCase))
-            {
-                var googleUrl = $"https://oauth2.googleapis.com/tokeninfo?id_token={request.Token}";
-                var response = await httpClient.GetAsync(googleUrl, cancellationToken);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return CreateError("ExternalAuthFailed");
-                }
-
-                var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-                if (string.IsNullOrWhiteSpace(externalAuthSetting.GoogleClientId) ||
-                    !root.TryGetProperty("aud", out var audienceProp) ||
-                    audienceProp.ValueKind != JsonValueKind.String ||
-                    !string.Equals(audienceProp.GetString(), externalAuthSetting.GoogleClientId,
-                        StringComparison.Ordinal))
-                {
-                    return CreateError("ExternalAuthFailed");
-                }
-
-                if (!root.TryGetProperty("email", out var emailProp))
-                {
-                    return CreateError("ExternalAuthFailed");
-                }
-
-                email = emailProp.GetString();
-                if (root.TryGetProperty("given_name", out var givenNameProp)) firstName = givenNameProp.GetString() ?? "";
-                if (root.TryGetProperty("family_name", out var familyNameProp)) lastName = familyNameProp.GetString() ?? "";
-            }
-            else if (request.Provider.Equals("Microsoft", StringComparison.OrdinalIgnoreCase))
-            {
-                httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.Token);
-                var msUrl = "https://graph.microsoft.com/v1.0/me";
-                var response = await httpClient.GetAsync(msUrl, cancellationToken);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return CreateError("ExternalAuthFailed");
-                }
-
-                var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-                if (root.TryGetProperty("mail", out var mailProp) && mailProp.ValueKind != JsonValueKind.Null)
-                {
-                    email = mailProp.GetString();
-                }
-
-                if (string.IsNullOrEmpty(email) && root.TryGetProperty("userPrincipalName", out var upnProp))
-                {
-                    email = upnProp.GetString();
-                }
-
-                if (string.IsNullOrEmpty(email))
-                {
-                    return CreateError("ExternalAuthFailed");
-                }
-
-                if (root.TryGetProperty("givenName", out var givenNameProp)) firstName = givenNameProp.GetString() ?? "";
-                if (root.TryGetProperty("surname", out var surnameProp)) lastName = surnameProp.GetString() ?? "";
-            }
-            else
-            {
-                return CreateError("ProviderNotSupported");
-            }
+            verified = await verifier.VerifyAsync(request.Token, cancellationToken);
         }
         catch (Exception)
         {
             return CreateError("ExternalAuthException");
         }
+
+        if (verified is null)
+        {
+            return CreateError("ExternalAuthFailed");
+        }
+
+        var email = verified.Email;
+        var firstName = verified.FirstName;
+        var lastName = verified.LastName;
 
         if (string.IsNullOrEmpty(email))
         {

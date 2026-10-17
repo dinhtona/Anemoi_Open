@@ -9,4 +9,4 @@ public sealed record GetWorkingCalendarRulesQuery(
     int Page = 1,
     int PageSize = 50,
     string SortBy = null,
-    string SortDirection = "asc") : IQuery<PaginationResponse<WorkingCalendarRuleResponse>>;
+    string SortDirection = "asc") : IQueryOne<PaginationResponse<WorkingCalendarRuleResponse>>;

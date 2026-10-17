@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 using System;
@@ -11,4 +12,4 @@ public sealed record SearchInterviewsQuery(
     string? Result,
     EmployeeId? InterviewerEmployeeId,
     DateTime? FromDate,
-    DateTime? ToDate) : GetManyQuery, IQueryPaged<InterviewScheduleResponse>;
+    DateTime? ToDate) : GetManyQuery, IQueryOne<PaginationResponse<InterviewScheduleResponse>>;

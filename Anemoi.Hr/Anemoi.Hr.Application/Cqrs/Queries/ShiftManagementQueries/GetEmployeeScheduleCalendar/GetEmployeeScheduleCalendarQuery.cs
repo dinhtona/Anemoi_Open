@@ -7,4 +7,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.ShiftManagementQueries.GetEmployeeS
 public sealed record GetEmployeeScheduleCalendarQuery(
     EmployeeId EmployeeId = null,
     DateOnly? FromDate = null,
-    DateOnly? ToDate = null) : IQuery<List<EmployeeScheduleCalendarResponse>>;
+    DateOnly? ToDate = null) : IQueryOne<List<EmployeeScheduleCalendarResponse>>;

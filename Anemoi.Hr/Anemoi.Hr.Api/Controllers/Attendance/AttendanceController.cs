@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 namespace Anemoi.Hr.Api.Controllers.Attendance;
 
 [ApiController]
-[Route("api/hr/attendance/Attendance/[action]")]
+[Route("api/hr/attendance/[action]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [Produces("application/json")]
 public sealed class AttendanceController(ISender sender) : ControllerBase

@@ -5,4 +5,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.ShiftManagementQueries.GetShiftTemplateById;
 
 public sealed record GetShiftTemplateByIdQuery(
-    ShiftTemplateId Id) : IQuery<ShiftTemplateResponse>;
+    ShiftTemplateId Id) : IQueryOne<ShiftTemplateResponse>;

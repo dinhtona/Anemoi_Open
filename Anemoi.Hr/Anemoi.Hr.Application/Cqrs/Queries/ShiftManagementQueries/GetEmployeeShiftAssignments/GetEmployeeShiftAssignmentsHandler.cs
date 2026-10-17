@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.ShiftManagementQueries.GetEmployeeShiftAssignments;
 
 public sealed class GetEmployeeShiftAssignmentsHandler(
     ISqlRepository<EmployeeShiftAssignment> assignmentRepository,
     ShiftManagementMapper mapper)
-    : IQueryHandler<GetEmployeeShiftAssignmentsQuery, PaginationResponse<EmployeeShiftAssignmentResponse>>
+    : IQueryHandler<GetEmployeeShiftAssignmentsQuery, OneOf<PaginationResponse<EmployeeShiftAssignmentResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeShiftAssignmentResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<EmployeeShiftAssignmentResponse>, ErrorDetailResponse>> Handle(
         GetEmployeeShiftAssignmentsQuery request,
         CancellationToken cancellationToken)
     {

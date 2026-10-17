@@ -7,7 +7,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollRunSummaryReport;
 
-public sealed record GetPayrollRunSummaryReportQuery : IQuery<PaginationResponse<PayrollRunSummaryReportItem>>
+public sealed record GetPayrollRunSummaryReportQuery : IQueryOne<PaginationResponse<PayrollRunSummaryReportItem>>
 {
     public PayrollPeriodId? PayrollPeriodId { get; init; }
     public PayrollRunId? PayrollRunId { get; init; }

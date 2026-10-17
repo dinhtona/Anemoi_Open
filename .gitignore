@@ -264,6 +264,14 @@ ClientBin/
 *.dbproj.schemaview
 *.jfm
 *.pfx
+# Private keys and certificates — NEVER commit key material.
+# (SEC-001: a real JWT private key was committed once; these patterns
+# prevent a repeat. Covers JWT keys, SSH keys and TLS certs.)
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
 *.publishsettings
 orleans.codegen.cs
 

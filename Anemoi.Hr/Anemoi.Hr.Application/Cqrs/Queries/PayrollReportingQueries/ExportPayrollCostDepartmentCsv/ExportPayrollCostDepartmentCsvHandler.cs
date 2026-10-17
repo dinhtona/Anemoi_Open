@@ -1,10 +1,8 @@
 #nullable enable
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Responses;
@@ -14,6 +12,10 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.ExportPayrollCostDepartmentCsv;
 
@@ -25,9 +27,9 @@ public sealed class ExportPayrollCostDepartmentCsvHandler(
     ISqlRepository<TaxCalculationSnapshot> taxRepository,
     ISqlRepository<InsuranceCalculationSnapshot> insuranceRepository,
     PayrollReportExportService exportService)
-    : IQueryHandler<ExportPayrollCostDepartmentCsvQuery, ExportResult>
+    : IQueryHandler<ExportPayrollCostDepartmentCsvQuery, OneOf<ExportResult, ErrorDetailResponse>>
 {
-    public async Task<ExportResult> Handle(
+    public async Task<OneOf<ExportResult, ErrorDetailResponse>> Handle(
         ExportPayrollCostDepartmentCsvQuery request,
         CancellationToken cancellationToken)
     {

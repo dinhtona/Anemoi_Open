@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CalendarManagementQueries.MonthlyCalendar.GetMonthlyCalendar;
 
@@ -12,9 +14,9 @@ public sealed class GetMonthlyCalendarHandler(
     ISqlRepository<Domain.CalendarManagement.CompanyHoliday> companyHolidayRepository,
     ISqlRepository<Domain.CalendarManagement.CalendarException> calendarExceptionRepository,
     IWorkingCalendarEngine workingCalendarEngine)
-    : IQueryHandler<GetMonthlyCalendarQuery, MonthlyCalendarResponse>
+    : IQueryHandler<GetMonthlyCalendarQuery, OneOf<MonthlyCalendarResponse, ErrorDetailResponse>>
 {
-    public async Task<MonthlyCalendarResponse> Handle(
+    public async Task<OneOf<MonthlyCalendarResponse, ErrorDetailResponse>> Handle(
         GetMonthlyCalendarQuery request,
         CancellationToken cancellationToken)
     {

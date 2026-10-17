@@ -8,7 +8,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayslipDeliveryReport;
 
-public sealed record GetPayslipDeliveryReportQuery : IQuery<PaginationResponse<PayslipDeliveryReportItem>>
+public sealed record GetPayslipDeliveryReportQuery : IQueryOne<PaginationResponse<PayslipDeliveryReportItem>>
 {
     public PayrollPeriodId? PayrollPeriodId { get; init; }
     public PayrollRunId? PayrollRunId { get; init; }

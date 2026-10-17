@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LifecycleQueries.GetEmployeeTimeline;
 
 public sealed class GetEmployeeTimelineHandler(
     ISqlRepository<EmployeeHistory> repository,
     EmployeeHistoryMapper mapper)
-    : IQueryHandler<GetEmployeeTimelineQuery, PaginationResponse<EmployeeHistoryDto>>
+    : IQueryHandler<GetEmployeeTimelineQuery, OneOf<PaginationResponse<EmployeeHistoryDto>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeHistoryDto>> Handle(
+    public async Task<OneOf<PaginationResponse<EmployeeHistoryDto>, ErrorDetailResponse>> Handle(
         GetEmployeeTimelineQuery request, CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

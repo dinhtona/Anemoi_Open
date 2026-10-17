@@ -7,7 +7,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.ExportPayslipDeliveryCsv;
 
-public sealed record ExportPayslipDeliveryCsvQuery : IQuery<ExportResult>
+public sealed record ExportPayslipDeliveryCsvQuery : IQueryOne<ExportResult>
 {
     public PayrollPeriodId? PayrollPeriodId { get; init; }
     public PayrollRunId? PayrollRunId { get; init; }

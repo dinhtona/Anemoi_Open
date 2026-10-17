@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -8,4 +9,4 @@ public sealed record GetWorkflowRoleAssignmentsQuery(
     string? Role,
     EmployeeId? EmployeeId,
     int Page = 1,
-    int PageSize = 20) : IQueryPaged<WorkflowRoleAssignmentResponse>;
+    int PageSize = 20) : IQueryOne<PaginationResponse<WorkflowRoleAssignmentResponse>>;

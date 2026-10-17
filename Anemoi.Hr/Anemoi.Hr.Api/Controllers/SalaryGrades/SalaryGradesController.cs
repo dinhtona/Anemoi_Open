@@ -25,10 +25,11 @@ public sealed class SalaryGradesController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.SalaryGradeView)]
     [ProducesResponseType(typeof(PaginationResponse<SalaryGradeResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<SalaryGradeResponse>> GetSalaryGrades(
+    public async Task<IActionResult> GetSalaryGrades(
         [FromQuery] GetSalaryGradesQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

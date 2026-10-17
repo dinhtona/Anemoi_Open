@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.InsuranceQueries.GetInsuranceCalcul
 public sealed class GetInsuranceCalculationSnapshotsHandler(
     ISqlRepository<InsuranceCalculationSnapshot> repository,
     InsuranceMapper mapper)
-    : IQueryHandler<GetInsuranceCalculationSnapshotsQuery, IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>
+    : IQueryHandler<GetInsuranceCalculationSnapshotsQuery, OneOf<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>, ErrorDetailResponse>> Handle(
         GetInsuranceCalculationSnapshotsQuery request,
         CancellationToken cancellationToken)
     {

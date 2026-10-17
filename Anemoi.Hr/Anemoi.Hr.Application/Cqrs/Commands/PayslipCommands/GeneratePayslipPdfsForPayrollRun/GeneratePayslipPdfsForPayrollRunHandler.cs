@@ -66,7 +66,7 @@ public sealed class GeneratePayslipPdfsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Skipped"
+                    Status = PayslipBatchItemStatuses.Skipped
                 });
                 continue;
             }
@@ -83,7 +83,7 @@ public sealed class GeneratePayslipPdfsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Succeeded"
+                    Status = PayslipBatchItemStatuses.Succeeded
                 });
             }
             else
@@ -93,7 +93,7 @@ public sealed class GeneratePayslipPdfsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Failed",
+                    Status = PayslipBatchItemStatuses.Failed,
                     ErrorCode = result.AsT1.Code
                 });
             }

@@ -48,7 +48,7 @@ public sealed class RejectRecruitmentRequestHandler(
         {
             Id = new RecruitmentRequestHistoryId(IdGenerator.NextGuid()),
             RecruitmentRequestId = recruitmentRequest.Id,
-            ActionCode = "Rejected",
+            ActionCode = RecruitmentRequestStatusCode.Rejected,
             OldStatus = oldStatus,
             NewStatus = recruitmentRequest.Status,
             Comment = request.Comment,

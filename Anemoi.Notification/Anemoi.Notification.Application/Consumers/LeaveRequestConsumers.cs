@@ -6,6 +6,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
@@ -27,7 +28,7 @@ public sealed class LeaveRequestSubmittedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.leave.request",
+            Resource = NotificationResourceKeys.HrLeaveRequest,
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.LeaveRequestId,
             WorkspaceId = null,
@@ -105,7 +106,7 @@ public sealed class LeaveRequestApprovedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.leave.request",
+            Resource = NotificationResourceKeys.HrLeaveRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.LeaveRequestId,
             WorkspaceId = null,
@@ -151,7 +152,7 @@ public sealed class LeaveRequestRejectedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.leave.request",
+            Resource = NotificationResourceKeys.HrLeaveRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.LeaveRequestId,
             WorkspaceId = null,
@@ -197,7 +198,7 @@ public sealed class LeaveRequestCancelledConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.leave.request",
+            Resource = NotificationResourceKeys.HrLeaveRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.LeaveRequestId,
             WorkspaceId = null,
@@ -226,5 +227,51 @@ public sealed class LeaveRequestCancelledConsumer(
 
         await mediator.Send(command, context.CancellationToken);
         logger.Information("Processed LeaveRequestCancelled notification for Employee User ID: {UserId}", userId);
+    }
+}
+
+public sealed class LeaveBalanceChangedConsumer(
+    INotificationRecipientResolver recipientResolver,
+    IMediator mediator,
+    IPublishEndpoint publishEndpoint,
+    ILogger logger)
+    : IConsumer<LeaveBalanceChangedIntegrationEvent>
+{
+    public async Task Consume(ConsumeContext<LeaveBalanceChangedIntegrationEvent> context)
+    {
+        var message = context.Message;
+
+        // Emit DataChangeOccurred transient invalidation event first (always emit!)
+        await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
+        {
+            Resource = NotificationResourceKeys.HrLeaveBalance,
+            Action = NotificationConstants.DataChangeActions.Update,
+            EntityId = message.EmployeeId,
+            WorkspaceId = null,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
+            QueryTags = new List<string> { "hr", "leave", "leave-balance" },
+            OccurredAt = DateTime.UtcNow
+        }, context.CancellationToken);
+
+        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.EmployeeId, context.CancellationToken);
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.Warning("Could not resolve Employee User ID for EmployeeId: {EmployeeId}. Skipping notification.", message.EmployeeId);
+            return;
+        }
+
+        var command = new CreateNotificationCommand(
+            UserId: userId,
+            TitleLocalizationKey: "notification.leave.balance.changed.title",
+            ContentLocalizationKey: "notification.leave.balance.changed.content",
+            Category: NotificationConstants.Categories.Leave,
+            ActionUrl: "/ess/leave",
+            DeduplicationKey: $"leave-balance:{message.EmployeeId}:{message.LeavePolicyId}:{message.Year}:{message.TransactionTypeCode}",
+            Type: NotificationConstants.Types.Business,
+            Severity: NotificationConstants.Severities.Info
+        );
+
+        await mediator.Send(command, context.CancellationToken);
+        logger.Information("Processed LeaveBalanceChanged notification for Employee User ID: {UserId}", userId);
     }
 }

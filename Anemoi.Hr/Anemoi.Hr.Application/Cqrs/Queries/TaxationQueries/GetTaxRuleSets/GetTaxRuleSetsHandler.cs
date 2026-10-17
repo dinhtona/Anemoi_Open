@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,9 +16,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.TaxationQueries.GetTaxRuleSets;
 public sealed class GetTaxRuleSetsHandler(
     ISqlRepository<TaxRuleSet> repository,
     TaxationMapper mapper)
-    : IQueryHandler<GetTaxRuleSetsQuery, IReadOnlyCollection<TaxRuleSetResponse>>
+    : IQueryHandler<GetTaxRuleSetsQuery, OneOf<IReadOnlyCollection<TaxRuleSetResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<TaxRuleSetResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<TaxRuleSetResponse>, ErrorDetailResponse>> Handle(
         GetTaxRuleSetsQuery request,
         CancellationToken cancellationToken)
     {

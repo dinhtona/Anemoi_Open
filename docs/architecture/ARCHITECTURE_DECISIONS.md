@@ -12,11 +12,11 @@ Before changing an existing pattern, verify whether an Architecture Decision Rec
 
 # ANEMOI HR - Architecture Decisions Record (ADR)
 
-Version: After ADR-035 Approval
+Version: After ADR-036 Approval
 
 Status: Active
 
-Last Updated: 2026-07-03
+Last Updated: 2026-10-16
 
 ---
 
@@ -917,6 +917,56 @@ Phase 35 introduces a generic Bulk Import Framework. Multiple business modules (
 - Storage: jsonb columns replace bytea for uploaded files
 - Error file generation requires re-validation (acceptable trade-off)
 - Future modules only need: row DTO, validator, handler, template provider
+
+---
+
+# ADR-036 — Administrator Reserved-Role Checks on Trust-Anchor Endpoints
+
+## Status
+
+Approved
+
+## Context
+
+The 2026-10-16 security audit (MED-6 / SEC-010) observed that
+`PromoteSystemAdministrator` / `DemoteSystemAdministrator`
+(`Anemoi.Centralize.Api/Controllers/Identity/UserController.cs`) and similar
+endpoints in the District / Province / Member / Organization / RoleGroup / Admin
+controllers use `[Authorize(Policy = ..., Roles = SystemRoles.Administrator)]`
+instead of `[HasPermission(...)]`. AGENTS.md requires `[HasPermission]` on
+protected endpoints, while DEVELOPMENT.md §8 explicitly sanctions the reserved
+Administrator role — an internal document conflict (also tracked as LOW-12 /
+ANEMOI004 guard flag).
+
+## Decision
+
+The role-based check is RETAINED as a sanctioned exception on these trust-anchor
+endpoints. Rationale:
+
+1. They are the bootstrap of the permission system itself: promoting or demoting
+   a system administrator must remain a hard, non-delegable check.
+2. A permission-based equivalent would be grantable through the admin UI to
+   arbitrary role groups, widening the blast radius of a single misconfiguration.
+3. A migration mistake (e.g. the admin role-group seed not granting the new
+   permission) would lock every environment out of administrator promotion with
+   no UI recovery path — only direct database surgery.
+
+## Scope
+
+Endpoints that grant, revoke, or manage system-administrator membership, and the
+MasterData / Workspace admin endpoints that predate the permission catalog for
+the same bootstrap reason, keep
+`[Authorize(Policy = AuthorizationPolicies.Internal | Agency, Roles = SystemRoles.Administrator)]`.
+
+## Implications
+
+- New endpoints MUST still use `[HasPermission]` per AGENTS.md; this exception
+  does not extend to them.
+- The ArchitectureGuard rule ANEMOI004 flagging `Roles = SystemRoles.Administrator`
+  should exempt `SystemRoles.Administrator` or reference this ADR (LOW-12).
+- Revisit only if the full Critical-permission assignment ceremony (warning +
+  reason + audit log + second approver, AGENTS.md rule 13) is implemented AND a
+  safe migration with a verified admin-seed grant is proven.
 
 ---
 

@@ -5,4 +5,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.AssetQueries.GetEmployeeAssets;
 
 public sealed record GetEmployeeAssetsQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<EmployeeAssetResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<EmployeeAssetResponse>>;

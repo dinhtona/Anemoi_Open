@@ -96,10 +96,14 @@ public sealed class AuthenticationInstaller : IInstaller
                     }
                     catch (Exception exception)
                     {
+                        // SECURITY (SEC-003): fail CLOSED — if the revocation cache
+                        // cannot be reached, the token's revocation state is unknown
+                        // and the token must NOT be allowed to proceed.
                         logger.LogError(exception,
                             "Unable to validate JWT revocation state for user {UserId}. " +
-                            "Allowing token to proceed — token revocation cache is unavailable.",
+                            "Rejecting token — token revocation cache is unavailable.",
                             userIdClaim);
+                        context.Fail("Token revocation state cannot be verified.");
                     }
                 }
             };

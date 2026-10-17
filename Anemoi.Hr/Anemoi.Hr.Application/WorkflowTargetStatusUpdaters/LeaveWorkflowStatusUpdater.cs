@@ -1,14 +1,16 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Events;
-using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using Serilog;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
@@ -25,12 +27,12 @@ public sealed class LeaveWorkflowStatusUpdater(
     public bool CanHandle(string entityType)
         => entityType == WorkflowConstants.TargetEntityTypes.LeaveRequest;
 
-    public async Task MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
     {
         var id = new LeaveRequestId(Guid.Parse(entityId));
         var leave = await leaveRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (leave is null) return;
+        if (leave is null) return true;
 
         var balance = await leaveBalanceRepository.GetFirstByConditionAsync(
             x => x.EmployeeId == leave.EmployeeId &&
@@ -77,14 +79,15 @@ public sealed class LeaveWorkflowStatusUpdater(
         }
 
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 
-    public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
     {
         var id = new LeaveRequestId(Guid.Parse(entityId));
         var leave = await leaveRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (leave is null) return;
+        if (leave is null) return true;
 
         var balance = await leaveBalanceRepository.GetFirstByConditionAsync(
             x => x.EmployeeId == leave.EmployeeId &&
@@ -142,6 +145,7 @@ public sealed class LeaveWorkflowStatusUpdater(
         }
 
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 
     private static LeaveTransaction NewTransaction(LeaveRequest request, LeaveBalance balance, string type, decimal days)

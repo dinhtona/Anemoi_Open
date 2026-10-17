@@ -1,11 +1,13 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +23,9 @@ public sealed class GetCompensationDashboardHandler(
     ISqlRepository<SalaryValidationBypassLog> bypassLogRepository,
     HrSettings hrSettings,
     CompensationMapper mapper)
-    : IQueryHandler<GetCompensationDashboardQuery, CompensationDashboardResponse>
+    : IQueryHandler<GetCompensationDashboardQuery, OneOf<CompensationDashboardResponse, ErrorDetailResponse>>
 {
-    public async Task<CompensationDashboardResponse> Handle(
+    public async Task<OneOf<CompensationDashboardResponse, ErrorDetailResponse>> Handle(
         GetCompensationDashboardQuery request,
         CancellationToken cancellationToken)
     {

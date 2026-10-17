@@ -5,6 +5,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
@@ -26,7 +27,7 @@ public sealed class PayslipPublishedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payslip",
+            Resource = NotificationResourceKeys.HrPayslip,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayslipId,
             WorkspaceId = null,
@@ -72,7 +73,7 @@ public sealed class PayslipCancelledConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payslip",
+            Resource = NotificationResourceKeys.HrPayslip,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayslipId,
             WorkspaceId = null,

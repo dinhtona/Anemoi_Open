@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -9,4 +10,4 @@ public sealed record GetLeaveRequestsQuery(
     EmployeeId? EmployeeId,
     string? StatusCode,
     DateOnly? FromDate,
-    DateOnly? ToDate) : GetManyQuery, IQueryPaged<LeaveRequestResponse>;
+    DateOnly? ToDate) : GetManyQuery, IQueryOne<PaginationResponse<LeaveRequestResponse>>;

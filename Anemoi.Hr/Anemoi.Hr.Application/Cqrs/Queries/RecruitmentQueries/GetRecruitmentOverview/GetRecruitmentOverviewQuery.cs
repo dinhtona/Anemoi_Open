@@ -6,4 +6,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentOv
 
 public sealed record GetRecruitmentOverviewQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<RecruitmentOverviewResponse>;
+    DateOnly? ToDate) : IQueryOne<RecruitmentOverviewResponse>;

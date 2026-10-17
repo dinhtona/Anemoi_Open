@@ -24,10 +24,11 @@ public sealed class WorkflowRoleAssignmentController(ISender sender) : Controlle
     [HttpGet]
     [HasPermission(HrPermissions.WorkflowView)]
     [ProducesResponseType(typeof(PaginationResponse<WorkflowRoleAssignmentResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<WorkflowRoleAssignmentResponse>> GetWorkflowRoleAssignments(
+    public async Task<IActionResult> GetWorkflowRoleAssignments(
         [FromQuery] GetWorkflowRoleAssignmentsQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetApplicationsByStage;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetCandidateSourceEffectiveness;
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetHiringByDepartment;
@@ -6,15 +7,16 @@ using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentOvervi
 using Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetTimeToHire;
 using Anemoi.Hr.Application.Responses;
 using MediatR;
+using OneOf;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentAnalyticsDashboard;
 
 public sealed class GetRecruitmentAnalyticsDashboardHandler(ISender sender)
-    : IQueryHandler<GetRecruitmentAnalyticsDashboardQuery, RecruitmentAnalyticsDashboardResponse>
+    : IQueryHandler<GetRecruitmentAnalyticsDashboardQuery, OneOf<RecruitmentAnalyticsDashboardResponse, ErrorDetailResponse>>
 {
-    public async Task<RecruitmentAnalyticsDashboardResponse> Handle(
+    public async Task<OneOf<RecruitmentAnalyticsDashboardResponse, ErrorDetailResponse>> Handle(
         GetRecruitmentAnalyticsDashboardQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,7 +31,13 @@ public sealed class GetRecruitmentAnalyticsDashboardHandler(ISender sender)
         var timeToHire = await sender.Send(
             new GetTimeToHireQuery(request.FromDate, request.ToDate), cancellationToken);
 
+        if (overview.IsT1) return overview.AsT1;
+        if (byStage.IsT1) return byStage.AsT1;
+        if (byDept.IsT1) return byDept.AsT1;
+        if (sourceEffectiveness.IsT1) return sourceEffectiveness.AsT1;
+        if (timeToHire.IsT1) return timeToHire.AsT1;
+
         return new RecruitmentAnalyticsDashboardResponse(
-            overview, byStage, byDept, sourceEffectiveness, timeToHire);
+            overview.AsT0, byStage.AsT0, byDept.AsT0, sourceEffectiveness.AsT0, timeToHire.AsT0);
     }
 }

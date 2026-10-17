@@ -31,7 +31,7 @@ public sealed class EmployeeAssetController(ISender mediator) : ControllerBase
     public async Task<IActionResult> GetAssets(Guid employeeId, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetEmployeeAssetsQuery(new EmployeeId(employeeId)), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

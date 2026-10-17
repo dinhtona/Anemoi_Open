@@ -43,6 +43,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<EssMapper>();
         services.AddScoped<WorkflowMapper>();
         services.AddScoped<MasterDataMapper>();
+        services.AddScoped<OrganizationMapper>();
         services.AddScoped<WorkflowRoleAssignmentMapper>();
         services.AddScoped<ProbationRecordMapper>();
         services.AddScoped<EmployeeTransferMapper>();
@@ -75,7 +76,6 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<IApprovalResolver, DefaultApprovalResolver>();
         services.AddScoped<IWorkflowRoleResolver, DefaultWorkflowRoleResolver>();
         services.AddScoped<IWorkflowQueryService, WorkflowQueryService>();
-        services.AddScoped<IOrganizationService, OrganizationService>();
         services.AddScoped<IWorkflowTargetStatusUpdater, LeaveWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, OvertimeWorkflowStatusUpdater>();
         services.AddScoped<IWorkflowTargetStatusUpdater, PayrollWorkflowStatusUpdater>();

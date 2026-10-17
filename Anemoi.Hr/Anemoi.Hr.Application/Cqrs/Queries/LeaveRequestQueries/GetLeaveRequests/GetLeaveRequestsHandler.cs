@@ -7,6 +7,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Leaves;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveRequestQueries.GetLeaveRequests;
 
@@ -14,9 +15,9 @@ public sealed class GetLeaveRequestsHandler(
     ISqlRepository<LeaveRequest> repository,
     LeaveMapper mapper,
     IWorkflowQueryService workflowQueryService)
-    : IQueryHandler<GetLeaveRequestsQuery, PaginationResponse<LeaveRequestResponse>>
+    : IQueryHandler<GetLeaveRequestsQuery, OneOf<PaginationResponse<LeaveRequestResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<LeaveRequestResponse>> Handle(GetLeaveRequestsQuery request,
+    public async Task<OneOf<PaginationResponse<LeaveRequestResponse>, ErrorDetailResponse>> Handle(GetLeaveRequestsQuery request,
         CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

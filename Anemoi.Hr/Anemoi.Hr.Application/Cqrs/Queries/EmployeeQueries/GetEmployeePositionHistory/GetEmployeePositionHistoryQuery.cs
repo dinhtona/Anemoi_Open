@@ -5,4 +5,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePositionHistory;
 
 public sealed record GetEmployeePositionHistoryQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<EmployeePositionHistoryResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<EmployeePositionHistoryResponse>>;

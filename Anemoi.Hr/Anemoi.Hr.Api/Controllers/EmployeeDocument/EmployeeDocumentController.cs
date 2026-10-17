@@ -28,7 +28,7 @@ public sealed class EmployeeDocumentController(ISender mediator) : ControllerBas
     public async Task<IActionResult> GetDocuments(Guid employeeId, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetEmployeeDocumentsQuery(new EmployeeId(employeeId)), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

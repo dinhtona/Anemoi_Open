@@ -50,7 +50,7 @@ public sealed class SubmitRecruitmentRequestHandler(
         {
             Id = new RecruitmentRequestHistoryId(IdGenerator.NextGuid()),
             RecruitmentRequestId = recruitmentRequest.Id,
-            ActionCode = "Submitted",
+            ActionCode = RecruitmentRequestStatusCode.Submitted,
             OldStatus = oldStatus,
             NewStatus = recruitmentRequest.Status,
             PerformedBy = request.SubmittedBy,

@@ -5,4 +5,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.CalendarManagementQueries.MonthlyCa
 
 public sealed record GetMonthlyCalendarQuery(
     int Year,
-    int Month) : IQuery<MonthlyCalendarResponse>;
+    int Month) : IQueryOne<MonthlyCalendarResponse>;

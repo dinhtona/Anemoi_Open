@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Taxation;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +18,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.TaxationQueries.GetTaxCalculationSn
 public sealed class GetTaxCalculationSnapshotsHandler(
     ISqlRepository<TaxCalculationSnapshot> repository,
     TaxationMapper mapper)
-    : IQueryHandler<GetTaxCalculationSnapshotsQuery, IReadOnlyCollection<TaxCalculationSnapshotResponse>>
+    : IQueryHandler<GetTaxCalculationSnapshotsQuery, OneOf<IReadOnlyCollection<TaxCalculationSnapshotResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<TaxCalculationSnapshotResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<TaxCalculationSnapshotResponse>, ErrorDetailResponse>> Handle(
         GetTaxCalculationSnapshotsQuery request,
         CancellationToken cancellationToken)
     {

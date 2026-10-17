@@ -6,4 +6,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetTimeToHire;
 
 public sealed record GetTimeToHireQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<TimeToHireResponse>;
+    DateOnly? ToDate) : IQueryOne<TimeToHireResponse>;

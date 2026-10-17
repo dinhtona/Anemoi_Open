@@ -44,7 +44,7 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     {
         var query = new GetInsuranceRuleSetsQuery(countryCode, insuranceType);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("rule-sets/{id}")]
@@ -165,7 +165,7 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     {
         var query = new GetInsuranceCalculationSnapshotsQuery(employeeId, insuranceType, sourceModule, sourceReferenceId);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("calculation-snapshots/{id}")]
@@ -192,6 +192,6 @@ public sealed class InsuranceManagementController(ISender sender) : ControllerBa
     {
         var query = new GetInsuranceContributionReportQuery(periodStart, periodEnd, countryCode, insuranceType);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

@@ -6,4 +6,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.InsuranceQueries.GetInsuranceRuleSe
 
 public sealed record GetInsuranceRuleSetsQuery(
     string? CountryCode = null,
-    string? InsuranceType = null) : IQuery<IReadOnlyCollection<InsuranceRuleSetResponse>>;
+    string? InsuranceType = null) : IQueryOne<IReadOnlyCollection<InsuranceRuleSetResponse>>;

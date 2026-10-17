@@ -14,4 +14,4 @@ public sealed record GetOvertimeRequestsQuery(
     int Page = 1,
     int PageSize = 50,
     string? SortBy = null,
-    string? SortDirection = "asc") : IQuery<PaginationResponse<OvertimeRequestResponse>>;
+    string? SortDirection = "asc") : IQueryOne<PaginationResponse<OvertimeRequestResponse>>;

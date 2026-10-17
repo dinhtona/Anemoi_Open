@@ -53,10 +53,10 @@ public sealed class EmployeeImportMappingService
         {
             Id = new EmployeeHistoryId(IdGenerator.NextGuid()),
             EmployeeId = employee.Id,
-            EntityType = "Employee",
+            EntityType = EmployeeImportHistoryConstants.EntityType,
             EntityId = employee.Id.Value.ToString(),
-            EventType = "BulkImported",
-            Title = "Bulk import",
+            EventType = EmployeeImportHistoryConstants.EventType,
+            Title = EmployeeImportHistoryConstants.TitleFallback,
             Description = $"{employee.FullName} ({employee.EmployeeCode})",
             OccurredAt = DateTime.UtcNow,
             ActorUserId = actorGuid

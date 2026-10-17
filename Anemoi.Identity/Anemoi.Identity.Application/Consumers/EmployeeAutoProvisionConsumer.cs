@@ -51,7 +51,7 @@ public sealed class EmployeeAutoProvisionConsumer(
             user = new User
             {
                 UserId = new UserId(IdGenerator.NextGuid()),
-                Id = Guid.NewGuid(),
+                Id = IdGenerator.NextGuid(),
                 UserName = email,
                 Email = email,
                 FirstName = message.FullName,

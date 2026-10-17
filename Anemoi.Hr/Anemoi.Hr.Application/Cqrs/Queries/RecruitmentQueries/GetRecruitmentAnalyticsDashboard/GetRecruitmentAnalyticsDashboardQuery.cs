@@ -6,4 +6,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentAn
 
 public sealed record GetRecruitmentAnalyticsDashboardQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<RecruitmentAnalyticsDashboardResponse>;
+    DateOnly? ToDate) : IQueryOne<RecruitmentAnalyticsDashboardResponse>;

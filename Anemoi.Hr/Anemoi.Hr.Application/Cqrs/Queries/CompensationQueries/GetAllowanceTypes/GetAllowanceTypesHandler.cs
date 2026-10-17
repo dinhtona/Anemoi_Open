@@ -6,15 +6,16 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetAllowanceTypes;
 
 public sealed class GetAllowanceTypesHandler(
     ISqlRepository<AllowanceType> repository,
     CompensationMapper mapper)
-    : IQueryHandler<GetAllowanceTypesQuery, PaginationResponse<AllowanceTypeResponse>>
+    : IQueryHandler<GetAllowanceTypesQuery, OneOf<PaginationResponse<AllowanceTypeResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<AllowanceTypeResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<AllowanceTypeResponse>, ErrorDetailResponse>> Handle(
         GetAllowanceTypesQuery request, CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

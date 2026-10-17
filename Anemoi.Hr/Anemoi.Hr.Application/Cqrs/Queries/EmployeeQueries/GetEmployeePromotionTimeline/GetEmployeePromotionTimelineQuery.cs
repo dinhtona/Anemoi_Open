@@ -5,4 +5,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePromotionTimeline;
 
 public sealed record GetEmployeePromotionTimelineQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<EmployeePromotionTimelineResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<EmployeePromotionTimelineResponse>>;

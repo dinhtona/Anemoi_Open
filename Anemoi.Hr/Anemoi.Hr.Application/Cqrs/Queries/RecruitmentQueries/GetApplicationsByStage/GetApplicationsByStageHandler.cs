@@ -1,8 +1,10 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,9 +14,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetApplicationsB
 
 public sealed class GetApplicationsByStageHandler(
     ISqlRepository<CandidateApplication> applicationRepository)
-    : IQueryHandler<GetApplicationsByStageQuery, IReadOnlyCollection<ApplicationsByStageItem>>
+    : IQueryHandler<GetApplicationsByStageQuery, OneOf<IReadOnlyCollection<ApplicationsByStageItem>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<ApplicationsByStageItem>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<ApplicationsByStageItem>, ErrorDetailResponse>> Handle(
         GetApplicationsByStageQuery request,
         CancellationToken cancellationToken)
     {

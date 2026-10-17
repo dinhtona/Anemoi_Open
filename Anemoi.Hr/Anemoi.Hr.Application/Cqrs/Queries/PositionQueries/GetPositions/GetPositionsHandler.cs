@@ -6,13 +6,14 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Positions;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PositionQueries.GetPositions;
 
 public sealed class GetPositionsHandler(ISqlRepository<Position> repository, EmployeeMapper mapper)
-    : IQueryHandler<GetPositionsQuery, PaginationResponse<PositionResponse>>
+    : IQueryHandler<GetPositionsQuery, OneOf<PaginationResponse<PositionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PositionResponse>> Handle(GetPositionsQuery request,
+    public async Task<OneOf<PaginationResponse<PositionResponse>, ErrorDetailResponse>> Handle(GetPositionsQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

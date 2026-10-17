@@ -2,12 +2,14 @@
 
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.ExportPayrollRunSummaryCsv;
 
@@ -15,9 +17,9 @@ public sealed class ExportPayrollRunSummaryCsvHandler(
     ISqlRepository<PayrollRun> repository,
     PayrollReportingMapper mapper,
     PayrollReportExportService exportService)
-    : IQueryHandler<ExportPayrollRunSummaryCsvQuery, ExportResult>
+    : IQueryHandler<ExportPayrollRunSummaryCsvQuery, OneOf<ExportResult, ErrorDetailResponse>>
 {
-    public async Task<ExportResult> Handle(
+    public async Task<OneOf<ExportResult, ErrorDetailResponse>> Handle(
         ExportPayrollRunSummaryCsvQuery request,
         CancellationToken cancellationToken)
     {

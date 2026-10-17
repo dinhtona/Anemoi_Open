@@ -44,7 +44,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetAllowanceTypes(CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetAllowanceTypesQuery(null, null), cancellationToken);
-        return Ok(res.Items);
+        return res.Match<IActionResult>(r => Ok(r.Items), BadRequest);
     }
     [HttpPost]
     [HasPermission(HrPermissions.SalaryChange)]
@@ -164,7 +164,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeeSalaryHistoryQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{employeeId}")]
@@ -175,7 +175,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeeAllowancesQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{employeeId}")]
@@ -186,7 +186,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetCompensationTimelineQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -198,7 +198,7 @@ public sealed class CompensationController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetCompensationSnapshotQuery(employeeId, referenceDate), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -207,6 +207,6 @@ public sealed class CompensationController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetCompensationDashboard(CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetCompensationDashboardQuery(), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

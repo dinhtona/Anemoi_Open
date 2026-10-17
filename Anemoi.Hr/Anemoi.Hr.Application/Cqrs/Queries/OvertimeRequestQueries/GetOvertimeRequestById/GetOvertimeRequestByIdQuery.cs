@@ -6,4 +6,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.OvertimeRequestQueries.GetOvertimeRequestById;
 
 public sealed record GetOvertimeRequestByIdQuery(
-    OvertimeRequestId Id) : IQuery<OvertimeRequestResponse>;
+    OvertimeRequestId Id) : IQueryOne<OvertimeRequestResponse>;

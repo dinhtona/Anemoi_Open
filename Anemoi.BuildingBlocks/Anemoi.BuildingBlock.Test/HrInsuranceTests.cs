@@ -640,7 +640,7 @@ public sealed class HrInsuranceTests
             SourceModule: null,
             SourceReferenceId: null);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = (await handler.Handle(query, CancellationToken.None)).AsT0;
 
         Assert.Single(result);
         Assert.Equal(800000m, result.First().TotalEmployeeContribution);
@@ -687,7 +687,7 @@ public sealed class HrInsuranceTests
             CountryCode: null,
             InsuranceType: null);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = (await handler.Handle(query, CancellationToken.None)).AsT0;
 
         Assert.Single(result);
         var report = result.First();

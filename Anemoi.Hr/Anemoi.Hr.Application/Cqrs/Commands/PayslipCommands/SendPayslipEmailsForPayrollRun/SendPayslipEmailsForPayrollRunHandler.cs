@@ -61,7 +61,7 @@ public sealed class SendPayslipEmailsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Skipped"
+                    Status = PayslipBatchItemStatuses.Skipped
                 });
                 continue;
             }
@@ -79,7 +79,7 @@ public sealed class SendPayslipEmailsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Skipped"
+                    Status = PayslipBatchItemStatuses.Skipped
                 });
                 continue;
             }
@@ -99,7 +99,7 @@ public sealed class SendPayslipEmailsForPayrollRunHandler(
                     {
                         PayslipId = payslip.Id.Value,
                         EmployeeId = payslip.EmployeeId.Value,
-                        Status = "Succeeded"
+                        Status = PayslipBatchItemStatuses.Succeeded
                     });
                 }
                 else // Status is Failed
@@ -109,7 +109,7 @@ public sealed class SendPayslipEmailsForPayrollRunHandler(
                     {
                         PayslipId = payslip.Id.Value,
                         EmployeeId = payslip.EmployeeId.Value,
-                        Status = "Failed",
+                        Status = PayslipBatchItemStatuses.Failed,
                         ErrorCode = delivery.ErrorMessage
                     });
                 }
@@ -121,7 +121,7 @@ public sealed class SendPayslipEmailsForPayrollRunHandler(
                 {
                     PayslipId = payslip.Id.Value,
                     EmployeeId = payslip.EmployeeId.Value,
-                    Status = "Failed",
+                    Status = PayslipBatchItemStatuses.Failed,
                     ErrorCode = result.AsT1.Code
                 });
             }

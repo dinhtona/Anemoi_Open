@@ -6,13 +6,14 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.SalaryGradeQueries.GetSalaryGrades;
 
 public sealed class GetSalaryGradesHandler(ISqlRepository<SalaryGrade> repository, CompensationMapper mapper)
-    : IQueryHandler<GetSalaryGradesQuery, PaginationResponse<SalaryGradeResponse>>
+    : IQueryHandler<GetSalaryGradesQuery, OneOf<PaginationResponse<SalaryGradeResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<SalaryGradeResponse>> Handle(GetSalaryGradesQuery request,
+    public async Task<OneOf<PaginationResponse<SalaryGradeResponse>, ErrorDetailResponse>> Handle(GetSalaryGradesQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

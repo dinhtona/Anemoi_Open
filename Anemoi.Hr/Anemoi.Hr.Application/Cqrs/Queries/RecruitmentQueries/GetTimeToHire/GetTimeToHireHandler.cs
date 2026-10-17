@@ -1,8 +1,10 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -12,9 +14,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetTimeToHire;
 
 public sealed class GetTimeToHireHandler(
     ISqlRepository<HiringDecision> decisionRepository)
-    : IQueryHandler<GetTimeToHireQuery, TimeToHireResponse>
+    : IQueryHandler<GetTimeToHireQuery, OneOf<TimeToHireResponse, ErrorDetailResponse>>
 {
-    public async Task<TimeToHireResponse> Handle(
+    public async Task<OneOf<TimeToHireResponse, ErrorDetailResponse>> Handle(
         GetTimeToHireQuery request,
         CancellationToken cancellationToken)
     {

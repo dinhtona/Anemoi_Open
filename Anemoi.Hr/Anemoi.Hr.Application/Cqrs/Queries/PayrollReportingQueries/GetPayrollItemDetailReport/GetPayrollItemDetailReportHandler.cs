@@ -8,6 +8,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollItemDetailReport;
 
@@ -15,9 +16,9 @@ public sealed class GetPayrollItemDetailReportHandler(
     ISqlRepository<PayrollItem> repository,
     ISqlRepository<PayrollRun> payrollRunRepository,
     PayrollReportingMapper mapper)
-    : IQueryHandler<GetPayrollItemDetailReportQuery, PaginationResponse<PayrollItemDetailReportItem>>
+    : IQueryHandler<GetPayrollItemDetailReportQuery, OneOf<PaginationResponse<PayrollItemDetailReportItem>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PayrollItemDetailReportItem>> Handle(
+    public async Task<OneOf<PaginationResponse<PayrollItemDetailReportItem>, ErrorDetailResponse>> Handle(
         GetPayrollItemDetailReportQuery request,
         CancellationToken cancellationToken)
     {

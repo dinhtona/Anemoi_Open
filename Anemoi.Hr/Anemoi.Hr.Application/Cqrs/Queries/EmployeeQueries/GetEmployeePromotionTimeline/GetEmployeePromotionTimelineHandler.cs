@@ -1,18 +1,20 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeePromotionTimeline;
 
 public sealed class GetEmployeePromotionTimelineHandler(
     ISqlRepository<EmployeePositionHistory> positionHistoryRepository,
     ISqlRepository<EmployeeGradeHistory> gradeHistoryRepository)
-    : IQueryHandler<GetEmployeePromotionTimelineQuery, IReadOnlyCollection<EmployeePromotionTimelineResponse>>
+    : IQueryHandler<GetEmployeePromotionTimelineQuery, OneOf<IReadOnlyCollection<EmployeePromotionTimelineResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<EmployeePromotionTimelineResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<EmployeePromotionTimelineResponse>, ErrorDetailResponse>> Handle(
         GetEmployeePromotionTimelineQuery request,
         CancellationToken cancellationToken)
     {

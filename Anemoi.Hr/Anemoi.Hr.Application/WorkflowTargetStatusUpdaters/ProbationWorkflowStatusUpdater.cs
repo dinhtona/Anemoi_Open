@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Probation;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
 
@@ -17,36 +19,40 @@ public sealed class ProbationWorkflowStatusUpdater(
     public bool CanHandle(string entityType)
         => entityType == WorkflowConstants.TargetEntityTypes.ProbationRecord;
 
-    public async Task MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
     {
         var id = new ProbationRecordId(Guid.Parse(entityId));
         var record = await probationRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (record is null) return;
+        if (record is null) return true;
 
         var reviewer = await ResolveReviewerAsync(performedBy, ct);
+        var reviewerId = reviewer?.Id ?? record.ReviewerEmployeeId;
+        if (reviewerId is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ProbationReviewerNotResolved);
 
-        record.Pass("Approved", null, reviewer?.Id
-            ?? record.ReviewerEmployeeId
-            ?? throw new InvalidOperationException("Cannot resolve reviewer for probation approval."));
+        record.Pass(ProbationResultCode.Approved, null, reviewerId);
 
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 
-    public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
     {
         var id = new ProbationRecordId(Guid.Parse(entityId));
         var record = await probationRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (record is null) return;
+        if (record is null) return true;
 
         var reviewer = await ResolveReviewerAsync(performedBy, ct);
+        var reviewerId = reviewer?.Id ?? record.ReviewerEmployeeId;
+        if (reviewerId is null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ProbationReviewerNotResolved);
 
-        record.Fail(reason ?? "Rejected", reviewer?.Id
-            ?? record.ReviewerEmployeeId
-            ?? throw new InvalidOperationException("Cannot resolve reviewer for probation rejection."));
+        record.Fail(reason ?? ProbationResultCode.Rejected, reviewerId);
 
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 
     private async Task<Employee?> ResolveReviewerAsync(string performedBy, CancellationToken ct)

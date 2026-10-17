@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Workflow;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetWorkflowDefinitions;
 
 public sealed class GetWorkflowDefinitionsHandler(
     ISqlRepository<WorkflowDefinition> repository,
     WorkflowMapper mapper)
-    : IQueryHandler<GetWorkflowDefinitionsQuery, PaginationResponse<WorkflowDefinitionResponse>>
+    : IQueryHandler<GetWorkflowDefinitionsQuery, OneOf<PaginationResponse<WorkflowDefinitionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<WorkflowDefinitionResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<WorkflowDefinitionResponse>, ErrorDetailResponse>> Handle(
         GetWorkflowDefinitionsQuery request, CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

@@ -45,7 +45,7 @@ public sealed class TaxManagementController(ISender sender) : ControllerBase
     {
         var query = new GetTaxRuleSetsQuery(countryCode, taxType);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("rule-sets/{id}")]
@@ -189,7 +189,7 @@ public sealed class TaxManagementController(ISender sender) : ControllerBase
     {
         var query = new GetTaxCalculationSnapshotsQuery(employeeId, sourceModule, sourceReferenceId);
         var res = await sender.Send(query, cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("calculation-snapshots/{id}")]

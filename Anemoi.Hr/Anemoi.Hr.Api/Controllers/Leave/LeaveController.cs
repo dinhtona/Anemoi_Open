@@ -43,7 +43,8 @@ public sealed class LeaveController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetLeaveBalances([FromQuery] GetLeaveBalancesQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpPost]
@@ -70,7 +71,8 @@ public sealed class LeaveController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetLeaveRequests([FromQuery] GetLeaveRequestsQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpPost]
@@ -139,6 +141,7 @@ public sealed class LeaveController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetLeaveTransactions([FromQuery] GetLeaveTransactionsQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

@@ -89,10 +89,11 @@ public sealed class OnboardingTemplatesController(ISender sender) : ControllerBa
     [HttpGet]
     [HasPermission(HrPermissions.OnboardingView)]
     [ProducesResponseType(typeof(PaginationResponse<OnboardingPlanTemplateResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<OnboardingPlanTemplateResponse>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] GetOnboardingPlanTemplatesQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

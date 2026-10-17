@@ -6,4 +6,4 @@ using System.Collections.Generic;
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetHeadcountTrend;
 
 public sealed record GetHeadcountTrendQuery(DateOnly FromDate, DateOnly ToDate)
-    : IQuery<ICollection<HeadcountTrendItem>>;
+    : IQueryOne<ICollection<HeadcountTrendItem>>;

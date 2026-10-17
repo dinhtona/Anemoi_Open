@@ -5,7 +5,6 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Identity.ModelIds;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Events;
 using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
-using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
@@ -52,20 +51,6 @@ public static class HrDevSeedData
         new(Guid.Parse("40000000-0000-0000-0000-000000000001"));
     private static readonly LeaveTypeId AnnualLeaveTypeId =
         new(Guid.Parse("50000000-0000-0000-0000-000000000001"));
-    private static readonly WorkflowDefinitionId TransferWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000001"));
-    private static readonly WorkflowDefinitionId SeparationWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000002"));
-    private static readonly WorkflowDefinitionId LeaveWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000003"));
-    private static readonly WorkflowDefinitionId OvertimeWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000004"));
-    private static readonly WorkflowDefinitionId PayrollWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000005"));
-    private static readonly WorkflowDefinitionId RecruitmentWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000006"));
-    private static readonly WorkflowDefinitionId ProbationWorkflowDefId =
-        new(Guid.Parse("80000000-0000-0000-0000-000000000007"));
 
     public static async Task SeedAsync(IServiceScope serviceScope, CancellationToken cancellationToken = default)
     {
@@ -94,7 +79,9 @@ public static class HrDevSeedData
 
         await SeedLeavePolicyAsync(leavePolicyRepository, now, cancellationToken);
         await SeedLeaveBalancesAsync(leaveBalanceRepository, now.Year, now, cancellationToken);
-        await SeedWorkflowDefinitionsAsync(serviceScope, cancellationToken);
+        // Workflow definitions are seeded idempotently for ALL environments
+        // (ADR-029); HrDevSeedData itself remains Development-only demo data.
+        await HrWorkflowDefinitionSeedData.SeedAsync(serviceScope, cancellationToken);
         await SeedWorkflowRoleAssignmentsAsync(serviceScope, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -129,7 +116,7 @@ public static class HrDevSeedData
             return;
         }
 
-        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Identity", Pooling = false };
+        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Anemoi_Identity", Pooling = false };
         var identityConnString = builder.ConnectionString;
 
         var emails = employees.Select(e => e.WorkEmail!.Trim().ToLowerInvariant()).ToList();
@@ -417,80 +404,6 @@ public static class HrDevSeedData
                 "",
                 15m
             ), cancellationToken);
-    }
-
-    private static async Task SeedWorkflowDefinitionsAsync(
-        IServiceScope serviceScope,
-        CancellationToken cancellationToken)
-    {
-        var workflowDefinitionRepository = serviceScope.ServiceProvider
-            .GetRequiredService<ISqlRepository<WorkflowDefinition>>();
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "LEAVE-REQUEST", "Leave Request Approval",
-            WorkflowConstants.TargetEntityTypes.LeaveRequest,
-            LeaveWorkflowDefId, 0x301, 0x302);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "OVERTIME-REQUEST", "Overtime Request Approval",
-            WorkflowConstants.TargetEntityTypes.OvertimeRequest,
-            OvertimeWorkflowDefId, 0x401, 0x402);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "PAYROLL-RUN", "Payroll Run Approval",
-            WorkflowConstants.TargetEntityTypes.PayrollRun,
-            PayrollWorkflowDefId, 0x501, 0x502);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "RECRUITMENT-REQUEST", "Recruitment Request Approval",
-            WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
-            RecruitmentWorkflowDefId, 0x601, 0x602);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "EMPLOYEE-TRANSFER", "Employee Transfer Approval",
-            WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
-            TransferWorkflowDefId, 0x101, 0x102);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "EMPLOYEE-SEPARATION", "Employee Separation Approval",
-            WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
-            SeparationWorkflowDefId, 0x201, 0x202);
-
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
-            "PROBATION-RECORD", "Probation Record Approval",
-            WorkflowConstants.TargetEntityTypes.ProbationRecord,
-            ProbationWorkflowDefId, 0x701, 0x702);
-    }
-
-    private static async Task SeedDefinitionIfNotExists(
-        ISqlRepository<WorkflowDefinition> repository,
-        CancellationToken cancellationToken,
-        string code,
-        string name,
-        string targetEntityType,
-        WorkflowDefinitionId defId,
-        int step1Suffix,
-        int step2Suffix)
-    {
-        if (await repository.ExistByConditionAsync(
-                x => x.Code == code, cancellationToken)) return;
-
-        var steps = new List<WorkflowDefinitionStep>
-        {
-            WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse($"80000000-0000-0000-0000-0000{step1Suffix:X8}")),
-                defId, 1, ApproverType.DirectManager, null, true),
-            WorkflowDefinitionStep.Create(
-                new WorkflowDefinitionStepId(Guid.Parse($"80000000-0000-0000-0000-0000{step2Suffix:X8}")),
-                defId, 2, ApproverType.HrManager, null, true)
-        };
-
-        var def = WorkflowDefinition.Create(
-            defId, code, name,
-            null, WorkflowTypeCode.Approval, targetEntityType,
-            1, steps);
-        def.Activate();
-        await repository.CreateOneAsync(def, cancellationToken);
     }
 
     private static async Task SeedWorkflowRoleAssignmentsAsync(

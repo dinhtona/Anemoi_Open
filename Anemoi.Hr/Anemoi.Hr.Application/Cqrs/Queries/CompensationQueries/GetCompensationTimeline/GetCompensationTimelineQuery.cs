@@ -6,4 +6,4 @@ using System.Collections.Generic;
 namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensationTimeline;
 
 public sealed record GetCompensationTimelineQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<CompensationTimelineItemResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<CompensationTimelineItemResponse>>;

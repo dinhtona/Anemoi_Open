@@ -244,14 +244,17 @@ public static class HrBusinessErrorCodes
     public const string ValEffectiveFromRequired = "VAL_EFFECTIVE_FROM_REQUIRED";
     public const string ValEmployeeAllowanceIdRequired = "VAL_EMPLOYEE_ALLOWANCE_ID_REQUIRED";
     public const string ValEmployeeIdRequired = "VAL_EMPLOYEE_ID_REQUIRED";
+    public const string ValEmployeeIdInvalidGuid = "VAL_EMPLOYEE_ID_INVALID_GUID";
     public const string ValEndDateBeforeStartDate = "VAL_END_DATE_BEFORE_START_DATE";
     public const string ValEndDateRequired = "VAL_END_DATE_REQUIRED";
+    public const string ValEntityTypeRequired = "VAL_ENTITY_TYPE_REQUIRED";
     public const string ValLeaveBalanceIdRequired = "VAL_LEAVE_BALANCE_ID_REQUIRED";
     public const string ValLeavePolicyIdRequired = "VAL_LEAVE_POLICY_ID_REQUIRED";
     public const string ValLeaveRequestIdRequired = "VAL_LEAVE_REQUEST_ID_REQUIRED";
     public const string ValMaxSalaryMustBeGeMinSalary = "VAL_MAX_SALARY_MUST_BE_GE_MIN_SALARY";
     public const string ValMinSalaryMustBePositive = "VAL_MIN_SALARY_MUST_BE_POSITIVE";
     public const string ValDepartmentIdRequired = "VAL_DEPARTMENT_ID_REQUIRED";
+    public const string ValGradeCodeRequired = "VAL_GRADE_CODE_REQUIRED";
     public const string ValNewDepartmentIdRequired = "VAL_NEW_DEPARTMENT_ID_REQUIRED";
     public const string ValOvertimeRequestIdRequired = "VAL_OVERTIME_REQUEST_ID_REQUIRED";
     public const string ValPayrollPeriodIdRequired = "VAL_PAYROLL_PERIOD_ID_REQUIRED";
@@ -429,6 +432,7 @@ public static class HrBusinessErrorCodes
     public const string ValWorkflowRoleInvalid = "VAL_WORKFLOW_ROLE_INVALID";
     public const string ValWorkflowDefinitionIdRequired = "VAL_WF_DEF_ID_REQUIRED";
     public const string ValWorkflowInstanceIdRequired = "VAL_WF_INSTANCE_ID_REQUIRED";
+    public const string ValWorkflowInstanceIdInvalidGuid = "VAL_WF_INSTANCE_ID_INVALID_GUID";
     public const string ValWorkflowCodeRequired = "VAL_WF_CODE_REQUIRED";
     public const string ValWorkflowNameRequired = "VAL_WF_NAME_REQUIRED";
     public const string ValWorkflowStepSequenceInvalid = "VAL_WF_STEP_SEQUENCE_INVALID";
@@ -448,6 +452,7 @@ public static class HrBusinessErrorCodes
 
     // Lifecycle management error codes
     public const string ProbationRecordNotFound = "HR_PROBATION_RECORD_NOT_FOUND";
+    public const string ProbationReviewerNotResolved = "HR_PROBATION_REVIEWER_NOT_RESOLVED";
     public const string TransferNotFound = "HR_TRANSFER_NOT_FOUND";
     public const string SeparationNotFound = "HR_SEPARATION_NOT_FOUND";
 

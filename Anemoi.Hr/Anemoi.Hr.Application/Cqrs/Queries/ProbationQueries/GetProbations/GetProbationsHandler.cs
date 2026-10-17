@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Probation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.ProbationQueries.GetProbations;
 
 public sealed class GetProbationsHandler(
     ISqlRepository<ProbationRecord> repository,
     ProbationRecordMapper mapper)
-    : IQueryHandler<GetProbationsQuery, PaginationResponse<ProbationRecordDto>>
+    : IQueryHandler<GetProbationsQuery, OneOf<PaginationResponse<ProbationRecordDto>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<ProbationRecordDto>> Handle(
+    public async Task<OneOf<PaginationResponse<ProbationRecordDto>, ErrorDetailResponse>> Handle(
         GetProbationsQuery request, CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

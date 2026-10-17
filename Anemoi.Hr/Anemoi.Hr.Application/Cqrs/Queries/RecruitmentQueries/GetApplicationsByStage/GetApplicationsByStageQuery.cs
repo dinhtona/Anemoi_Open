@@ -7,4 +7,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetApplicationsB
 
 public sealed record GetApplicationsByStageQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<IReadOnlyCollection<ApplicationsByStageItem>>;
+    DateOnly? ToDate) : IQueryOne<IReadOnlyCollection<ApplicationsByStageItem>>;

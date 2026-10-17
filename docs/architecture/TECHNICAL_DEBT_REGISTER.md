@@ -727,7 +727,12 @@ Medium
 
 ### Status
 
-⚠️ Active — discovered Phase 34 Iteration 7
+✅ **Resolved** — October 2026
+
+### Fix Applied
+
+- `PassProbationHandler` / `FailProbationHandler` no longer use `new EmployeeId(Guid.Empty)`. Both handlers now inject `ICurrentUser`, resolve the reviewer's `EmployeeId` via the linked `Employee` (`IdentityUserId == currentUser.UserId`), and pass it to `record.Pass(...)` / `record.Fail(...)` as `ReviewerEmployeeId`. If the current user has no linked employee, the handler returns `HR_EMPLOYEE_NOT_FOUND`.
+- `SaveChangesAsync` failures are now surfaced: the handlers check the `OneOf<None, Exception>` result and return `HrErrorResponses.FromSaveResult(...)` (e.g. `HR_DB_FOREIGN_KEY_VIOLATION` / `HR_SAVE_CHANGES_FAILED`) instead of returning 200 with an in-memory DTO.
 
 ### Context
 
@@ -850,7 +855,15 @@ Medium
 
 ### Status
 
-⚠️ Active — discovered Phase 34 Iteration 9 Security Audit
+✅ Resolved 2026-10-16 — controller now injects only `ISender` and dispatches
+`GetOrganizationTreeQuery` / `GetReportingChainQuery` (+ validators) /
+`GetApproversPreviewQuery` / `GetWorkflowRoutePreviewQuery` /
+`UpdateOrganizationManagerCommand` (+ validator). Handlers return
+`OneOf<..., ErrorDetailResponse>` and map to `OrganizationNodeResponse` /
+`ReportingRelationshipResponse` DTOs via the new Mapperly `OrganizationMapper`
+(`Application/Mappings`); no domain entity is returned from the API.
+`IOrganizationService` / `OrganizationService` removed (logic moved into
+handlers; it had no other callers) and its DI registration deleted.
 
 ### Context
 
@@ -887,7 +900,11 @@ Medium
 
 ### Status
 
-⚠️ Active — discovered Phase 34 Iteration 9 Security Audit
+✅ Resolved 2026-10-16 — applied recommended fix options 2 + 3: `GetQueryableFromRawQuery` is now
+marked `[Obsolete]` with a security message and carries XML doc warnings on both
+`ISqlRepository<T>` and `EfRepository<T>`. Method retained (not deleted) because test mocks
+implement the interface. Caller sweep confirmed: no production callers, no direct `FromSqlRaw`
+with string concatenation in production code.
 
 ### Context
 
@@ -922,7 +939,17 @@ High
 
 ### Status
 
-⚠️ Active (partially mitigated by docker-compose + .env.example) — discovered Phase 34 Iteration 9 Security Audit
+✅ Resolved 2026-10-16 — remaining hardcoded credentials removed from the two
+`appsettings.Development.json` files: Identity dev seed user passwords are now
+`${DEV_TEST_USER_PASSWORD}` (resolved from the environment, fail-fast with error
+code `MissingRequiredConfiguration` if unset; key added to `.env.example`), and
+HR RabbitMQ `guest/guest` is now `${RABBITMQ_DEFAULT_USER}` /
+`${RABBITMQ_DEFAULT_PASS}` with the same fail-fast resolution in
+`MassTransitInstaller`. Main `appsettings.json` files were already sanitized
+(empty secrets). Recommended fix #4 also applied: `UseHttpsRedirection()` +
+`UseHsts()` in non-Development for Centralize API, HR API, and Identity
+WorkerService. Note: `docker-compose.yml` (out of scope) must pass
+`DEV_TEST_USER_PASSWORD` through to the identity worker service.
 
 ### Context
 
@@ -1559,19 +1586,18 @@ Restructure to paginate at the database level: resolve user's applicable roles f
 
 3. TD-003 Frontend testing infrastructure
 4. TD-007 End-to-End automation
-5. TD-P34-PROBATION-01 Direct Pass/Fail handler FK violation
-6. TD-P34-SEC-04 Hardcoded credentials in appsettings.json
-7. TD-P34-PERF-01 N+1 queries in recruitment/analytics handlers
-8. TD-P34-PERF-02 N+1 role resolution in approval handlers
-9. TD-P34-PERF-03 MonthlyLeaveAccrualWorker N+1
-10. TD-P34-PERF-14 Database index gap analysis
-11. TD-P34-PERF-15 GetPendingApprovalsHandler in-memory pagination
+5. TD-P34-SEC-04 Hardcoded credentials in appsettings.json
+6. TD-P34-PERF-01 N+1 queries in recruitment/analytics handlers
+7. TD-P34-PERF-02 N+1 role resolution in approval handlers
+8. TD-P34-PERF-03 MonthlyLeaveAccrualWorker N+1
+9. TD-P34-PERF-14 Database index gap analysis
+10. TD-P34-PERF-15 GetPendingApprovalsHandler in-memory pagination
 
 ## Medium-Term Priority (P3)
 
 5. TD-006 OpenAPI-generated contracts
 6. TD-009 Permission audit
-7. TD-P34-SEC-02 OrganizationHierarchyController returns domain entities
+7. TD-P34-SEC-02 OrganizationHierarchyController returns domain entities — ✅ Resolved 2026-10-16
 8. TD-P34-SEC-03 Latent FromSqlRaw injection surface
 9. TD-P34-PERF-04 Full table loads in analytics handlers
 10. TD-P34-PERF-05 Missing AsNoTracking in 16+ handlers
@@ -1636,6 +1662,16 @@ P2
 ### Severity
 
 High
+
+### Status
+
+✅ **Resolved** — October 2026
+
+### Fix Applied
+
+- Added required `GradeCode` to `ConvertCandidateToEmployeeCommand` (bound directly from the JSON request body; no separate DTO mapping needed since the controller binds the command via `[FromBody]`).
+- `ConvertCandidateToEmployeeValidator` enforces non-empty `GradeCode` (`VAL_GRADE_CODE_REQUIRED`); the handler validates the code against existing active salary grades via `IEmployeeGradeLookup.IsValidGradeAsync` (same mechanism as `PromoteEmployeeHandler`) and returns `HR_GRADE_NOT_FOUND` when invalid.
+- The converted `Employee.GradeCode` is now the trimmed caller-supplied value instead of hardcoded `"G1"`.
 
 ### Context
 

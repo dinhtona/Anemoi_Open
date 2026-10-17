@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CalendarManagementQueries.PublicHoliday.GetPublicHolidays;
 
 public sealed class GetPublicHolidaysHandler(
     ISqlRepository<Domain.CalendarManagement.PublicHoliday> publicHolidayRepository,
     CalendarManagementMapper mapper)
-    : IQueryHandler<GetPublicHolidaysQuery, PaginationResponse<PublicHolidayResponse>>
+    : IQueryHandler<GetPublicHolidaysQuery, OneOf<PaginationResponse<PublicHolidayResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PublicHolidayResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<PublicHolidayResponse>, ErrorDetailResponse>> Handle(
         GetPublicHolidaysQuery request,
         CancellationToken cancellationToken)
     {

@@ -10,4 +10,4 @@ public sealed record GetShiftTemplatesQuery(
     int Page = 1,
     int PageSize = 50,
     string SortBy = null,
-    string SortDirection = "asc") : IQuery<PaginationResponse<ShiftTemplateResponse>>;
+    string SortDirection = "asc") : IQueryOne<PaginationResponse<ShiftTemplateResponse>>;

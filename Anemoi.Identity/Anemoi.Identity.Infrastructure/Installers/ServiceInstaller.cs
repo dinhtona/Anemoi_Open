@@ -44,5 +44,8 @@ public sealed class ServiceInstaller : IInstaller
         services.AddScoped<ITokenGetter>(sp => sp.GetRequiredService<ITokenSetter>() as TokenService);
 
         services.AddScoped<IPermissionResolver, Authorization.IdentityPermissionResolver>();
+
+        services.AddScoped<IExternalAuthVerifier, Services.GoogleExternalAuthVerifier>();
+        services.AddScoped<IExternalAuthVerifier, Services.MicrosoftExternalAuthVerifier>();
     }
 }

@@ -6,6 +6,7 @@ using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,9 +17,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetRecruitmentRe
 public sealed class GetRecruitmentRequestsHandler(
     ISqlRepository<RecruitmentRequest> requestRepository,
     RecruitmentMapper mapper)
-    : IQueryHandler<GetRecruitmentRequestsQuery, PaginationResponse<RecruitmentRequestResponse>>
+    : IQueryHandler<GetRecruitmentRequestsQuery, OneOf<PaginationResponse<RecruitmentRequestResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<RecruitmentRequestResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<RecruitmentRequestResponse>, ErrorDetailResponse>> Handle(
         GetRecruitmentRequestsQuery request,
         CancellationToken cancellationToken)
     {

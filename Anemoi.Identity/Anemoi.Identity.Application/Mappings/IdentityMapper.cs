@@ -34,7 +34,7 @@ public partial class IdentityMapper(IPasswordHasher<User> passwordHasher, IUserI
         user.Id = user.UserId.Value;
         user.UserName = command.Email;
         user.NormalizedUserName = user.UserName?.ToUpper();
-        user.LockoutEnabled = false;
+        user.LockoutEnabled = true;
         user.CreatedTime = DateTime.UtcNow;
         user.SecurityStamp = IdGenerator.NextGuid().ToString();
         user.SearchHint = $"{command.FirstName} {command.LastName}".Trim().GenerateSearchHint();

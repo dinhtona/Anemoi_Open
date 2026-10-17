@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Insurance;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,9 +16,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.InsuranceQueries.GetInsuranceRuleSe
 public sealed class GetInsuranceRuleSetsHandler(
     ISqlRepository<InsuranceRuleSet> repository,
     InsuranceMapper mapper)
-    : IQueryHandler<GetInsuranceRuleSetsQuery, IReadOnlyCollection<InsuranceRuleSetResponse>>
+    : IQueryHandler<GetInsuranceRuleSetsQuery, OneOf<IReadOnlyCollection<InsuranceRuleSetResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<InsuranceRuleSetResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<InsuranceRuleSetResponse>, ErrorDetailResponse>> Handle(
         GetInsuranceRuleSetsQuery request,
         CancellationToken cancellationToken)
     {

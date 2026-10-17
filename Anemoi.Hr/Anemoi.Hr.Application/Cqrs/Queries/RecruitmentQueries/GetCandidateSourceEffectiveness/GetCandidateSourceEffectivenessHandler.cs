@@ -1,8 +1,10 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,9 +15,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetCandidateSour
 public sealed class GetCandidateSourceEffectivenessHandler(
     ISqlRepository<Candidate> candidateRepository,
     ISqlRepository<CandidateApplication> applicationRepository)
-    : IQueryHandler<GetCandidateSourceEffectivenessQuery, IReadOnlyCollection<CandidateSourceEffectivenessItem>>
+    : IQueryHandler<GetCandidateSourceEffectivenessQuery, OneOf<IReadOnlyCollection<CandidateSourceEffectivenessItem>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<CandidateSourceEffectivenessItem>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<CandidateSourceEffectivenessItem>, ErrorDetailResponse>> Handle(
         GetCandidateSourceEffectivenessQuery request,
         CancellationToken cancellationToken)
     {

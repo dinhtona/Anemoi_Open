@@ -7,6 +7,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,9 +17,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchHiringDeci
 public sealed class SearchHiringDecisionsHandler(
     ISqlRepository<HiringDecision> decisionRepository,
     RecruitmentMapper mapper)
-    : IQueryHandler<SearchHiringDecisionsQuery, PaginationResponse<HiringDecisionResponse>>
+    : IQueryHandler<SearchHiringDecisionsQuery, OneOf<PaginationResponse<HiringDecisionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<HiringDecisionResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<HiringDecisionResponse>, ErrorDetailResponse>> Handle(
         SearchHiringDecisionsQuery request,
         CancellationToken cancellationToken)
     {

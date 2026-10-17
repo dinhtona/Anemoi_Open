@@ -12,7 +12,11 @@ public record DomainEvent : IDomainEvent
 
     protected DomainEvent()
     {
-        AggregateId = Guid.NewGuid();
+        // Same sequential-GUID semantics as IdGenerator.NextGuid() (which is
+        // MassTransit.NewId.NextGuid()). BuildingBlock.Domain cannot reference
+        // Anemoi.BuildingBlock.Application.Helpers.IdGenerator without inverting
+        // the Clean Architecture dependency direction, so NewId is used directly.
+        AggregateId = MassTransit.NewId.NextGuid();
         OccurredAt = DateTime.UtcNow;
         EventType = GetType().Name;
         AssemblyType = $"{GetType().FullName},{GetType().Assembly.GetName().Name}";

@@ -7,4 +7,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensation
 
 public sealed record GetCompensationSnapshotQuery(
     EmployeeId EmployeeId,
-    DateOnly ReferenceDate) : IQuery<CompensationSnapshotResponse>;
+    DateOnly ReferenceDate) : IQueryOne<CompensationSnapshotResponse>;

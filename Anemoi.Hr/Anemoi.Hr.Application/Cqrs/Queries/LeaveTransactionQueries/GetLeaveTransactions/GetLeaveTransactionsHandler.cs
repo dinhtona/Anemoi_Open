@@ -6,13 +6,14 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Leaves;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveTransactionQueries.GetLeaveTransactions;
 
 public sealed class GetLeaveTransactionsHandler(ISqlRepository<LeaveTransaction> repository, LeaveMapper mapper)
-    : IQueryHandler<GetLeaveTransactionsQuery, PaginationResponse<LeaveTransactionResponse>>
+    : IQueryHandler<GetLeaveTransactionsQuery, OneOf<PaginationResponse<LeaveTransactionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<LeaveTransactionResponse>> Handle(GetLeaveTransactionsQuery request,
+    public async Task<OneOf<PaginationResponse<LeaveTransactionResponse>, ErrorDetailResponse>> Handle(GetLeaveTransactionsQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

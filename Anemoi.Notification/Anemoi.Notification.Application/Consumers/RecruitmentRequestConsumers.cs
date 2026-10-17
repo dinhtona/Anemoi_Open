@@ -5,6 +5,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using MassTransit;
 using MediatR;
 using Serilog;
@@ -23,7 +24,7 @@ public sealed class RecruitmentRequestSubmittedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.recruitment.request",
+            Resource = NotificationResourceKeys.HrRecruitmentRequest,
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.RecruitmentRequestId,
             WorkspaceId = null,
@@ -69,7 +70,7 @@ public sealed class RecruitmentRequestApprovedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.recruitment.request",
+            Resource = NotificationResourceKeys.HrRecruitmentRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.RecruitmentRequestId,
             WorkspaceId = null,
@@ -109,7 +110,7 @@ public sealed class RecruitmentRequestRejectedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.recruitment.request",
+            Resource = NotificationResourceKeys.HrRecruitmentRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.RecruitmentRequestId,
             WorkspaceId = null,
@@ -134,5 +135,33 @@ public sealed class RecruitmentRequestRejectedConsumer(
 
         await mediator.Send(command, context.CancellationToken);
         logger.Information("Processed RecruitmentRequestRejected notification for User ID: {UserId}", userId);
+    }
+}
+
+public sealed class RecruitmentOpeningCreatedConsumer(
+    IPublishEndpoint publishEndpoint,
+    ILogger logger)
+    : IConsumer<RecruitmentOpeningCreatedIntegrationEvent>
+{
+    public async Task Consume(ConsumeContext<RecruitmentOpeningCreatedIntegrationEvent> context)
+    {
+        var message = context.Message;
+
+        // The event carries no recipient user id; emit the DataChangeOccurred
+        // transient invalidation event so recruitment UIs refresh in real time.
+        await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
+        {
+            Resource = NotificationResourceKeys.HrRecruitmentOpening,
+            Action = NotificationConstants.DataChangeActions.Create,
+            EntityId = message.RecruitmentOpeningId,
+            WorkspaceId = null,
+            Sensitivity = NotificationConstants.DataSensitivity.Low,
+            QueryTags = new List<string> { "hr", "recruitment", "recruitment-opening" },
+            OccurredAt = DateTime.UtcNow
+        }, context.CancellationToken);
+
+        logger.Information(
+            "Processed RecruitmentOpeningCreated data-change for Opening {OpeningId} (Code: {Code}, PlannedHeadcount: {PlannedHeadcount})",
+            message.RecruitmentOpeningId, message.Code, message.PlannedHeadcount);
     }
 }

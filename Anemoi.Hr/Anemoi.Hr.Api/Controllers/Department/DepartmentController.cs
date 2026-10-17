@@ -26,10 +26,11 @@ public sealed class DepartmentController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.DepartmentView)]
     [ProducesResponseType(typeof(PaginationResponse<DepartmentResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<DepartmentResponse>> GetDepartments(
+    public async Task<IActionResult> GetDepartments(
         [FromQuery] GetDepartmentsQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
@@ -8,6 +9,7 @@ using Anemoi.Hr.Domain.Transfers;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
 
@@ -22,12 +24,12 @@ public sealed class EmployeeTransferWorkflowStatusUpdater(
     public bool CanHandle(string entityType)
         => entityType == WorkflowConstants.TargetEntityTypes.EmployeeTransfer;
 
-    public async Task MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
     {
         var id = new EmployeeTransferId(Guid.Parse(entityId));
         var transfer = await transferRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (transfer is null) return;
+        if (transfer is null) return true;
 
         transfer.Approve(performedBy);
 
@@ -68,16 +70,18 @@ public sealed class EmployeeTransferWorkflowStatusUpdater(
             transfer.SourcePositionId.Value.ToString(),
             transfer.TargetPositionId.Value.ToString()
         ), ct);
+        return true;
     }
 
-    public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
     {
         var id = new EmployeeTransferId(Guid.Parse(entityId));
         var transfer = await transferRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (transfer is null) return;
+        if (transfer is null) return true;
 
         transfer.Reject(performedBy, reason ?? "Rejected by approver");
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 }

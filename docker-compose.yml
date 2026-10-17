@@ -5,8 +5,10 @@
 
 services:
   # RabbitMQ service for event-driven messaging
+  # Pinned tag (was unpinned `latest`): management-alpine + delayed exchange
+  # plugin. Re-check available tags on Docker Hub before upgrading.
   rabbitmq:
-    image: masstransit/rabbitmq
+    image: masstransit/rabbitmq:3.12.7
     container_name: rabbitmq
     ports:
       - "${BIND_ADDRESS:-127.0.0.1}:5672:5672"      # RabbitMQ port
@@ -103,7 +105,7 @@ services:
       context: .
       dockerfile: Anemoi.Centralize/Anemoi.Centralize.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
       - MassTransitSetting__Password=${RABBITMQ_DEFAULT_PASS}
@@ -130,8 +132,6 @@ services:
       - jwt_keys:/home/app/.anemoi/jwt
       # /var/run/docker.sock mount removed — Docker management API is Dev-only and not safe for production
       - ./local_env/env_data:/app/env_data
-      - ./local_env/sftp_data:/app/sftp_data
-      - ./local_env/sftp_keys:/app/sftp_keys
 
   # Identity service
   anemoi_identity:
@@ -140,7 +140,7 @@ services:
       context: .
       dockerfile: Anemoi.Identity/Anemoi.Identity.WorkerService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Identity
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
@@ -150,6 +150,7 @@ services:
       - JwtSetting__PrivateKeyPath=${JWT_PRIVATE_KEY_PATH:-/home/app/.anemoi/jwt/development-private.key}
       - JwtSetting__PublicKeyPath=${JWT_PUBLIC_KEY_PATH:-/home/app/.anemoi/jwt/development-public.crt}
       - ExternalAuthSetting__GoogleClientId=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      - DEV_TEST_USER_PASSWORD=${DEV_TEST_USER_PASSWORD:?}
       - Kestrel__Endpoints__Http2__Url=http://0.0.0.0:5021
       - Kestrel__Endpoints__Http1__Url=http://0.0.0.0:5031
     volumes:
@@ -171,7 +172,7 @@ services:
       context: .
       dockerfile: Anemoi.MasterData/Anemoi.MasterData.WorkerService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=MasterData
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
@@ -194,7 +195,7 @@ services:
       context: .
       dockerfile: Anemoi.Notification/Anemoi.Notification.WorkerService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Notification
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
@@ -216,7 +217,7 @@ services:
       context: .
       dockerfile: Anemoi.Hr/Anemoi.Hr.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Hr
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
@@ -285,7 +286,7 @@ services:
       context: .
       dockerfile: Anemoi.Workspace/Anemoi.Workspace.WorkerService/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - PostgresDbSetting__ConnectionString=Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Workspace
       - MassTransitSetting__Host=rabbitmq
       - MassTransitSetting__UserName=${RABBITMQ_DEFAULT_USER}
@@ -317,34 +318,46 @@ services:
   #     - ssh-keygen -A && exec /entrypoint "$$@"
   #     - --
   #   command:
-  #     - user1:123456:1001
+  #     - ${SFTP_USER:-user1}:${SFTP_PASSWORD:?}
+  #   # Credentials come from .env (see .env.example); never hardcode the
+  #   # password here (was `user1:123456:1001`).
   #   networks:
   #     - anemoi_network
 
-  # smtp4dev:
-  #   image: rnwood/smtp4dev:v3
-  #   container_name: smtp4dev_server
-  #   restart: unless-stopped
-  #   command: --basepath=/mail
-  #   ports:
-  #     - "${BIND_ADDRESS:-127.0.0.1}:${SMTP_HOST_PORT:-25}:25"
-  #     - "${BIND_ADDRESS:-127.0.0.1}:${SMTP_WEB_HOST_PORT:-5555}:80"
-  #   networks:
-  #     - anemoi_network
-
-  # Next.js frontend. Browser traffic should enter through Caddy so the
-  # frontend and API share one HTTPS origin.
-  anemoi_web:
-    image: anemoi/web
-    build:
-      context: ./cody-web-app
-      dockerfile: Dockerfile
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://anemoi_centralize:8080
-    depends_on:
-      - anemoi_centralize
+  # Dev-only mail catcher (smtp4dev). Kept ENABLED so that
+  # DevEnvironmentsSetting__MailApiUrl in anemoi_centralize and the Caddy
+  # /mail route resolve. Exclude from production stacks.
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    container_name: smtp4dev_server
+    restart: unless-stopped
+    command: --basepath=/mail
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${SMTP_HOST_PORT:-25}:25"
+      - "${BIND_ADDRESS:-127.0.0.1}:${SMTP_WEB_HOST_PORT:-5555}:80"
     networks:
       - anemoi_network
+
+  # TODO(CRIT-2/FUNC-001): Re-enable this service once the frontend exists here.
+  # The Next.js frontend (cody-web-app) lives in a SEPARATE repository and is
+  # intentionally git-ignored (see .gitignore and TD-004), so ./cody-web-app
+  # does not exist in this repo and `docker compose build` fails while this
+  # service is active. Uncomment the block below once the frontend code (or a
+  # prebuilt image) is available, and also re-enable the Caddy
+  # `reverse_proxy anemoi_web:3000` line and the caddy `depends_on` entry.
+  # Next.js frontend. Browser traffic should enter through Caddy so the
+  # frontend and API share one HTTPS origin.
+  # anemoi_web:
+  #   image: anemoi/web
+  #   build:
+  #     context: ./cody-web-app
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - NEXT_PUBLIC_API_BASE_URL=http://anemoi_centralize:8080
+  #   depends_on:
+  #     - anemoi_centralize
+  #   networks:
+  #     - anemoi_network
 
   # Single HTTP(S) entrypoint for the frontend and API. Caddy creates a local
   # development CA certificate for https://localhost automatically.
@@ -368,8 +381,10 @@ services:
 
   # Optional stable public entrypoint. Create one Cloudflare Tunnel whose
   # published application targets http://caddy:80, then start profile "public".
+  # Pinned tag (was `latest`): cloudflared releases are date-versioned.
+  # Re-check the newest stable tag on Docker Hub before upgrading.
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.6.0
     container_name: cloudflared
     restart: unless-stopped
     profiles:

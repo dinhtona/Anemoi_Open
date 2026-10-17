@@ -1,17 +1,20 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Cqrs.Common.Dtos;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Probation;
-using Anemoi.Hr.ModelIds.ModelIds;
 using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Commands.ProbationCommands.FailProbation;
 
 public sealed class FailProbationHandler(
     ISqlRepository<ProbationRecord> probationRepository,
+    ISqlRepository<Employee> employeeRepository,
     IUnitOfWork unitOfWork,
+    ICurrentUser currentUser,
     Mappings.ProbationRecordMapper mapper)
     : ICommandHandler<FailProbationCommand, OneOf<ProbationRecordDto, ErrorDetailResponse>>
 {
@@ -23,8 +26,18 @@ public sealed class FailProbationHandler(
         if (record == null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ProbationRecordNotFound!);
 
-        record.Fail(request.Comment, new EmployeeId(Guid.Empty));
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        Employee reviewer = null;
+        if (Guid.TryParse(currentUser.UserId, out var identityUserId))
+            reviewer = await employeeRepository.GetFirstByConditionAsync(
+                x => x.IdentityUserId == identityUserId, null, cancellationToken);
+        if (reviewer == null)
+            return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
+        record.Fail(request.Comment, reviewer.Id);
+
+        var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (saveResult.IsT1)
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.SaveChangesFailed);
 
         return mapper.ToDto(record);
     }

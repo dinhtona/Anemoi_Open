@@ -108,9 +108,8 @@ public sealed class HrCompensationStabilizationTests
             ]),
             new CompensationMapper());
 
-        var result = await handler.Handle(
-            new GetCompensationSnapshotQuery(employeeId, new DateOnly(2026, 6, 1)),
-            CancellationToken.None);
+        var result = (await handler.Handle(new GetCompensationSnapshotQuery(employeeId, new DateOnly(2026, 6, 1)),
+            CancellationToken.None)).AsT0;
 
         Assert.Equal(1200, result.TotalsByCurrency.Single(x => x.Currency == "USD").TotalAmount);
         Assert.Equal(300000, result.TotalsByCurrency.Single(x => x.Currency == "VND").TotalAmount);
@@ -140,7 +139,7 @@ public sealed class HrCompensationStabilizationTests
             new HrSettings { BusinessTimeZone = "Asia/Ho_Chi_Minh" },
             new CompensationMapper());
 
-        var result = await handler.Handle(new GetCompensationDashboardQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetCompensationDashboardQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(1000, result.PayrollProjectionByCurrency.Single(x => x.Currency == "USD").Total);
         Assert.Equal(500000, result.PayrollProjectionByCurrency.Single(x => x.Currency == "VND").Total);

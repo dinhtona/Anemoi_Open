@@ -27,6 +27,12 @@ public class EfRepository<T> : ISqlRepository<T> where T : class
     public virtual IQueryable<T> GetQueryable(Expression<Func<T, bool>> conditionExpression = null) =>
         conditionExpression is null ? _collection : _collection.Where(conditionExpression);
 
+    /// <summary>
+    /// SECURITY (TD-P34-SEC-03): this method passes <paramref name="sql"/> straight into EF Core's
+    /// <c>FromSqlRaw</c>. Use ONLY for reviewed internal migrations/reports with fully static SQL —
+    /// NEVER build the query from user input (SQL injection risk). Prefer LINQ-based queries instead.
+    /// </summary>
+    [Obsolete("Security: chỉ dùng cho migration/report nội bộ đã review với SQL tĩnh hoàn toàn — không nhận input từ user. Ưu tiên query LINQ thay thế.")]
     public IQueryable<T> GetQueryableFromRawQuery(string sql, params object[] parameters) =>
         sql is null ? _collection : _collection.FromSqlRaw(sql, parameters);
 

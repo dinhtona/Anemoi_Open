@@ -371,6 +371,8 @@
   <data name="Timeline.ProbationStatusChanged.Title" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi</value></data>
   <data name="Timeline.ProbationStatusChanged.Description" xml:space="preserve"><value>Trạng thái thử việc đã thay đổi.</value></data>
   <data name="Timeline.TransferApproved.Title" xml:space="preserve"><value>Đã phê duyệt điều chuyển</value></data>
+  <data name="Timeline.BulkImported.Title" xml:space="preserve"><value>Nhập hàng loạt</value></data>
+  <data name="Timeline.BulkImported.Description" xml:space="preserve"><value>Đã nhập hàng loạt nhân viên {0} ({1}).</value></data>
   <data name="Timeline.TransferApproved.Description" xml:space="preserve"><value>Đã phê duyệt điều chuyển.</value></data>
   <data name="Timeline.SeparationApproved.Title" xml:space="preserve"><value>Đã phê duyệt nghỉ việc</value></data>
   <data name="Timeline.SeparationApproved.Description" xml:space="preserve"><value>Loại nghỉ việc: {4}.</value></data>
@@ -396,4 +398,5 @@
   <data name="PermissionDescriptionHrEmployeeImportHistory" xml:space="preserve"><value>Xem lịch sử nhập.</value></data>
   <data name="PermissionDescriptionHrEmployeeImportDownload" xml:space="preserve"><value>Tải file lỗi nhập.</value></data>
   <data name="PermissionDescriptionHrEmployeeImportTemplate" xml:space="preserve"><value>Tải file mẫu nhập.</value></data>
+  <data name="MissingRequiredConfiguration" xml:space="preserve"><value>Thiếu cấu hình bắt buộc '{0}'. Hãy đặt biến môi trường '{1}' trước khi khởi động service.</value></data>
 </root>

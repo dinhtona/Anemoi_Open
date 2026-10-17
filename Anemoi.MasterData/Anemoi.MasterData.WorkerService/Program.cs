@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using Anemoi.BuildingBlock.Infrastructure.GeneralInstaller;
 using Anemoi.BuildingBlock.Infrastructure.RunSqlMigration;
@@ -6,6 +7,7 @@ using Anemoi.MasterData.Infrastructure.DataContext;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 using Serilog.Events;
@@ -28,7 +30,25 @@ builder.Host.UseSerilog((host, configuration) => configuration.Enrich
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning));
 
 builder.Services.InstallServicesInAssembly<IMasterDataInfrastructureAssemblyMarker>(builder.Configuration);
-builder.Services.AddHealthChecks();
+
+// Health checks (same pattern as Centralize API).
+builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
+    .AddCheck("rabbitmq", () =>
+    {
+        var host = builder.Configuration.GetValue<string>("MassTransitSetting:Host") ?? "localhost";
+        try
+        {
+            using var tcp = new System.Net.Sockets.TcpClient(host, 5672);
+            return tcp.Connected
+                ? HealthCheckResult.Healthy()
+                : HealthCheckResult.Unhealthy("RabbitMQ port unreachable");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy("RabbitMQ unreachable", ex);
+        }
+    }, tags: ["ready"]);
 
 var app = builder.Build();
 

@@ -5,7 +5,6 @@ using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Events;
 using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.ModelIds.ModelIds;

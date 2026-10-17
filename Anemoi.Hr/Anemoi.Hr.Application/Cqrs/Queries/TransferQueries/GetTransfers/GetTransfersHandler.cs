@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Transfers;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.TransferQueries.GetTransfers;
 
 public sealed class GetTransfersHandler(
     ISqlRepository<EmployeeTransfer> repository,
     EmployeeTransferMapper mapper)
-    : IQueryHandler<GetTransfersQuery, PaginationResponse<EmployeeTransferDto>>
+    : IQueryHandler<GetTransfersQuery, OneOf<PaginationResponse<EmployeeTransferDto>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeTransferDto>> Handle(
+    public async Task<OneOf<PaginationResponse<EmployeeTransferDto>, ErrorDetailResponse>> Handle(
         GetTransfersQuery request, CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

@@ -5,4 +5,4 @@ using Anemoi.Hr.ModelIds.ModelIds;
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeNoteQueries.GetEmployeeNotes;
 
 public sealed record GetEmployeeNotesQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<EmployeeNoteResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<EmployeeNoteResponse>>;
