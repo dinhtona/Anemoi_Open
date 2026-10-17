@@ -39,9 +39,13 @@ public sealed class CreateHireDecisionHandler(
         if (app.CurrentStage != CandidateApplicationStageCode.Offer)
             return HrErrorResponses.Create(HrBusinessErrorCodes.HireRequiresOfferStage);
 
-        var existing = await decisionRepository.ExistByConditionAsync(
-            x => x.CandidateApplicationId == request.CandidateApplicationId, cancellationToken);
-        if (existing)
+        // An Offer decision must not block the Hire decision (offer accepted).
+        // Only a terminal decision (Hire/Reject, i.e. anything that is not Offer) blocks a new Hire.
+        var existingTerminalDecision = await decisionRepository.ExistByConditionAsync(
+            x => x.CandidateApplicationId == request.CandidateApplicationId &&
+                 x.Decision != HiringDecisionCode.Offer,
+            cancellationToken);
+        if (existingTerminalDecision)
             return HrErrorResponses.Create(HrBusinessErrorCodes.HiringDecisionAlreadyExists);
 
         var hasFeedback = await feedbackRepository.ExistByConditionAsync(
