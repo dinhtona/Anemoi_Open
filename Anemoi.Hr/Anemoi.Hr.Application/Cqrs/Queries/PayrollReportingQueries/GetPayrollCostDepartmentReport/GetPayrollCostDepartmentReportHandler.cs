@@ -1,5 +1,8 @@
 #nullable enable
 
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -11,10 +14,6 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
-using OneOf;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollCostDepartmentReport;
 
@@ -25,9 +24,9 @@ public sealed class GetPayrollCostDepartmentReportHandler(
     ISqlRepository<Department> departmentRepository,
     ISqlRepository<TaxCalculationSnapshot> taxRepository,
     ISqlRepository<InsuranceCalculationSnapshot> insuranceRepository)
-    : IQueryHandler<GetPayrollCostDepartmentReportQuery, OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>>
+    : IQueryHandler<GetPayrollCostDepartmentReportQuery, PaginationResponse<PayrollCostDepartmentReportItem>>
 {
-    public async Task<OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>> Handle(
+    public async Task<PaginationResponse<PayrollCostDepartmentReportItem>> Handle(
         GetPayrollCostDepartmentReportQuery request,
         CancellationToken cancellationToken)
     {
@@ -41,21 +40,22 @@ public sealed class GetPayrollCostDepartmentReportHandler(
             request.SortBy,
             request.SortDirection);
 
-        var query = PayrollReportingQueryExtensions.BuildPayrollCostDepartment(
+        var items = await PayrollReportingQueryExtensions.BuildPayrollCostDepartmentAsync(
             runRepository.GetQueryable().AsNoTracking(),
             periodRepository.GetQueryable().AsNoTracking(),
             employeeRepository.GetQueryable().AsNoTracking(),
             departmentRepository.GetQueryable().AsNoTracking(),
             taxRepository.GetQueryable().AsNoTracking(),
             insuranceRepository.GetQueryable().AsNoTracking(),
-            filter);
+            filter,
+            cancellationToken);
 
-        var totalRecords = await query.LongCountAsync(cancellationToken);
-        var items = await query
+        var totalRecords = items.Count;
+        var pagedItems = items
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
-        return new PaginationResponse<PayrollCostDepartmentReportItem>(items, totalRecords);
+        return new PaginationResponse<PayrollCostDepartmentReportItem>(pagedItems, totalRecords);
     }
 }

@@ -249,8 +249,10 @@ public static class PayrollReportingQueryExtensions
                          from ins in insGroup.DefaultIfEmpty()
                          select new
                          {
-                             DepartmentId = emp.PrimaryDepartmentId != null ? (Guid?)emp.PrimaryDepartmentId.Value : null,
-                            DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
+                             // Group by the strongly-typed ID directly — EF Core can translate
+                             // this, but cannot translate .Value unwrapping inside a GroupBy key.
+                             DepartmentId = emp.PrimaryDepartmentId,
+                             DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
                              run.GrossAmount,
                              TaxAmount = tax != null ? tax.TotalTaxAmount : 0m,
                              EmployeeInsurance = ins != null ? ins.TotalEmployeeContribution : 0m,
@@ -262,7 +264,9 @@ public static class PayrollReportingQueryExtensions
                       group item by new { item.DepartmentId, item.DepartmentName } into g
                       select new PayrollCostDepartmentReportItem
                       {
-                          DepartmentId = g.Key.DepartmentId,
+                          // Unwrap .Value only in the final projection (after grouping),
+                          // which EF Core can translate — same pattern as BuildPayrollCostSummary.
+                          DepartmentId = (Guid?)g.Key.DepartmentId.Value,
                           DepartmentName = g.Key.DepartmentName,
                           EmployeeCount = g.Count(),
                           TotalGrossIncome = g.Sum(x => x.GrossAmount),
