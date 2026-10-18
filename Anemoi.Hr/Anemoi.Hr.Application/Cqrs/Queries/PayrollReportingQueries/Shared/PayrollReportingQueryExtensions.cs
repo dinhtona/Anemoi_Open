@@ -227,14 +227,15 @@ public static class PayrollReportingQueryExtensions
         };
     }
 
-    public static IQueryable<PayrollCostDepartmentReportItem> BuildPayrollCostDepartment(
+    public static async Task<List<PayrollCostDepartmentReportItem>> BuildPayrollCostDepartmentAsync(
         IQueryable<PayrollRun> runs,
         IQueryable<PayrollPeriod> periods,
         IQueryable<Employee> employees,
         IQueryable<Department> departments,
         IQueryable<TaxCalculationSnapshot> taxSnapshots,
         IQueryable<InsuranceCalculationSnapshot> insuranceSnapshots,
-        PayrollReportingFilter filter)
+        PayrollReportingFilter filter,
+        CancellationToken cancellationToken)
     {
         var filteredRuns = ApplyBaseFilters(runs, employees, filter);
 
@@ -249,7 +250,7 @@ public static class PayrollReportingQueryExtensions
                          from ins in insGroup.DefaultIfEmpty()
                          select new
                          {
-                             DepartmentId = emp.PrimaryDepartmentId != null ? (Guid?)emp.PrimaryDepartmentId.Value : null,
+                             DepartmentId = (Guid?)emp.PrimaryDepartmentId.Value,
                             DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
                              run.GrossAmount,
                              TaxAmount = tax != null ? tax.TotalTaxAmount : 0m,
@@ -258,7 +259,12 @@ public static class PayrollReportingQueryExtensions
                              run.NetAmount
                          };
 
-        var grouped = from item in runDetails
+        // Materialize before grouping: EF Core cannot translate GroupBy over
+        // strongly-typed ID .Value projections (InvalidOperationException).
+        // This is a reporting query, not a hot path — in-memory grouping is acceptable.
+        var details = await runDetails.ToListAsync(cancellationToken);
+
+        var grouped = from item in details
                       group item by new { item.DepartmentId, item.DepartmentName } into g
                       select new PayrollCostDepartmentReportItem
                       {
@@ -273,7 +279,7 @@ public static class PayrollReportingQueryExtensions
                       };
 
         var descending = IsDescending(filter.SortDirection);
-        return filter.SortBy?.ToLowerInvariant() switch
+        var ordered = filter.SortBy?.ToLowerInvariant() switch
         {
             "departmentname" => descending
                 ? grouped.OrderByDescending(x => x.DepartmentName).ThenByDescending(x => x.TotalNetPay)
@@ -288,6 +294,8 @@ public static class PayrollReportingQueryExtensions
                 ? grouped.OrderByDescending(x => x.DepartmentName)
                 : grouped.OrderBy(x => x.DepartmentName)
         };
+
+        return ordered.ToList();
     }
 
     public static IQueryable<PayrollCostEmployeeReportItem> BuildPayrollCostEmployee(
