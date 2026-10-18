@@ -227,15 +227,14 @@ public static class PayrollReportingQueryExtensions
         };
     }
 
-    public static async Task<List<PayrollCostDepartmentReportItem>> BuildPayrollCostDepartmentAsync(
+    public static IQueryable<PayrollCostDepartmentReportItem> BuildPayrollCostDepartment(
         IQueryable<PayrollRun> runs,
         IQueryable<PayrollPeriod> periods,
         IQueryable<Employee> employees,
         IQueryable<Department> departments,
         IQueryable<TaxCalculationSnapshot> taxSnapshots,
         IQueryable<InsuranceCalculationSnapshot> insuranceSnapshots,
-        PayrollReportingFilter filter,
-        CancellationToken cancellationToken)
+        PayrollReportingFilter filter)
     {
         var filteredRuns = ApplyBaseFilters(runs, employees, filter);
 
@@ -250,8 +249,10 @@ public static class PayrollReportingQueryExtensions
                          from ins in insGroup.DefaultIfEmpty()
                          select new
                          {
-                             DepartmentId = (Guid?)emp.PrimaryDepartmentId.Value,
-                            DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
+                             // Group by the strongly-typed ID directly — EF Core can translate
+                             // this, but cannot translate .Value unwrapping inside a GroupBy key.
+                             DepartmentId = emp.PrimaryDepartmentId,
+                             DepartmentName = dept != null ? dept.Name : PayrollConstants.FallbackDepartmentName,
                              run.GrossAmount,
                              TaxAmount = tax != null ? tax.TotalTaxAmount : 0m,
                              EmployeeInsurance = ins != null ? ins.TotalEmployeeContribution : 0m,
@@ -259,16 +260,13 @@ public static class PayrollReportingQueryExtensions
                              run.NetAmount
                          };
 
-        // Materialize before grouping: EF Core cannot translate GroupBy over
-        // strongly-typed ID .Value projections (InvalidOperationException).
-        // This is a reporting query, not a hot path — in-memory grouping is acceptable.
-        var details = await runDetails.ToListAsync(cancellationToken);
-
-        var grouped = from item in details
+        var grouped = from item in runDetails
                       group item by new { item.DepartmentId, item.DepartmentName } into g
                       select new PayrollCostDepartmentReportItem
                       {
-                          DepartmentId = g.Key.DepartmentId,
+                          // Unwrap .Value only in the final projection (after grouping),
+                          // which EF Core can translate — same pattern as BuildPayrollCostSummary.
+                          DepartmentId = (Guid?)g.Key.DepartmentId.Value,
                           DepartmentName = g.Key.DepartmentName,
                           EmployeeCount = g.Count(),
                           TotalGrossIncome = g.Sum(x => x.GrossAmount),
@@ -279,7 +277,7 @@ public static class PayrollReportingQueryExtensions
                       };
 
         var descending = IsDescending(filter.SortDirection);
-        var ordered = filter.SortBy?.ToLowerInvariant() switch
+        return filter.SortBy?.ToLowerInvariant() switch
         {
             "departmentname" => descending
                 ? grouped.OrderByDescending(x => x.DepartmentName).ThenByDescending(x => x.TotalNetPay)
@@ -294,8 +292,6 @@ public static class PayrollReportingQueryExtensions
                 ? grouped.OrderByDescending(x => x.DepartmentName)
                 : grouped.OrderBy(x => x.DepartmentName)
         };
-
-        return ordered.ToList();
     }
 
     public static IQueryable<PayrollCostEmployeeReportItem> BuildPayrollCostEmployee(
