@@ -116,7 +116,7 @@ public static class HrDevSeedData
             return;
         }
 
-        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Anemoi_Identity", Pooling = false };
+        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Identity", Pooling = false };
         var identityConnString = builder.ConnectionString;
 
         var emails = employees.Select(e => e.WorkEmail!.Trim().ToLowerInvariant()).ToList();
