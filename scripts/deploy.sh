@@ -240,13 +240,17 @@ INFRA_IMAGES=(
     "caddy:2-alpine"
 )
 
-for img in "${INFRA_IMAGES[@]}"; do
-    log "Pulling $img …"
-    docker pull "$img" || {
-        err "Failed to pull $img — aborting."
-        exit 1
-    }
-done
+if $DO_PULL; then
+    for img in "${INFRA_IMAGES[@]}"; do
+        log "Pulling $img …"
+        docker pull "$img" || {
+            err "Failed to pull $img — aborting."
+            exit 1
+        }
+    done
+else
+    warn "Skipping infrastructure image pull (--no-pull)"
+fi
 
 # Application images from GHCR
 if $DO_PULL; then

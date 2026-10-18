@@ -266,7 +266,7 @@ public sealed class LeaveBalanceChangedConsumer(
             ContentLocalizationKey: "notification.leave.balance.changed.content",
             Category: NotificationConstants.Categories.Leave,
             ActionUrl: "/ess/leave",
-            DeduplicationKey: $"leave-balance:{message.EmployeeId}:{message.LeavePolicyId}:{message.Year}:{message.TransactionTypeCode}",
+            DeduplicationKey: $"leave-balance:{context.MessageId}",
             Type: NotificationConstants.Types.Business,
             Severity: NotificationConstants.Severities.Info
         );

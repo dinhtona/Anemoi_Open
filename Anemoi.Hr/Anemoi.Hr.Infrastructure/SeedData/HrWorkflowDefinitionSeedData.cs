@@ -43,47 +43,56 @@ public static class HrWorkflowDefinitionSeedData
         var unitOfWork = serviceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "LEAVE-REQUEST", "Leave Request Approval",
             WorkflowConstants.TargetEntityTypes.LeaveRequest,
             LeaveWorkflowDefId, 0x301, 0x302);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "OVERTIME-REQUEST", "Overtime Request Approval",
             WorkflowConstants.TargetEntityTypes.OvertimeRequest,
             OvertimeWorkflowDefId, 0x401, 0x402);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "PAYROLL-RUN", "Payroll Run Approval",
             WorkflowConstants.TargetEntityTypes.PayrollRun,
             PayrollWorkflowDefId, 0x501, 0x502);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "RECRUITMENT-REQUEST", "Recruitment Request Approval",
             WorkflowConstants.TargetEntityTypes.RecruitmentRequest,
             RecruitmentWorkflowDefId, 0x601, 0x602);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "EMPLOYEE-TRANSFER", "Employee Transfer Approval",
             WorkflowConstants.TargetEntityTypes.EmployeeTransfer,
             TransferWorkflowDefId, 0x101, 0x102);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "EMPLOYEE-SEPARATION", "Employee Separation Approval",
             WorkflowConstants.TargetEntityTypes.EmployeeSeparation,
             SeparationWorkflowDefId, 0x201, 0x202);
 
-        await SeedDefinitionIfNotExists(workflowDefinitionRepository, cancellationToken,
+        await SeedDefinitionIfNotExists(workflowDefinitionRepository, logger, cancellationToken,
             "PROBATION-RECORD", "Probation Record Approval",
             WorkflowConstants.TargetEntityTypes.ProbationRecord,
             ProbationWorkflowDefId, 0x701, 0x702);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        logger.Information("[SeedData] Required workflow definitions are present (idempotent seed)");
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            logger.Information("[SeedData] Required workflow definitions are present (idempotent seed)");
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "[SeedData] Failed to persist workflow definitions");
+            throw;
+        }
     }
 
     private static async Task SeedDefinitionIfNotExists(
         ISqlRepository<WorkflowDefinition> repository,
+        ILogger logger,
         CancellationToken cancellationToken,
         string code,
         string name,
@@ -92,8 +101,17 @@ public static class HrWorkflowDefinitionSeedData
         int step1Suffix,
         int step2Suffix)
     {
+        // ADR-029: exactly one ACTIVE definition per target entity type
+        // (unique filtered index on TargetEntityType WHERE IsActive). A custom
+        // active definition under a different code already satisfies the
+        // requirement — inserting ours would violate the unique index.
         if (await repository.ExistByConditionAsync(
-                x => x.Code == code, cancellationToken)) return;
+                x => x.TargetEntityType == targetEntityType && x.IsActive, cancellationToken))
+        {
+            logger.Information("[SeedData] Active workflow definition already exists for {TargetEntityType}; skipping seed '{Code}'",
+                targetEntityType, code);
+            return;
+        }
 
         var steps = new List<WorkflowDefinitionStep>
         {
