@@ -77,8 +77,14 @@ builder.Host.ConfigureServices((context, services) =>
 
     if (context.HostingEnvironment.IsDevelopment())
     {
+        // SECURITY (SEC-002): never log request/response bodies in any environment —
+        // they may contain plaintext passwords (login/register/change-password).
+        // Log only the safe metadata whitelist.
         services.AddHttpLogging(options
-            => options.LoggingFields = HttpLoggingFields.All);
+            => options.LoggingFields = HttpLoggingFields.RequestPath
+                                       | HttpLoggingFields.RequestMethod
+                                       | HttpLoggingFields.ResponseStatusCode
+                                       | HttpLoggingFields.Duration);
     }
     else
     {
@@ -125,6 +131,14 @@ builder.Host.ConfigureServices((context, services) =>
 });
 
 var app = builder.Build();
+
+// SEC-008: enforce HTTPS at the app layer when not in Development
+// (Caddy/Cloudflare terminate TLS in front, this is defense-in-depth).
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
 
 if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();

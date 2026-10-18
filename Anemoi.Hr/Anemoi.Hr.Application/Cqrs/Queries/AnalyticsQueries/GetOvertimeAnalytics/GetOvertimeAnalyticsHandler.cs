@@ -1,20 +1,22 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Overtime;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Cqrs.Queries;
-using Anemoi.Hr.Application.Responses;
-using Anemoi.Hr.Domain.Overtime;
-using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetOvertimeAnalytics;
 
 public sealed class GetOvertimeAnalyticsHandler(
     ISqlRepository<OvertimeRequest> overtimeRepository)
-    : IQueryHandler<GetOvertimeAnalyticsQuery, OvertimeAnalyticsResponse>
+    : IQueryHandler<GetOvertimeAnalyticsQuery, OneOf<OvertimeAnalyticsResponse, ErrorDetailResponse>>
 {
-    public async Task<OvertimeAnalyticsResponse> Handle(
+    public async Task<OneOf<OvertimeAnalyticsResponse, ErrorDetailResponse>> Handle(
         GetOvertimeAnalyticsQuery request,
         CancellationToken cancellationToken)
     {

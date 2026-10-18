@@ -1,7 +1,9 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
+using OneOf;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,9 +16,9 @@ public sealed class GetRecruitmentOverviewHandler(
     ISqlRepository<Candidate> candidateRepository,
     ISqlRepository<CandidateApplication> applicationRepository,
     ISqlRepository<InterviewSchedule> interviewRepository)
-    : IQueryHandler<GetRecruitmentOverviewQuery, RecruitmentOverviewResponse>
+    : IQueryHandler<GetRecruitmentOverviewQuery, OneOf<RecruitmentOverviewResponse, ErrorDetailResponse>>
 {
-    public async Task<RecruitmentOverviewResponse> Handle(
+    public async Task<OneOf<RecruitmentOverviewResponse, ErrorDetailResponse>> Handle(
         GetRecruitmentOverviewQuery request,
         CancellationToken cancellationToken)
     {

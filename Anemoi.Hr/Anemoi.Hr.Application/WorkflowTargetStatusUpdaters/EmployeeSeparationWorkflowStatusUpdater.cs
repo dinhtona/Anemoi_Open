@@ -1,4 +1,5 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
@@ -7,6 +8,7 @@ using Anemoi.Hr.Domain.Separations;
 using Anemoi.Hr.ModelIds.ModelIds;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.WorkflowTargetStatusUpdaters;
 
@@ -21,12 +23,12 @@ public sealed class EmployeeSeparationWorkflowStatusUpdater(
     public bool CanHandle(string entityType)
         => entityType == WorkflowConstants.TargetEntityTypes.EmployeeSeparation;
 
-    public async Task MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkApprovedAsync(string entityId, string performedBy, CancellationToken ct)
     {
         var id = new EmployeeSeparationId(Guid.Parse(entityId));
         var separation = await separationRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (separation is null) return;
+        if (separation is null) return true;
 
         separation.Approve(performedBy);
 
@@ -55,16 +57,18 @@ public sealed class EmployeeSeparationWorkflowStatusUpdater(
             separation.SeparationTypeCode,
             separation.LastWorkingDate ?? separation.SeparationDate
         ), ct);
+        return true;
     }
 
-    public async Task MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
+    public async Task<OneOf<bool, ErrorDetailResponse>> MarkRejectedAsync(string entityId, string performedBy, string? reason, CancellationToken ct)
     {
         var id = new EmployeeSeparationId(Guid.Parse(entityId));
         var separation = await separationRepository.GetQueryable()
             .FirstOrDefaultAsync(x => x.Id == id, ct);
-        if (separation is null) return;
+        if (separation is null) return true;
 
         separation.Reject(performedBy, reason ?? "Rejected by approver");
         await unitOfWork.SaveChangesAsync(ct);
+        return true;
     }
 }

@@ -27,7 +27,7 @@ public sealed class EmployeeNoteController(ISender mediator) : ControllerBase
     public async Task<IActionResult> GetNotes(Guid employeeId, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetEmployeeNotesQuery(new EmployeeId(employeeId)), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

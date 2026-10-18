@@ -1,8 +1,5 @@
 #nullable enable
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -14,6 +11,10 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollCostDepartmentReport;
 
@@ -24,9 +25,9 @@ public sealed class GetPayrollCostDepartmentReportHandler(
     ISqlRepository<Department> departmentRepository,
     ISqlRepository<TaxCalculationSnapshot> taxRepository,
     ISqlRepository<InsuranceCalculationSnapshot> insuranceRepository)
-    : IQueryHandler<GetPayrollCostDepartmentReportQuery, PaginationResponse<PayrollCostDepartmentReportItem>>
+    : IQueryHandler<GetPayrollCostDepartmentReportQuery, OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PayrollCostDepartmentReportItem>> Handle(
+    public async Task<OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>> Handle(
         GetPayrollCostDepartmentReportQuery request,
         CancellationToken cancellationToken)
     {

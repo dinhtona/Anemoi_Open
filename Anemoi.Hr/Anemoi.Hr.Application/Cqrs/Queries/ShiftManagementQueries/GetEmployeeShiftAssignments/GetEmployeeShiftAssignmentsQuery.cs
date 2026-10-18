@@ -14,4 +14,4 @@ public sealed record GetEmployeeShiftAssignmentsQuery(
     int Page = 1,
     int PageSize = 50,
     string SortBy = null,
-    string SortDirection = "asc") : IQuery<PaginationResponse<EmployeeShiftAssignmentResponse>>;
+    string SortDirection = "asc") : IQueryOne<PaginationResponse<EmployeeShiftAssignmentResponse>>;

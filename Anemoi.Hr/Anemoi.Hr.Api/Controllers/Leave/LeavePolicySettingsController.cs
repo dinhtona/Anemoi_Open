@@ -25,10 +25,11 @@ public sealed class LeavePolicySettingsController(ISender sender) : ControllerBa
     [HttpGet]
     [HasPermission(HrPermissions.LeavePolicySettingsView)]
     [ProducesResponseType(typeof(PaginationResponse<LeavePolicyResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<LeavePolicyResponse>> GetLeavePolicies(
+    public async Task<IActionResult> GetLeavePolicies(
         [FromQuery] GetLeavePoliciesQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

@@ -6,13 +6,14 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Leaves;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeaveBalanceQueries.GetLeaveBalances;
 
 public sealed class GetLeaveBalancesHandler(ISqlRepository<LeaveBalance> repository, LeaveMapper mapper)
-    : IQueryHandler<GetLeaveBalancesQuery, PaginationResponse<LeaveBalanceResponse>>
+    : IQueryHandler<GetLeaveBalancesQuery, OneOf<PaginationResponse<LeaveBalanceResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<LeaveBalanceResponse>> Handle(GetLeaveBalancesQuery request,
+    public async Task<OneOf<PaginationResponse<LeaveBalanceResponse>, ErrorDetailResponse>> Handle(GetLeaveBalancesQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

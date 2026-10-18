@@ -3,4 +3,4 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetOvertimeAnalytics;
 
-public sealed record GetOvertimeAnalyticsQuery : IQuery<OvertimeAnalyticsResponse>;
+public sealed record GetOvertimeAnalyticsQuery : IQueryOne<OvertimeAnalyticsResponse>;

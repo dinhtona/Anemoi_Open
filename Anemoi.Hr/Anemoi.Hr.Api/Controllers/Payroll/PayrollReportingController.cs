@@ -40,7 +40,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -51,7 +51,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -62,7 +62,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -74,7 +74,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -86,7 +86,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -98,7 +98,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     // Phase 23 endpoints
@@ -111,7 +111,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -122,7 +122,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -133,7 +133,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -144,7 +144,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -155,7 +155,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -167,7 +167,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -179,7 +179,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -191,7 +191,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -203,7 +203,7 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 
     [HttpGet]
@@ -215,6 +215,6 @@ public sealed class PayrollReportingController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return File(result.Content, result.ContentType, result.FileName);
+        return result.Match<IActionResult>(r => File(r.Content, r.ContentType, r.FileName), BadRequest);
     }
 }

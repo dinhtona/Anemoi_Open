@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.ModelIds.ModelIds;
 
@@ -10,4 +11,4 @@ public sealed record GetEmployeeTimelineQuery(
     string? EventType,
     string? EntityType,
     DateTime? DateFrom,
-    DateTime? DateTo) : GetManyQuery, IQueryPaged<EmployeeHistoryDto>;
+    DateTime? DateTo) : GetManyQuery, IQueryOne<PaginationResponse<EmployeeHistoryDto>>;

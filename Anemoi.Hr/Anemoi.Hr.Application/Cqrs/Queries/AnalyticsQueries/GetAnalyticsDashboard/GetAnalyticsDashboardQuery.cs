@@ -3,4 +3,4 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetAnalyticsDashboard;
 
-public sealed record GetAnalyticsDashboardQuery : IQuery<AnalyticsDashboardResponse>;
+public sealed record GetAnalyticsDashboardQuery : IQueryOne<AnalyticsDashboardResponse>;

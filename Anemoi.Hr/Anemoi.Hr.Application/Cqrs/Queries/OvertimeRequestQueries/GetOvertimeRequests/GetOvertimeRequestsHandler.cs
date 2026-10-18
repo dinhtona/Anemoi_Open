@@ -7,6 +7,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.OvertimeRequestQueries.GetOvertimeRequests;
 
@@ -14,9 +15,9 @@ public sealed class GetOvertimeRequestsHandler(
     ISqlRepository<OvertimeRequest> overtimeRequestRepository,
     OvertimeMapper mapper,
     IWorkflowQueryService workflowQueryService)
-    : IQueryHandler<GetOvertimeRequestsQuery, PaginationResponse<OvertimeRequestResponse>>
+    : IQueryHandler<GetOvertimeRequestsQuery, OneOf<PaginationResponse<OvertimeRequestResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<OvertimeRequestResponse>> Handle(GetOvertimeRequestsQuery request,
+    public async Task<OneOf<PaginationResponse<OvertimeRequestResponse>, ErrorDetailResponse>> Handle(GetOvertimeRequestsQuery request,
         CancellationToken cancellationToken)
     {
         var query = overtimeRequestRepository.GetQueryable().AsNoTracking()

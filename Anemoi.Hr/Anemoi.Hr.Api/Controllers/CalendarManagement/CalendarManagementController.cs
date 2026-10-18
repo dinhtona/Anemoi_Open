@@ -49,7 +49,8 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetPublicHolidays([FromQuery] GetPublicHolidaysQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -59,7 +60,7 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetPublicHolidayByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -101,7 +102,8 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetCompanyHolidays([FromQuery] GetCompanyHolidaysQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -111,7 +113,7 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetCompanyHolidayByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -153,7 +155,8 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetWorkingCalendarRules([FromQuery] GetWorkingCalendarRulesQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -163,7 +166,7 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkingCalendarRuleByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -225,7 +228,8 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetCalendarExceptions([FromQuery] GetCalendarExceptionsQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -235,7 +239,7 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetCalendarExceptionByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -277,7 +281,8 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetCalendarStatus([FromQuery] GetCalendarStatusQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet]
@@ -286,6 +291,7 @@ public sealed class CalendarManagementController(ISender sender) : ControllerBas
     public async Task<IActionResult> GetMonthlyCalendar([FromQuery] GetMonthlyCalendarQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

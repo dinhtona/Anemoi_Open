@@ -32,7 +32,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetDashboard(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetAnalyticsDashboardQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("workforce")]
@@ -41,7 +41,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetWorkforce(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetWorkforceOverviewQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("headcount-trend")]
@@ -52,7 +52,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("payroll")]
@@ -61,7 +61,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetPayroll(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetPayrollAnalyticsQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("overtime")]
@@ -70,7 +70,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetOvertime(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetOvertimeAnalyticsQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("attendance")]
@@ -79,7 +79,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetAttendance(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetAttendanceAnalyticsQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("department-cost")]
@@ -88,7 +88,7 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetDepartmentCost(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetDepartmentCostAnalyticsQuery(), cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("top-earners")]
@@ -99,6 +99,6 @@ public sealed class AnalyticsController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(query, cancellationToken);
-        return Ok(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 }

@@ -4,14 +4,15 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Workflow;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.WorkflowQueries.GetWorkflowRoleAssignments;
 
 public sealed class GetWorkflowRoleAssignmentsHandler(
     ISqlRepository<WorkflowRoleAssignment> repository)
-    : IQueryHandler<GetWorkflowRoleAssignmentsQuery, PaginationResponse<WorkflowRoleAssignmentResponse>>
+    : IQueryHandler<GetWorkflowRoleAssignmentsQuery, OneOf<PaginationResponse<WorkflowRoleAssignmentResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<WorkflowRoleAssignmentResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<WorkflowRoleAssignmentResponse>, ErrorDetailResponse>> Handle(
         GetWorkflowRoleAssignmentsQuery request, CancellationToken cancellationToken)
     {
         var baseQuery = repository.GetQueryable().AsQueryable();

@@ -1,20 +1,22 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Attendance;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Cqrs.Queries;
-using Anemoi.Hr.Application.Responses;
-using Anemoi.Hr.Domain.Attendance;
-using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetAttendanceAnalytics;
 
 public sealed class GetAttendanceAnalyticsHandler(
     ISqlRepository<AttendanceSummary> attendanceRepository)
-    : IQueryHandler<GetAttendanceAnalyticsQuery, AttendanceAnalyticsResponse>
+    : IQueryHandler<GetAttendanceAnalyticsQuery, OneOf<AttendanceAnalyticsResponse, ErrorDetailResponse>>
 {
-    public async Task<AttendanceAnalyticsResponse> Handle(
+    public async Task<OneOf<AttendanceAnalyticsResponse, ErrorDetailResponse>> Handle(
         GetAttendanceAnalyticsQuery request,
         CancellationToken cancellationToken)
     {

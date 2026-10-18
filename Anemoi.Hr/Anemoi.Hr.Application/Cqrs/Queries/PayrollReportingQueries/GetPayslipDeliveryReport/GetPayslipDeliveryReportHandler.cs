@@ -1,8 +1,5 @@
 #nullable enable
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
@@ -11,6 +8,10 @@ using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayslipDeliveryReport;
 
@@ -20,9 +21,9 @@ public sealed class GetPayslipDeliveryReportHandler(
     ISqlRepository<Payslip> payslipRepository,
     ISqlRepository<PayslipDocument> documentRepository,
     ISqlRepository<PayslipEmailDelivery> emailRepository)
-    : IQueryHandler<GetPayslipDeliveryReportQuery, PaginationResponse<PayslipDeliveryReportItem>>
+    : IQueryHandler<GetPayslipDeliveryReportQuery, OneOf<PaginationResponse<PayslipDeliveryReportItem>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PayslipDeliveryReportItem>> Handle(
+    public async Task<OneOf<PaginationResponse<PayslipDeliveryReportItem>, ErrorDetailResponse>> Handle(
         GetPayslipDeliveryReportQuery request,
         CancellationToken cancellationToken)
     {

@@ -153,8 +153,8 @@ public sealed class CalculatePayrollRunHandler(
 
         // Overtime calculation
         var overtimeRequests = await overtimeSnapshotProvider.GetApprovedOvertimeRequestsAsync(
-            period.StartDate.ToDateTime(TimeOnly.MinValue),
-            period.EndDate.ToDateTime(TimeOnly.MaxValue),
+            period.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+            period.EndDate.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc),
             cancellationToken);
 
         var employeeOvertimeRequests = overtimeRequests

@@ -10,4 +10,4 @@ public sealed record GetCompanyHolidaysQuery(
     int Page = 1,
     int PageSize = 50,
     string SortBy = null,
-    string SortDirection = "asc") : IQuery<PaginationResponse<CompanyHolidayResponse>>;
+    string SortDirection = "asc") : IQueryOne<PaginationResponse<CompanyHolidayResponse>>;

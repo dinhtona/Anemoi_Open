@@ -1,16 +1,18 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.ShiftManagementQueries.GetEmployeeScheduleCalendar;
 
 public sealed class GetEmployeeScheduleCalendarHandler(
     ISqlRepository<EmployeeShiftAssignment> assignmentRepository)
-    : IQueryHandler<GetEmployeeScheduleCalendarQuery, List<EmployeeScheduleCalendarResponse>>
+    : IQueryHandler<GetEmployeeScheduleCalendarQuery, OneOf<List<EmployeeScheduleCalendarResponse>, ErrorDetailResponse>>
 {
-    public async Task<List<EmployeeScheduleCalendarResponse>> Handle(
+    public async Task<OneOf<List<EmployeeScheduleCalendarResponse>, ErrorDetailResponse>> Handle(
         GetEmployeeScheduleCalendarQuery request,
         CancellationToken cancellationToken)
     {

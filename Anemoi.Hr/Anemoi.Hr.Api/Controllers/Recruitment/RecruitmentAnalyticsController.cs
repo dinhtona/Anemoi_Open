@@ -28,61 +28,67 @@ public sealed class RecruitmentAnalyticsController(ISender sender) : ControllerB
     [HttpGet("overview")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(RecruitmentOverviewResponse), StatusCodes.Status200OK)]
-    public async Task<RecruitmentOverviewResponse> GetRecruitmentOverview(
+    public async Task<IActionResult> GetRecruitmentOverview(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetRecruitmentOverviewQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetRecruitmentOverviewQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("applications-by-stage")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(IReadOnlyCollection<ApplicationsByStageItem>), StatusCodes.Status200OK)]
-    public async Task<IReadOnlyCollection<ApplicationsByStageItem>> GetApplicationsByStage(
+    public async Task<IActionResult> GetApplicationsByStage(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetApplicationsByStageQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetApplicationsByStageQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("hiring-by-department")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(IReadOnlyCollection<HiringByDepartmentItem>), StatusCodes.Status200OK)]
-    public async Task<IReadOnlyCollection<HiringByDepartmentItem>> GetHiringByDepartment(
+    public async Task<IActionResult> GetHiringByDepartment(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetHiringByDepartmentQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetHiringByDepartmentQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("source-effectiveness")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(IReadOnlyCollection<CandidateSourceEffectivenessItem>), StatusCodes.Status200OK)]
-    public async Task<IReadOnlyCollection<CandidateSourceEffectivenessItem>> GetCandidateSourceEffectiveness(
+    public async Task<IActionResult> GetCandidateSourceEffectiveness(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetCandidateSourceEffectivenessQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetCandidateSourceEffectivenessQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("time-to-hire")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(TimeToHireResponse), StatusCodes.Status200OK)]
-    public async Task<TimeToHireResponse> GetTimeToHire(
+    public async Task<IActionResult> GetTimeToHire(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetTimeToHireQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetTimeToHireQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("dashboard")]
     [HasPermission(HrPermissions.RecruitmentAnalytics)]
     [ProducesResponseType(typeof(RecruitmentAnalyticsDashboardResponse), StatusCodes.Status200OK)]
-    public async Task<RecruitmentAnalyticsDashboardResponse> GetRecruitmentAnalyticsDashboard(
+    public async Task<IActionResult> GetRecruitmentAnalyticsDashboard(
         [FromQuery] DateOnly? fromDate, [FromQuery] DateOnly? toDate,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetRecruitmentAnalyticsDashboardQuery(fromDate, toDate), cancellationToken);
+        var res = await sender.Send(new GetRecruitmentAnalyticsDashboardQuery(fromDate, toDate), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("widgets")]

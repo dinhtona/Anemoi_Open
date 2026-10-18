@@ -6,13 +6,14 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Departments;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.DepartmentQueries.GetDepartments;
 
 public sealed class GetDepartmentsHandler(ISqlRepository<Department> repository, EmployeeMapper mapper)
-    : IQueryHandler<GetDepartmentsQuery, PaginationResponse<DepartmentResponse>>
+    : IQueryHandler<GetDepartmentsQuery, OneOf<PaginationResponse<DepartmentResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<DepartmentResponse>> Handle(GetDepartmentsQuery request,
+    public async Task<OneOf<PaginationResponse<DepartmentResponse>, ErrorDetailResponse>> Handle(GetDepartmentsQuery request,
         CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

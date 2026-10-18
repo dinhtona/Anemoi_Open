@@ -7,15 +7,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.MasterData;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeavePolicyQueries.GetLeavePolicies;
 
 public sealed class GetLeavePoliciesHandler(
     ISqlRepository<LeavePolicy> repository,
     MasterDataMapper mapper)
-    : IQueryHandler<GetLeavePoliciesQuery, PaginationResponse<LeavePolicyResponse>>
+    : IQueryHandler<GetLeavePoliciesQuery, OneOf<PaginationResponse<LeavePolicyResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<LeavePolicyResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<LeavePolicyResponse>, ErrorDetailResponse>> Handle(
         GetLeavePoliciesQuery request, CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

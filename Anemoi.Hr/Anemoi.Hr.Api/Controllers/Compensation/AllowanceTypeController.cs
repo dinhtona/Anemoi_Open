@@ -25,10 +25,11 @@ public sealed class AllowanceTypeController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.AllowanceTypeView)]
     [ProducesResponseType(typeof(PaginationResponse<AllowanceTypeResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<AllowanceTypeResponse>> GetAllowanceTypes(
+    public async Task<IActionResult> GetAllowanceTypes(
         [FromQuery] GetAllowanceTypesQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

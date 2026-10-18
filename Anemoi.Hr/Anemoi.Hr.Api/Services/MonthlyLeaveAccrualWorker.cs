@@ -1,7 +1,7 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Application.Configurations;
-using Anemoi.Hr.Application.Events;
+using Anemoi.Contract.Hr.Events;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.MasterData;

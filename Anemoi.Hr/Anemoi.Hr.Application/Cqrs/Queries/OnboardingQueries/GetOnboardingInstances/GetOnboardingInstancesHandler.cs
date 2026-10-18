@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Onboarding;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,9 +17,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.OnboardingQueries.GetOnboardingInst
 public sealed class GetOnboardingInstancesHandler(
     ISqlRepository<OnboardingInstance> instanceRepository,
     OnboardingMapper mapper)
-    : IQueryHandler<GetOnboardingInstancesQuery, PaginationResponse<OnboardingInstanceResponse>>
+    : IQueryHandler<GetOnboardingInstancesQuery, OneOf<PaginationResponse<OnboardingInstanceResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<OnboardingInstanceResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<OnboardingInstanceResponse>, ErrorDetailResponse>> Handle(
         GetOnboardingInstancesQuery request, CancellationToken cancellationToken)
     {
         var page = await instanceRepository.GetManyByConditionWithPaginationAsync(

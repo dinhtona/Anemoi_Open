@@ -93,8 +93,10 @@ public sealed class RecruitmentInterviewsController(ISender sender) : Controller
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(command with
-            { InterviewerEmployeeId = new EmployeeId(System.Guid.Parse(HttpContext.GetUserId())) },
-            cancellationToken);
+        {
+            CallerUserId = HttpContext.GetUserId(),
+            CallerEmail = HttpContext.GetClaimValue("email")
+        }, cancellationToken);
         return res.Match<IActionResult>(Ok, BadRequest);
     }
 
@@ -112,11 +114,12 @@ public sealed class RecruitmentInterviewsController(ISender sender) : Controller
     [HttpGet]
     [HasPermission(HrPermissions.RecruitmentView)]
     [ProducesResponseType(typeof(PaginationResponse<InterviewScheduleResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<InterviewScheduleResponse>> SearchInterviews(
+    public async Task<IActionResult> SearchInterviews(
         [FromQuery] SearchInterviewsQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

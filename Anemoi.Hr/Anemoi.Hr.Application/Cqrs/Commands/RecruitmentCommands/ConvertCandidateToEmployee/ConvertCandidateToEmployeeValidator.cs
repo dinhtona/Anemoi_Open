@@ -24,5 +24,7 @@ public sealed class ConvertCandidateToEmployeeValidator : AbstractValidator<Conv
             .NotEmpty().WithMessage(HrBusinessErrorCodes.ValStartDateRequired);
         RuleFor(x => x.EmploymentTypeCode)
             .NotEmpty().WithMessage(HrBusinessErrorCodes.ValRequisitionEmploymentTypeRequired);
+        RuleFor(x => x.GradeCode)
+            .NotEmpty().WithErrorCode(HrBusinessErrorCodes.ValGradeCodeRequired!);
     }
 }

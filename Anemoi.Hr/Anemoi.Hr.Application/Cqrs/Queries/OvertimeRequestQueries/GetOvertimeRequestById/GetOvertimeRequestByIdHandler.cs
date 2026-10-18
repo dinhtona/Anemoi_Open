@@ -4,15 +4,16 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.OvertimeRequestQueries.GetOvertimeRequestById;
 
 public sealed class GetOvertimeRequestByIdHandler(
     ISqlRepository<OvertimeRequest> overtimeRequestRepository,
     OvertimeMapper mapper)
-    : IQueryHandler<GetOvertimeRequestByIdQuery, OvertimeRequestResponse>
+    : IQueryHandler<GetOvertimeRequestByIdQuery, OneOf<OvertimeRequestResponse, ErrorDetailResponse>>
 {
-    public async Task<OvertimeRequestResponse> Handle(GetOvertimeRequestByIdQuery request,
+    public async Task<OneOf<OvertimeRequestResponse, ErrorDetailResponse>> Handle(GetOvertimeRequestByIdQuery request,
         CancellationToken cancellationToken)
     {
         var overtimeRequest = await overtimeRequestRepository.GetFirstByConditionAsync(

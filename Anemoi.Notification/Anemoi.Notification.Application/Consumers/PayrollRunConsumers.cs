@@ -8,6 +8,7 @@ using Anemoi.Contract.Identity.Queries.UserQueries.ResolveUsersByPermission;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using MassTransit;
 using MediatR;
 using Serilog;
@@ -28,7 +29,7 @@ public sealed class PayrollRunSubmittedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payroll",
+            Resource = NotificationResourceKeys.HrPayroll,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
@@ -100,7 +101,7 @@ public sealed class PayrollRunApprovedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payroll",
+            Resource = NotificationResourceKeys.HrPayroll,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
@@ -172,7 +173,7 @@ public sealed class PayrollRunRejectedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payroll",
+            Resource = NotificationResourceKeys.HrPayroll,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,
@@ -244,7 +245,7 @@ public sealed class PayrollRunFinalizedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.payroll",
+            Resource = NotificationResourceKeys.HrPayroll,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.PayrollRunId,
             WorkspaceId = null,

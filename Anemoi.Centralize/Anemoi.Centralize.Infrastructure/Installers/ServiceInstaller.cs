@@ -1,6 +1,7 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Configurations;
 using Anemoi.BuildingBlock.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ public sealed class ServiceInstaller : IInstaller
         services.AddHttpClient();
         services.AddScoped<CentralizeMapper>();
         services.AddTransient<IRequestClientService, RequestClientService>();
+        services.AddSingleton<PermissionMetadataLocalizer>();
         services.AddScoped<AutoMapDataFilter>();
         services.AddScoped<IFileService, S3FileService>();
         services.AddScoped<IImageProcessor, ImageProcessor>();

@@ -99,10 +99,36 @@ builder.Host.ConfigureServices((context, services) =>
             {
                 return HealthCheckResult.Unhealthy("RabbitMQ unreachable", ex);
             }
+        }, tags: ["ready"])
+        .AddCheck("postgres", () =>
+        {
+            // FUNC-007: /health/ready must not report ready when Postgres is unreachable.
+            // (Manual Npgsql ping — same style as the other checks here; no new library.)
+            var connectionString = context.Configuration.GetValue<string>("PostgresDbSetting:ConnectionString");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return HealthCheckResult.Unhealthy("PostgresDbSetting:ConnectionString is not configured");
+            try
+            {
+                using var connection = new Npgsql.NpgsqlConnection(connectionString);
+                connection.Open();
+                return HealthCheckResult.Healthy();
+            }
+            catch (Exception ex)
+            {
+                return HealthCheckResult.Unhealthy("Postgres unreachable", ex);
+            }
         }, tags: ["ready"]);
 });
 
 var app = builder.Build();
+
+// SEC-008: enforce HTTPS at the app layer when not in Development
+// (Caddy/Cloudflare terminate TLS in front, this is defense-in-depth).
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
 
 var supportedCultures = new[] { "en-US", "vi-VN" };
 var localizationOptions = new RequestLocalizationOptions()
@@ -131,10 +157,16 @@ app.MapControllers();
 
 await Anemoi.BuildingBlock.Infrastructure.RunSqlMigration.MigrationDatabase.MigrationDatabaseAsync<Anemoi.Hr.Infrastructure.Persistence.HrDbContext>(app);
 
+// FUNC-004 / ADR-029: required workflow definitions are definition-bound
+// (hierarchy fallback is forbidden in production), so the idempotent definition
+// seed runs in EVERY environment. Demo data stays Development-only.
+using (var serviceScope = app.Services.CreateScope())
+    await HrWorkflowDefinitionSeedData.SeedAsync(serviceScope);
+
 if (app.Environment.IsDevelopment())
 {
-    using var serviceScope = app.Services.CreateScope();
-    await HrDevSeedData.SeedAsync(serviceScope);
+    using var devScope = app.Services.CreateScope();
+    await HrDevSeedData.SeedAsync(devScope);
 }
 
 await app.RunAsync();

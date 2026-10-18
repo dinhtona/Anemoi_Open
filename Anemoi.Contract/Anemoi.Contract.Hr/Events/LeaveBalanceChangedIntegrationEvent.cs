@@ -1,4 +1,4 @@
-namespace Anemoi.Hr.Application.Events;
+namespace Anemoi.Contract.Hr.Events;
 
 public sealed record LeaveBalanceChangedIntegrationEvent(
     string EmployeeId,

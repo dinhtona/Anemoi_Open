@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,9 +16,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetEmployeeSala
 public sealed class GetEmployeeSalaryHistoryHandler(
     ISqlRepository<EmployeeSalary> repository,
     CompensationMapper mapper)
-    : IQueryHandler<GetEmployeeSalaryHistoryQuery, IReadOnlyCollection<EmployeeSalaryResponse>>
+    : IQueryHandler<GetEmployeeSalaryHistoryQuery, OneOf<IReadOnlyCollection<EmployeeSalaryResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<EmployeeSalaryResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<EmployeeSalaryResponse>, ErrorDetailResponse>> Handle(
         GetEmployeeSalaryHistoryQuery request,
         CancellationToken cancellationToken)
     {

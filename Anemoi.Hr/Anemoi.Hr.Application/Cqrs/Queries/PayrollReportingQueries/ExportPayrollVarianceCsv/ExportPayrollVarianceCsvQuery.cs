@@ -6,7 +6,7 @@ using Anemoi.Hr.ModelIds.ModelIds;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.ExportPayrollVarianceCsv;
 
-public sealed record ExportPayrollVarianceCsvQuery : IQuery<ExportResult>
+public sealed record ExportPayrollVarianceCsvQuery : IQueryOne<ExportResult>
 {
     public PayrollPeriodId? CurrentPayrollPeriodId { get; init; }
     public PayrollPeriodId? PreviousPayrollPeriodId { get; init; }

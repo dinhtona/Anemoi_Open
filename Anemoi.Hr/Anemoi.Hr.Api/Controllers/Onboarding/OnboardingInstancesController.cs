@@ -41,11 +41,12 @@ public sealed class OnboardingInstancesController(ISender sender) : ControllerBa
     [HttpGet]
     [HasPermission(HrPermissions.OnboardingView)]
     [ProducesResponseType(typeof(PaginationResponse<OnboardingInstanceResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<OnboardingInstanceResponse>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] GetOnboardingInstancesQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

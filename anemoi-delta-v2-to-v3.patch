@@ -1,0 +1,206 @@
+diff --git a/Anemoi.Hr/Anemoi.Hr.Api/Controllers/Recruitment/RecruitmentInterviewsController.cs b/Anemoi.Hr/Anemoi.Hr.Api/Controllers/Recruitment/RecruitmentInterviewsController.cs
+index 6799bb4..5bf4bf0 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Api/Controllers/Recruitment/RecruitmentInterviewsController.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Api/Controllers/Recruitment/RecruitmentInterviewsController.cs
+@@ -93,8 +93,10 @@ public sealed class RecruitmentInterviewsController(ISender sender) : Controller
+         CancellationToken cancellationToken)
+     {
+         var res = await sender.Send(command with
+-            { InterviewerEmployeeId = new EmployeeId(System.Guid.Parse(HttpContext.GetUserId())) },
+-            cancellationToken);
++        {
++            CallerUserId = HttpContext.GetUserId(),
++            CallerEmail = HttpContext.GetClaimValue("email")
++        }, cancellationToken);
+         return res.Match<IActionResult>(Ok, BadRequest);
+     }
+ 
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/PayrollCommands/CalculatePayrollRun/CalculatePayrollRunHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/PayrollCommands/CalculatePayrollRun/CalculatePayrollRunHandler.cs
+index eef134d..756854a 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/PayrollCommands/CalculatePayrollRun/CalculatePayrollRunHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/PayrollCommands/CalculatePayrollRun/CalculatePayrollRunHandler.cs
+@@ -153,8 +153,8 @@ public sealed class CalculatePayrollRunHandler(
+ 
+         // Overtime calculation
+         var overtimeRequests = await overtimeSnapshotProvider.GetApprovedOvertimeRequestsAsync(
+-            period.StartDate.ToDateTime(TimeOnly.MinValue),
+-            period.EndDate.ToDateTime(TimeOnly.MaxValue),
++            period.StartDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
++            period.EndDate.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc),
+             cancellationToken);
+ 
+         var employeeOvertimeRequests = overtimeRequests
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/ConvertCandidateToEmployee/ConvertCandidateToEmployeeHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/ConvertCandidateToEmployee/ConvertCandidateToEmployeeHandler.cs
+index 0965f88..856a438 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/ConvertCandidateToEmployee/ConvertCandidateToEmployeeHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/ConvertCandidateToEmployee/ConvertCandidateToEmployeeHandler.cs
+@@ -97,6 +97,8 @@ public sealed class ConvertCandidateToEmployeeHandler(
+             LastName = request.LastName,
+             DisplayName = request.DisplayName,
+             WorkEmail = request.WorkEmail,
++            PersonalEmail = candidate.Email,
++            PhoneNumber = candidate.PhoneNumber,
+             JoinDate = request.JoinDate,
+             EmploymentStatusCode = EmploymentStatusCode.PendingOnboarding,
+             EmploymentTypeCode = request.EmploymentTypeCode,
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateOfferDecision/CreateOfferDecisionHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateOfferDecision/CreateOfferDecisionHandler.cs
+index 61235ab..6bac45b 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateOfferDecision/CreateOfferDecisionHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateOfferDecision/CreateOfferDecisionHandler.cs
+@@ -46,7 +46,7 @@ public sealed class CreateOfferDecisionHandler(
+ 
+         var hasCompletedInterview = await interviewRepository.ExistByConditionAsync(
+             x => x.CandidateApplicationId == request.CandidateApplicationId &&
+-                 InterviewResultCode.IsCompleted(x.Result), cancellationToken);
++                 InterviewResultCode.CompletedResults.Contains(x.Result), cancellationToken);
+         if (!hasCompletedInterview)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.OfferRequiresCompletedInterview);
+ 
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackCommand.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackCommand.cs
+index b0aed13..0b22453 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackCommand.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackCommand.cs
+@@ -12,6 +12,8 @@ public sealed record SubmitInterviewFeedbackCommand(
+     string Concerns,
+     string Recommendation,
+ 
+-    [property: JsonIgnore] EmployeeId InterviewerEmployeeId = null) : ICommandResult<InterviewFeedbackResponse>
++    [property: JsonIgnore] EmployeeId InterviewerEmployeeId = null,
++    [property: JsonIgnore] string CallerUserId = null,
++    [property: JsonIgnore] string CallerEmail = null) : ICommandResult<InterviewFeedbackResponse>
+ {
+ }
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackHandler.cs
+index 5dce8c5..5da9bdf 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/SubmitInterviewFeedback/SubmitInterviewFeedbackHandler.cs
+@@ -5,6 +5,7 @@ using Anemoi.BuildingBlock.Application.Responses;
+ using Anemoi.Hr.Application.Configurations;
+ using Anemoi.Hr.Application.Mappings;
+ using Anemoi.Hr.Application.Responses;
++using Anemoi.Hr.Domain.Employees;
+ using Anemoi.Hr.Domain.Recruitment;
+ using Anemoi.Hr.ModelIds.ModelIds;
+ using Microsoft.EntityFrameworkCore;
+@@ -19,6 +20,7 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.SubmitIntervie
+ public sealed class SubmitInterviewFeedbackHandler(
+     ISqlRepository<InterviewSchedule> interviewRepository,
+     ISqlRepository<InterviewFeedback> feedbackRepository,
++    ISqlRepository<Employee> employeeRepository,
+     IUnitOfWork unitOfWork,
+     RecruitmentMapper mapper)
+     : ICommandHandler<SubmitInterviewFeedbackCommand, OneOf<InterviewFeedbackResponse, ErrorDetailResponse>>
+@@ -32,9 +34,36 @@ public sealed class SubmitInterviewFeedbackHandler(
+         if (!interview)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.InterviewNotFound);
+ 
++        // Resolve the interviewer: an explicit InterviewerEmployeeId wins; otherwise map the
++        // caller's Identity user to their HR employee record (same pattern as GetMyEmployeeProfile).
++        // The Identity UserId GUID must never be cast directly to EmployeeId — they are different
++        // aggregates and the cast causes an FK violation on insert.
++        var interviewerEmployeeId = request.InterviewerEmployeeId;
++        if (interviewerEmployeeId is null)
++        {
++            Employee interviewer = null;
++            if (Guid.TryParse(request.CallerUserId, out var identityUserId))
++            {
++                interviewer = await employeeRepository.GetFirstByConditionAsync(
++                    x => x.IdentityUserId == identityUserId, null, cancellationToken);
++            }
++
++            if (interviewer is null && !string.IsNullOrEmpty(request.CallerEmail))
++            {
++                var searchEmail = request.CallerEmail.ToLower();
++                interviewer = await employeeRepository.GetFirstByConditionAsync(
++                    x => x.WorkEmail != null && x.WorkEmail.ToLower() == searchEmail, null, cancellationToken);
++            }
++
++            if (interviewer is null)
++                return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
++
++            interviewerEmployeeId = interviewer.Id;
++        }
++
+         var existing = await feedbackRepository.ExistByConditionAsync(
+             x => x.InterviewScheduleId == request.InterviewScheduleId &&
+-                 x.InterviewerEmployeeId == request.InterviewerEmployeeId, cancellationToken);
++                 x.InterviewerEmployeeId == interviewerEmployeeId, cancellationToken);
+         if (existing)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.InterviewFeedbackAlreadyExists);
+ 
+@@ -42,7 +71,7 @@ public sealed class SubmitInterviewFeedbackHandler(
+         var feedback = InterviewFeedback.Create(
+             new InterviewFeedbackId(IdGenerator.NextGuid()),
+             request.InterviewScheduleId,
+-            request.InterviewerEmployeeId,
++            interviewerEmployeeId,
+             request.Rating,
+             request.Strengths,
+             request.Concerns,
+diff --git a/Anemoi.Hr/Anemoi.Hr.Infrastructure/SeedData/HrDevSeedData.cs b/Anemoi.Hr/Anemoi.Hr.Infrastructure/SeedData/HrDevSeedData.cs
+index b0a52b4..f694601 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Infrastructure/SeedData/HrDevSeedData.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Infrastructure/SeedData/HrDevSeedData.cs
+@@ -116,7 +116,7 @@ public static class HrDevSeedData
+             return;
+         }
+ 
+-        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Identity", Pooling = false };
++        var builder = new NpgsqlConnectionStringBuilder(hrConnString) { Database = "Anemoi_Identity", Pooling = false };
+         var identityConnString = builder.ConnectionString;
+ 
+         var emails = employees.Select(e => e.WorkEmail!.Trim().ToLowerInvariant()).ToList();
+diff --git a/Anemoi.Identity/Anemoi.Identity.Application/SeedData/SeedData.cs b/Anemoi.Identity/Anemoi.Identity.Application/SeedData/SeedData.cs
+index 6cd48be..aa0e784 100644
+--- a/Anemoi.Identity/Anemoi.Identity.Application/SeedData/SeedData.cs
++++ b/Anemoi.Identity/Anemoi.Identity.Application/SeedData/SeedData.cs
+@@ -130,10 +130,15 @@ public static class SystemRoleProfiles
+             Permissions.HrInsuranceCalculate,
+             Permissions.HrInsuranceReport,
+             Permissions.HrRecruitmentView,
++            Permissions.HrRecruitmentManage,
+             Permissions.HrRecruitmentInterview,
++            Permissions.HrRecruitmentHire,
+             Permissions.HrRecruitmentAnalytics,
+             Permissions.HrRecruitmentRequestView,
+             Permissions.HrRecruitmentRequestCreate,
++            Permissions.HrRecruitmentRequestSubmit,
++            Permissions.HrRecruitmentRequestApprove,
++            Permissions.HrRecruitmentRequestManage,
+             Permissions.HrWorkflowView,
+             Permissions.HrWorkflowManage,
+             Permissions.HrWorkflowExecute,
+diff --git a/Anemoi.Identity/Anemoi.Identity.Infrastructure/Migrations/IdentityDbContextModelSnapshot.cs b/Anemoi.Identity/Anemoi.Identity.Infrastructure/Migrations/IdentityDbContextModelSnapshot.cs
+index 040ea1f..9a39267 100644
+--- a/Anemoi.Identity/Anemoi.Identity.Infrastructure/Migrations/IdentityDbContextModelSnapshot.cs
++++ b/Anemoi.Identity/Anemoi.Identity.Infrastructure/Migrations/IdentityDbContextModelSnapshot.cs
+@@ -131,7 +131,6 @@ namespace Anemoi.Identity.Infrastructure.Migrations
+                         .HasColumnType("uuid");
+ 
+                     b.Property<string>("Code")
+-                        .IsRequired()
+                         .HasColumnType("text");
+ 
+                     b.Property<DateTime>("CreatedTime")
+diff --git a/Anemoi.Identity/Anemoi.Identity.WorkerService/Program.cs b/Anemoi.Identity/Anemoi.Identity.WorkerService/Program.cs
+index 1710490..8584795 100644
+--- a/Anemoi.Identity/Anemoi.Identity.WorkerService/Program.cs
++++ b/Anemoi.Identity/Anemoi.Identity.WorkerService/Program.cs
+@@ -100,17 +100,6 @@ app.UseAuthentication();
+ 
+ app.UseAuthorization();
+ 
+-app.MapHealthChecks("/health/live", new HealthCheckOptions
+-{
+-    Predicate = _ => false,
+-    ResultStatusCodes =
+-    {
+-        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+-        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+-        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+-    }
+-});
+-
+ app.MapGraphQL();
+ 
+ app.MapHealthChecks("/health/live", new HealthCheckOptions

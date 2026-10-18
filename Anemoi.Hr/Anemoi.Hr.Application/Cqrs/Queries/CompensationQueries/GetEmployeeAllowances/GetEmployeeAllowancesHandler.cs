@@ -1,10 +1,12 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,9 +19,9 @@ public sealed class GetEmployeeAllowancesHandler(
     ISqlRepository<EmployeeAllowance> employeeAllowanceRepository,
     ISqlRepository<PositionAllowance> positionAllowanceRepository,
     CompensationMapper mapper)
-    : IQueryHandler<GetEmployeeAllowancesQuery, EmployeeAllowancesResponse>
+    : IQueryHandler<GetEmployeeAllowancesQuery, OneOf<EmployeeAllowancesResponse, ErrorDetailResponse>>
 {
-    public async Task<EmployeeAllowancesResponse> Handle(
+    public async Task<OneOf<EmployeeAllowancesResponse, ErrorDetailResponse>> Handle(
         GetEmployeeAllowancesQuery request,
         CancellationToken cancellationToken)
     {

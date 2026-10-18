@@ -1,0 +1,420 @@
+# ==============================================================================
+# Anemoi_Open — Production Docker Compose
+# ==============================================================================
+# Usage:
+#   1. cp .env.production.example .env.production && edit .env.production
+#   2. docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+#   3. Or use: bash scripts/deploy.sh
+# ==============================================================================
+#
+# Principles:
+#   - No "build:" blocks — only pre-built images from ghcr.io
+#   - Infrastructure (postgres, redis, rabbitmq) never publishes ports
+#   - Caddy is the single HTTPS entry point with automatic Let's Encrypt
+#   - All services have real health checks, restart policies, and log rotation
+#   - Named volumes for data; bind mounts for keys and uploads
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-health-defaults: &default-health
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 20s
+
+x-health-api: &api-health
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 30s
+
+x-health-worker: &worker-health
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 40s
+
+x-deploy: &service-deploy
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 512M
+    reservations:
+      cpus: "0.25"
+      memory: 128M
+
+x-deploy-db: &db-deploy
+  resources:
+    limits:
+      cpus: "1.0"
+      memory: 512M
+    reservations:
+      cpus: "0.5"
+      memory: 256M
+
+services:
+  # ── Infrastructure (internal network only) ────────────────────────────────
+
+  rabbitmq:
+    image: masstransit/rabbitmq:3.13
+    container_name: rabbitmq
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - anemoi_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      <<: *default-health
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    deploy: *db-deploy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - anemoi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      <<: *default-health
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy: *db-deploy
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep PONG"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
+      - --save
+      - "900"
+      - "1"
+      - --save
+      - "300"
+      - "10"
+      - --save
+      - "60"
+      - "10000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+  # ── Application Services ──────────────────────────────────────────────────
+
+  anemoi_identity:
+    image: ${GHCR_PREFIX}/anemoi-identity:${IMAGE_TAG:-latest}
+    container_name: anemoi_identity
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      PostgresDbSetting__ConnectionString: Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Identity
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+      JwtSetting__Issuer: ${JWT_ISSUER}
+      JwtSetting__Audience: ${JWT_AUDIENCE}
+      JwtSetting__PrivateKeyPath: ${JWT_PRIVATE_KEY_PATH}
+      JwtSetting__PublicKeyPath: ${JWT_PUBLIC_KEY_PATH}
+      ExternalAuthSetting__GoogleClientId: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+      Kestrel__Endpoints__Http1__Url: http://0.0.0.0:5031
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:5031/health/live || exit 1"
+        ]
+      <<: *worker-health
+    volumes:
+      - identity_keys:/home/app/.aspnet/DataProtection-Keys
+      - ${JWT_KEYS_HOST_PATH:-/opt/anemoi/jwt}:/home/app/.anemoi/jwt:ro
+    deploy: *service-deploy
+
+  anemoi_masterdata:
+    image: ${GHCR_PREFIX}/anemoi-masterdata:${IMAGE_TAG:-latest}
+    container_name: anemoi_masterdata
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      PostgresDbSetting__ConnectionString: Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=MasterData
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:8080/health/live || exit 1"
+        ]
+      <<: *worker-health
+    volumes:
+      - masterdata_keys:/home/app/.aspnet/DataProtection-Keys
+    deploy: *service-deploy
+
+  anemoi_notification:
+    image: ${GHCR_PREFIX}/anemoi-notification:${IMAGE_TAG:-latest}
+    container_name: anemoi_notification
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      PostgresDbSetting__ConnectionString: Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Notification
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:8080/health/live || exit 1"
+        ]
+      <<: *worker-health
+    volumes:
+      - notification_keys:/home/app/.aspnet/DataProtection-Keys
+    deploy: *service-deploy
+
+  anemoi_workspace:
+    image: ${GHCR_PREFIX}/anemoi-workspace:${IMAGE_TAG:-latest}
+    container_name: anemoi_workspace
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      PostgresDbSetting__ConnectionString: Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Workspace
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:8080/health/live || exit 1"
+        ]
+      <<: *worker-health
+    volumes:
+      - workspace_keys:/home/app/.aspnet/DataProtection-Keys
+    deploy: *service-deploy
+
+  anemoi_centralize:
+    image: ${GHCR_PREFIX}/anemoi-centralize:${IMAGE_TAG:-latest}
+    container_name: anemoi_centralize
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+      RedisSetting__ConnectionString: redis:6379,password=${REDIS_PASSWORD},abortConnect=false
+      JwtSetting__Issuer: ${JWT_ISSUER}
+      JwtSetting__Audience: ${JWT_AUDIENCE}
+      JwtSetting__PublicKeyPath: ${JWT_PUBLIC_KEY_PATH}
+      PUBLIC_APP_ORIGIN: ${PUBLIC_APP_ORIGIN}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      anemoi_identity:
+        condition: service_started
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:8080/health/live || exit 1"
+        ]
+      <<: *api-health
+    volumes:
+      - centralize_keys:/home/app/.aspnet/DataProtection-Keys
+      - ${JWT_KEYS_HOST_PATH:-/opt/anemoi/jwt}:/home/app/.anemoi/jwt:ro
+      - ${UPLOADS_HOST_PATH:-/opt/anemoi/uploads}:/opt/anemoi/uploads
+    deploy: *service-deploy
+
+  anemoi_hr:
+    image: ${GHCR_PREFIX}/anemoi-hr:${IMAGE_TAG:-latest}
+    container_name: anemoi_hr
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      PostgresDbSetting__ConnectionString: Host=postgres;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=Hr
+      MassTransitSetting__Host: rabbitmq
+      MassTransitSetting__UserName: ${RABBITMQ_DEFAULT_USER}
+      MassTransitSetting__Password: ${RABBITMQ_DEFAULT_PASS}
+      JwtSetting__Issuer: ${JWT_ISSUER}
+      JwtSetting__Audience: ${JWT_AUDIENCE}
+      JwtSetting__PublicKeyPath: ${JWT_PUBLIC_KEY_PATH}
+      HrSettings__BusinessTimeZone: Asia/Ho_Chi_Minh
+      HrSettings__MonthlyAccrualCheckIntervalHours: 12
+      HrSettings__MonthlyAccrualRunHour: 0
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      anemoi_identity:
+        condition: service_started
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf http://localhost:8080/health/live || exit 1"
+        ]
+      <<: *api-health
+    volumes:
+      - ${JWT_KEYS_HOST_PATH:-/opt/anemoi/jwt}:/home/app/.anemoi/jwt:ro
+    deploy: *service-deploy
+
+  anemoi_web:
+    image: ${GHCR_PREFIX}/anemoi-web:${IMAGE_TAG:-latest}
+    container_name: anemoi_web
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      NEXT_PUBLIC_API_BASE_URL: http://anemoi_centralize:8080
+      NEXT_PUBLIC_NOTIFICATION_HUB_URL: ""
+    depends_on:
+      anemoi_centralize:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    deploy: *service-deploy
+
+  # ── Single HTTPS Entry Point ──────────────────────────────────────────────
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: anemoi_caddy
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+    volumes:
+      - ${CADDYFILE_HOST_PATH:-./deploy/Caddyfile}:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      anemoi_centralize:
+        condition: service_healthy
+      anemoi_hr:
+        condition: service_healthy
+      anemoi_web:
+        condition: service_healthy
+    networks:
+      - anemoi_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://localhost:80/health || wget -qO- http://localhost:2019/config/ || exit 1"
+        ]
+      <<: *default-health
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+networks:
+  anemoi_network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  postgres_data:
+  redis_data:
+  centralize_keys:
+  identity_keys:
+  masterdata_keys:
+  workspace_keys:
+  notification_keys:
+  caddy_data:
+  caddy_config:

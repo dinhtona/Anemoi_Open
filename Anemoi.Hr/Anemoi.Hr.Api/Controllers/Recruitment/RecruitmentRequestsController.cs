@@ -108,11 +108,12 @@ public sealed class RecruitmentRequestsController(ISender sender) : ControllerBa
     [HttpGet]
     [HasPermission(HrPermissions.RecruitmentRequestView)]
     [ProducesResponseType(typeof(PaginationResponse<RecruitmentRequestResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<RecruitmentRequestResponse>> GetRecruitmentRequests(
+    public async Task<IActionResult> GetRecruitmentRequests(
         [FromQuery] GetRecruitmentRequestsQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}/timeline")]

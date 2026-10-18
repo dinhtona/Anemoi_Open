@@ -46,7 +46,8 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(PaginationResponse<EmployeeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetEmployees([FromQuery] GetEmployeesQuery query, CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -63,7 +64,8 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(PaginationResponse<EmployeeResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchEmployees([FromQuery] SearchEmployeesQuery query, CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("me")]
@@ -118,7 +120,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeeDepartmentHistoryQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{employeeId}/position-history")]
@@ -129,7 +131,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeePositionHistoryQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{employeeId}/grade-history")]
@@ -140,7 +142,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeeGradeHistoryQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{employeeId}/promotion-timeline")]
@@ -151,7 +153,7 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var res = await sender.Send(new GetEmployeePromotionTimelineQuery(employeeId), cancellationToken);
-        return Ok(res);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}/timeline")]
@@ -166,7 +168,8 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var query = new GetEmployeeTimelineQuery(id, eventType, entityType, dateFrom, dateTo);
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("me/timeline")]
@@ -188,7 +191,8 @@ public sealed class EmployeeController(ISender sender) : ControllerBase
 
         var employeeId = new EmployeeId(Guid.Parse(profile.Id));
         var query = new GetEmployeeTimelineQuery(employeeId, eventType, entityType, dateFrom, dateTo);
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HasPermission(HrPermissions.EmployeeCreate)]

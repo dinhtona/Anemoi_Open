@@ -46,7 +46,7 @@ public sealed class CreateOfferDecisionHandler(
 
         var hasCompletedInterview = await interviewRepository.ExistByConditionAsync(
             x => x.CandidateApplicationId == request.CandidateApplicationId &&
-                 InterviewResultCode.IsCompleted(x.Result), cancellationToken);
+                 InterviewResultCode.CompletedResults.Contains(x.Result), cancellationToken);
         if (!hasCompletedInterview)
             return HrErrorResponses.Create(HrBusinessErrorCodes.OfferRequiresCompletedInterview);
 

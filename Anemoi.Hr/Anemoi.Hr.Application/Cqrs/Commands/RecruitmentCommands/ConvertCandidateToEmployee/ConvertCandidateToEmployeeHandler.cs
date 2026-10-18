@@ -3,6 +3,7 @@ using Anemoi.BuildingBlock.Application.Cqrs.Commands;
 using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Contract.Hr.Events;
+using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
@@ -28,6 +29,7 @@ public sealed class ConvertCandidateToEmployeeHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<RecruitmentOpening> openingRepository,
     ISqlRepository<OnboardingInstance> onboardingInstanceRepository,
+    IEmployeeGradeLookup employeeGradeLookup,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<ConvertCandidateToEmployeeCommand, OneOf<CandidateConversionResponse, ErrorDetailResponse>>
@@ -79,6 +81,11 @@ public sealed class ConvertCandidateToEmployeeHandler(
         if (application is null)
             return HrErrorResponses.Create(HrBusinessErrorCodes.ConversionRequiresHiredStage);
 
+        // Grade code must reference an existing active salary grade
+        var gradeCode = request.GradeCode.Trim();
+        if (!await employeeGradeLookup.IsValidGradeAsync(gradeCode, cancellationToken))
+            return HrErrorResponses.Create(HrBusinessErrorCodes.GradeNotFound);
+
         var now = DateTime.UtcNow;
         var employeeId = new EmployeeId(IdGenerator.NextGuid());
 
@@ -90,10 +97,12 @@ public sealed class ConvertCandidateToEmployeeHandler(
             LastName = request.LastName,
             DisplayName = request.DisplayName,
             WorkEmail = request.WorkEmail,
+            PersonalEmail = candidate.Email,
+            PhoneNumber = candidate.PhoneNumber,
             JoinDate = request.JoinDate,
             EmploymentStatusCode = EmploymentStatusCode.PendingOnboarding,
             EmploymentTypeCode = request.EmploymentTypeCode,
-            GradeCode = "G1",
+            GradeCode = gradeCode,
             PrimaryDepartmentId = request.DepartmentId,
             PrimaryPositionId = request.PositionId,
             CreatedAt = now,

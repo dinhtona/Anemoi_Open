@@ -7,4 +7,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetCandidateSour
 
 public sealed record GetCandidateSourceEffectivenessQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<IReadOnlyCollection<CandidateSourceEffectivenessItem>>;
+    DateOnly? ToDate) : IQueryOne<IReadOnlyCollection<CandidateSourceEffectivenessItem>>;

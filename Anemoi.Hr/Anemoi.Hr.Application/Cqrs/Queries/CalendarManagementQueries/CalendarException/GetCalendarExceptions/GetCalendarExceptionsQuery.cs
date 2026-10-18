@@ -11,4 +11,4 @@ public sealed record GetCalendarExceptionsQuery(
     int Page = 1,
     int PageSize = 50,
     string SortBy = null,
-    string SortDirection = "asc") : IQuery<PaginationResponse<CalendarExceptionResponse>>;
+    string SortDirection = "asc") : IQueryOne<PaginationResponse<CalendarExceptionResponse>>;

@@ -4,14 +4,15 @@ using Anemoi.BuildingBlock.Application.Extensions;
 using Anemoi.BuildingBlock.Application.Queries;
 using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Domain.BulkImport;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeImport;
 
 public sealed class GetImportHistoryHandler(
     ISqlRepository<BulkImportJob> jobRepository)
-    : IQueryHandler<GetImportHistoryQuery, PaginationResponse<EmployeeImportHistoryResponse>>
+    : IQueryHandler<GetImportHistoryQuery, OneOf<PaginationResponse<EmployeeImportHistoryResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeImportHistoryResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<EmployeeImportHistoryResponse>, ErrorDetailResponse>> Handle(
         GetImportHistoryQuery request, CancellationToken ct)
     {
         var page = await jobRepository.GetManyByConditionWithPaginationAsync(

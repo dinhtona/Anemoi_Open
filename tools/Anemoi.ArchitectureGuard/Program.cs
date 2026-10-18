@@ -134,12 +134,36 @@ static void CheckRoleBasedAuthorize(string path, CompilationUnitSyntax root, Lis
     foreach (var attribute in authorizeAttributes)
     {
         var text = attribute.ToString();
-        if (text.Contains("Roles", StringComparison.Ordinal))
-        {
-            violations.Add(new("ANEMOI004", path, "Role-name-based authorization detected. Use permission constants and [HasPermission]."));
-            return;
-        }
+        if (!text.Contains("Roles", StringComparison.Ordinal))
+            continue;
+
+        // ADR-036: the reserved SystemRoles.Administrator check on trust-anchor
+        // endpoints is a sanctioned exception. Exempt exactly that constant —
+        // any other Roles usage is still flagged.
+        if (IsAdministratorOnlyRolesArgument(attribute))
+            continue;
+
+        violations.Add(new("ANEMOI004", path, "Role-name-based authorization detected. Use permission constants and [HasPermission]. See ADR-036 for the SystemRoles.Administrator exception."));
+        return;
     }
+}
+
+static bool IsAdministratorOnlyRolesArgument(AttributeSyntax attribute)
+{
+    if (attribute.ArgumentList is null)
+        return false;
+
+    foreach (var argument in attribute.ArgumentList.Arguments)
+    {
+        if (argument.NameEquals?.Name.Identifier.ValueText != "Roles")
+            continue;
+
+        // Exempt only the exact sanctioned constant; e.g. Roles = "Manager"
+        // or Roles = SystemRoles.SomethingElse must still be flagged.
+        return argument.Expression.ToString() == "SystemRoles.Administrator";
+    }
+
+    return false;
 }
 
 static void CheckControllerBusinessLogic(string path, CompilationUnitSyntax root, List<Violation> violations)

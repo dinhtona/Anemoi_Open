@@ -8,4 +8,4 @@ public sealed record GetInsuranceCalculationSnapshotsQuery(
     string? EmployeeId = null,
     string? InsuranceType = null,
     string? SourceModule = null,
-    string? SourceReferenceId = null) : IQuery<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;
+    string? SourceReferenceId = null) : IQueryOne<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;

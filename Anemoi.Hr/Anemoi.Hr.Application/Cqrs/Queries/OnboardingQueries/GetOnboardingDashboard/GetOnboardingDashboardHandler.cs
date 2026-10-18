@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Onboarding;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -14,9 +16,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.OnboardingQueries.GetOnboardingDash
 public sealed class GetOnboardingDashboardHandler(
     ISqlRepository<OnboardingInstance> instanceRepository,
     OnboardingMapper mapper)
-    : IQueryHandler<GetOnboardingDashboardQuery, OnboardingDashboardResponse>
+    : IQueryHandler<GetOnboardingDashboardQuery, OneOf<OnboardingDashboardResponse, ErrorDetailResponse>>
 {
-    public async Task<OnboardingDashboardResponse> Handle(
+    public async Task<OneOf<OnboardingDashboardResponse, ErrorDetailResponse>> Handle(
         GetOnboardingDashboardQuery request, CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;

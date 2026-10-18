@@ -34,11 +34,12 @@ public sealed class TransferController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.EmployeeTransferView)]
     [ProducesResponseType(typeof(PaginationResponse<EmployeeTransferDto>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<EmployeeTransferDto>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] GetTransfersQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

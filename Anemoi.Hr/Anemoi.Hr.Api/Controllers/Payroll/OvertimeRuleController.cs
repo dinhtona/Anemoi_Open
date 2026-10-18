@@ -25,10 +25,11 @@ public sealed class OvertimeRuleController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.OvertimeRuleView)]
     [ProducesResponseType(typeof(PaginationResponse<OvertimeRuleResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<OvertimeRuleResponse>> GetOvertimeRules(
+    public async Task<IActionResult> GetOvertimeRules(
         [FromQuery] GetOvertimeRulesQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.ShiftManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.ShiftManagementQueries.GetShiftTemplates;
 
 public sealed class GetShiftTemplatesHandler(
     ISqlRepository<ShiftTemplate> shiftTemplateRepository,
     ShiftManagementMapper mapper)
-    : IQueryHandler<GetShiftTemplatesQuery, PaginationResponse<ShiftTemplateResponse>>
+    : IQueryHandler<GetShiftTemplatesQuery, OneOf<PaginationResponse<ShiftTemplateResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<ShiftTemplateResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<ShiftTemplateResponse>, ErrorDetailResponse>> Handle(
         GetShiftTemplatesQuery request,
         CancellationToken cancellationToken)
     {

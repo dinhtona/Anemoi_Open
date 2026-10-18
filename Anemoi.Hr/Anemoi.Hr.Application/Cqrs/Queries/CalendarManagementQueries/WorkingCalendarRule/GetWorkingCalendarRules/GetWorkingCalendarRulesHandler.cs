@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CalendarManagementQueries.WorkingCalendarRule.GetWorkingCalendarRules;
 
 public sealed class GetWorkingCalendarRulesHandler(
     ISqlRepository<Domain.CalendarManagement.WorkingCalendarRule> workingCalendarRuleRepository,
     CalendarManagementMapper mapper)
-    : IQueryHandler<GetWorkingCalendarRulesQuery, PaginationResponse<WorkingCalendarRuleResponse>>
+    : IQueryHandler<GetWorkingCalendarRulesQuery, OneOf<PaginationResponse<WorkingCalendarRuleResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<WorkingCalendarRuleResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<WorkingCalendarRuleResponse>, ErrorDetailResponse>> Handle(
         GetWorkingCalendarRulesQuery request,
         CancellationToken cancellationToken)
     {

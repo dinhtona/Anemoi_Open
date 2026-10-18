@@ -5,6 +5,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Recruitment;
 using Anemoi.Hr.ModelIds.ModelIds;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,7 @@ namespace Anemoi.Hr.Application.Cqrs.Commands.RecruitmentCommands.SubmitIntervie
 public sealed class SubmitInterviewFeedbackHandler(
     ISqlRepository<InterviewSchedule> interviewRepository,
     ISqlRepository<InterviewFeedback> feedbackRepository,
+    ISqlRepository<Employee> employeeRepository,
     IUnitOfWork unitOfWork,
     RecruitmentMapper mapper)
     : ICommandHandler<SubmitInterviewFeedbackCommand, OneOf<InterviewFeedbackResponse, ErrorDetailResponse>>
@@ -32,9 +34,36 @@ public sealed class SubmitInterviewFeedbackHandler(
         if (!interview)
             return HrErrorResponses.Create(HrBusinessErrorCodes.InterviewNotFound);
 
+        // Resolve the interviewer: an explicit InterviewerEmployeeId wins; otherwise map the
+        // caller's Identity user to their HR employee record (same pattern as GetMyEmployeeProfile).
+        // The Identity UserId GUID must never be cast directly to EmployeeId — they are different
+        // aggregates and the cast causes an FK violation on insert.
+        var interviewerEmployeeId = request.InterviewerEmployeeId;
+        if (interviewerEmployeeId is null)
+        {
+            Employee interviewer = null;
+            if (Guid.TryParse(request.CallerUserId, out var identityUserId))
+            {
+                interviewer = await employeeRepository.GetFirstByConditionAsync(
+                    x => x.IdentityUserId == identityUserId, null, cancellationToken);
+            }
+
+            if (interviewer is null && !string.IsNullOrEmpty(request.CallerEmail))
+            {
+                var searchEmail = request.CallerEmail.ToLower();
+                interviewer = await employeeRepository.GetFirstByConditionAsync(
+                    x => x.WorkEmail != null && x.WorkEmail.ToLower() == searchEmail, null, cancellationToken);
+            }
+
+            if (interviewer is null)
+                return HrErrorResponses.Create(HrBusinessErrorCodes.EmployeeNotFound);
+
+            interviewerEmployeeId = interviewer.Id;
+        }
+
         var existing = await feedbackRepository.ExistByConditionAsync(
             x => x.InterviewScheduleId == request.InterviewScheduleId &&
-                 x.InterviewerEmployeeId == request.InterviewerEmployeeId, cancellationToken);
+                 x.InterviewerEmployeeId == interviewerEmployeeId, cancellationToken);
         if (existing)
             return HrErrorResponses.Create(HrBusinessErrorCodes.InterviewFeedbackAlreadyExists);
 
@@ -42,7 +71,7 @@ public sealed class SubmitInterviewFeedbackHandler(
         var feedback = InterviewFeedback.Create(
             new InterviewFeedbackId(IdGenerator.NextGuid()),
             request.InterviewScheduleId,
-            request.InterviewerEmployeeId,
+            interviewerEmployeeId,
             request.Rating,
             request.Strengths,
             request.Concerns,

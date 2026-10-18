@@ -6,15 +6,16 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Overtime;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.OvertimeRuleQueries.GetOvertimeRules;
 
 public sealed class GetOvertimeRulesHandler(
     ISqlRepository<OvertimeRule> repository,
     MasterDataMapper mapper)
-    : IQueryHandler<GetOvertimeRulesQuery, PaginationResponse<OvertimeRuleResponse>>
+    : IQueryHandler<GetOvertimeRulesQuery, OneOf<PaginationResponse<OvertimeRuleResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<OvertimeRuleResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<OvertimeRuleResponse>, ErrorDetailResponse>> Handle(
         GetOvertimeRulesQuery request, CancellationToken cancellationToken)
     {
         var page = await repository.GetManyByConditionWithPaginationAsync(

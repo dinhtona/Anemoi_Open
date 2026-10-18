@@ -1,0 +1,42 @@
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateHireDecision/CreateHireDecisionHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateHireDecision/CreateHireDecisionHandler.cs
+index 1e9f045..82739e2 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateHireDecision/CreateHireDecisionHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateHireDecision/CreateHireDecisionHandler.cs
+@@ -39,9 +39,13 @@ public sealed class CreateHireDecisionHandler(
+         if (app.CurrentStage != CandidateApplicationStageCode.Offer)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.HireRequiresOfferStage);
+ 
+-        var existing = await decisionRepository.ExistByConditionAsync(
+-            x => x.CandidateApplicationId == request.CandidateApplicationId, cancellationToken);
+-        if (existing)
++        // An Offer decision must not block the Hire decision (offer accepted).
++        // Only a terminal decision (Hire/Reject, i.e. anything that is not Offer) blocks a new Hire.
++        var existingTerminalDecision = await decisionRepository.ExistByConditionAsync(
++            x => x.CandidateApplicationId == request.CandidateApplicationId &&
++                 x.Decision != HiringDecisionCode.Offer,
++            cancellationToken);
++        if (existingTerminalDecision)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.HiringDecisionAlreadyExists);
+ 
+         var hasFeedback = await feedbackRepository.ExistByConditionAsync(
+diff --git a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateRejectDecision/CreateRejectDecisionHandler.cs b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateRejectDecision/CreateRejectDecisionHandler.cs
+index 66d15b3..25f3431 100644
+--- a/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateRejectDecision/CreateRejectDecisionHandler.cs
++++ b/Anemoi.Hr/Anemoi.Hr.Application/Cqrs/Commands/RecruitmentCommands/CreateRejectDecision/CreateRejectDecisionHandler.cs
+@@ -36,9 +36,13 @@ public sealed class CreateRejectDecisionHandler(
+         if (CandidateApplicationStageCode.IsTerminal(app.CurrentStage))
+             return HrErrorResponses.Create(HrBusinessErrorCodes.ApplicationInvalidStageTransition);
+ 
+-        var existing = await decisionRepository.ExistByConditionAsync(
+-            x => x.CandidateApplicationId == request.CandidateApplicationId, cancellationToken);
+-        if (existing)
++        // A candidate may decline an existing Offer, so an Offer decision must not
++        // block the Reject decision. Only a terminal decision blocks a new Reject.
++        var existingTerminalDecision = await decisionRepository.ExistByConditionAsync(
++            x => x.CandidateApplicationId == request.CandidateApplicationId &&
++                 x.Decision != HiringDecisionCode.Offer,
++            cancellationToken);
++        if (existingTerminalDecision)
+             return HrErrorResponses.Create(HrBusinessErrorCodes.HiringDecisionAlreadyExists);
+ 
+         if (!CandidateApplicationStageCode.IsValidTransition(app.CurrentStage, CandidateApplicationStageCode.Rejected))

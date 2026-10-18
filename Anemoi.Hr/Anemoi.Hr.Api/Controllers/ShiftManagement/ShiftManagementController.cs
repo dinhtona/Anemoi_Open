@@ -36,7 +36,8 @@ public sealed class ShiftManagementController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetShiftTemplates([FromQuery] GetShiftTemplatesQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -46,7 +47,7 @@ public sealed class ShiftManagementController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetShiftTemplateByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -98,7 +99,8 @@ public sealed class ShiftManagementController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetEmployeeShiftAssignments([FromQuery] GetEmployeeShiftAssignmentsQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]
@@ -108,7 +110,7 @@ public sealed class ShiftManagementController(ISender sender) : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetEmployeeShiftAssignmentByIdQuery(id), cancellationToken);
-        return result is null ? NotFound() : Ok(result);
+        return result.Match<IActionResult>(r => r is null ? NotFound() : Ok(r), BadRequest);
     }
 
     [HttpPost]
@@ -150,6 +152,7 @@ public sealed class ShiftManagementController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetEmployeeScheduleCalendar([FromQuery] GetEmployeeScheduleCalendarQuery query,
         CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

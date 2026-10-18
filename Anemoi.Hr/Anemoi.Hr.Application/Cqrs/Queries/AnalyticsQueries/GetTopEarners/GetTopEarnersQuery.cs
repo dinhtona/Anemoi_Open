@@ -8,4 +8,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetTopEarners;
 public sealed record GetTopEarnersQuery(
     PayrollRunId? PayrollRunId,
     int Top = 10
-) : IQuery<ICollection<TopEarnerItem>>;
+) : IQueryOne<ICollection<TopEarnerItem>>;

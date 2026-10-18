@@ -3,4 +3,4 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetWorkforceOverview;
 
-public sealed record GetWorkforceOverviewQuery : IQuery<WorkforceOverviewResponse>;
+public sealed record GetWorkforceOverviewQuery : IQueryOne<WorkforceOverviewResponse>;

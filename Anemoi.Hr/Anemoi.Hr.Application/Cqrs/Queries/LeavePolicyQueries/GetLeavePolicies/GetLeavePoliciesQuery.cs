@@ -1,8 +1,9 @@
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
 using Anemoi.BuildingBlock.Application.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.LeavePolicyQueries.GetLeavePolicies;
 
 public sealed record GetLeavePoliciesQuery(string? SearchKey, bool? IsActive)
-    : GetManyQuery, IQueryPaged<LeavePolicyResponse>;
+    : GetManyQuery, IQueryOne<PaginationResponse<LeavePolicyResponse>>;

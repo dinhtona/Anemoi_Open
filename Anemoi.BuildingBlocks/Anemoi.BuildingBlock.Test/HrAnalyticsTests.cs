@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.BuildingBlock.Application.Results;
 using Anemoi.BuildingBlock.Domain;
 using Anemoi.BuildingBlock.Domain.Models;
@@ -60,7 +61,7 @@ public sealed class HrAnalyticsTests
             new FakeRepository<Department>(departments),
             new FakeRepository<Position>(positions));
 
-        var result = await handler.Handle(new GetWorkforceOverviewQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetWorkforceOverviewQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(3, result.TotalEmployees);
         Assert.Equal(2, result.ActiveEmployees);
@@ -91,7 +92,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetPayrollAnalyticsHandler(new FakeRepository<PayrollItem>(payrollItems));
 
-        var result = await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(6000, result.TotalPayrollCost);
         Assert.Equal(2000, result.AverageSalary);
@@ -146,7 +147,7 @@ public sealed class HrAnalyticsTests
         var handler = new GetPayrollAnalyticsHandler(
             new FakeRepository<PayrollItem>(payrollItems));
 
-        var result = await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetPayrollAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(1000, result.TotalPayrollCost);
         Assert.Equal(1, result.EmployeeCount);
@@ -163,7 +164,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetAttendanceAnalyticsHandler(new FakeRepository<AttendanceSummary>(summaries));
 
-        var result = await handler.Handle(new GetAttendanceAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetAttendanceAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         // TotalWorkedDays = 38, TotalDays = 46, Rate = 38/46*100 = 82.61
         Assert.Equal(82.61m, result.AverageAttendanceRate);
@@ -188,7 +189,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetOvertimeAnalyticsHandler(new FakeRepository<OvertimeRequest>(requests));
 
-        var result = await handler.Handle(new GetOvertimeAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetOvertimeAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(2, result.ApprovedRequestCount);
         Assert.Equal(1, result.RejectedRequestCount);
@@ -238,7 +239,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollItem>(payrollItems));
 
-        var result = await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         Assert.Equal(2, result.Count);
         Assert.Equal("Engineering", result.First().DepartmentName);
@@ -273,7 +274,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetDepartmentCostAnalyticsHandler(new FakeRepository<PayrollItem>([item]));
 
-        var result = await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetDepartmentCostAnalyticsQuery(), CancellationToken.None)).AsT0;
 
         Assert.Single(result);
         Assert.Equal("Marketing", result.Single().DepartmentName);
@@ -307,7 +308,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetTopEarnersHandler(new FakeRepository<PayrollRun>([run1, run2, run3]));
 
-        var result = await handler.Handle(new GetTopEarnersQuery(runId1, 10), CancellationToken.None);
+        var result = (await handler.Handle(new GetTopEarnersQuery(runId1, 10), CancellationToken.None)).AsT0;
 
         Assert.Equal(2, result.Count);
         Assert.Contains(result, x => x.EmployeeName == "Alice");
@@ -342,7 +343,7 @@ public sealed class HrAnalyticsTests
 
         var handler = new GetTopEarnersHandler(new FakeRepository<PayrollRun>([earlierRun, laterRun]));
 
-        var result = await handler.Handle(new GetTopEarnersQuery(null, 10), CancellationToken.None);
+        var result = (await handler.Handle(new GetTopEarnersQuery(null, 10), CancellationToken.None)).AsT0;
 
         Assert.Single(result);
         Assert.Equal("Bob", result.Single().EmployeeName);
@@ -359,7 +360,7 @@ public sealed class HrAnalyticsTests
         var sender = new FakeSender(workforceResponse, payrollResponse, attendanceResponse, overtimeResponse);
         var handler = new GetAnalyticsDashboardHandler(sender);
 
-        var result = await handler.Handle(new GetAnalyticsDashboardQuery(), CancellationToken.None);
+        var result = (await handler.Handle(new GetAnalyticsDashboardQuery(), CancellationToken.None)).AsT0;
 
         Assert.NotNull(result.Workforce);
         Assert.Equal(5, result.Workforce.TotalEmployees);
@@ -556,10 +557,10 @@ public sealed class HrAnalyticsTests
 
     private sealed class FakeSender : ISender
     {
-        private readonly WorkforceOverviewResponse _workforce;
-        private readonly PayrollAnalyticsResponse _payroll;
-        private readonly AttendanceAnalyticsResponse _attendance;
-        private readonly OvertimeAnalyticsResponse _overtime;
+        private readonly OneOf<WorkforceOverviewResponse, ErrorDetailResponse> _workforce;
+        private readonly OneOf<PayrollAnalyticsResponse, ErrorDetailResponse> _payroll;
+        private readonly OneOf<AttendanceAnalyticsResponse, ErrorDetailResponse> _attendance;
+        private readonly OneOf<OvertimeAnalyticsResponse, ErrorDetailResponse> _overtime;
 
         public FakeSender(
             WorkforceOverviewResponse workforce,

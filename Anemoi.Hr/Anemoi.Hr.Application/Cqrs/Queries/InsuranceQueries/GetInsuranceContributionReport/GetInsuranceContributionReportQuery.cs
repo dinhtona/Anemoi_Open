@@ -9,4 +9,4 @@ public sealed record GetInsuranceContributionReportQuery(
     DateOnly PeriodStart,
     DateOnly PeriodEnd,
     string? CountryCode = null,
-    string? InsuranceType = null) : IQuery<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;
+    string? InsuranceType = null) : IQueryOne<IReadOnlyCollection<InsuranceCalculationSnapshotResponse>>;

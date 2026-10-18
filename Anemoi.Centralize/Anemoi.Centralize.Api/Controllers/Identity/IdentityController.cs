@@ -177,7 +177,9 @@ public class IdentityController(ISender sender, IWebHostEnvironment environment)
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = !environment.IsDevelopment(),
+            // SEC-007: Secure is always on — TLS is terminated at Caddy/Cloudflare,
+            // so cookies must never travel without the Secure flag in any environment.
+            Secure = true,
             SameSite = SameSiteMode.Lax,
             Path = "/"
         };

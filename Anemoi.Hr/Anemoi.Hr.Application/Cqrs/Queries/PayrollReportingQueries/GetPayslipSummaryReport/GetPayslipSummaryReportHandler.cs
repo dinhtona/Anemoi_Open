@@ -8,6 +8,7 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayslipSummaryReport;
 
@@ -15,9 +16,9 @@ public sealed class GetPayslipSummaryReportHandler(
     ISqlRepository<Payslip> repository,
     ISqlRepository<PayrollRun> payrollRunRepository,
     PayrollReportingMapper mapper)
-    : IQueryHandler<GetPayslipSummaryReportQuery, PaginationResponse<PayslipSummaryReportItem>>
+    : IQueryHandler<GetPayslipSummaryReportQuery, OneOf<PaginationResponse<PayslipSummaryReportItem>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PayslipSummaryReportItem>> Handle(
+    public async Task<OneOf<PaginationResponse<PayslipSummaryReportItem>, ErrorDetailResponse>> Handle(
         GetPayslipSummaryReportQuery request,
         CancellationToken cancellationToken)
     {

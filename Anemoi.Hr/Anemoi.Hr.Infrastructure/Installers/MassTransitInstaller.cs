@@ -1,5 +1,6 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Configurations;
+using Anemoi.BuildingBlock.Application.Helpers;
 using Anemoi.Hr.Application;
 using Anemoi.Hr.Infrastructure.Persistence;
 using MassTransit;
@@ -39,6 +40,10 @@ public sealed class MassTransitInstaller : IInstaller
             }
 
             var (host, virtualHost, userName, password, _, _) = masstransitSetting;
+            // SEC-006: credentials come from ${ENV_VAR} placeholders in appsettings —
+            // resolve them here and fail fast if the environment variable is missing.
+            userName = ConfigurationPlaceholders.ResolveRequired(userName, "MassTransitSetting:UserName");
+            password = ConfigurationPlaceholders.ResolveRequired(password, "MassTransitSetting:Password");
             configurator.UsingRabbitMq((context, bus) =>
             {
                 bus.Host(host, virtualHost, c =>

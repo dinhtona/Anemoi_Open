@@ -3,4 +3,4 @@ using Anemoi.Hr.Application.Responses;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensationDashboard;
 
-public sealed record GetCompensationDashboardQuery : IQuery<CompensationDashboardResponse>;
+public sealed record GetCompensationDashboardQuery : IQueryOne<CompensationDashboardResponse>;

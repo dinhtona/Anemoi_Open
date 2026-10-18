@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Recruitment;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,9 +17,9 @@ public sealed class GetHiringByDepartmentHandler(
     ISqlRepository<JobRequisition> requisitionRepository,
     ISqlRepository<CandidateApplication> applicationRepository,
     ISqlRepository<Department> departmentRepository)
-    : IQueryHandler<GetHiringByDepartmentQuery, IReadOnlyCollection<HiringByDepartmentItem>>
+    : IQueryHandler<GetHiringByDepartmentQuery, OneOf<IReadOnlyCollection<HiringByDepartmentItem>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<HiringByDepartmentItem>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<HiringByDepartmentItem>, ErrorDetailResponse>> Handle(
         GetHiringByDepartmentQuery request,
         CancellationToken cancellationToken)
     {

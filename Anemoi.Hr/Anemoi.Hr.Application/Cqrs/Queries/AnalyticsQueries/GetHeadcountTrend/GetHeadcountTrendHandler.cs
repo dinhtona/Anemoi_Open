@@ -1,21 +1,23 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Employees;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Cqrs.Queries;
-using Anemoi.Hr.Application.Responses;
-using Anemoi.Hr.Domain.Employees;
-using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetHeadcountTrend;
 
 public sealed class GetHeadcountTrendHandler(
     ISqlRepository<Employee> employeeRepository)
-    : IQueryHandler<GetHeadcountTrendQuery, ICollection<HeadcountTrendItem>>
+    : IQueryHandler<GetHeadcountTrendQuery, OneOf<ICollection<HeadcountTrendItem>, ErrorDetailResponse>>
 {
-    public async Task<ICollection<HeadcountTrendItem>> Handle(
+    public async Task<OneOf<ICollection<HeadcountTrendItem>, ErrorDetailResponse>> Handle(
         GetHeadcountTrendQuery request,
         CancellationToken cancellationToken)
     {

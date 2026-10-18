@@ -25,10 +25,11 @@ public sealed class LeaveTypeController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.LeaveTypeView)]
     [ProducesResponseType(typeof(PaginationResponse<LeaveTypeResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<LeaveTypeResponse>> GetLeaveTypes(
+    public async Task<IActionResult> GetLeaveTypes(
         [FromQuery] GetLeaveTypesQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

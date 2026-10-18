@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -15,9 +17,9 @@ public sealed class GetCompensationSnapshotHandler(
     ISqlRepository<EmployeeSalary> salaryRepository,
     ISqlRepository<EmployeeAllowance> allowanceRepository,
     CompensationMapper mapper)
-    : IQueryHandler<GetCompensationSnapshotQuery, CompensationSnapshotResponse>
+    : IQueryHandler<GetCompensationSnapshotQuery, OneOf<CompensationSnapshotResponse, ErrorDetailResponse>>
 {
-    public async Task<CompensationSnapshotResponse> Handle(
+    public async Task<OneOf<CompensationSnapshotResponse, ErrorDetailResponse>> Handle(
         GetCompensationSnapshotQuery request,
         CancellationToken cancellationToken)
     {

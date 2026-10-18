@@ -96,10 +96,11 @@ public sealed class RecruitmentJobPostingsController(ISender sender) : Controlle
     [HttpGet]
     [HasPermission(HrPermissions.RecruitmentView)]
     [ProducesResponseType(typeof(PaginationResponse<JobPostingResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<JobPostingResponse>> SearchJobPostings(
+    public async Task<IActionResult> SearchJobPostings(
         [FromQuery] SearchJobPostingsQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

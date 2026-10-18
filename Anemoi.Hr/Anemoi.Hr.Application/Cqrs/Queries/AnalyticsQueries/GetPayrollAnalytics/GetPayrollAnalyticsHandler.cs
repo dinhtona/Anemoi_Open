@@ -1,19 +1,21 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Payroll;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetPayrollAnalytics;
 
 public sealed class GetPayrollAnalyticsHandler(
     ISqlRepository<PayrollItem> payrollItemRepository)
-    : IQueryHandler<GetPayrollAnalyticsQuery, PayrollAnalyticsResponse>
+    : IQueryHandler<GetPayrollAnalyticsQuery, OneOf<PayrollAnalyticsResponse, ErrorDetailResponse>>
 {
-    public async Task<PayrollAnalyticsResponse> Handle(
+    public async Task<OneOf<PayrollAnalyticsResponse, ErrorDetailResponse>> Handle(
         GetPayrollAnalyticsQuery request,
         CancellationToken cancellationToken)
     {

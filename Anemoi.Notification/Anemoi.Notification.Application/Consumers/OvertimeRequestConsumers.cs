@@ -5,6 +5,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
@@ -26,7 +27,7 @@ public sealed class OvertimeRequestCreatedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.overtime.request",
+            Resource = NotificationResourceKeys.HrOvertimeRequest,
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
@@ -78,7 +79,7 @@ public sealed class OvertimeRequestApprovedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.overtime.request",
+            Resource = NotificationResourceKeys.HrOvertimeRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
@@ -124,7 +125,7 @@ public sealed class OvertimeRequestRejectedConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.overtime.request",
+            Resource = NotificationResourceKeys.HrOvertimeRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,
@@ -170,7 +171,7 @@ public sealed class OvertimeRequestCancelledConsumer(
         // Emit DataChangeOccurred transient invalidation event first (always emit!)
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.overtime.request",
+            Resource = NotificationResourceKeys.HrOvertimeRequest,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.OvertimeRequestId,
             WorkspaceId = null,

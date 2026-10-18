@@ -12,6 +12,8 @@ public sealed record SubmitInterviewFeedbackCommand(
     string Concerns,
     string Recommendation,
 
-    [property: JsonIgnore] EmployeeId InterviewerEmployeeId = null) : ICommandResult<InterviewFeedbackResponse>
+    [property: JsonIgnore] EmployeeId InterviewerEmployeeId = null,
+    [property: JsonIgnore] string CallerUserId = null,
+    [property: JsonIgnore] string CallerEmail = null) : ICommandResult<InterviewFeedbackResponse>
 {
 }

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Authorization;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Resources;
 using Anemoi.Contract.Identity.Commands.UserCommands.CreateUser;
 using Anemoi.Contract.Identity.Events;
 using Anemoi.Contract.Identity.ModelIds;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Anemoi.Identity.Application.Abstractions;
 using Anemoi.Identity.Application.Configurations;
 using Anemoi.Identity.Domain.Models;
@@ -128,10 +130,15 @@ public static class SystemRoleProfiles
             Permissions.HrInsuranceCalculate,
             Permissions.HrInsuranceReport,
             Permissions.HrRecruitmentView,
+            Permissions.HrRecruitmentManage,
             Permissions.HrRecruitmentInterview,
+            Permissions.HrRecruitmentHire,
             Permissions.HrRecruitmentAnalytics,
             Permissions.HrRecruitmentRequestView,
             Permissions.HrRecruitmentRequestCreate,
+            Permissions.HrRecruitmentRequestSubmit,
+            Permissions.HrRecruitmentRequestApprove,
+            Permissions.HrRecruitmentRequestManage,
             Permissions.HrWorkflowView,
             Permissions.HrWorkflowManage,
             Permissions.HrWorkflowExecute,
@@ -427,6 +434,7 @@ public static class SeedData
         var config = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger>();
         var seedUsers = config.GetSection(nameof(SeedUserData)).Get<SeedUserData>()?.DevTestUsers ?? [];
+        var localizer = serviceScope.ServiceProvider.GetRequiredService<IStringLocalizer<SharedResource>>();
 
         foreach (var user in seedUsers)
         {
@@ -435,10 +443,25 @@ public static class SeedData
             if (await userDbRepository.ExistByConditionAsync(x => x.Email == email && x.IsActivated))
                 continue;
 
+            // SEC-006: dev test passwords come from the DEV_TEST_USER_PASSWORD environment
+            // variable via a ${...} placeholder in appsettings — fail clearly if it is missing.
+            string password;
+            try
+            {
+                password = ConfigurationPlaceholders.ResolveRequired(
+                    user.Password, $"SeedUserData:DevTestUsers:{email}:Password");
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException(localizer[
+                    ConfigurationPlaceholders.MissingConfigurationErrorCode,
+                    "SeedUserData:DevTestUsers:Password", "DEV_TEST_USER_PASSWORD"].Value);
+            }
+
             var result = await mediator.Send(new CreateUserCommand
             {
                 Email = email,
-                Password = user.Password,
+                Password = password,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 IsActivated = true

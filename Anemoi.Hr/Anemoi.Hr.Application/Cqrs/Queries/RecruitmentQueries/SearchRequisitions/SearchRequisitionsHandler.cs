@@ -6,6 +6,7 @@ using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Recruitment;
+using OneOf;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,9 +17,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.SearchRequisitio
 public sealed class SearchRequisitionsHandler(
     ISqlRepository<JobRequisition> requisitionRepository,
     RecruitmentMapper mapper)
-    : IQueryHandler<SearchRequisitionsQuery, PaginationResponse<JobRequisitionResponse>>
+    : IQueryHandler<SearchRequisitionsQuery, OneOf<PaginationResponse<JobRequisitionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<JobRequisitionResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<JobRequisitionResponse>, ErrorDetailResponse>> Handle(
         SearchRequisitionsQuery request,
         CancellationToken cancellationToken)
     {

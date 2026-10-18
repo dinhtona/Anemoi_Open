@@ -12,6 +12,13 @@ namespace Anemoi.BuildingBlock.Application.Abstractions;
 public interface ISqlRepository<T> where T : class
 {
     IQueryable<T> GetQueryable(Expression<Func<T, bool>> conditionExpression = null);
+
+    /// <summary>
+    /// SECURITY (TD-P34-SEC-03): this method passes <paramref name="sql"/> straight into EF Core's
+    /// <c>FromSqlRaw</c>. Use ONLY for reviewed internal migrations/reports with fully static SQL —
+    /// NEVER build the query from user input (SQL injection risk). Prefer LINQ-based queries instead.
+    /// </summary>
+    [Obsolete("Security: chỉ dùng cho migration/report nội bộ đã review với SQL tĩnh hoàn toàn — không nhận input từ user. Ưu tiên query LINQ thay thế.")]
     IQueryable<T> GetQueryableFromRawQuery(string sql, params object[] parameters);
 
     Task<T> GetFirstByConditionAsync(Expression<Func<T, bool>> conditionExpression = null,

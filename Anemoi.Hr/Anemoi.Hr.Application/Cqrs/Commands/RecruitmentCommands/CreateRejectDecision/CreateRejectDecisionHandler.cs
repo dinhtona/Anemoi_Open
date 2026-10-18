@@ -36,9 +36,13 @@ public sealed class CreateRejectDecisionHandler(
         if (CandidateApplicationStageCode.IsTerminal(app.CurrentStage))
             return HrErrorResponses.Create(HrBusinessErrorCodes.ApplicationInvalidStageTransition);
 
-        var existing = await decisionRepository.ExistByConditionAsync(
-            x => x.CandidateApplicationId == request.CandidateApplicationId, cancellationToken);
-        if (existing)
+        // A candidate may decline an existing Offer, so an Offer decision must not
+        // block the Reject decision. Only a terminal decision blocks a new Reject.
+        var existingTerminalDecision = await decisionRepository.ExistByConditionAsync(
+            x => x.CandidateApplicationId == request.CandidateApplicationId &&
+                 x.Decision != HiringDecisionCode.Offer,
+            cancellationToken);
+        if (existingTerminalDecision)
             return HrErrorResponses.Create(HrBusinessErrorCodes.HiringDecisionAlreadyExists);
 
         if (!CandidateApplicationStageCode.IsValidTransition(app.CurrentStage, CandidateApplicationStageCode.Rejected))

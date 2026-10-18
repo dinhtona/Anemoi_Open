@@ -1,13 +1,15 @@
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Departments;
 using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetWorkforceOverview;
 
@@ -15,9 +17,9 @@ public sealed class GetWorkforceOverviewHandler(
     ISqlRepository<Employee> employeeRepository,
     ISqlRepository<Department> departmentRepository,
     ISqlRepository<Position> positionRepository)
-    : IQueryHandler<GetWorkforceOverviewQuery, WorkforceOverviewResponse>
+    : IQueryHandler<GetWorkforceOverviewQuery, OneOf<WorkforceOverviewResponse, ErrorDetailResponse>>
 {
-    public async Task<WorkforceOverviewResponse> Handle(
+    public async Task<OneOf<WorkforceOverviewResponse, ErrorDetailResponse>> Handle(
         GetWorkforceOverviewQuery request,
         CancellationToken cancellationToken)
     {

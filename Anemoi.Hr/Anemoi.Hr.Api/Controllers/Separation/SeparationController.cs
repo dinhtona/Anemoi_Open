@@ -34,11 +34,12 @@ public sealed class SeparationController(ISender sender) : ControllerBase
     [HttpGet]
     [HasPermission(HrPermissions.SeparationView)]
     [ProducesResponseType(typeof(PaginationResponse<EmployeeSeparationDto>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<EmployeeSeparationDto>> GetAll(
+    public async Task<IActionResult> GetAll(
         [FromQuery] GetSeparationsQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

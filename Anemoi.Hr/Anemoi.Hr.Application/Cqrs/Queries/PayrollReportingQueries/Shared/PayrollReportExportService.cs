@@ -4,11 +4,13 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Helpers;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Abstractions;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Reporting;
 using Anemoi.Hr.ModelIds.ModelIds;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.Shared;
 
@@ -18,7 +20,7 @@ public sealed class PayrollReportExportService(
     ISqlRepository<ReportExportAuditLog> auditLogRepository,
     IUnitOfWork unitOfWork)
 {
-    public async Task<ExportResult> ExportAsync<T>(
+    public async Task<OneOf<ExportResult, ErrorDetailResponse>> ExportAsync<T>(
         IReadOnlyCollection<T> records,
         string reportType,
         object filters,
@@ -27,10 +29,10 @@ public sealed class PayrollReportExportService(
     {
         var exportedBy = currentUser.UserId;
         if (string.IsNullOrWhiteSpace(exportedBy))
-            throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportPermissionDenied);
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ReportExportPermissionDenied);
 
         if (records.Count > ReportExportLimits.MaxRows)
-            throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportLimitExceeded);
+            return HrErrorResponses.Create(HrBusinessErrorCodes.ReportExportLimitExceeded);
 
         var fileName = $"{reportType.Replace('.', '-')}-{DateTime.UtcNow:yyyyMMddHHmmss}.csv";
         var result = reportExporter.ExportCsv(records, fileName);
@@ -50,11 +52,11 @@ public sealed class PayrollReportExportService(
 
         var createResult = await auditLogRepository.CreateOneAsync(auditLog, cancellationToken);
         if (createResult.IsT1)
-            throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportAuditLogSaveFailed, createResult.AsT1);
+            return HrErrorResponses.FromSaveResult(createResult.AsT1, HrBusinessErrorCodes.ReportExportAuditLogSaveFailed);
 
         var saveResult = await unitOfWork.SaveChangesAsync(cancellationToken);
         if (saveResult.IsT1)
-            throw new InvalidOperationException(HrBusinessErrorCodes.ReportExportAuditLogSaveFailed, saveResult.AsT1);
+            return HrErrorResponses.FromSaveResult(saveResult.AsT1, HrBusinessErrorCodes.ReportExportAuditLogSaveFailed);
 
         return result;
     }

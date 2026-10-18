@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Cqrs.Common.Dtos;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Domain.Separations;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.SeparationQueries.GetSeparations;
 
 public sealed class GetSeparationsHandler(
     ISqlRepository<EmployeeSeparation> repository,
     EmployeeSeparationMapper mapper)
-    : IQueryHandler<GetSeparationsQuery, PaginationResponse<EmployeeSeparationDto>>
+    : IQueryHandler<GetSeparationsQuery, OneOf<PaginationResponse<EmployeeSeparationDto>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<EmployeeSeparationDto>> Handle(
+    public async Task<OneOf<PaginationResponse<EmployeeSeparationDto>, ErrorDetailResponse>> Handle(
         GetSeparationsQuery request, CancellationToken cancellationToken)
     {
         var query = repository.GetQueryable()

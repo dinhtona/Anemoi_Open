@@ -1,20 +1,22 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Payroll;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Cqrs.Queries;
-using Anemoi.Hr.Application.Responses;
-using Anemoi.Hr.Domain.Payroll;
-using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetDepartmentCostAnalytics;
 
 public sealed class GetDepartmentCostAnalyticsHandler(
     ISqlRepository<PayrollItem> payrollItemRepository)
-    : IQueryHandler<GetDepartmentCostAnalyticsQuery, ICollection<DepartmentCostItem>>
+    : IQueryHandler<GetDepartmentCostAnalyticsQuery, OneOf<ICollection<DepartmentCostItem>, ErrorDetailResponse>>
 {
-    public async Task<ICollection<DepartmentCostItem>> Handle(
+    public async Task<OneOf<ICollection<DepartmentCostItem>, ErrorDetailResponse>> Handle(
         GetDepartmentCostAnalyticsQuery request,
         CancellationToken cancellationToken)
     {

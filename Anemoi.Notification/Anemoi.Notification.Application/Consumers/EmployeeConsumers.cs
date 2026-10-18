@@ -5,6 +5,7 @@ using Anemoi.Contract.Hr.Events;
 using Anemoi.Contract.Notification.Commands.NotificationCommands.CreateNotification;
 using Anemoi.Contract.Notification.Constants;
 using Anemoi.Contract.Notification.Events;
+using Anemoi.Notification.Application.Constants;
 using Anemoi.Notification.Application.Services;
 using MassTransit;
 using MediatR;
@@ -25,7 +26,7 @@ public sealed class EmployeeCreatedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.employee",
+            Resource = NotificationResourceKeys.HrEmployee,
             Action = NotificationConstants.DataChangeActions.Create,
             EntityId = message.EmployeeId.ToString(),
             WorkspaceId = null,
@@ -70,7 +71,7 @@ public sealed class TransferApprovedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.employee.transfer",
+            Resource = NotificationResourceKeys.HrEmployeeTransfer,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.TransferId.ToString(),
             WorkspaceId = null,
@@ -115,7 +116,7 @@ public sealed class SeparationApprovedConsumer(
 
         await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
         {
-            Resource = "hr.employee.separation",
+            Resource = NotificationResourceKeys.HrEmployeeSeparation,
             Action = NotificationConstants.DataChangeActions.Update,
             EntityId = message.SeparationId.ToString(),
             WorkspaceId = null,
@@ -144,5 +145,51 @@ public sealed class SeparationApprovedConsumer(
 
         await mediator.Send(command, context.CancellationToken);
         logger.Information("Processed SeparationApproved notification for Employee User ID: {UserId}", userId);
+    }
+}
+
+public sealed class EmployeeStatusChangedConsumer(
+    INotificationRecipientResolver recipientResolver,
+    IMediator mediator,
+    IPublishEndpoint publishEndpoint,
+    ILogger logger)
+    : IConsumer<EmployeeStatusChangedIntegrationEvent>
+{
+    public async Task Consume(ConsumeContext<EmployeeStatusChangedIntegrationEvent> context)
+    {
+        var message = context.Message;
+
+        // Emit DataChangeOccurred transient invalidation event first (always emit!)
+        await publishEndpoint.Publish(new DataChangeOccurredIntegrationEvent
+        {
+            Resource = NotificationResourceKeys.HrEmployee,
+            Action = NotificationConstants.DataChangeActions.Update,
+            EntityId = message.EmployeeId.ToString(),
+            WorkspaceId = null,
+            Sensitivity = NotificationConstants.DataSensitivity.Medium,
+            QueryTags = new List<string> { "hr", "employee" },
+            OccurredAt = DateTime.UtcNow
+        }, context.CancellationToken);
+
+        var userId = await recipientResolver.ResolveUserIdByEmployeeId(message.EmployeeId.ToString(), context.CancellationToken);
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.Warning("Could not resolve Employee User ID for EmployeeId: {EmployeeId}. Skipping notification.", message.EmployeeId);
+            return;
+        }
+
+        var command = new CreateNotificationCommand(
+            UserId: userId,
+            Title: "Employment Status Changed",
+            Content: $"Your employment status has changed from {message.FromStatus} to {message.ToStatus}",
+            Category: "HR",
+            ActionUrl: $"/hr/employees/{message.EmployeeId}",
+            DeduplicationKey: $"employee:{message.EmployeeId}:status-changed:{message.ToStatus}",
+            Type: NotificationConstants.Types.Business,
+            Severity: NotificationConstants.Severities.Info
+        );
+
+        await mediator.Send(command, context.CancellationToken);
+        logger.Information("Processed EmployeeStatusChanged notification for Employee User ID: {UserId}", userId);
     }
 }

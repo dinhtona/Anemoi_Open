@@ -6,4 +6,4 @@ using System.Collections.Generic;
 namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetEmployeeSalaryHistory;
 
 public sealed record GetEmployeeSalaryHistoryQuery(
-    EmployeeId EmployeeId) : IQuery<IReadOnlyCollection<EmployeeSalaryResponse>>;
+    EmployeeId EmployeeId) : IQueryOne<IReadOnlyCollection<EmployeeSalaryResponse>>;

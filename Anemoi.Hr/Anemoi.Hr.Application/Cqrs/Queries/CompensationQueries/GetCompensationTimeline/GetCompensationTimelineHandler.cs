@@ -1,9 +1,11 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Compensation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,9 +16,9 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.CompensationQueries.GetCompensation
 public sealed class GetCompensationTimelineHandler(
     ISqlRepository<EmployeeSalary> salaryRepository,
     ISqlRepository<EmployeeAllowance> allowanceRepository)
-    : IQueryHandler<GetCompensationTimelineQuery, IReadOnlyCollection<CompensationTimelineItemResponse>>
+    : IQueryHandler<GetCompensationTimelineQuery, OneOf<IReadOnlyCollection<CompensationTimelineItemResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<CompensationTimelineItemResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<CompensationTimelineItemResponse>, ErrorDetailResponse>> Handle(
         GetCompensationTimelineQuery request,
         CancellationToken cancellationToken)
     {

@@ -7,4 +7,4 @@ namespace Anemoi.Hr.Application.Cqrs.Queries.RecruitmentQueries.GetHiringByDepar
 
 public sealed record GetHiringByDepartmentQuery(
     DateOnly? FromDate,
-    DateOnly? ToDate) : IQuery<IReadOnlyCollection<HiringByDepartmentItem>>;
+    DateOnly? ToDate) : IQueryOne<IReadOnlyCollection<HiringByDepartmentItem>>;

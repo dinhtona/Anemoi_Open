@@ -48,7 +48,7 @@ public sealed class ApproveRecruitmentRequestHandler(
         {
             Id = new RecruitmentRequestHistoryId(IdGenerator.NextGuid()),
             RecruitmentRequestId = recruitmentRequest.Id,
-            ActionCode = "Approved",
+            ActionCode = RecruitmentRequestStatusCode.Approved,
             OldStatus = oldStatus,
             NewStatus = recruitmentRequest.Status,
             Comment = request.Comment,

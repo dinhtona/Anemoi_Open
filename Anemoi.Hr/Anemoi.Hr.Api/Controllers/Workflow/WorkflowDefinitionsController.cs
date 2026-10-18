@@ -25,10 +25,11 @@ public sealed class WorkflowDefinitionsController(ISender sender) : ControllerBa
     [HttpGet]
     [HasPermission(HrPermissions.WorkflowView)]
     [ProducesResponseType(typeof(PaginationResponse<WorkflowDefinitionResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<WorkflowDefinitionResponse>> GetWorkflowDefinitions(
+    public async Task<IActionResult> GetWorkflowDefinitions(
         [FromQuery] GetWorkflowDefinitionsQuery query, CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{id}")]

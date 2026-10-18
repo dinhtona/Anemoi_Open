@@ -68,7 +68,8 @@ public sealed class EmployeeImportController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetImportHistory(
         [FromQuery] GetImportHistoryQuery query, CancellationToken cancellationToken)
     {
-        return Ok(await sender.Send(query, cancellationToken));
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("{jobId}")]

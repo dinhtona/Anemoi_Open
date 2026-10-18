@@ -1,18 +1,20 @@
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.EmployeeQueries.GetEmployeeGradeHistory;
 
 public sealed class GetEmployeeGradeHistoryHandler(
     ISqlRepository<EmployeeGradeHistory> repository,
     EmployeeMapper mapper)
-    : IQueryHandler<GetEmployeeGradeHistoryQuery, IReadOnlyCollection<EmployeeGradeHistoryResponse>>
+    : IQueryHandler<GetEmployeeGradeHistoryQuery, OneOf<IReadOnlyCollection<EmployeeGradeHistoryResponse>, ErrorDetailResponse>>
 {
-    public async Task<IReadOnlyCollection<EmployeeGradeHistoryResponse>> Handle(
+    public async Task<OneOf<IReadOnlyCollection<EmployeeGradeHistoryResponse>, ErrorDetailResponse>> Handle(
         GetEmployeeGradeHistoryQuery request,
         CancellationToken cancellationToken)
     {

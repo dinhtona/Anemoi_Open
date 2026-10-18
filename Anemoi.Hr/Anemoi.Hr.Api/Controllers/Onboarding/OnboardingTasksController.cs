@@ -85,31 +85,34 @@ public sealed class OnboardingTasksController(ISender sender) : ControllerBase
     [HttpGet("~/api/hr/onboarding/my-tasks")]
     [HasPermission(HrPermissions.OnboardingView)]
     [ProducesResponseType(typeof(PaginationResponse<OnboardingTaskResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<OnboardingTaskResponse>> GetMyTasks(
+    public async Task<IActionResult> GetMyTasks(
         [FromQuery] GetMyOnboardingTasksQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(
+        var res = await sender.Send(
             query with { UserId = HttpContext.GetUserId() },
             cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("~/api/hr/onboarding/pending-tasks")]
     [HasPermission(HrPermissions.OnboardingView)]
     [ProducesResponseType(typeof(PaginationResponse<OnboardingTaskResponse>), StatusCodes.Status200OK)]
-    public async Task<PaginationResponse<OnboardingTaskResponse>> GetPendingTasks(
+    public async Task<IActionResult> GetPendingTasks(
         [FromQuery] GetPendingOnboardingTasksQuery query,
         CancellationToken cancellationToken)
     {
-        return await sender.Send(query, cancellationToken);
+        var res = await sender.Send(query, cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 
     [HttpGet("~/api/hr/onboarding/dashboard")]
     [HasPermission(HrPermissions.OnboardingView)]
     [ProducesResponseType(typeof(OnboardingDashboardResponse), StatusCodes.Status200OK)]
-    public async Task<OnboardingDashboardResponse> GetDashboard(
+    public async Task<IActionResult> GetDashboard(
         CancellationToken cancellationToken)
     {
-        return await sender.Send(new GetOnboardingDashboardQuery(), cancellationToken);
+        var res = await sender.Send(new GetOnboardingDashboardQuery(), cancellationToken);
+        return res.Match<IActionResult>(Ok, BadRequest);
     }
 }

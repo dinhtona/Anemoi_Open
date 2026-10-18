@@ -1,20 +1,22 @@
+using Anemoi.BuildingBlock.Application.Abstractions;
+using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
+using Anemoi.Hr.Application.Responses;
+using Anemoi.Hr.Domain.Payroll;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Anemoi.BuildingBlock.Application.Abstractions;
-using Anemoi.BuildingBlock.Application.Cqrs.Queries;
-using Anemoi.Hr.Application.Responses;
-using Anemoi.Hr.Domain.Payroll;
-using Microsoft.EntityFrameworkCore;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.AnalyticsQueries.GetTopEarners;
 
 public sealed class GetTopEarnersHandler(
     ISqlRepository<PayrollRun> payrollRunRepository)
-    : IQueryHandler<GetTopEarnersQuery, ICollection<TopEarnerItem>>
+    : IQueryHandler<GetTopEarnersQuery, OneOf<ICollection<TopEarnerItem>, ErrorDetailResponse>>
 {
-    public async Task<ICollection<TopEarnerItem>> Handle(
+    public async Task<OneOf<ICollection<TopEarnerItem>, ErrorDetailResponse>> Handle(
         GetTopEarnersQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,7 +31,7 @@ public sealed class GetTopEarnersHandler(
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (latestRun is null)
-                return [];
+                return OneOf<ICollection<TopEarnerItem>, ErrorDetailResponse>.FromT0([]);
 
             payrollRunId = latestRun;
         }

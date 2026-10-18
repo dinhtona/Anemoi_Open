@@ -5,15 +5,16 @@ using Anemoi.Hr.Application.Mappings;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.CalendarManagement;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.CalendarManagementQueries.CalendarException.GetCalendarExceptions;
 
 public sealed class GetCalendarExceptionsHandler(
     ISqlRepository<Domain.CalendarManagement.CalendarException> calendarExceptionRepository,
     CalendarManagementMapper mapper)
-    : IQueryHandler<GetCalendarExceptionsQuery, PaginationResponse<CalendarExceptionResponse>>
+    : IQueryHandler<GetCalendarExceptionsQuery, OneOf<PaginationResponse<CalendarExceptionResponse>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<CalendarExceptionResponse>> Handle(
+    public async Task<OneOf<PaginationResponse<CalendarExceptionResponse>, ErrorDetailResponse>> Handle(
         GetCalendarExceptionsQuery request,
         CancellationToken cancellationToken)
     {

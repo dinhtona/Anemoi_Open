@@ -194,7 +194,7 @@ public sealed class HrCalendarManagementTests
         var handler = new GetCalendarStatusHandler(publicHolidayRepo, companyHolidayRepo, exceptionRepo, engine);
 
         // Query Jan 1st 2026 (should return Recurring New Year name)
-        var response = await handler.Handle(new GetCalendarStatusQuery(new DateOnly(2026, 1, 1)), CancellationToken.None);
+        var response = (await handler.Handle(new GetCalendarStatusQuery(new DateOnly(2026, 1, 1)), CancellationToken.None)).AsT0;
         Assert.Equal("Recurring New Year", response.HolidayName);
     }
 
@@ -222,7 +222,7 @@ public sealed class HrCalendarManagementTests
 
         var handler = new GetMonthlyCalendarHandler(publicHolidayRepo, companyHolidayRepo, exceptionRepo, engine);
 
-        var response = await handler.Handle(new GetMonthlyCalendarQuery(2026, 1), CancellationToken.None);
+        var response = (await handler.Handle(new GetMonthlyCalendarQuery(2026, 1), CancellationToken.None)).AsT0;
 
         var day1 = response.Days.First(d => d.Date.Day == 1);
         Assert.Equal(CalendarStatus.Holiday, day1.Status);

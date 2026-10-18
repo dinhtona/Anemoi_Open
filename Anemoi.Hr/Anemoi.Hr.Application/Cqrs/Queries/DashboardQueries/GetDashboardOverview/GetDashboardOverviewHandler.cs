@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Anemoi.BuildingBlock.Application.Abstractions;
 using Anemoi.BuildingBlock.Application.Cqrs.Queries;
+using Anemoi.BuildingBlock.Application.Responses;
 using Anemoi.Hr.Application.Configurations;
 using Anemoi.Hr.Application.Responses;
 using Anemoi.Hr.Domain.Contracts;
@@ -13,6 +9,12 @@ using Anemoi.Hr.Domain.Employees;
 using Anemoi.Hr.Domain.Leaves;
 using Anemoi.Hr.Domain.Positions;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.DashboardQueries.GetDashboardOverview;
 
@@ -24,9 +26,9 @@ public sealed class GetDashboardOverviewHandler(
     ISqlRepository<Position> positionRepository,
     ISqlRepository<EmployeeContract> contractRepository,
     HrSettings hrSettings)
-    : IQueryHandler<GetDashboardOverviewQuery, DashboardOverviewResponse>
+    : IQueryHandler<GetDashboardOverviewQuery, OneOf<DashboardOverviewResponse, ErrorDetailResponse>>
 {
-    public async Task<DashboardOverviewResponse> Handle(GetDashboardOverviewQuery request,
+    public async Task<OneOf<DashboardOverviewResponse, ErrorDetailResponse>> Handle(GetDashboardOverviewQuery request,
         CancellationToken cancellationToken)
     {
         var now = DateTime.UtcNow;
