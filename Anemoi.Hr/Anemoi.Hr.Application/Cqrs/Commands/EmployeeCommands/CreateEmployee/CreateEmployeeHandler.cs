@@ -63,7 +63,7 @@ public sealed class CreateEmployeeHandler(
             DisplayName = request.DisplayName,
             AvatarStorageKey = request.AvatarStorageKey,
             WorkEmail = request.WorkEmail,
-            PersonalEmail = request.PersonalEmail,
+            PersonalEmail = request.PersonalEmail ?? string.Empty,
             PhoneNumber = request.PhoneNumber,
             DateOfBirth = request.DateOfBirth,
             JoinDate = request.JoinDate,
