@@ -96,8 +96,10 @@ public sealed class CreateContractHandler(
             EndDate = request.EndDate,
             SignedDate = request.SignedDate,
             StatusCode = statusCode,
-            Notes = request.Notes,
-            AttachmentFileId = request.AttachmentFileId,
+            Notes = request.Notes ?? string.Empty,
+            // Entity column is NOT NULL but command field is optional:
+            // coalesce null to empty string (same pattern as PersonalEmail).
+            AttachmentFileId = request.AttachmentFileId ?? string.Empty,
             PreviousContractId = request.PreviousContractId,
             CreatedBy = request.CreatedBy ?? PayrollConstants.SystemActor,
             CreatedAt = DateTime.UtcNow,

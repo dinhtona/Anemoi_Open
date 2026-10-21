@@ -47,8 +47,10 @@ public sealed class TerminateContractHandler(
         {
             TerminatedDate = request.TerminationDate,
             ReasonCode = request.ReasonCode,
-            Notes = request.Notes,
-            TerminationAttachmentId = request.TerminationAttachmentId
+            Notes = request.Notes ?? string.Empty,
+            // Entity column is NOT NULL but command field is optional:
+            // coalesce null to empty string (same pattern as PersonalEmail).
+            TerminationAttachmentId = request.TerminationAttachmentId ?? string.Empty
         };
         contract.UpdatedAt = DateTime.UtcNow;
         contract.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
