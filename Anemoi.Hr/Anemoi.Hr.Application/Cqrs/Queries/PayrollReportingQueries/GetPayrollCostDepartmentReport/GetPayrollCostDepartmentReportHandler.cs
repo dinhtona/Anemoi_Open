@@ -14,6 +14,7 @@ using Anemoi.Hr.Domain.Insurance;
 using Anemoi.Hr.Domain.Payroll;
 using Anemoi.Hr.Domain.Taxation;
 using Microsoft.EntityFrameworkCore;
+using OneOf;
 
 namespace Anemoi.Hr.Application.Cqrs.Queries.PayrollReportingQueries.GetPayrollCostDepartmentReport;
 
@@ -24,9 +25,9 @@ public sealed class GetPayrollCostDepartmentReportHandler(
     ISqlRepository<Department> departmentRepository,
     ISqlRepository<TaxCalculationSnapshot> taxRepository,
     ISqlRepository<InsuranceCalculationSnapshot> insuranceRepository)
-    : IQueryHandler<GetPayrollCostDepartmentReportQuery, PaginationResponse<PayrollCostDepartmentReportItem>>
+    : IQueryHandler<GetPayrollCostDepartmentReportQuery, OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>>
 {
-    public async Task<PaginationResponse<PayrollCostDepartmentReportItem>> Handle(
+    public async Task<OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>> Handle(
         GetPayrollCostDepartmentReportQuery request,
         CancellationToken cancellationToken)
     {
@@ -40,22 +41,21 @@ public sealed class GetPayrollCostDepartmentReportHandler(
             request.SortBy,
             request.SortDirection);
 
-        var items = await PayrollReportingQueryExtensions.BuildPayrollCostDepartmentAsync(
+        var query = PayrollReportingQueryExtensions.BuildPayrollCostDepartment(
             runRepository.GetQueryable().AsNoTracking(),
             periodRepository.GetQueryable().AsNoTracking(),
             employeeRepository.GetQueryable().AsNoTracking(),
             departmentRepository.GetQueryable().AsNoTracking(),
             taxRepository.GetQueryable().AsNoTracking(),
             insuranceRepository.GetQueryable().AsNoTracking(),
-            filter,
-            cancellationToken);
+            filter);
 
-        var totalRecords = items.Count;
-        var pagedItems = items
+        var totalRecords = await query.LongCountAsync(cancellationToken);
+        var items = await query
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        return new PaginationResponse<PayrollCostDepartmentReportItem>(pagedItems, totalRecords);
+        return OneOf<PaginationResponse<PayrollCostDepartmentReportItem>, ErrorDetailResponse>.FromT0(new PaginationResponse<PayrollCostDepartmentReportItem>(items, totalRecords));
     }
 }
