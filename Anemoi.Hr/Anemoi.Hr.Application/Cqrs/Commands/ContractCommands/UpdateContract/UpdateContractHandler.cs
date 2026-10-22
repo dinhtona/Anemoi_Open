@@ -95,8 +95,10 @@ public sealed class UpdateContractHandler(
         contract.StartDate = request.StartDate;
         contract.EndDate = request.EndDate;
         contract.SignedDate = request.SignedDate;
-        contract.Notes = request.Notes;
-        contract.AttachmentFileId = request.AttachmentFileId;
+        contract.Notes = request.Notes ?? string.Empty;
+        // Entity column is NOT NULL but command field is optional:
+        // coalesce null to empty string (same pattern as PersonalEmail).
+        contract.AttachmentFileId = request.AttachmentFileId ?? string.Empty;
         contract.UpdatedAt = DateTime.UtcNow;
         contract.UpdatedBy = request.UpdatedBy ?? PayrollConstants.SystemActor;
 
