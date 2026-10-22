@@ -1,117 +1,58 @@
 # Backend Engineering Rules
 
+Normative rules are in `AGENTS.md` section 3. This file explains the expected project shape and patterns.
+
 ## Required Stack
 
 Use the established Anemoi stack:
 
-- Use the same TargetFramework as the existing repository projects. Do not introduce a different .NET version unless explicitly approved.
-- EF Core
-- Npgsql.EntityFrameworkCore.PostgreSQL
-- MassTransit
-- MassTransit.RabbitMQ
-- MediatR
-- OneOf
-- Riok.Mapperly
-- FluentValidation
-- Serilog
-- Polly
-- ASP.NET Core Localization
+- The same TargetFramework as the existing repository projects (.NET 10).
+- EF Core with `Npgsql.EntityFrameworkCore.PostgreSQL`.
+- MassTransit with RabbitMQ.
+- MediatR and OneOf.
+- Riok.Mapperly.
+- FluentValidation.
+- Serilog.
+- Polly.
+- ASP.NET Core localization.
 
-Do not introduce random new libraries.
-
-Do not use AutoMapper unless explicitly approved. Use Mapperly.
+Do not introduce a different framework or library without explicit approval.
 
 ## Standard Project Layers
-
-Each service follows:
 
 ```text
 {Service}.ModelIds
 {Service}.Domain
 {Service}.Application
 {Service}.Infrastructure
-{Service}.Api
+{Service}.Api or {Service}.WorkerService
 ```
 
 ## Domain Layer
 
-Contains:
+Contains entities, aggregate roots, value objects, domain events, strongly typed IDs, and domain services only when necessary.
 
-```text
-Entities
-Aggregate Roots
-Value Objects
-Domain Events
-Strongly typed IDs
-Domain services only when necessary
-```
-
-Rules:
-
-- Must not depend on Application, Infrastructure, or Api.
-- Must not contain EF Core-specific persistence logic.
-- Must use strongly typed IDs for local aggregate IDs.
+Keep the domain free of EF Core, Application, Infrastructure, and Api dependencies. Domain factories accept IDs from the caller; ID generation belongs in the application layer.
 
 ## Application Layer
 
-Contains:
+Contains commands, queries, handlers, validators, responses/DTOs, Mapperly mappers, and application abstractions.
 
-```text
-Commands
-Queries
-Handlers
-Validators
-Responses / DTOs
-Mapperly mappers
-Application abstractions
-```
-
-Rules:
-
-- Must not depend on Infrastructure.
-- Must not return EF Core entities.
-- Must use CQRS.
-- Must expose stable error codes for business errors.
-- Must use localization contracts for user-facing messages.
+Do not reference Infrastructure. Do not return EF Core entities. Use stable error codes for business errors and localization contracts for user-facing messages.
 
 ## Infrastructure Layer
 
-Contains:
-
-```text
-DbContext
-EntityTypeConfiguration
-Migrations
-Repository implementations if used
-MassTransit persistence / outbox if used
-External provider implementations
-```
+Contains the DbContext, entity type configurations, migrations, repository implementations if used, MassTransit persistence/outbox, and external provider implementations.
 
 ## Api Layer
 
-Contains:
+Contains controllers, GraphQL endpoints if used, `Program.cs`, DI registration, Swagger, MassTransit host wiring, rate limiting, and authorization configuration.
 
-```text
-Controllers
-GraphQL endpoints if used
-Program.cs
-DI registration
-Swagger
-MassTransit host wiring
-Rate limiting
-Authorization configuration
-```
+Controllers only dispatch commands/queries. They do not contain business logic or direct DbContext queries.
 
-Rules:
+## CQRS Pattern
 
-- Controllers must only dispatch Commands/Queries.
-- Controllers must not contain business logic.
-- Controllers must not query DbContext directly.
-- Protected endpoints must use permission authorization.
-
-## CQRS Rules
-
-Every write action requires:
+Every write action has:
 
 ```text
 XxxCommand
@@ -119,18 +60,18 @@ XxxCommandHandler
 XxxCommandValidator
 ```
 
-Every read action requires:
+Every read action has:
 
 ```text
 XxxQuery
 XxxQueryHandler
 ```
 
-## Mapperly Rules
+Return `OneOf<TResult, ErrorDetailResponse>` for expected business outcomes.
 
-Use Mapperly partial classes.
+## Mapperly Pattern
 
-Example:
+Use Mapperly partial classes annotated with `[Mapper]`:
 
 ```csharp
 [Mapper]
@@ -140,7 +81,9 @@ public partial class EmployeeMapper
 }
 ```
 
-## Strongly Typed ID Rules
+Do not use AutoMapper.
+
+## Strongly Typed IDs
 
 Use strongly typed IDs for local aggregate IDs:
 
@@ -154,13 +97,17 @@ LeaveBalanceId
 LeaveTransactionId
 ```
 
-Primitive IDs are allowed only at serialization boundaries such as DTOs, claims, headers, and integration events if needed.
+Create new IDs in the application layer:
 
-## Event-Driven Rules
+```csharp
+new EmployeeId(IdGenerator.NextGuid())
+```
 
-Use MassTransit for cross-service side effects.
+Primitive IDs are allowed only at serialization boundaries such as DTOs, claims, headers, route values, and integration events.
 
-Examples:
+## Event-Driven Patterns
+
+Use past-tense integration event names:
 
 ```text
 EmployeeCreatedIntegrationEvent
@@ -170,6 +117,8 @@ LeaveBalanceChangedIntegrationEvent
 SensitivePermissionAssignmentRequestedIntegrationEvent
 ```
 
-Prefer events for asynchronous side effects.
+Publish async side effects through MassTransit. Use request-response only when the current request cannot complete without the external result.
 
-Use MassTransit request-response only when the current request cannot complete without the external result.
+## Read-Heavy Queries
+
+Use `IQueryable` projections or dedicated response projections. Do not load full entities when a projection is enough. Do not inject repositories into other repositories.

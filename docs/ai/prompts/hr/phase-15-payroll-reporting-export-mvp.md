@@ -1,3 +1,5 @@
+Read `AGENTS.md` first. It is the single source of truth for mandatory rules.
+
 You are implementing Phase 15 - Payroll Reporting / Export MVP for the ANEMOI HR project.
 
 Project context:

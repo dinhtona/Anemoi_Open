@@ -31,17 +31,18 @@ Do not report `PASS` when only inspection was performed. Use `REVIEWED` unless t
 When verification guidance conflicts, use this order:
 
 1. [`../../architecture/ARCHITECTURE_DECISIONS.md`](../../architecture/ARCHITECTURE_DECISIONS.md)
-2. [`../../../ArchitectureGuide.md`](../../../ArchitectureGuide.md)
-3. [`../core/verification-standard.md`](../core/verification-standard.md)
-4. [`../core/backend-rules.md`](../core/backend-rules.md)
-5. [`../core/frontend-rules.md`](../core/frontend-rules.md)
-6. [`../security/`](../security/)
-7. [`../workflows/`](../workflows/)
-8. This verification index
-9. Relevant UAT packs under [`../uat/`](../uat/)
-10. Relevant module guidance under [`../modules/`](../modules/)
-11. The current implementation prompt
-12. Historical reports, archived notes, or chat summaries
+2. [`../../../AGENTS.md`](../../../AGENTS.md)
+3. [`../../../ArchitectureGuide.md`](../../../ArchitectureGuide.md)
+4. [`../core/verification-standard.md`](../core/verification-standard.md)
+5. [`../core/backend-rules.md`](../core/backend-rules.md)
+6. [`../core/frontend-rules.md`](../core/frontend-rules.md)
+7. [`../security/`](../security/)
+8. [`../workflows/`](../workflows/)
+9. This verification index
+10. Relevant UAT packs under [`../uat/`](../uat/)
+11. Relevant module guidance under [`../modules/`](../modules/)
+12. The current implementation prompt
+13. Historical reports, archived notes, or chat summaries
 
 Historical reports can explain context, but they cannot prove the current change works.
 

@@ -39,10 +39,10 @@ Api/
 
 ## Permission Codes
 
-Use:
+Follow the central catalog in `Permissions.cs`. New HR permissions use:
 
 ```text
-{module}.{resource}.{action}
+hr.{module}.{resource}.{action}
 ```
 
 Examples:
@@ -50,8 +50,10 @@ Examples:
 ```text
 hr.employee.view
 hr.leave.request.approve
-hr.salary.view_all
+hr.salary.view
 ```
+
+Legacy permissions in the same catalog may use other formats. Do not rename or normalize existing codes.
 
 ## Integration Events
 

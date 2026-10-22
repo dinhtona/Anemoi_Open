@@ -5,6 +5,7 @@ Use this prompt with Codex.
 ```text
 Read these files first:
 
+- AGENTS.md
 - docs/ai/README.md
 - docs/ai/core/architecture.md
 - docs/ai/core/backend-rules.md

@@ -1,6 +1,6 @@
 # Anemoi Development Guidelines
 
-This document summarizes the development conventions for Anemoi_Open. When in doubt, architecture decisions in [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) take precedence.
+This document summarizes development conventions for Anemoi_Open. Normative rules live in `AGENTS.md`; approved decisions in [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) take precedence over this guide.
 
 ## 1. Architecture
 
@@ -21,7 +21,7 @@ Some cross-service contracts live under `Anemoi.Contract`. Local aggregate IDs b
 ## 2. Layer Responsibilities
 
 | Layer | Responsibility | Dependency Rule |
-| :--- | :--- | :--- |
+| --- | --- | --- |
 | ModelIds | Strongly typed ID wrappers only | Depends only on shared domain primitives |
 | Domain | Entities, aggregate roots, value objects, domain events, domain rules | Must not depend on Application, Infrastructure, or Api |
 | Application | CQRS use cases, handlers, validators, DTOs, Mapperly mappers, abstractions | Must not depend on Infrastructure |
@@ -29,124 +29,79 @@ Some cross-service contracts live under `Anemoi.Contract`. Local aggregate IDs b
 | Api / WorkerService | Host startup, DI, controllers, GraphQL, MassTransit wiring | Depends on Infrastructure |
 | Contract | Cross-service DTOs, integration events, shared wire contracts | Must stay implementation-free |
 
-## 3. CQRS and Result Handling
+## 3. CQRS, Results, And Mapping
 
-- Every mutation must be a command.
-- Every read must be a query.
-- Commands and queries should have dedicated handler files.
-- Handlers return `OneOf<TResult, ErrorDetailResponse>` for expected success/error outcomes.
-- Do not throw exceptions for normal business validation failures.
-- Controllers must not contain business logic or query EF Core directly.
+- Use command/handler/validator for writes and query/handler for reads.
+- Handlers return `OneOf<TResult, ErrorDetailResponse>` for expected outcomes.
+- Do not throw for normal business validation failures.
+- Use Riok.Mapperly. Mapper classes are `partial` and annotated with `[Mapper]` in `Application/Mappings`.
+- Do not use AutoMapper.
+- Use manual wrapper methods when mapping needs generated IDs, hashing, localization, or other non-trivial logic.
 
 ## 4. Strongly Typed IDs
 
 - Use typed ID wrappers such as `EmployeeId`, `UserId`, or `PayrollRunId` for local aggregate IDs.
-- Create new IDs with `new XxxId(IdGenerator.NextGuid())`.
+- Create new IDs in the application layer with `new XxxId(IdGenerator.NextGuid())`.
+- Domain factories accept IDs from the caller.
 - Primitive IDs are allowed at wire boundaries only: DTOs, headers, claims, route values, and integration events.
-- Convert primitive IDs to strongly typed IDs before using them in domain/application logic.
-- Domain factories should accept IDs from the caller; ID generation belongs in the application layer.
+- Convert primitive IDs to strongly typed IDs before using them in domain or application logic.
 
-## 5. Mapping
+## 5. Validation, Localization, And Messaging
 
-- Use Riok.Mapperly for object mapping.
-- Do not use AutoMapper.
-- Mapper classes belong in `Application/Mappings`.
-- Mapper classes must be `partial` and annotated with `[Mapper]`.
-- Use manual wrapper methods when mapping needs generated IDs, hashing, localization, or other non-trivial logic.
-
-## 6. Validation and Localization
-
-- Use FluentValidation for command/query validation.
-- The MediatR validation pipeline triggers validation automatically.
-- User-facing messages must be localized through `IStringLocalizer<SharedResource>` or service-owned resources.
-- Business errors must expose stable error codes.
-- Do not hard-code user-facing Vietnamese or English text in controllers, handlers, validators, filters, or middleware.
-
-## 7. Messaging
-
-- Use MassTransit for event-driven coordination.
-- Publish integration events for cross-service side effects that do not need an immediate result.
-- Use MassTransit request-response for narrow internal calls that require an immediate result.
+- Use FluentValidation; the MediatR validation pipeline triggers validation automatically.
+- Localize user-facing messages through `IStringLocalizer<SharedResource>` or service-owned resources.
+- Business errors expose stable error codes.
+- Use MassTransit for event-driven coordination and internal request-response.
 - Do not use HTTP/gRPC for internal service-to-service workflows unless explicitly approved.
-- External provider calls belong behind application abstractions and infrastructure implementations.
+- Put external provider calls behind application abstractions and infrastructure implementations.
 
-## 8. Authorization
+## 6. Authorization
 
-- Use permission-based authorization.
-- Add permission constants before exposing protected endpoints.
-- Protect endpoints with `[HasPermission(...)]` or the existing permission mechanism.
+- Use permission-based authorization and central permission constants.
+- Protect endpoints with `[HasPermission(...)]`.
 - Do not hard-code business role names in feature code.
 - `Administrator` is a reserved system role handled by centralized authorization logic.
+- See `docs/ai/security/permission-model.md` for the permission catalog and Identity mapping.
 
-## 8.1 Development JWT Key Ownership
+## 7. Development JWT Key Ownership
 
 - Development JWT signing keys must stay outside the repository.
 - `Anemoi.Identity` is the only service allowed to create the development JWT key pair.
-- `Anemoi.Centralize` and `Anemoi.Hr` must treat JWT keys as read-only and load only the configured public key.
-- If the public key is missing in Development, start `Anemoi.Identity` first or ensure the shared `jwt_keys` Docker volume already contains the generated key pair.
+- `Anemoi.Centralize` and `Anemoi.Hr` treat JWT keys as read-only and load only the configured public key.
+- If the public key is missing in Development, start `Anemoi.Identity` first or ensure the shared `jwt_keys` Docker volume already contains the key pair.
 - Do not reintroduce startup logic that lets non-Identity services generate JWT signing keys.
 
-## 9. Feature Workflow
+## 8. Feature Workflow
 
 Implement features in reviewed steps:
 
 1. Domain and data: strongly typed IDs, entities, EF Core configuration, DbContext registration.
 2. Application layer: DTOs/responses, Mapperly mappers, commands, queries, handlers, validators.
 3. API and communication: controllers/GraphQL endpoints, MassTransit events, worker wiring.
+4. Frontend or full-stack: complete browser validation before reporting completion.
 
 Stop after each step for review when the task follows the project's iterative workflow.
 
-For frontend or full-stack work, add a final browser validation step before reporting completion. Use the available browser automation / DevTools MCP to load the implemented page, check console and network errors, exercise the main user flow, verify permission gating and localization, and confirm React Query refresh after mutations. If browser tooling is unavailable, report that limitation explicitly.
+## 9. Additional Conventions
 
-## 10. Do and Do Not
+- Keep the Domain layer free of EF Core and infrastructure dependencies.
+- Use existing BuildingBlocks abstractions before adding new infrastructure.
+- Use `IQueryable` projections or dedicated response projections for read-heavy paths.
+- Centralize business/status/type string literals as constants.
+- Add tests proportional to risk and blast radius.
+- Do not inject repositories into other repositories.
+- Do not return EF Core entities directly from APIs.
+- Do not introduce new libraries without explicit approval.
+- Do not bypass localization, permission checks, or audit requirements for sensitive HR operations.
 
-- DO keep the Domain layer free of EF Core and infrastructure dependencies.
-- DO use existing BuildingBlocks abstractions before adding new infrastructure.
-- DO use `IQueryable` projections or dedicated response projections for read-heavy paths.
-- DO centralize business/status/type string literals as constants.
-- DO add tests proportional to the risk and blast radius of the change.
-- DO run browser validation for frontend-impacting changes.
-- DO NOT inject repositories into other repositories.
-- DO NOT return EF Core entities directly from APIs.
-- DO NOT introduce new libraries without explicit approval.
-- DO NOT bypass localization, permission checks, or audit requirements for sensitive HR operations.
-- DO NOT claim frontend completion based only on build, lint, TypeScript, or unit tests.
+## 10. Verification
 
-## 11. Verification Rules
+Use the statuses and evidence rules in `docs/ai/core/verification-standard.md` and `AGENTS.md` section 8. Code review alone is not evidence.
 
-### Status Definitions
+For frontend or full-stack work, browser validation is the source of truth:
 
-NOT REVIEWED
-REVIEWED
-TESTED
-VERIFIED
-PASS
-FAIL
+```text
+Browser -> Network -> API -> Database -> Code
+```
 
-### Evidence Requirements
-
-Code review alone is not evidence.
-
-A feature may only be marked PASS when:
-- executed through browser or API,
-- expected state change is observed,
-- evidence is recorded.
-
-Acceptable evidence:
-- Browser interaction
-- API response
-- Database state
-- Test execution
-- Build output
-
-### Browser First Principle
-
-For frontend or full-stack features:
-
-Browser
-→ Network
-→ API
-→ Database
-→ Code
-
-The browser is the source of truth.
+If browser tooling is unavailable, report that limitation explicitly instead of claiming browser validation.

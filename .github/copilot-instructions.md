@@ -1,23 +1,7 @@
 # GitHub Copilot / Agent Instructions
 
-Read `docs/ai/README.md` first.
+Read `AGENTS.md` first. It is the single source of truth for mandatory rules.
 
-All repository-specific architecture rules, coding standards, security rules, module rules, and phase prompts are defined under `docs/ai/`.
+Use `docs/ai/README.md` as the documentation map, then read only the task-specific sources under `docs/ai/` and the relevant ADRs.
 
-For HR work, do not generate code before reading:
-
-- `docs/ai/modules/hr/`
-- `docs/ai/security/`
-- `docs/ai/workflows/`
-- `docs/ai/prompts/hr/`
-
-Never bypass:
-- Clean Architecture
-- CQRS
-- Strongly typed IDs
-- Mapperly
-- FluentValidation
-- Permission-based authorization
-- Localization
-- Sensitive permission protection
-- Audit log requirements
+Do not bypass the rules in `AGENTS.md` for architecture, CQRS, typed IDs, Mapperly, validation, permissions, localization, sensitive permissions, audit logging, workflow, or verification.

@@ -1,60 +1,58 @@
 # Sensitive Permissions
 
-Risk levels:
+Sensitive permissions are marked in the central catalog with `IsSensitive = true` and a `RiskLevel`.
+
+## Risk Levels And Assignment Policy
 
 ```text
-Low
-Medium
-High
-Critical
+Medium: warning confirmation, reason, audit log.
+High: warning confirmation, reason, re-authentication or OTP, notification, audit log.
+Critical: warning confirmation, reason, re-authentication or OTP, second approver, notification, audit log, active only after approval.
 ```
 
-## Assignment Policy
+Do not assign sensitive permissions from a normal role-edit screen without the required confirmation flow.
 
-Medium: warning confirmation, reason, audit log.
+The catalog currently contains `High` and `Critical` entries. Treat any new `IsSensitive` entry as subject to the matching policy even if no workflow has been implemented for it yet.
 
-High: warning confirmation, reason, password re-authentication or OTP, notification, audit log.
-
-Critical: warning confirmation, reason, password re-authentication or OTP, second approver, notification, audit log, active only after approval.
-
-## Sensitive HR Permissions
+## Current High-Risk Permissions
 
 ```text
-hr.employee.personal_info.view
-hr.employee.personal_info.update
-hr.employee.bank_info.view
-hr.employee.bank_info.update
-hr.employee.identity_document.view
-hr.employee.identity_document.update
-hr.salary.view_own
-hr.salary.view_all
-hr.salary.update
-hr.salary.adjust
-hr.salary.history.view
-hr.salary.change.approve
-hr.contract.view_all
+hr.leave.balance.adjust
+hr.employee.transfer.create
+hr.promotion.create
+hr.position.change
+hr.grade.change
+hr.contract.view
 hr.contract.create
 hr.contract.update
 hr.contract.terminate
-hr.contract.file.view
-hr.contract.file.download
-hr.leave.balance.adjust
-hr.leave.request.force_approve
-hr.leave.request.force_cancel
-hr.department.transfer
-hr.position.change
-hr.grade.change
-hr.performance.review.view
-hr.performance.review.update
-hr.promotion.approve
-identity.role.update
-identity.permission.assign
-identity.permission.assign_sensitive
-identity.user.deactivate
+hr.salary.view
+hr.salary.change
+hr.salary.grade.manage
+hr.allowance.type.manage
+hr.employee.allowance.change
+hr.attendance.lock
+hr.overtime.manage
+hr.tax.manage
+hr.insurance.manage
+hr.payroll.calculate
+hr.payroll.approve
+hr.payroll.export
+hr.payroll.reporting.export
+hr.probation.manage
+hr.separation.create
+hr.workflow.approve
 ```
 
-Do not allow sensitive permission assignment from a normal role-edit screen without explicit warning and confirmation.
+## Current Critical Permissions
 
-> [!NOTE]
-> - `hr.promotion.create` is the aggregate permission for combined promotion action.
-> - `hr.position.change` and `hr.grade.change` are reserved for future standalone actions.
+```text
+hr.payroll.lock
+```
+
+## Rules
+
+- Keep the permission list in sync with `Permissions.cs`; do not maintain a separate module-local list.
+- Sensitive actions require an audit log entry.
+- Sensitive assignments must not be possible through a normal role edit without the required warning, reason, and approval.
+- Critical permissions activate only after the required approval.

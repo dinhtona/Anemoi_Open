@@ -1,5 +1,7 @@
 # Localization Rules
 
+Normative rules are in `AGENTS.md` section 7. This file defines the supported cultures and resource conventions.
+
 ## Backend
 
 Supported cultures:

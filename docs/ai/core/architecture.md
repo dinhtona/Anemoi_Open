@@ -2,16 +2,14 @@
 
 Anemoi_Open is based on:
 
-- Microservices architecture
-- Docker Compose for local orchestration
-- Event-driven communication
-- RabbitMQ through MassTransit
-- Clean Architecture
-- CQRS
-- PostgreSQL for most services
-- PostgreSQL for all services including Saga persistence (MassTransit EF Core)
+- Microservices deployed with Docker Compose for local orchestration.
+- Event-driven communication through RabbitMQ and MassTransit.
+- Clean Architecture and CQRS.
+- PostgreSQL for all services, including MassTransit EF Core saga persistence.
 
-## Existing Conceptual Services
+Normative architecture rules are in `AGENTS.md` section 2.
+
+## Existing Services
 
 ```text
 anemoi_centralize
@@ -21,49 +19,21 @@ anemoi_workspace
 anemoi_orchestrator
 anemoi_notification
 anemoi_secure
-```
-
-## HR Direction
-
-Introduce HR as a bounded context first:
-
-```text
 anemoi_hr
 ```
 
-Recommended projects:
+## HR Bounded Context
+
+HR is a bounded context inside the modular monolith:
 
 ```text
-Anemoi.Hr.ModelIds
-Anemoi.Hr.Domain
-Anemoi.Hr.Application
-Anemoi.Hr.Infrastructure
-Anemoi.Hr.Api
+Anemoi.Hr/Anemoi.Hr.ModelIds
+Anemoi.Hr/Anemoi.Hr.Domain
+Anemoi.Hr/Anemoi.Hr.Application
+Anemoi.Hr/Anemoi.Hr.Infrastructure
+Anemoi.Hr/Anemoi.Hr.Api
 ```
 
-Future split is possible, but not required initially:
+HR modules share employee profile, department hierarchy, approval workflow, leave balance, payroll, contracts, grades, career paths, sensitive permissions, and audit logs.
 
-```text
-anemoi_employee
-anemoi_leave
-anemoi_payroll
-anemoi_contract
-anemoi_performance
-```
-
-## Why One HR Bounded Context First
-
-HR modules share many rules:
-
-- Employee profile
-- Department hierarchy
-- Approval workflow
-- Leave balance
-- Payroll
-- Contract
-- Grade
-- Career path
-- Sensitive permissions
-- Audit logs
-
-Splitting too early creates unnecessary distributed transaction complexity. Keep boundaries clean so future extraction remains possible.
+Future extraction into separate services is possible but not required. Keep boundaries clean so extraction remains possible.

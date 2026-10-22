@@ -2,24 +2,22 @@
 
 Target frontend repository: `cody-web-app`.
 
+Normative rules are in `AGENTS.md` section 4. This file defines the frontend structure and validation details. Project-specific patterns for error handling, async UI, and layout are in `cody-web-app/frontend-guidelines.md`.
+
 ## Required Stack
 
-Use:
+- Next.js 16 App Router.
+- TypeScript strict mode, no `any`.
+- Tailwind CSS.
+- shadcn/ui and Radix UI.
+- Lucide React.
+- TanStack Query v5.
+- Axios.
+- React Hook Form and Zod.
+- next-intl.
+- next-themes.
 
-- Next.js 14+ App Router
-- TypeScript strict mode
-- Tailwind CSS
-- shadcn/ui
-- Radix UI
-- Lucide React
-- TanStack Query v5
-- Axios
-- React Hook Form
-- Zod
-- next-intl
-- next-themes
-
-Do not use `any`.
+Read `cody-web-app/node_modules/next/dist/docs/` for the installed version before writing code. Do not rely on older Next.js conventions.
 
 ## Standard Folder Structure
 
@@ -49,63 +47,55 @@ src/services/hr/
 src/types/hr/
 ```
 
-## API Rules
+## API And Data Rules
 
 - Define TypeScript interfaces before UI.
 - API calls belong in `services/`.
 - React Query hooks belong in `hooks/`.
 - UI components only render data and call hooks.
-- Shared HTTP failures belong to the existing Axios interceptor.
-- Feature code must not duplicate global error toasts.
+- Shared HTTP failures belong to the Axios interceptor.
+- Feature code must not duplicate global error toasts or console errors.
+- Use `handleLocalApiError()` before showing a local domain error.
+- Consume rejected `mutateAsync()` promises in form/dialog handlers.
 
 ## i18n Rules
 
-- Use `next-intl`.
-- Frontend locales: `vi`, `en`.
-- Default frontend locale: `vi`.
-- Send backend culture through `Accept-Language`:
-  - `vi -> vi-VN`
-  - `en -> en-US`
-- All UI text must be added to:
-  - `messages/vi.json`
-  - `messages/en.json`
+- Use next-intl with locale-prefixed routes.
+- Frontend locales: `vi`, `en`. Default: `vi`.
+- Map `vi -> vi-VN` and `en -> en-US` through `Accept-Language`.
+- All UI text belongs in `messages/vi.json` and `messages/en.json`.
+- Do not translate backend codes or user-entered domain data.
 
 ## Layout Rules
 
-Use compact dashboard layout:
+Use the compact dashboard layout:
 
 ```tsx
 <div className="flex flex-col gap-3 w-full">
 ```
 
-Avoid large padding, excessive shadows, and large grid gaps.
+Avoid large padding, excessive shadows, `gap-6` or larger, and `rounded-3xl`. Use compact card padding (`p-4` or `p-3`). Detailed spacing rules are in `cody-web-app/frontend-guidelines.md`.
 
-## Browser Validation Rules
+## Browser Validation
 
-For any frontend or full-stack task that changes pages, components, hooks, services, routing, permissions, localization, or user workflows, browser validation is mandatory before reporting completion.
+Browser validation is mandatory for any frontend or full-stack change that affects pages, components, hooks, services, routing, permissions, localization, or user workflows.
 
-Use the available browser automation / DevTools MCP. If browser tooling is unavailable, state that explicitly and do not claim browser validation passed.
-
-Build, TypeScript, lint, and unit tests are not enough for frontend completion. A phase is not complete until the implemented UI is exercised in the browser.
+Use available browser automation / DevTools MCP. If tooling is unavailable, state that explicitly and do not claim browser validation passed.
 
 Required checks:
 
-- Start the frontend application.
-- Open the implemented route in the browser.
-- Verify the page renders without React runtime errors.
-- Verify there are no unhandled promise rejections.
+- Start the application and open the changed route.
+- Verify the page renders without React runtime errors or unhandled promise rejections.
 - Verify there are no unexpected failed network requests.
-- Verify API data renders correctly.
-- Execute the main user flow for the task.
-- For CRUD screens, test create, edit, detail/view, delete or cancel where applicable.
-- Verify primary workflow actions such as submit, approve, reject, publish, send, or complete where applicable.
-- Verify success and error feedback behavior.
-- Verify React Query cache invalidation or refresh updates visible tables/cards.
+- Verify API data renders correctly and the main flow works.
+- For CRUD screens, test create, edit, detail/view, delete/cancel where applicable.
+- Verify success and error feedback.
+- Verify React Query cache invalidation updates the visible UI.
 - Verify permission-based UI visibility.
 - Verify `vi` and `en` localization for touched UI.
-- Capture console errors and network failures in the final report.
+- Capture console errors and network failures.
 
-Required browser validation report:
+Required report:
 
 ```text
 Browser Validation:
@@ -119,11 +109,6 @@ Browser Validation:
 - Localization: PASS/FAIL
 ```
 
-For workflow pages, also validate:
+For workflow pages, also verify submit/start, pending approval visibility, approve/reject, target status, history, notifications, and visible UI refresh.
 
-- Create or open the target request.
-- Submit/start the workflow.
-- Verify workflow instance or approval state is created.
-- Open pending approvals.
-- Approve or reject the request.
-- Verify status, history, notifications, and visible UI refresh.
+Build, TypeScript, lint, and unit tests are not substitutes for browser validation.

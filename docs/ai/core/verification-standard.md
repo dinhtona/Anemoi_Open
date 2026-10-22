@@ -1,6 +1,6 @@
 # Verification Standard
 
-AI agents must not report work as complete unless the required checks were actually run in the current session.
+`AGENTS.md` section 8 is the canonical summary. This file defines the full status vocabulary and minimum evidence standard. AI agents must not report work as complete unless the required checks were actually run in the current session.
 
 Use these statuses:
 
@@ -19,6 +19,8 @@ Minimum evidence:
 - Frontend changes: frontend build plus browser validation through available DevTools MCP.
 - Workflow changes: active WorkflowDefinition, submit/start, pending approval visibility, approve/reject through workflow commands, target status update, history, and notification evidence.
 - Localization changes: verify touched `vi` and `en` keys.
+- Security changes: allowed and denied authorization checks.
+- Sensitive HR changes: authorization, audit trail, database state, and no cross-employee exposure.
 
 Frontend or full-stack reports must include page load, console errors, network errors, runtime exceptions, main flow, permission checks, and localization results.
 

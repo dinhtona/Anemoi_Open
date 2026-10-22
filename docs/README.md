@@ -7,24 +7,25 @@ This directory is the documentation map for Anemoi_Open. Use it to find the righ
 Use this precedence when documents disagree:
 
 1. `docs/architecture/ARCHITECTURE_DECISIONS.md`
-2. `ArchitectureGuide.md`
-3. `docs/ai/core/*`
-4. `docs/ai/security/*` and `docs/ai/workflows/*`
-5. `docs/ai/modules/*`
-6. Approved roadmap/spec files
-7. Execution plans, completion reports, prompts, and historical notes
+2. `AGENTS.md`
+3. `ArchitectureGuide.md`
+4. `docs/ai/core/*`
+5. `docs/ai/security/*` and `docs/ai/workflows/*`
+6. `docs/ai/modules/*`
+7. Approved roadmap/spec files
+8. Execution plans, completion reports, prompts, and historical notes
 
 Technical debt recommendations do not override approved architecture decisions.
 
 ## Start Here
 
-- `AI_ENGINEERING_HANDBOOK.md` - entry point and runtime flow for AI agents
-- `ai/README.md` - mandatory AI working guide
+- `../AGENTS.md` - single source of truth for mandatory rules
+- `AI_ENGINEERING_HANDBOOK.md` - runtime flow, evidence, and reporting contract
+- `ai/README.md` - documentation map and task-specific reading
 - `ai/AI_CONTEXT.md` - compact context for agent sessions
 - `../README.md` - project overview and setup
 - `../ArchitectureGuide.md` - practical architecture guide
 - `../DEVELOPMENT.md` - development conventions
-- `../AGENTS.md` - compact project memory for coding agents
 
 ## Architecture
 
@@ -35,8 +36,8 @@ Technical debt recommendations do not override approved architecture decisions.
 
 ## AI Guidelines
 
-- `AI_ENGINEERING_HANDBOOK.md` - AI engineering entry point, runtime flow, reporting contract, and definition of done
-- `ai/README.md` - reading order, rule precedence, execution policy
+- `AI_ENGINEERING_HANDBOOK.md` - runtime flow, evidence, and reporting contract
+- `ai/README.md` - documentation map, reading order, and execution policy
 - `ai/core/architecture.md` - core architecture direction
 - `ai/core/backend-rules.md` - backend engineering rules
 - `ai/core/frontend-rules.md` - frontend engineering rules
