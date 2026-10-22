@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 10, EF Core + PostgreSQL xmin concurrency, MediatR + OneOf, Mapperly, FluentValidation, MassTransit + RabbitMQ
 
-**Design doc:** `docs/superpowers/specs/2026-06-22-phase33-employee-lifecycle-design.md`
+**Design doc:** `docs/specs/2026-06-22-phase33-employee-lifecycle-design.md`
 
 ---
 

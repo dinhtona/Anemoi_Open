@@ -41,7 +41,7 @@ For HR-related work, also read all relevant files under:
 
 ```text
 docs/ai/modules/hr/
-docs/ai/RoadmapDocumentation/hr/
+docs/roadmap/hr/
 docs/ai/prompts/hr/
 ```
 

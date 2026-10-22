@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 10, CQRS + MediatR, EF Core + PostgreSQL, Mapperly, Next.js 14 App Router, React Query, shadcn/ui, next-intl.
 
-**Design doc:** `docs/superpowers/specs/2026-06-20-phase31-hr-settings-master-data-hub-design.md`
+**Design doc:** `docs/specs/2026-06-20-phase31-hr-settings-master-data-hub-design.md`
 
 ---
 

@@ -19,15 +19,18 @@ Technical debt recommendations do not override approved architecture decisions.
 ## Start Here
 
 - `AI_ENGINEERING_HANDBOOK.md` - entry point and runtime flow for AI agents
+- `ai/README.md` - mandatory AI working guide
+- `ai/AI_CONTEXT.md` - compact context for agent sessions
 - `../README.md` - project overview and setup
 - `../ArchitectureGuide.md` - practical architecture guide
 - `../DEVELOPMENT.md` - development conventions
 - `../AGENTS.md` - compact project memory for coding agents
-- `ai/README.md` - mandatory AI working guide
 
 ## Architecture
 
 - `architecture/ARCHITECTURE_DECISIONS.md` - approved architecture decisions
+- `architecture/RELEASE_1_ARCHITECTURE_FREEZE.md` - Release 1 architecture freeze
+- `architecture/adr/` - individual architecture decision records
 - `architecture/TECHNICAL_DEBT_REGISTER.md` - known technical debt and remediation notes
 
 ## AI Guidelines
@@ -38,36 +41,44 @@ Technical debt recommendations do not override approved architecture decisions.
 - `ai/core/backend-rules.md` - backend engineering rules
 - `ai/core/frontend-rules.md` - frontend engineering rules
 - `ai/core/verification-standard.md` - execution evidence and status rules for AI reports
-- `ai/verification/` - browser, API, database, and workflow verification guides
-- `ai/uat/` - browser UAT packs for product flows
-- `ai/prompts/templates/` - reusable implementation, audit, and bugfix prompt templates
 - `ai/core/localization.md` - localization rules
 - `ai/core/naming-conventions.md` - naming conventions
+- `ai/verification/` - browser, API, database, and workflow verification guides
+- `ai/uat/` - browser UAT packs for product flows
+- `ai/prompts/templates/` - reusable implementation, audit, bugfix, and planning templates
 - `ai/security/` - permission, sensitive permission, and audit rules
 - `ai/workflows/` - approval workflow rules
-- `AI_CONTEXT.md` - compact context for agent sessions
+- `ai/modules/` - module guidance
 
 ## HR Documentation
 
 - `ai/modules/hr/` - HR module guidance
-- `ai/RoadmapDocumentation/hr/` - HR roadmap and approved phase descriptions
+- `roadmap/hr/` - HR roadmap and approved phase descriptions
 - `ai/prompts/hr/` - phase prompts used for guided implementation
+
+## Operations
+
+- `operations/PRODUCTION_DEPLOYMENT.md` - production deployment guide
+- `operations/BACKUP_RESTORE_AND_ROLLBACK.md` - backup, restore, and rollback procedures
+- `operations/OBSERVABILITY_BASELINE.md` - observability baseline
+- `operations/production-baseline.md` - production topology and service baseline
+- `operations/HTTPS.md` - local HTTPS and Cloudflare Tunnel setup
 
 ## Plans, Specs, And Reports
 
 - `plans/` - current or recent implementation plans
-- `superpowers/specs/` - detailed design specs and drafts
-- `superpowers/plans/` - execution plans
-- `superpowers/reports/` - completion reports
-- `archive/superseded/` - preserved old prompts/reports that are no longer canonical
+- `specs/` - detailed design specs and drafts
+- `reports/` - completion and verification reports
+- `audit/` - phase audit evidence and UAT reports
+- `archive/superseded/` - preserved old prompts and reports that are no longer canonical
 
-These files are useful historical context, but they should not redefine platform-wide rules already covered by ADRs, architecture guides, or AI core rules.
+These files are useful historical context, but they should not redefine platform-wide rules already covered by ADRs, architecture guides, or AI core rules. Completed plans, specs, and reports are historical even when they remain useful as implementation detail.
 
-Some `superpowers` execution files use phase numbers local to an implementation run. For HR product roadmap phase names, prefer `ai/RoadmapDocumentation/hr/README.md`.
+Some execution plans use phase numbers local to an implementation run. For HR product roadmap phase names, prefer `roadmap/hr/README.md`.
 
 ## Archived Superseded Files
 
-The following older prompt/report files were moved to `archive/superseded/` because they still contain useful historical implementation detail, but should not be used as current source-of-truth:
+The following older prompt/report files live in `archive/superseded/` because they still contain useful historical implementation detail, but should not be used as current source-of-truth:
 
 - `archive/superseded/prompts/hr-platform-codex-prompts.md`
 - `archive/superseded/prompts/CODEX_PROMPT_START_HERE.md`
@@ -77,15 +88,10 @@ The following older prompt/report files were moved to `archive/superseded/` beca
 - `archive/superseded/phase-16-overtime/OVERTIME_IMPLEMENTATION.md`
 - `archive/superseded/phase-25-recruitment/2026-06-16-phase25-recruitment-design.md`
 
-## Removed Low-Value Files
-
-The following file was removed because it was an outdated folder snapshot and its useful content is covered by the documentation map:
-
-- `docs/ai/FOLDER_STRUCTURE.md`
-
 ## Maintenance Rules
 
 - Prefer linking to an existing rule instead of copying it.
 - Mark phase documents as draft, approved, implemented, or superseded when possible.
-- Move obsolete plans/reports to an archive folder instead of leaving them mixed with active guidance.
+- Promote a document by lifecycle: new plans to `plans/`, design specs to `specs/`, completion reports to `reports/`, audit evidence to `audit/`, and obsolete documents to `archive/superseded/`.
 - Keep README files short and navigational.
+- Update this map when adding, moving, or archiving documentation.

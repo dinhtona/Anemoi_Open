@@ -18,7 +18,7 @@
 
 **Tech Stack:** .NET 10, EF Core + PostgreSQL, MediatR + OneOf, Mapperly, FluentValidation, Next.js (cody-web-app)
 
-**Design Doc:** `docs/superpowers/specs/2026-07-01-phase34-employee-administration-design.md`
+**Design Doc:** `docs/specs/2026-07-01-phase34-employee-administration-design.md`
 
 ---
 

@@ -1,6 +1,6 @@
 # ANEMOI HR Agent Context
 
-Compact HR context for agent sessions. Use [docs/README.md](README.md) for the full documentation map.
+Compact HR context for agent sessions. Use [docs/README.md](../README.md) for the full documentation map.
 
 ## Required References
 
