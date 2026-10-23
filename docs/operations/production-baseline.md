@@ -123,7 +123,7 @@ cp .env.example .env
 docker compose up -d --build
 
 # 3. Verify
-docker compose ps              # 13 services Up
+docker compose ps              # 12 services Up
 docker compose ps postgres     # healthy
 docker compose ps rabbitmq     # healthy
 docker compose ps redis        # healthy
@@ -146,7 +146,7 @@ See `.env.example` for full template. **Required for baseline:**
 
 - [x] Build succeeds (0 errors)
 - [x] All tests pass (575/575)
-- [x] Docker stack starts cleanly (13 services)
+- [x] Docker stack starts cleanly (12 services)
 - [x] Database migrations applied (5 databases)
 - [x] JWT authentication works (RS256)
 - [x] Permission enforcement verified (3 scopes)

@@ -25,17 +25,17 @@ The platform currently covers identity and access management, workspace manageme
 Anemoi.BuildingBlocks/   Shared kernel, base abstractions, CQRS pipeline, helpers
 Anemoi.Centralize/       Gateway / aggregation API
 Anemoi.Contract/         Shared contracts, integration events, cross-service DTOs
-Anemoi.Grpc/             gRPC service contracts/layers
+Anemoi.Grpc/             gRPC contracts (stub, no active service yet)
 Anemoi.Hr/               Core HR bounded context
 Anemoi.Identity/         Authentication, users, role groups, permissions
-Anemoi.Kubernetes/       Kubernetes deployment resources
+Anemoi.Kubernetes/       K8s resources (stub/planned)
 Anemoi.MasterData/       Static/reference data
 Anemoi.Notification/     Notification and email dispatch
-Anemoi.Orchestration/    Saga orchestration
-Anemoi.Secure/           Security and encryption service
-Anemoi.Storage/          File/object storage service
+Anemoi.Orchestration/    Saga orchestration (stub, placeholder README)
+Anemoi.Secure/           Security and encryption service (stub, placeholder README)
+Anemoi.Storage/          File/object storage service (stub, empty)
 Anemoi.Workspace/        Workspace and multi-tenancy management
-cody-web-app/            Frontend application
+cody-web-app/            Frontend application (separate nested repo)
 docs/                    Architecture, AI guidelines, roadmap, plans, reports
 ```
 

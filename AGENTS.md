@@ -4,7 +4,7 @@ This is the single source of truth for mandatory rules. Detailed guidance lives 
 
 ## Project Snapshot
 
-- Modular monolith with independently deployable .NET services: Centralize, Identity, MasterData, Workspace, Notification, Secure, Orchestrator, and HR.
+- Modular monolith with independently deployable .NET services: Centralize, Identity, MasterData, Workspace, Notification, and HR. Orchestrator and Secure are placeholder/stub services (planned, not active in docker-compose).
 - HR is a bounded context under `Anemoi.Hr/` with Domain, Application, Infrastructure, Api, and ModelIds projects.
 - Frontend is `cody-web-app` on Next.js 16 App Router.
 - PostgreSQL is the primary database; MassTransit over RabbitMQ handles internal messaging.
@@ -25,6 +25,9 @@ Then read only what the task needs:
 - Workflow: `docs/ai/workflows/` and ADR-027, ADR-028, ADR-029
 - HR: `docs/ai/modules/hr/` and `docs/roadmap/hr/`
 - Decisions: `docs/architecture/ARCHITECTURE_DECISIONS.md`
+- Docs map / Start Here: `docs/README.md` (consolidated source-of-truth policy).
+
+`cody-web-app/AGENTS.md` and `cody-web-app/frontend-guidelines.md` live in the separate nested `cody-web-app` repo; they are required reading for frontend work when that repo is checked out alongside this one.
 
 If a required source cannot be read, stop and report `BLOCKED` with the missing path.
 

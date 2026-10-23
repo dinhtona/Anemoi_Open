@@ -20,6 +20,10 @@ Last Updated: 2026-10-16
 
 ---
 
+ADR numbering is not contiguous: ADR-022–024 and ADR-030–034 were retired, merged, or renumbered during earlier refactors and are not missing files.
+
+---
+
 # Purpose
 
 This document records architectural decisions that have been intentionally approved for ANEMOI HR.

@@ -14,7 +14,10 @@ docker compose up -d --build
 Open `https://localhost` or `https://localhost:3000`. Both URLs enter through
 Caddy. The port `3000` alias is available for OAuth test callbacks that were
 already registered with that port. Caddy routes `/api/*` and `/hubs/*` to
-`anemoi_centralize`; all other requests go to `anemoi_web`.
+`anemoi_centralize`. The `anemoi_web` fallback route for non-API requests is
+currently disabled (commented out in `Caddyfile` and `docker-compose.yml`
+pending CRIT-2/FUNC-001), so non-API requests match no route in local compose
+until it is re-enabled.
 
 The frontend is built on the host before Docker packages its standalone
 runtime. This avoids running the memory-intensive Next.js build inside Docker.

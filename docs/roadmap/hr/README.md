@@ -1,4 +1,4 @@
-# ANEMOI HR Roadmap - Phase 16 to Phase 28
+# ANEMOI HR Roadmap - Phase 06 to Phase 28
 
 This folder contains concise roadmap/design documents for ANEMOI HR modules.
 
@@ -10,6 +10,16 @@ Treat this file as the source for HR roadmap phase names.
 
 | Phase | Module | Status |
 |---|---|---|
+| 06 | HR Dashboard | Implemented |
+| 07 | Department Transfer | Implemented |
+| 08 | Promotion Management | Implemented |
+| 09 | Contract Management | Implemented |
+| 10 | Compensation Management | Implemented |
+| 11 | Payroll MVP | Implemented |
+| 12 | Attendance → Payroll Integration | Implemented |
+| 13 | Payroll Approval Workflow MVP | Implemented |
+| 14 | Payslip MVP | Implemented |
+| 15 | Payroll Reporting - Export MVP | Implemented |
 | 16 | Overtime Management | Implemented |
 | 17 | Shift Management | Implemented |
 | 18 | Holiday & Working Calendar Engine | Implemented |
