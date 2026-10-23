@@ -20,7 +20,7 @@ When documents disagree:
 3. `ArchitectureGuide.md` and `docs/ai/core/*`
 4. `docs/ai/security/*`, `docs/ai/workflows/*`, `docs/ai/modules/*`
 5. Approved roadmap and specs
-6. Plans, reports, prompts, and historical notes
+6. Specs, prompt templates, and historical notes
 
 Technical debt recommendations do not override approved architecture decisions.
 

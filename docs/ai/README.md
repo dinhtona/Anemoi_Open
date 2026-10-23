@@ -21,7 +21,7 @@ This folder explains how to apply the rules. The mandatory rules live in `AGENTS
 Approved ADRs
 > AGENTS.md
 > Task-specific docs under docs/ai/
-> Roadmap, plans, specs, reports
+> Roadmap, specs, historical notes
 ```
 
 If a task-specific document conflicts with `AGENTS.md`, follow `AGENTS.md` and report the conflict.

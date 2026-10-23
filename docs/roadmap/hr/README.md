@@ -2,9 +2,9 @@
 
 This folder contains concise roadmap/design documents for ANEMOI HR modules.
 
-Detailed design specs, execution plans, and completion reports may exist under `docs/specs/`, `docs/plans/`, and `docs/reports/`, but this folder is the compact HR roadmap index. Use ADRs and `docs/ai/core/*` for platform-wide rules.
+Detailed design specs may exist under `docs/specs/`, but this folder is the compact HR roadmap index. Use ADRs and `docs/ai/core/*` for platform-wide rules.
 
-Note: some execution plans under `docs/plans/` use phase numbers that do not match this HR roadmap numbering. Treat this file as the source for HR roadmap phase names.
+Treat this file as the source for HR roadmap phase names.
 
 ## Phase Index
 

@@ -13,7 +13,7 @@ Use this precedence when documents disagree:
 5. `docs/ai/security/*` and `docs/ai/workflows/*`
 6. `docs/ai/modules/*`
 7. Approved roadmap/spec files
-8. Execution plans, completion reports, prompts, and historical notes
+8. Historical specs and prompt templates
 
 Technical debt recommendations do not override approved architecture decisions.
 
@@ -30,14 +30,11 @@ Technical debt recommendations do not override approved architecture decisions.
 ## Architecture
 
 - `architecture/ARCHITECTURE_DECISIONS.md` - approved architecture decisions
-- `architecture/RELEASE_1_ARCHITECTURE_FREEZE.md` - Release 1 architecture freeze
 - `architecture/adr/` - individual architecture decision records
 - `architecture/TECHNICAL_DEBT_REGISTER.md` - known technical debt and remediation notes
 
 ## AI Guidelines
 
-- `AI_ENGINEERING_HANDBOOK.md` - runtime flow, evidence, and reporting contract
-- `ai/README.md` - documentation map, reading order, and execution policy
 - `ai/core/architecture.md` - core architecture direction
 - `ai/core/backend-rules.md` - backend engineering rules
 - `ai/core/frontend-rules.md` - frontend engineering rules
@@ -55,7 +52,6 @@ Technical debt recommendations do not override approved architecture decisions.
 
 - `ai/modules/hr/` - HR module guidance
 - `roadmap/hr/` - HR roadmap and approved phase descriptions
-- `ai/prompts/hr/` - phase prompts used for guided implementation
 
 ## Operations
 
@@ -65,34 +61,17 @@ Technical debt recommendations do not override approved architecture decisions.
 - `operations/production-baseline.md` - production topology and service baseline
 - `operations/HTTPS.md` - local HTTPS and Cloudflare Tunnel setup
 
-## Plans, Specs, And Reports
+## Historical Specs
 
-- `plans/` - current or recent implementation plans
-- `specs/` - detailed design specs and drafts
-- `reports/` - completion and verification reports
-- `audit/` - phase audit evidence and UAT reports
-- `archive/superseded/` - preserved old prompts and reports that are no longer canonical
+- `specs/` - implemented phase design specs
 
-These files are useful historical context, but they should not redefine platform-wide rules already covered by ADRs, architecture guides, or AI core rules. Completed plans, specs, and reports are historical even when they remain useful as implementation detail.
+These files are historical context and do not define platform-wide rules. Delete superseded documents instead of keeping parallel copies; Git history preserves them.
 
-Some execution plans use phase numbers local to an implementation run. For HR product roadmap phase names, prefer `roadmap/hr/README.md`.
-
-## Archived Superseded Files
-
-The following older prompt/report files live in `archive/superseded/` because they still contain useful historical implementation detail, but should not be used as current source-of-truth:
-
-- `archive/superseded/prompts/hr-platform-codex-prompts.md`
-- `archive/superseded/prompts/CODEX_PROMPT_START_HERE.md`
-- `archive/superseded/phase-16-overtime/PHASE16_FINAL_STATUS.md`
-- `archive/superseded/phase-16-overtime/PHASE16_IMPLEMENTATION_REPORT.md`
-- `archive/superseded/phase-16-overtime/PHASE16_IMPLEMENTATION_SUMMARY.md`
-- `archive/superseded/phase-16-overtime/OVERTIME_IMPLEMENTATION.md`
-- `archive/superseded/phase-25-recruitment/2026-06-16-phase25-recruitment-design.md`
+For HR product roadmap phase names, prefer `roadmap/hr/README.md`.
 
 ## Maintenance Rules
 
 - Prefer linking to an existing rule instead of copying it.
-- Mark phase documents as draft, approved, implemented, or superseded when possible.
-- Promote a document by lifecycle: new plans to `plans/`, design specs to `specs/`, completion reports to `reports/`, audit evidence to `audit/`, and obsolete documents to `archive/superseded/`.
 - Keep README files short and navigational.
-- Update this map when adding, moving, or archiving documentation.
+- Add design specs to `specs/` only when they remain useful after implementation.
+- Delete superseded documents; do not create archive copies.

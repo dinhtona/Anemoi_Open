@@ -42,7 +42,7 @@ When verification guidance conflicts, use this order:
 10. Relevant UAT packs under [`../uat/`](../uat/)
 11. Relevant module guidance under [`../modules/`](../modules/)
 12. The current implementation prompt
-13. Historical reports, archived notes, or chat summaries
+13. Historical specs or chat summaries
 
 Historical reports can explain context, but they cannot prove the current change works.
 
