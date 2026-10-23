@@ -1,0 +1,28 @@
+{
+  "description": "Shared exemptions for the architecture guard. Read by scripts/architecture-guard.ps1 and tools/Anemoi.ArchitectureGuard/Program.cs so both stay in sync. Every entry must be narrow (one file) and carry a reason. See docs/ai/architecture-guard/README.md.",
+  "excludedScanPrefixes": [
+    "tools/"
+  ],
+  "guidNewGuidExemptions": [
+    {
+      "path": "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/QueryHelpers/EfQueryCrossCuttingHandler.cs",
+      "reason": "Random EF sort key for unsorted queries; not an aggregate identifier."
+    },
+    {
+      "path": "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/QueryHelpers/EfQueryCountingCrossCuttingHandler.cs",
+      "reason": "Random EF sort key for unsorted queries; not an aggregate identifier."
+    },
+    {
+      "path": "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Application/QueryHelpers/EfQueryNameMapIdCrossCuttingHandler.cs",
+      "reason": "Random EF sort key for unsorted queries; not an aggregate identifier."
+    },
+    {
+      "path": "Anemoi.BuildingBlocks/Anemoi.BuildingBlock.Infrastructure/Services/S3FileService.cs",
+      "reason": "Object key / stored file name in object storage; not an aggregate identifier."
+    },
+    {
+      "path": "Anemoi.MasterData/Anemoi.MasterData.Application/Services/DataGeneratorService.cs",
+      "reason": "Synthetic demo value for a fake data column; not an aggregate identifier."
+    }
+  ]
+}

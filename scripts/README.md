@@ -12,6 +12,7 @@ This directory contains helper scripts for AI engineering verification. The scri
 | `verify-workflow.ps1` | Workflow verification checklist plus optional workflow definition endpoint check. |
 | `verify-browser.ps1` | Browser validation checklist plus optional route reachability check. DevTools MCP is still required for true frontend PASS. |
 | `architecture-guard.ps1` | PowerShell + Roslyn architecture guard for common architecture/security violations. |
+| `architecture-guard-exemptions.json` | Shared, documented exemptions read by both the PowerShell and Roslyn guard passes. See `docs/ai/architecture-guard/README.md`. |
 
 ## Common Commands
 
