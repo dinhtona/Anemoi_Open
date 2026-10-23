@@ -77,7 +77,7 @@ Final report format:
   - Area | Expected | Actual | Evidence | Status
 - Recommended fixes:
 - Known limitations / unverified areas:
-- Final status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Final status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

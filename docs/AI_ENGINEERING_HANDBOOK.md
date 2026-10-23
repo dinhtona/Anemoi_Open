@@ -9,6 +9,8 @@ This handbook defines the runtime flow, verification evidence, and reporting con
 3. `docs/ai/core/verification-standard.md`
 4. Relevant task-specific docs under `docs/ai/`
 
+For frontend work, also read `cody-web-app/AGENTS.md` and `cody-web-app/frontend-guidelines.md`.
+
 If a required source cannot be read, stop and report `BLOCKED` with the missing path.
 
 ## 2. Source Of Truth
@@ -68,7 +70,7 @@ Use only the status vocabulary in `docs/ai/core/verification-standard.md`.
 
 ## 5. Browser And Workflow Evidence
 
-A browser report should include the user account, route, actions performed, expected UI result, network requests checked, console errors checked, and final status.
+A browser report should include the user account, route, actions performed, expected UI result, network requests checked, console errors checked, and final status. Use the standard report template in `docs/ai/verification/browser.md`.
 
 For workflow changes, verify the full path:
 

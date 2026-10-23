@@ -47,7 +47,7 @@ Security rules:
 - Position/job title/department must never grant permissions or JWT claims.
 - System permissions must come only from explicit Identity role groups/permission assignments.
 - Workflow roles route approval responsibility only and must not grant system access.
-- Frontend authorization must use `user.permissions`, not display role names.
+- Frontend authorization must use `user.permissions`, not display roles.
 - Protected endpoints must use central permission constants and `[HasPermission]` where applicable.
 - Module-local permission string literals are forbidden unless they delegate to central permission constants.
 - Permission metadata must be localized through backend resource files when changed.
@@ -88,7 +88,7 @@ Final report format:
 - Audit/log evidence:
 - Browser evidence, if UI affected:
 - Known limitations / unverified areas:
-- Status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

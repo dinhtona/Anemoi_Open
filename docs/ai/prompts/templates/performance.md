@@ -66,7 +66,7 @@ Required investigation:
 Required verification:
 - Backend/API: build, relevant tests, API timing evidence, and authorization checks when endpoints are protected.
 - Database: query shape/index/schema verification when database performance is involved.
-- Frontend: build and browser validation, including network waterfall or route interaction evidence.
+- Frontend: build, lint/type checks, and browser validation, including network waterfall or route interaction evidence.
 - Workflow/event-driven: prove workflow state, history, target status, and event/notification side effects still work.
 - Payroll/sensitive HR data: prove calculations/snapshots/sensitive scope remain correct.
 
@@ -83,7 +83,7 @@ Final report format:
 - Correctness verification:
 - Security/scope verification:
 - Known limitations / unverified areas:
-- Status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

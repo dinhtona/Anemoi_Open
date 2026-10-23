@@ -9,6 +9,8 @@ Compact HR context for agent sessions. Mandatory rules are in `AGENTS.md`; use [
 - `docs/architecture/ARCHITECTURE_DECISIONS.md`
 - `docs/architecture/TECHNICAL_DEBT_REGISTER.md`
 - `docs/ai/core/backend-rules.md`
+- `cody-web-app/AGENTS.md`
+- `cody-web-app/frontend-guidelines.md`
 - `docs/ai/core/frontend-rules.md`
 
 ## HR Architecture Principles

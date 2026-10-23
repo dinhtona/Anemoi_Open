@@ -17,6 +17,8 @@ Use this precedence when documents disagree:
 
 Technical debt recommendations do not override approved architecture decisions.
 
+Within `cody-web-app`, `cody-web-app/AGENTS.md` is the frontend source of truth and `cody-web-app/frontend-guidelines.md` holds the detailed patterns. If either conflicts with a platform rule above, the platform rule wins.
+
 ## Start Here
 
 - `../AGENTS.md` - single source of truth for mandatory rules
@@ -36,7 +38,9 @@ Technical debt recommendations do not override approved architecture decisions.
 
 - `ai/core/architecture.md` - core architecture direction
 - `ai/core/backend-rules.md` - backend engineering rules
-- `ai/core/frontend-rules.md` - frontend engineering rules
+- `../cody-web-app/AGENTS.md` - frontend repo mandatory rules
+- `../cody-web-app/frontend-guidelines.md` - frontend patterns and browser checklist
+- `ai/core/frontend-rules.md` - frontend rule pointer and platform verification requirements
 - `ai/core/verification-standard.md` - execution evidence and status rules for AI reports
 - `ai/core/localization.md` - localization rules
 - `ai/core/naming-conventions.md` - naming conventions

@@ -47,6 +47,8 @@ docs/                    Architecture, AI guidelines, roadmap, plans, reports
 - [docs/architecture/ARCHITECTURE_DECISIONS.md](docs/architecture/ARCHITECTURE_DECISIONS.md) - approved architectural decisions
 - [docs/architecture/TECHNICAL_DEBT_REGISTER.md](docs/architecture/TECHNICAL_DEBT_REGISTER.md) - known technical debt
 - [docs/ai/README.md](docs/ai/README.md) - documentation map for AI agents
+- [cody-web-app/AGENTS.md](cody-web-app/AGENTS.md) - frontend repo mandatory rules
+- [cody-web-app/frontend-guidelines.md](cody-web-app/frontend-guidelines.md) - frontend patterns and browser checklist
 - [docs/ai/architecture-guard/README.md](docs/ai/architecture-guard/README.md) - architecture guard rules and enforcement
 - [scripts/README.md](scripts/README.md) - verification scripts for AI engineering evidence
 - [DEVELOPMENT.md](DEVELOPMENT.md) - development conventions and workflow

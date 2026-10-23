@@ -104,4 +104,6 @@ For frontend or full-stack work, browser validation is the source of truth:
 Browser -> Network -> API -> Database -> Code
 ```
 
+Frontend rules live in `cody-web-app/AGENTS.md` and `cody-web-app/frontend-guidelines.md`.
+
 If browser tooling is unavailable, report that limitation explicitly instead of claiming browser validation.

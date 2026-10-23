@@ -68,7 +68,7 @@ Required verification:
 - Backend bug: build and relevant tests.
 - API bug: success case and expected failure/authorization case.
 - Database bug: schema and read/write persistence check.
-- Frontend bug: build plus browser validation through available DevTools MCP.
+- Frontend bug: build, lint/type checks, and browser validation through available DevTools MCP.
 - Workflow bug: definition, instance, approver visibility, approve/reject, target status, history, and notification evidence.
 - Event/notification bug: publish/consume/log/persisted side effect evidence.
 - Security bug: allowed and denied authorization evidence.
@@ -85,7 +85,7 @@ Final report format:
 - Verification actually performed:
 - Regression checks:
 - Known limitations / unverified areas:
-- Status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

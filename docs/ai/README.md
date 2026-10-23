@@ -9,7 +9,7 @@ This folder explains how to apply the rules. The mandatory rules live in `AGENTS
 3. `docs/ai/core/verification-standard.md`
 4. Task-specific sources:
    - Backend: `docs/ai/core/backend-rules.md`
-   - Frontend: `docs/ai/core/frontend-rules.md`, `cody-web-app/frontend-guidelines.md`
+   - Frontend: `cody-web-app/AGENTS.md`, `cody-web-app/frontend-guidelines.md`, `docs/ai/core/frontend-rules.md`
    - Security: `docs/ai/security/`
    - Workflow: `docs/ai/workflows/`, ADR-027, ADR-028, ADR-029
    - HR: `docs/ai/modules/hr/`, `docs/roadmap/hr/`
@@ -29,7 +29,7 @@ Do not implement a large feature in one pass. Split work into reviewed steps:
 
 ```text
 Backend: Domain & data -> Application -> API/events/worker
-Frontend: Types/services/hooks -> Pages/components -> i18n/permissions -> Browser validation
+Frontend: Types/schemas/services/hooks -> i18n/permissions -> Pages/components -> Browser validation
 ```
 
 Stop after each step and wait for review. Frontend or full-stack work is not complete until browser validation passes.

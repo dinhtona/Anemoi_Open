@@ -64,8 +64,9 @@ Implementation approach:
    - Domain and data
    - Application layer
    - API, events, and communication
-   - Frontend types/services/hooks
-   - Frontend pages/components/i18n
+   - Frontend types/schemas/services/hooks
+   - Frontend i18n/permissions
+   - Frontend pages/components
    - Browser validation
 4. Prefer updating existing patterns over introducing new abstractions.
 5. Add or update tests where practical and relevant.
@@ -76,7 +77,7 @@ Required verification:
 - Backend: dotnet build Anemoi.sln and relevant tests.
 - API: HTTP success and expected failure/authorization checks.
 - Database/migration: schema/migration and read/write verification where practical.
-- Frontend: frontend build plus browser validation through available DevTools MCP.
+- Frontend: frontend build, lint/type checks, and browser validation through available DevTools MCP.
 - Workflow: definition, submit/start, approver visibility, approve/reject, target status, history, and notification evidence.
 - Security/permission: allowed and denied authorization checks.
 - Notification/event-driven: publish/consume/log/persisted side-effect evidence.
@@ -94,7 +95,7 @@ Final response format:
 - Commit SHA:
 - Verification actually performed:
 - Known limitations / unverified areas:
-- Status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

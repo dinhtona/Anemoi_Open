@@ -43,6 +43,8 @@ this sequence:
 8. Relevant UAT packs under [`../uat/`](../uat/)
 9. Relevant module guidance under [`../modules/`](../modules/)
 
+For frontend work, also read `cody-web-app/AGENTS.md` and `cody-web-app/frontend-guidelines.md`.
+
 `ArchitectureGuide.md` sits between `AGENTS.md` and `docs/ai/core/*` in the
 canonical policy; verification steps rarely need it, so it is not repeated here.
 
@@ -86,7 +88,9 @@ Required checks:
 - page load check;
 - console error check;
 - network error check;
+- runtime exception check;
 - main user flow check;
+- CRUD flow check where applicable;
 - permission and localization checks when affected.
 
 Frontend-impacting work is not complete with TypeScript/build checks alone.
@@ -294,17 +298,18 @@ A change can require multiple verification types. The final status must reflect 
 Canonical verification rules:
 
 - [`../core/verification-standard.md`](../core/verification-standard.md) - status vocabulary and minimum evidence rules
-- [`../core/frontend-rules.md`](../core/frontend-rules.md) - frontend completion and browser validation expectations
+- [`../core/frontend-rules.md`](../core/frontend-rules.md) - frontend rule pointer and platform verification requirements
 - [`../core/backend-rules.md`](../core/backend-rules.md) - backend engineering and verification expectations
 - [`../workflows/approval-workflow.md`](../workflows/approval-workflow.md) - workflow architecture and approval verification expectations
 - [`../security/`](../security/) - permission, audit, and sensitive-access verification expectations
 
 Directory maps:
 
-- [`./`](./) - verification guides and this index
+- [`./api.md`](./api.md) - API verification guide
+- [`./browser.md`](./browser.md) - browser verification guide
+- [`./database.md`](./database.md) - database verification guide
+- [`./workflow.md`](./workflow.md) - workflow verification guide
 - [`../uat/`](../uat/) - browser UAT packs for product flows
-
-During AI-003, no additional subordinate file under `docs/ai/verification/` was confirmed through the GitHub Connector. Do not add guessed links. Add new links here only after the target file exists on the repository branch.
 
 ## Browser UAT Packs
 
@@ -324,7 +329,7 @@ Do not invent a UAT pack result. If no matching pack is available, run a focused
 Use these statuses exactly:
 
 - `PASS`: required checks were executed in the current session and passed.
-- `FAILED`: required checks were executed and at least one failed.
+- `FAIL`: required checks were executed and at least one failed.
 - `PARTIAL`: some required checks were executed, but at least one required check was skipped, unavailable, or incomplete.
 - `REVIEWED`: static inspection, code review, documentation review, or link review only; no runtime verification for that scope.
 - `BLOCKED`: verification or implementation could not proceed; explain the blocking condition.
@@ -382,19 +387,19 @@ Change type:
 - <documentation-only | backend | frontend | full-stack | workflow | permission/security | database/migration | notification/event-driven | payroll/sensitive HR data>
 
 Verification performed:
-- Build: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <command/evidence/reason>
-- Tests: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <command/evidence/reason>
-- Browser: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <route/persona/evidence/reason>
-- API: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <endpoint/evidence/reason>
-- Database: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <table/query intent/evidence/reason>
-- Workflow history: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <history evidence/reason>
-- Logs: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <service/evidence/reason>
-- GitHub Actions: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED | N/A> - <run evidence/reason>
+- Build: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <command/evidence/reason>
+- Tests: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <command/evidence/reason>
+- Browser: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <route/persona/evidence/reason>
+- API: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <endpoint/evidence/reason>
+- Database: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <table/query intent/evidence/reason>
+- Workflow history: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <history evidence/reason>
+- Logs: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <service/evidence/reason>
+- GitHub Actions: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED | N/A> - <run evidence/reason>
 
 Known limitations:
 - <anything not verified>
 
-Final status: <PASS | FAILED | PARTIAL | REVIEWED | BLOCKED>
+Final status: <PASS | FAIL | PARTIAL | REVIEWED | BLOCKED>
 ```
 
 Final status must be the strictest honest summary of the evidence. For example, if build passed but browser validation was required and not run, the final status is `PARTIAL`, not `PASS`.

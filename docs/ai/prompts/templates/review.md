@@ -76,7 +76,7 @@ Final report format:
 - Evidence quality assessment:
 - Recommendation: approve / request changes / needs verification / blocked
 - Known limitations / unverified areas:
-- Status: PASS / FAILED / PARTIAL / REVIEWED / BLOCKED
+- Status: PASS / FAIL / PARTIAL / REVIEWED / BLOCKED
 ```
 
 ## Usage Notes

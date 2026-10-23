@@ -20,7 +20,7 @@ Read these before changing code:
 Then read only what the task needs:
 
 - Backend: `docs/ai/core/backend-rules.md`
-- Frontend: `docs/ai/core/frontend-rules.md` and `cody-web-app/frontend-guidelines.md`
+- Frontend: `cody-web-app/AGENTS.md`, `cody-web-app/frontend-guidelines.md`, and `docs/ai/core/frontend-rules.md`
 - Security: `docs/ai/security/`
 - Workflow: `docs/ai/workflows/` and ADR-027, ADR-028, ADR-029
 - HR: `docs/ai/modules/hr/` and `docs/roadmap/hr/`
@@ -54,14 +54,10 @@ If a required source cannot be read, stop and report `BLOCKED` with the missing 
 
 ## 4. Frontend Rules
 
-- Next.js 16 App Router, TypeScript strict mode, no `any`, Tailwind CSS, shadcn/ui, TanStack Query v5, Axios, React Hook Form + Zod, next-intl, next-themes.
+- The frontend repo is `cody-web-app`. The mandatory frontend rulebook is `cody-web-app/AGENTS.md`; detailed patterns and the browser checklist are in `cody-web-app/frontend-guidelines.md`. Read both before changing frontend code.
 - Read `cody-web-app/node_modules/next/dist/docs/` for the installed Next.js version before writing code; this version has breaking changes from older Next.js.
-- Define TypeScript interfaces before UI. API calls belong in `services/`; React Query hooks belong in `hooks/`; UI components render data and call hooks.
-- All user-facing text goes in `messages/vi.json` and `messages/en.json`. Default frontend locale is `vi`. Map `vi -> vi-VN` and `en -> en-US` through `Accept-Language`.
-- Shared HTTP failures are handled by the Axios interceptor. Do not duplicate global toasts or console errors in feature code. Use `handleLocalApiError()` for local domain errors.
-- Consume rejected `mutateAsync()` promises in form/dialog handlers after the hook or interceptor has reported the error.
-- Use the compact dashboard layout: `flex flex-col gap-3 w-full`, compact card padding, no large shadows or oversized gaps.
-- Browser validation is mandatory before reporting completion for any frontend or full-stack change. Build, TypeScript, lint, and unit tests are not substitutes.
+- Do not add frontend dependencies, frameworks, or change the stack without explicit approval.
+- Browser validation is mandatory before reporting completion for any change that affects runtime UI behavior. Build, TypeScript, lint, and unit tests are not substitutes.
 
 ## 5. Permissions And Security
 
@@ -109,7 +105,7 @@ Minimum evidence:
 - Backend: `dotnet build Anemoi.sln` and relevant tests.
 - API: success and expected failure/authorization checks.
 - Database: migration/schema and read/write verification where practical.
-- Frontend: frontend build plus browser validation through available browser automation / DevTools MCP.
+- Frontend: frontend build, lint/type checks, and browser validation through available browser automation / DevTools MCP.
 - Workflow: active definition, submit/start, pending approval visibility, approve/reject, target status, history, and notification.
 - Localization: touched `vi` and `en` keys verified.
 - Security: allowed and denied authorization checks.
@@ -121,7 +117,7 @@ Rules:
 - Do not report `PASS`, `VERIFIED`, `COMPLETE`, `PRODUCTION READY`, or `UAT READY` without execution evidence from this session.
 - If evidence is missing, report `REVIEWED`, `PARTIAL`, or `BLOCKED` instead.
 - Do not mutate production data manually to force a pass.
-- Frontend reports must include page load, console errors, network errors, runtime exceptions, main flow, CRUD, permission checks, and localization.
+- Frontend reports must include page load, console errors, network errors, runtime exceptions, main flow, CRUD where applicable, permission checks, and localization.
 
 ## 9. Definition Of Done
 
@@ -130,7 +126,7 @@ Rules:
 - [ ] Backend build/tests executed where applicable.
 - [ ] API success and authorization failure checked where applicable.
 - [ ] Migration and database state checked where applicable.
-- [ ] Frontend build and browser validation executed where applicable.
+- [ ] Frontend build, lint/type checks, and browser validation executed where applicable.
 - [ ] Permissions checked for allowed and denied users.
 - [ ] Localization checked in `vi` and `en`.
 - [ ] Workflow verified end to end where applicable.
@@ -170,7 +166,9 @@ pwsh ./scripts/verify-browser.ps1 -AppBaseUrl http://localhost:3000 -Route /en/.
 - `docs/ai/README.md` - documentation map and task-specific reading.
 - `docs/ai/core/verification-standard.md` - status and evidence details.
 - `docs/ai/core/backend-rules.md` - backend patterns and examples.
-- `docs/ai/core/frontend-rules.md` - frontend rules and browser checklist.
+- `cody-web-app/AGENTS.md` - frontend repo mandatory rules.
+- `cody-web-app/frontend-guidelines.md` - frontend patterns and browser checklist.
+- `docs/ai/core/frontend-rules.md` - frontend rule pointer and platform verification requirements.
 - `docs/ai/core/localization.md` - localization details.
 - `docs/ai/security/permission-model.md` - permission catalog and Identity model.
 - `docs/ai/security/sensitive-permissions.md` - risk policy.

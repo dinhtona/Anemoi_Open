@@ -56,14 +56,14 @@ Follow `docs/ai/core/verification-standard.md`. Do not mark a row PASS unless it
 
 | Check | Status | Evidence |
 | --- | --- | --- |
-| Backend build | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Backend tests | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Database / migration | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| API / AuthZ | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Frontend build | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Browser validation | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Localization vi/en | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
-| Workflow validation | REVIEWED / PASS / FAIL / BLOCKED / N/A | |
+| Backend build | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Backend tests | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Database / migration | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| API / AuthZ | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Frontend build | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Browser validation | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Localization vi/en | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
+| Workflow validation | REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A | |
 
 Commands run:
 
@@ -77,14 +77,14 @@ Required for frontend or full-stack changes. Use DevTools MCP/browser automation
 
 - Routes opened:
 - Test users / roles:
-- Page loaded: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Console errors: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Network errors: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Runtime exceptions: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Main flow: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- CRUD flow: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Permission checks: REVIEWED / PASS / FAIL / BLOCKED / N/A
-- Localization: REVIEWED / PASS / FAIL / BLOCKED / N/A
+- Page loaded: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Console errors: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Network errors: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Runtime exceptions: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Main flow: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- CRUD flow: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Permission checks: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
+- Localization: REVIEWED / PASS / FAIL / PARTIAL / BLOCKED / N/A
 - Screenshots / captures:
 
 ## Risk And Follow-up
