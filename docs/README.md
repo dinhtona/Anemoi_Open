@@ -29,8 +29,7 @@ Technical debt recommendations do not override approved architecture decisions.
 
 ## Architecture
 
-- `architecture/ARCHITECTURE_DECISIONS.md` - approved architecture decisions
-- `architecture/adr/` - individual architecture decision records
+- `architecture/ARCHITECTURE_DECISIONS.md` - approved architecture decisions (one record per ADR)
 - `architecture/TECHNICAL_DEBT_REGISTER.md` - known technical debt and remediation notes
 
 ## AI Guidelines
@@ -41,6 +40,7 @@ Technical debt recommendations do not override approved architecture decisions.
 - `ai/core/verification-standard.md` - execution evidence and status rules for AI reports
 - `ai/core/localization.md` - localization rules
 - `ai/core/naming-conventions.md` - naming conventions
+- `ai/architecture-guard/README.md` - architecture guard rules, exemptions, and failure triage
 - `ai/verification/` - browser, API, database, and workflow verification guides
 - `ai/uat/` - browser UAT packs for product flows
 - `ai/prompts/templates/` - reusable implementation, audit, bugfix, and planning templates

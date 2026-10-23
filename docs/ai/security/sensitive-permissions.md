@@ -16,9 +16,17 @@ The catalog currently contains `High` and `Critical` entries. Treat any new `IsS
 
 ## Current High-Risk Permissions
 
+29 entries, verified against `Permissions.cs` on 2026-10-23. The catalog is the
+source; this list must be updated in the same change that adds a sensitive
+permission.
+
 ```text
 hr.leave.balance.adjust
+hr.leave.request.force_approve
+hr.leave.request.force_cancel
 hr.employee.transfer.create
+hr.employee.identity_link
+hr.employee.note.manage
 hr.promotion.create
 hr.position.change
 hr.grade.change

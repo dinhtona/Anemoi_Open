@@ -1,4 +1,4 @@
-# Phase 23 - Advanced Payroll Reporting
+# Phase 23 - Advanced Payroll Reporting (Design Spec)
 
 ## Overview
 
@@ -316,7 +316,10 @@ Future enhancement:
 
 ## Architectural Decisions
 
-### ADR-023-001
+These are spec-local decisions recorded with this phase. They are not entries in
+`docs/architecture/ARCHITECTURE_DECISIONS.md`, and must not be cited as ADR ids.
+
+### Decision 1 - Reporting reads snapshots only
 
 Reports must never recalculate payroll values.
 
@@ -331,7 +334,7 @@ as persisted historical data.
 
 ---
 
-### ADR-023-002
+### Decision 2 - JSON and CSV share one query source
 
 JSON reports and CSV exports must share the same query source through PayrollReportingQueryExtensions to prevent reporting inconsistencies.
 

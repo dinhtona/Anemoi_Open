@@ -12,17 +12,21 @@ Treat this file as the source for HR roadmap phase names.
 |---|---|---|
 | 16 | Overtime Management | Implemented |
 | 17 | Shift Management | Implemented |
-| 18 | Holiday & Working Calendar Engine | Planned |
-| 19 | Tax Engine | Planned |
+| 18 | Holiday & Working Calendar Engine | Implemented |
+| 19 | Tax Engine | Implemented |
 | 20 | Insurance Engine | Implemented |
-| 21 | Employee Self Service (ESS) | Planned |
+| 21 | Employee Self Service (ESS) | Implemented |
 | 22 | PDF Payslip & Email Delivery | Implemented |
 | 23 | Advanced Payroll Reporting | Implemented |
-| 24 | Workforce Analytics | Designed |
+| 24 | Workforce Analytics | Implemented |
 | 25 | Recruitment Management | Implemented |
-| 26 | Onboarding Management | Designed |
+| 26 | Onboarding Management | Implemented |
 | 27 | Performance Management | Planned |
 | 28 | Training Management | Planned |
+
+Status reflects the code on disk (`Anemoi.Hr.Api/Controllers/` plus the matching
+route under `cody-web-app`), not the original phase plan. Verify against code
+before relying on a status row.
 
 ## Architecture Principles
 
@@ -38,16 +42,17 @@ Treat this file as the source for HR roadmap phase names.
 
 ## Note About Approval Workflow
 
-Several planned modules will benefit from a shared Enterprise Approval Framework.
+The shared approval framework already exists and is binding:
 
-Strong candidates:
+- ADR-027 — three-scope separation (ESS, Approval, HR/Admin).
+- ADR-028 — approval inbox centralized under `/manager/approvals`.
+- ADR-029 — every required workflow type is definition-bound; hierarchy fallback
+  is not allowed in production.
 
-- Overtime
-- Shift Change Request
-- Recruitment Job Requisition
-- Performance Review
-- Promotion
-- Transfer
-- Contract Renewal
+Module work does not need a new approval phase. A new workflow-enabled entity
+type is added to `RequiredEntityTypes` with a seed definition (AGENTS.md §6).
 
-A dedicated approval framework phase may be inserted before Recruitment or Performance if needed.
+Performance (Phase 27) and Training (Phase 28) are not implemented. Phases 29+
+(universal workflow engine, organization hierarchy, employee lifecycle,
+employee administration, bulk import) are recorded in `docs/specs/` and
+`docs/architecture/ARCHITECTURE_DECISIONS.md`, not in this index.

@@ -1,4 +1,4 @@
-# Phase 22 - PDF Payslip & Email Delivery
+# Phase 22 - PDF Payslip & Email Delivery (Design Spec)
 
 ## Overview
 

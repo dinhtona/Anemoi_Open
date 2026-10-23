@@ -64,6 +64,29 @@ Run directly:
 dotnet run --project ./tools/Anemoi.ArchitectureGuard/Anemoi.ArchitectureGuard.csproj -- --path .
 ```
 
+### Shared Exemptions
+
+Path:
+
+```text
+scripts/architecture-guard-exemptions.json
+```
+
+Both the PowerShell launcher and the Roslyn analyzer read this one file, so the two passes cannot drift apart. It has two keys:
+
+| Key | Meaning |
+| --- | --- |
+| `excludedScanPrefixes` | Repository-relative prefixes that are not product code (currently `tools/`). The guard's own analyzer contains the literal `Guid.NewGuid()` in a message string and would otherwise flag itself. |
+| `guidNewGuidExemptions` | Exact file paths where `Guid.NewGuid()` is legitimate, each with a `reason`. |
+
+Rules for the file:
+
+- One file per entry — no directory wildcards.
+- Every `guidNewGuidExemptions` entry needs a `reason` that says why the value is not an aggregate identifier.
+- An exemption for a whole folder belongs in `excludedScanPrefixes`, and only for tooling that is not shipped.
+
+The Roslyn analyzer prints `Exemptions: <n> Guid.NewGuid() file(s), <n> excluded scan prefix(es)` on success, so a report can quote what was exempted. If the file is missing or unreadable the guard still runs, prints `Exemption warning: …`, and reports `Exemptions: none`.
+
 ## Rule Set
 
 | Rule | Area | Description |
@@ -71,7 +94,7 @@ dotnet run --project ./tools/Anemoi.ArchitectureGuard/Anemoi.ArchitectureGuard.c
 | `ANEMOI001` | Backend / API | Controller references `DbContext`. Controllers must delegate to CQRS handlers. |
 | `ANEMOI002` | Backend / Domain/Data | Production code calls `Guid.NewGuid()`. Use project ID generation conventions where generated GUIDs are required. |
 | `ANEMOI003` | Backend / Mapping | AutoMapper usage detected. Use Mapperly. |
-| `ANEMOI004` | Backend / Security | Role-name-based `[Authorize(Roles = ...)]` detected. Use permission constants and `[HasPermission]`. |
+| `ANEMOI004` | Backend / Security | Role-name-based `[Authorize(Roles = ...)]` detected. Use permission constants and `[HasPermission]`. `Roles = SystemRoles.Administrator` on trust-anchor endpoints is the only sanctioned exception (ADR-036); both guard passes apply that exemption. |
 | `ANEMOI005` | Frontend / Security | Frontend role-based authorization pattern detected. Use `user.permissions`. |
 | `ANEMOI006` | Backend / API | Controller body appears too heavy, such as loops or transaction/persistence calls. Keep controllers thin. |
 
@@ -129,6 +152,7 @@ Do not use Architecture Guard as a substitute for:
 
 - Add a rule only when it protects a documented project standard.
 - Prefer a low-false-positive rule over a broad noisy rule.
-- If a violation is legitimate for tests, migrations, generated code, or infrastructure, narrow the rule or exclusion instead of ignoring all failures.
+- If a violation is legitimate for tests, migrations, generated code, or infrastructure, add it to `scripts/architecture-guard-exemptions.json` with a reason — never fix it by ignoring all guard failures, and never by editing one pass only.
+- Keep the PowerShell pre-check and the Roslyn analyzer in step: a rule added to one must be added to the other, or the guard reports different results depending on which pass runs.
 - Keep rule IDs stable once introduced.
 - Document every new rule in this README.

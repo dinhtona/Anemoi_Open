@@ -28,21 +28,23 @@ Do not report `PASS` when only inspection was performed. Use `REVIEWED` unless t
 
 ## Verification Source-Of-Truth Order
 
-When verification guidance conflicts, use this order:
+The precedence order is defined once, in
+[`docs/README.md` § Source-Of-Truth Policy](../../README.md#source-of-truth-policy).
+Apply it as written. Within that order, verification work reads these sources in
+this sequence:
 
 1. [`../../architecture/ARCHITECTURE_DECISIONS.md`](../../architecture/ARCHITECTURE_DECISIONS.md)
 2. [`../../../AGENTS.md`](../../../AGENTS.md)
-3. [`../../../ArchitectureGuide.md`](../../../ArchitectureGuide.md)
-4. [`../core/verification-standard.md`](../core/verification-standard.md)
-5. [`../core/backend-rules.md`](../core/backend-rules.md)
-6. [`../core/frontend-rules.md`](../core/frontend-rules.md)
-7. [`../security/`](../security/)
-8. [`../workflows/`](../workflows/)
-9. This verification index
-10. Relevant UAT packs under [`../uat/`](../uat/)
-11. Relevant module guidance under [`../modules/`](../modules/)
-12. The current implementation prompt
-13. Historical specs or chat summaries
+3. [`../core/verification-standard.md`](../core/verification-standard.md)
+4. [`../core/backend-rules.md`](../core/backend-rules.md)
+5. [`../core/frontend-rules.md`](../core/frontend-rules.md)
+6. [`../security/`](../security/) and [`../workflows/`](../workflows/)
+7. This verification index
+8. Relevant UAT packs under [`../uat/`](../uat/)
+9. Relevant module guidance under [`../modules/`](../modules/)
+
+`ArchitectureGuide.md` sits between `AGENTS.md` and `docs/ai/core/*` in the
+canonical policy; verification steps rarely need it, so it is not repeated here.
 
 Historical reports can explain context, but they cannot prove the current change works.
 

@@ -1,30 +1,21 @@
-# ANEMOI HR - Technical Debt Register
+# ANEMOI HR — Technical Debt Register
 
-IMPORTANT
+Before working on any technical debt item, read `docs/architecture/ARCHITECTURE_DECISIONS.md`. Architectural decisions take precedence over technical debt recommendations.
 
-Before working on any technical debt item, read:
-
-- docs/architecture/ARCHITECTURE_DECISIONS.md
-
-Architectural decisions take precedence over technical debt recommendations.
-
-# ANEMOI HR - Technical Debt Register
-
-Version: Phase 34 Complete
-
+Version: Phase 34 complete plus post-34 audit items
 Status: Active
-
-Last Updated: 2026-07-03
-
----
+Last Updated: 2026-10-23
 
 # Purpose
 
-This document tracks known architectural, engineering, quality, and maintainability debt discovered during implementation and review of ANEMOI HR Phases 01–19.
+This document tracks known architectural, engineering, quality, and maintainability debt found while implementing and reviewing ANEMOI HR Phases 01–34 and the follow-up performance, security, and localization audits.
 
-Only unresolved debt should remain in this document.
+Conventions:
 
-Items that have already been fixed should be moved to the Historical Debt Resolution section.
+- Every open item carries an ID, priority, status, and affected files.
+- Item IDs are stable and are not re-sorted: they are assigned when the debt is found, so the file is not in numeric order.
+- Resolved items stay where they are, with the fix and its verification line next to the debt it closed. Git history is the archive — do not copy resolved items into parallel files.
+- "Resolved" requires an executed verification line (build, tests, API, or database evidence), not a code-review note.
 
 ---
 
@@ -575,16 +566,65 @@ If an employee transfers departments or positions, past period payroll reports w
 
 Store `DepartmentId`, `DepartmentName`, `PositionId`, and `PositionName` snapshots directly in the `PayrollRun` entity at calculation time (Phase 24 or next optimization sprint).
 
-BuildPayrollVariance fix not used full outer join
-
-HR_PAYROLL_RUN_ALREADY_EXISTS employee payroll status Draft but can not re calculation payroll
-
-
 ### Suggested Target
 
 Next Optimization Sprint
 
 ---
+
+## TD-014 — Payroll Variance Report Does Not Use a Full Outer Join
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — split out of TD-010 (it was an unlabelled note under that item).
+
+### Context
+
+`BuildPayrollVariance` compares two payroll runs without a full outer join, so an employee present in only one of the runs is dropped or gets one-sided totals depending on which side the join is driven from.
+
+### Recommended Fix
+
+Drive the comparison from the union of both runs' `PayrollItem` keys (full outer join, or a left join from the union) and compute deltas per employee.
+
+### Suggested Target
+
+Next Optimization Sprint (same sprint as TD-010)
+
+---
+
+## TD-015 — Payroll Run Cannot Be Recalculated While Draft
+
+### Priority
+
+P3
+
+### Severity
+
+Medium
+
+### Status
+
+⚠️ Active — split out of TD-010 (it was an unlabelled note under that item).
+
+### Context
+
+The recalculation path returns `HR_PAYROLL_RUN_ALREADY_EXISTS` for an employee payroll run that is still `Draft`, so a draft run has to be removed before it can be recalculated.
+
+### Recommended Fix
+
+Allow recalculation while the run is `Draft` (supersede or delete the draft items inside the recalculation handler) and keep `HR_PAYROLL_RUN_ALREADY_EXISTS` for finalized runs only.
+
+### Suggested Target
+
+Next Optimization Sprint (same sprint as TD-010)
 
 ---
 
@@ -627,7 +667,33 @@ Multi-tenant Production Hardening Phase
 
 ---
 
+## TD-013 — Onboarding Assignee Display Name Falls Back to User Id
+
+### Priority
+
+P5
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — revisit when the notification/user-profile integration lands.
+
+### Context
+
+Onboarding task assignee display names resolve to the raw user id instead of going through the user lookup service, so the onboarding screens show ids where a person name is expected.
+
+### Recommended Fix
+
+Resolve display names through the user lookup service used by the notification pipeline, keeping the user-id fallback only when the lookup returns nothing.
+
 ---
+
+# Resolved Debt By Phase
+
+These entries record fixes that were verified when they landed. They stay here because each one documents a pattern the codebase was deliberately moved away from.
 
 ## Phase 16
 
@@ -1577,44 +1643,50 @@ Restructure to paginate at the database level: resolve user's applicable roles f
 
 # Recommended Cleanup Roadmap
 
-## Immediate Priority (P1)
+Open items only, risk first. Resolved items are deliberately absent.
 
-1. TD-001 Domain → Application dependency
-2. TD-002 Build warning reduction
+## P1 — architecture and maintainability risk
 
-## Short-Term Priority (P2)
+1. TD-002 Build warning reduction
 
-3. TD-003 Frontend testing infrastructure
-4. TD-007 End-to-End automation
-5. TD-P34-SEC-04 Hardcoded credentials in appsettings.json
-6. TD-P34-PERF-01 N+1 queries in recruitment/analytics handlers
-7. TD-P34-PERF-02 N+1 role resolution in approval handlers
-8. TD-P34-PERF-03 MonthlyLeaveAccrualWorker N+1
-9. TD-P34-PERF-14 Database index gap analysis
-10. TD-P34-PERF-15 GetPendingApprovalsHandler in-memory pagination
+## P2 — quality and correctness gaps
 
-## Medium-Term Priority (P3)
+2. TD-003 Frontend testing infrastructure
+3. TD-007 End-to-end test automation
+4. TD-STOR-001 Durable object storage before multi-instance production
+5. TD-P34-PERF-01 N+1 queries in recruitment/analytics handlers
+6. TD-P34-PERF-02 N+1 role resolution in approval handlers
+7. TD-P34-PERF-03 MonthlyLeaveAccrualWorker N+1
+8. TD-P34-PERF-14 Database index gap analysis
+9. TD-P34-PERF-15 GetPendingApprovalsHandler in-memory pagination
 
-5. TD-006 OpenAPI-generated contracts
-6. TD-009 Permission audit
-7. TD-P34-SEC-02 OrganizationHierarchyController returns domain entities — ✅ Resolved 2026-10-16
-8. TD-P34-SEC-03 Latent FromSqlRaw injection surface
-9. TD-P34-PERF-04 Full table loads in analytics handlers
-10. TD-P34-PERF-05 Missing AsNoTracking in 16+ handlers
-11. TD-P34-PERF-06 Expensive Include chains without AsSplitQuery
-12. TD-P34-PERF-07 Redundant employee loading in approval handlers
-13. TD-P34-PERF-08 Missing pagination on unbounded endpoints
-14. TD-P34-PERF-09 GetDashboardOverviewHandler 6 independent loads
-15. TD-P34-PERF-10 Identity GetUsersHandler N+1
-16. TD-P34-PERF-11 GetOnboardingDashboardHandler full instance load
+## P3 — platform and productivity
 
-## Long-Term Priority (P4-P5)
+10. TD-006 OpenAPI-generated contracts
+11. TD-009 Permission audit
+12. TD-010 Payroll reporting department/position fallback
+13. TD-014 Payroll variance full outer join
+14. TD-015 Draft payroll run recalculation
+15. TD-P34-PERF-04 Full table loads in analytics handlers
+16. TD-P34-PERF-05 Missing AsNoTracking in 16+ handlers
+17. TD-P34-PERF-06 Expensive Include chains without AsSplitQuery
+18. TD-P34-PERF-07 Redundant employee loading in approval handlers
+19. TD-P34-PERF-08 Missing pagination on unbounded endpoints
+20. TD-P34-PERF-09 GetDashboardOverviewHandler 6 independent loads
+21. TD-P34-PERF-10 Identity GetUsersHandler N+1
+22. TD-P34-PERF-11 GetOnboardingDashboardHandler full instance load
 
-7. TD-005 Localization audit
-8. TD-008 Snapshot storage optimization
-9. TD-011 Validation localization strategy cleanup
-10. TD-P34-PERF-12 ContractExpirationWorker batching
-11. TD-P34-PERF-13 IdentityPolicyController PageSize = int.MaxValue
+## P4–P5 — UX and future optimization
+
+23. TD-005 Localization audit
+24. TD-008 Snapshot storage optimization
+25. TD-011 Validation localization strategy cleanup
+26. TD-012 DataChange sensitivity and workspace scoping
+27. TD-016 Audit actor fields stored as string
+28. TD-013 Onboarding assignee display-name resolution
+29. TD-PDF-001 Embedded Unicode font for Vietnamese payslip PDFs
+30. TD-P34-PERF-12 ContractExpirationWorker batching
+31. TD-P34-PERF-13 IdentityPolicyController PageSize = int.MaxValue
 
 ---
 
@@ -1626,32 +1698,102 @@ This register intentionally excludes:
 * Approved architectural decisions
 * Future roadmap items that are not yet debt
 
-Only known unresolved technical debt should remain in this document.
-
-
-Phase 22 Status:
-COMPLETED WITH ACCEPTED TECH DEBT
-
-TD-PDF-001: Vietnamese accents require embedded Unicode font support.
-TD-STOR-001: Local file storage should be replaced by durable object storage before production multi-instance deployment.
-
-
-# 2026-06-15
-Audit actor fields currently stored as string:
-- ApprovedBy
-- RejectedBy
-- CancelledBy
-
-Recommended:
-- UserId (Guid / Strongly Typed UserId)
-
-Reason:
-- Type safety
-- FK capability
-- Consistency with the rest of the domain model
-- Eliminate Guid -> string conversions
+Resolved entries stay inline with their fix and verification line (see Purpose); they are not moved into a separate archive file.
 
 ---
+
+# Accepted Debt
+
+Items that were shipped knowingly, with the risk accepted at the time.
+
+## TD-PDF-001 — Vietnamese Accents Require An Embedded Unicode Font
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Accepted in Phase 22 — payslip PDF text needs a font that carries Vietnamese diacritics.
+
+### Context
+
+The PDF generator relies on a font that is not guaranteed to carry the full Vietnamese diacritic set; missing glyphs would show up as broken or missing accents in payslip PDFs.
+
+### Recommended Fix
+
+Embed a Unicode font (for example Noto Sans) in the PDF generation path and add a PDF text-extraction test that asserts diacritics survive.
+
+---
+
+## TD-STOR-001 — Local File Storage Must Become Durable Object Storage
+
+### Priority
+
+P2
+
+### Severity
+
+High
+
+### Status
+
+⚠️ Accepted in Phase 22 — blocks multi-instance production deployment, not single-instance use.
+
+### Context
+
+Payslip documents and report exports are written to local file storage, which is not shared between instances and does not survive a lost host.
+
+### Recommended Fix
+
+Move these writes behind the existing `IFileStorage` abstraction with an S3-compatible implementation and migrate existing files before the first multi-instance deployment.
+
+---
+
+# Dated Audits
+
+Findings recorded during a review, kept with the date they were raised so the original evidence stays traceable.
+
+## TD-016 — Audit Actor Fields Stored As String (2026-06-15)
+
+### Priority
+
+P4
+
+### Severity
+
+Low
+
+### Status
+
+⚠️ Active — raised by the 2026-06-15 audit.
+
+### Context
+
+Audit actor fields are stored as `string`:
+
+- `ApprovedBy`
+- `RejectedBy`
+- `CancelledBy`
+
+### Recommended Fix
+
+Store a `UserId` (Guid, or a strongly typed `UserId`) instead of the string actor name.
+
+### Reason
+
+- Type safety.
+- Foreign-key capability.
+- Consistency with the rest of the domain model.
+- Removes `Guid` → `string` conversions.
+
+---
+
+# Resolved Debt (Post-Phase-34)
 
 ## TD-025-01 — Hardcoded GradeCode "G1" in Candidate-to-Employee Conversion
 
@@ -1732,10 +1874,3 @@ Both `Anemoi.Hr.Infrastructure` and `Anemoi.Notification.Infrastructure` have co
 1. **Bus outbox uses separate DbContext instances** — MassTransit's `BusOutboxPublishTransport` creates a separate DbContext scope via `IScopedDbContextFactory`. Domain changes and outbox messages are in **separate transactions**, even after the publish-order fix. True transactional outbox would require sharing the same DbContext instance.
 2. **DataChange sensitivity remains Low** — See TD-012. WorkspaceId is not propagated through HR integration events.
 3. **No MassTransit InMemoryTestHarness usage** — Consumer tests use NSubstitute mocks, not real MassTransit transport. Outbox delivery is not integration-tested.
-
----
-## Phase 26
-1. TD-013 — Onboarding assignee display name resolution should use user lookup service instead of userId fallback.
-Severity: Low
-Fix timing: Future notification/user profile integration phase.
----

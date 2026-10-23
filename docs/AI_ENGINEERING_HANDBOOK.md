@@ -13,14 +13,9 @@ If a required source cannot be read, stop and report `BLOCKED` with the missing 
 
 ## 2. Source Of Truth
 
-When documents disagree:
-
-1. Approved ADRs in `docs/architecture/ARCHITECTURE_DECISIONS.md`
-2. `AGENTS.md`
-3. `ArchitectureGuide.md` and `docs/ai/core/*`
-4. `docs/ai/security/*`, `docs/ai/workflows/*`, `docs/ai/modules/*`
-5. Approved roadmap and specs
-6. Specs, prompt templates, and historical notes
+The precedence order is defined once, in
+[`docs/README.md` § Source-Of-Truth Policy](README.md#source-of-truth-policy).
+Apply it as written; this handbook does not define a second order.
 
 Technical debt recommendations do not override approved architecture decisions.
 

@@ -17,12 +17,9 @@ This folder explains how to apply the rules. The mandatory rules live in `AGENTS
 
 ## 2. Rule Precedence
 
-```text
-Approved ADRs
-> AGENTS.md
-> Task-specific docs under docs/ai/
-> Roadmap, specs, historical notes
-```
+One list only: see
+[`docs/README.md` § Source-Of-Truth Policy](../README.md#source-of-truth-policy).
+Do not restate it here.
 
 If a task-specific document conflicts with `AGENTS.md`, follow `AGENTS.md` and report the conflict.
 
@@ -45,6 +42,7 @@ Stop after each step and wait for review. Frontend or full-stack work is not com
 - `docs/ai/security/` - permission model, sensitive permissions, audit log.
 - `docs/ai/workflows/` - workflow domain model and rules.
 - `docs/ai/modules/` - module-specific guidance.
+- `docs/ai/architecture-guard/` - architecture guard rules, exemptions, and failure triage.
 - `docs/ai/verification/` - API, browser, database, and workflow verification guides.
 - `docs/ai/uat/` - browser UAT packs.
 - `docs/architecture/ARCHITECTURE_DECISIONS.md` - approved ADRs.
