@@ -13,11 +13,6 @@ public static class Permissions
     public const string RoleRead = "RoleQuery";
     public const string RoleManage = "RoleCommand";
 
-    public const string EnvironmentRead = "EnvironmentRead";
-    public const string EnvironmentStartStop = "EnvironmentStartStop";
-    public const string EnvironmentMockRouteRead = "EnvironmentMockRouteRead";
-    public const string EnvironmentMockRouteManage = "EnvironmentMockRouteManage";
-
     public const string HrLeavePolicyView = "hr.leave.policy.view";
     public const string HrLeavePolicyCreate = "hr.leave.policy.create";
     public const string HrLeavePolicyUpdate = "hr.leave.policy.update";
@@ -180,10 +175,6 @@ public static class Permissions
         new(UserManage, "PermissionGroupUsers", "PermissionDescriptionUserManage"),
         new(RoleRead, "PermissionGroupRoleGroups", "PermissionDescriptionRoleRead"),
         new(RoleManage, "PermissionGroupRoleGroups", "PermissionDescriptionRoleManage"),
-        new(EnvironmentRead, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentRead"),
-        new(EnvironmentStartStop, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentStartStop"),
-        new(EnvironmentMockRouteRead, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentMockRouteRead"),
-        new(EnvironmentMockRouteManage, "PermissionGroupEnvironments", "PermissionDescriptionEnvironmentMockRouteManage"),
         new(HrLeavePolicyView, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyView"),
         new(HrLeavePolicyCreate, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyCreate"),
         new(HrLeavePolicyUpdate, "PermissionGroupHrLeave", "PermissionDescriptionHrLeavePolicyUpdate"),

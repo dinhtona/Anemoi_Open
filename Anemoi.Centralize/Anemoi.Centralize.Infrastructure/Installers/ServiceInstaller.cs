@@ -7,7 +7,6 @@ using Anemoi.BuildingBlock.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Anemoi.Centralize.Application.Abstractions;
-using Anemoi.Centralize.Application.Configurations;
 using Anemoi.Centralize.Application.ContractAssemblies;
 using Anemoi.Centralize.Application.Filters;
 using Anemoi.Centralize.Application.Mappings;
@@ -44,12 +43,5 @@ public sealed class ServiceInstaller : IInstaller
 
         // Active SignalR developer registry
         services.AddSingleton<IConnectedUsersRegistry, ConnectedUsersRegistry>();
-        services.AddScoped<IEnvironmentNotificationService, EnvironmentNotificationService>();
-
-        // Dev environments integration services
-        // DOCKER SOCKET: Docker management API is Dev-only — not safe for production.
-        // The service handles missing socket gracefully (returns "Docker daemon unreachable").
-        services.AddSingleton<IDockerService, DockerService>();
-        services.AddSingleton<IMockRouteRepository, MockRouteRepository>();
     }
 }

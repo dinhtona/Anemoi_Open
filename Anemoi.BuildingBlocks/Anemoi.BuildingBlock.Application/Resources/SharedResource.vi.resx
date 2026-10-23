@@ -187,18 +187,12 @@
   <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Kiểm thử email</value></data>
   <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Đã tải lên tệp: {0} vào đường dẫn: {1}</value></data>
   <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Đã xóa mục: {0}</value></data>
-  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>API Mock khớp yêu cầu: {0} /{1} - trả về {2}</value></data>
-  <data name="EnvironmentMailReceived" xml:space="preserve"><value>Nhận email mới từ {0} đến {1} với tiêu đề: "{2}"</value></data>
-  <data name="PermissionGroupUsers" xml:space="preserve"><value>Người dùng</value></data>
   <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Nhóm vai trò</value></data>
-  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Môi trường</value></data>
   <data name="PermissionGroupOther" xml:space="preserve"><value>Khác</value></data>
   <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>Xem người dùng và các nhóm vai trò đã được gán.</value></data>
   <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Tạo, cập nhật và quản lý quyền truy cập của người dùng.</value></data>
   <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>Xem nhóm vai trò và các quyền đã được gán.</value></data>
   <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Tạo, cập nhật và xóa nhóm vai trò.</value></data>
-  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>Xem các dịch vụ trong môi trường phát triển.</value></data>
-  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Khởi động và dừng các dịch vụ trong môi trường phát triển.</value></data>
   <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Duyệt và tải xuống tệp từ kho lưu trữ SFTP phát triển.</value></data>
   <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Tải lên, tạo và xóa nội dung trong kho lưu trữ SFTP phát triển.</value></data>
   <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>Xem các route API giả lập phục vụ phát triển.</value></data>

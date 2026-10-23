@@ -50,8 +50,6 @@ public sealed class AdministratorAuthorizationBehaviorTests
         Assert.Contains(Permissions.UserManage, permissions);
         Assert.Contains(Permissions.RoleRead, permissions);
         Assert.Contains(Permissions.RoleManage, permissions);
-        Assert.Contains(Permissions.EnvironmentRead, permissions);
-        Assert.Contains(Permissions.EnvironmentStartStop, permissions);
         Assert.Contains(Permissions.HrEmployeeView, permissions);
         Assert.Contains(Permissions.HrEmployeeIdentityLink, permissions);
         Assert.Contains(Permissions.NotificationManage, permissions);

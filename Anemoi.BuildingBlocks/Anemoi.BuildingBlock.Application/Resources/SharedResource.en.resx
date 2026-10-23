@@ -187,18 +187,12 @@
   <data name="EnvironmentServiceMailTest" xml:space="preserve"><value>Mail Test</value></data>
   <data name="EnvironmentSftpUploaded" xml:space="preserve"><value>Uploaded file: {0} to path: {1}</value></data>
   <data name="EnvironmentSftpDeleted" xml:space="preserve"><value>Deleted item: {0}</value></data>
-  <data name="EnvironmentMockApiMatched" xml:space="preserve"><value>Mock API matched: {0} /{1} - returned {2}</value></data>
-  <data name="EnvironmentMailReceived" xml:space="preserve"><value>New email received from {0} to {1} with subject: "{2}"</value></data>
-  <data name="PermissionGroupUsers" xml:space="preserve"><value>Users</value></data>
   <data name="PermissionGroupRoleGroups" xml:space="preserve"><value>Role groups</value></data>
-  <data name="PermissionGroupEnvironments" xml:space="preserve"><value>Environments</value></data>
   <data name="PermissionGroupOther" xml:space="preserve"><value>Other</value></data>
   <data name="PermissionDescriptionUserRead" xml:space="preserve"><value>View users and their assigned role groups.</value></data>
   <data name="PermissionDescriptionUserManage" xml:space="preserve"><value>Create, update and manage user access.</value></data>
   <data name="PermissionDescriptionRoleRead" xml:space="preserve"><value>View role groups and their assigned permissions.</value></data>
   <data name="PermissionDescriptionRoleManage" xml:space="preserve"><value>Create, update and remove role groups.</value></data>
-  <data name="PermissionDescriptionEnvironmentRead" xml:space="preserve"><value>View development environment services.</value></data>
-  <data name="PermissionDescriptionEnvironmentStartStop" xml:space="preserve"><value>Start and stop development environment services.</value></data>
   <data name="PermissionDescriptionEnvironmentSftpRead" xml:space="preserve"><value>Browse and download files from development SFTP storage.</value></data>
   <data name="PermissionDescriptionEnvironmentSftpManage" xml:space="preserve"><value>Upload, create and delete items in development SFTP storage.</value></data>
   <data name="PermissionDescriptionEnvironmentMockRouteRead" xml:space="preserve"><value>View development mock API routes.</value></data>

@@ -1,7 +1,4 @@
 (anemoi_routes) {
-	@mail path /mail /mail/*
-	reverse_proxy @mail smtp4dev:80
-
 	@hr path /api/hr /api/hr/*
 	reverse_proxy @hr anemoi_hr:8080
 
