@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Anemoi.Centralize.Application.Abstractions;
@@ -45,8 +44,7 @@ public sealed class EnvironmentsController(
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
             e.Id == id ||
-            (id == "mail" && e.Id == "smtp4dev_server") ||
-            (id == "sftp" && e.Id == "sftp_server")
+            (id == "mail" && e.Id == "smtp4dev_server")
         );
         return Ok(new { data = updated });
     }
@@ -63,8 +61,7 @@ public sealed class EnvironmentsController(
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
             e.Id == id ||
-            (id == "mail" && e.Id == "smtp4dev_server") ||
-            (id == "sftp" && e.Id == "sftp_server")
+            (id == "mail" && e.Id == "smtp4dev_server")
         );
         return Ok(new { data = updated });
     }
@@ -76,78 +73,13 @@ public sealed class EnvironmentsController(
         var environments = await sender.Send(new GetEnvironmentsQuery(), cancellationToken);
         var updated = environments.Find(e =>
             e.Id == id ||
-            (id == "mail" && e.Id == "smtp4dev_server") ||
-            (id == "sftp" && e.Id == "sftp_server")
+            (id == "mail" && e.Id == "smtp4dev_server")
         );
         if (updated == null)
         {
             return NotFound(CreateError("EnvironmentNotFound"));
         }
         return Ok(new { data = updated });
-    }
-
-    // --- SFTP File Endpoints ---
-
-    [HttpGet("sftp/files")]
-    [HasPermission(Permissions.EnvironmentSftpRead)]
-    public async Task<IActionResult> GetSftpFiles([FromQuery] string? path, CancellationToken cancellationToken)
-    {
-        var files = await sender.Send(new GetSftpFilesQuery(path), cancellationToken);
-        return Ok(new { data = files });
-    }
-
-    [HttpPost("sftp/upload")]
-    [HasPermission(Permissions.EnvironmentSftpManage)]
-    [RequestSizeLimit(50 * 1024 * 1024)]
-    public async Task<IActionResult> UploadSftpFile(
-        [FromQuery] string? path,
-        [FromForm] IFormFile file,
-        CancellationToken cancellationToken
-    )
-    {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest(CreateError("NoFileUploaded"));
-        }
-
-        using var stream = file.OpenReadStream();
-        var success = await sender.Send(new UploadSftpFileCommand(path, file.FileName, stream), cancellationToken);
-        return Ok(new { success });
-    }
-
-    [HttpGet("sftp/download")]
-    [HasPermission(Permissions.EnvironmentSftpRead)]
-    public async Task<IActionResult> DownloadSftpFile([FromQuery] string path, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var response = await sender.Send(new DownloadSftpFileQuery(path), cancellationToken);
-            return File(response.Stream, response.ContentType, response.FileName, enableRangeProcessing: true);
-        }
-        catch (FileNotFoundException)
-        {
-            return NotFound(CreateError("FileNotFound"));
-        }
-        catch (Exception)
-        {
-            return BadRequest(CreateError("FileOperationFailed"));
-        }
-    }
-
-    [HttpDelete("sftp/files")]
-    [HasPermission(Permissions.EnvironmentSftpManage)]
-    public async Task<IActionResult> DeleteSftpFile([FromQuery] string path, CancellationToken cancellationToken)
-    {
-        var success = await sender.Send(new DeleteSftpFileCommand(path), cancellationToken);
-        return Ok(new { success });
-    }
-
-    [HttpPost("sftp/directory")]
-    [HasPermission(Permissions.EnvironmentSftpManage)]
-    public async Task<IActionResult> CreateSftpDirectory([FromQuery] string path, CancellationToken cancellationToken)
-    {
-        var success = await sender.Send(new CreateSftpDirectoryCommand(path), cancellationToken);
-        return Ok(new { success });
     }
 
     // --- Mock API Route Endpoints ---

@@ -301,29 +301,6 @@ services:
     networks:
       - anemoi_network
 
-  # sftp:
-  #   platform: linux/amd64
-  #   image: atmoz/sftp:latest
-  #   container_name: sftp_server
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${BIND_ADDRESS:-127.0.0.1}:${SFTP_HOST_PORT:-2222}:22"
-  #   volumes:
-  #     - ./local_env/sftp_data:/home/user1/upload
-  #     - ./local_env/sftp_keys:/home/user1/.ssh/keys:ro
-  #     - sftp_host_keys:/etc/ssh
-  #   entrypoint:
-  #     - /bin/sh
-  #     - -c
-  #     - ssh-keygen -A && exec /entrypoint "$$@"
-  #     - --
-  #   command:
-  #     - ${SFTP_USER:-user1}:${SFTP_PASSWORD:?}
-  #   # Credentials come from .env (see .env.example); never hardcode the
-  #   # password here (was `user1:123456:1001`).
-  #   networks:
-  #     - anemoi_network
-
   # Dev-only mail catcher (smtp4dev). Kept ENABLED so that
   # DevEnvironmentsSetting__MailApiUrl in anemoi_centralize and the Caddy
   # /mail route resolve. Exclude from production stacks.
@@ -409,6 +386,5 @@ volumes:
   # mssql_data:
   postgres_data:
   redis_data:
-  # sftp_host_keys:
   caddy_data:
   caddy_config:

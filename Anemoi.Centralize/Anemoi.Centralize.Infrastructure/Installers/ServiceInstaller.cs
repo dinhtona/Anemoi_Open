@@ -50,16 +50,6 @@ public sealed class ServiceInstaller : IInstaller
         // DOCKER SOCKET: Docker management API is Dev-only — not safe for production.
         // The service handles missing socket gracefully (returns "Docker daemon unreachable").
         services.AddSingleton<IDockerService, DockerService>();
-        services.AddSingleton<ISftpFileManager, SftpFileManager>();
         services.AddSingleton<IMockRouteRepository, MockRouteRepository>();
-
-        // Ensure SFTP SSH keys exist at startup
-        var devSettings = configuration.GetSection(nameof(DevEnvironmentsSetting)).Get<DevEnvironmentsSetting>() ?? new DevEnvironmentsSetting();
-        var sftpKeysPath = "/app/sftp_keys";
-        if (!System.IO.Directory.Exists(sftpKeysPath))
-        {
-            sftpKeysPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), devSettings.LocalEnvDir, "sftp_keys");
-        }
-        SshKeyGenerator.EnsureKeysExist(sftpKeysPath);
     }
 }

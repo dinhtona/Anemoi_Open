@@ -10,12 +10,6 @@ using Anemoi.Contract.MasterData.Commands.DistrictCommands.CreateDistrict;
 using Anemoi.Contract.MasterData.Commands.DistrictCommands.UpdateDistrict;
 using Anemoi.Contract.MasterData.Commands.ProvinceCommands.CreateProvince;
 using Anemoi.Contract.MasterData.Commands.ProvinceCommands.UpdateProvince;
-using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.CreateSeedFunction;
-using Anemoi.Contract.MasterData.Commands.SeedFunctionCommands.UpdateSeedFunction;
-using Anemoi.Contract.MasterData.Commands.SeedServerCommands.CreateSeedServer;
-using Anemoi.Contract.MasterData.Commands.SeedServerCommands.UpdateSeedServer;
-using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.CreateSeedTemplate;
-using Anemoi.Contract.MasterData.Commands.SeedTemplateCommands.UpdateSeedTemplate;
 using Anemoi.Contract.MasterData.ModelIds;
 using Anemoi.Contract.MasterData.Responses;
 using Anemoi.MasterData.Domain.Models;
@@ -93,70 +87,6 @@ public partial class MasterDataMapper
 
     public partial DistrictResponse ToDistrictResponse(District district);
     public partial IQueryable<DistrictResponse> ProjectToDistrictResponse(IQueryable<District> query);
-
-    // Seed Data Mappings
-    public SeedServer ToSeedServer(CreateSeedServerCommand command)
-    {
-        var server = MapToSeedServer(command);
-        server.Id = new SeedServerId(IdGenerator.NextGuid());
-        return server;
-    }
-
-    [MapperIgnoreTarget(nameof(SeedServer.Id))]
-    private partial SeedServer MapToSeedServer(CreateSeedServerCommand command);
-
-    public partial void UpdateSeedServer(UpdateSeedServerCommand command, SeedServer server);
-
-    public SeedFunction ToSeedFunction(CreateSeedFunctionCommand command)
-    {
-        var function = MapToSeedFunction(command);
-        function.Id = new SeedFunctionId(IdGenerator.NextGuid());
-        return function;
-    }
-
-    [MapperIgnoreTarget(nameof(SeedFunction.Id))]
-    private partial SeedFunction MapToSeedFunction(CreateSeedFunctionCommand command);
-
-    public partial void UpdateSeedFunction(UpdateSeedFunctionCommand command, SeedFunction function);
-
-    public SeedTemplate ToSeedTemplate(CreateSeedTemplateCommand command)
-    {
-        var template = MapToSeedTemplate(command);
-        template.Id = new SeedTemplateId(IdGenerator.NextGuid());
-        return template;
-    }
-
-    [MapperIgnoreTarget(nameof(SeedTemplate.Id))]
-    private partial SeedTemplate MapToSeedTemplate(CreateSeedTemplateCommand command);
-
-    public partial void UpdateSeedTemplate(UpdateSeedTemplateCommand command, SeedTemplate template);
-
-    public partial SeedServerResponse ToSeedServerResponse(SeedServer server);
-    public partial IQueryable<SeedServerResponse> ProjectToSeedServerResponse(IQueryable<SeedServer> query);
-
-    public partial SeedFunctionResponse ToSeedFunctionResponse(SeedFunction function);
-    public partial IQueryable<SeedFunctionResponse> ProjectToSeedFunctionResponse(IQueryable<SeedFunction> query);
-
-    public partial SeedTemplateResponse ToSeedTemplateResponse(SeedTemplate template);
-    public partial IQueryable<SeedTemplateResponse> ProjectToSeedTemplateResponse(IQueryable<SeedTemplate> query);
-
-
-
-
-    public SeedRowLogResponse ToSeedRowLogResponse(SeedRowLog log)
-    {
-        return new SeedRowLogResponse
-        {
-            Id = log.Id.Value.ToString(),
-            SeedServerId = log.SeedServerId.Value.ToString(),
-            TableName = log.TableName,
-            RunAt = log.RunAt,
-            PrimaryKeyCondition = log.PrimaryKeyCondition,
-            Data = string.IsNullOrWhiteSpace(log.RowDataJson)
-                ? new Dictionary<string, object>()
-                : Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(log.RowDataJson)
-        };
-    }
 
     // Common Mappings
     public ErrorDetailResponse ToErrorDetailResponse(ErrorDetail errorDetail)

@@ -13,7 +13,6 @@ public sealed class StartEnvironmentCommandHandler(IDockerService dockerService)
         string containerName = request.Id switch
         {
             "mail" => "smtp4dev_server",
-            "sftp" => "sftp_server",
             _ => null
         };
 

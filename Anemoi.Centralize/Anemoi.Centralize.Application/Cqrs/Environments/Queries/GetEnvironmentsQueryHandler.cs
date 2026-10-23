@@ -21,14 +21,6 @@ public sealed class GetEnvironmentsQueryHandler(IDockerService dockerService, De
             cancellationToken
         );
 
-        var sftp = await dockerService.GetContainerStatusAsync(
-            settings.SftpContainerName,
-            settings.SftpDisplayName,
-            $"sftp://{settings.SftpUsername}:{settings.SftpPassword}@localhost:{settings.SftpPort}",
-            settings.SftpDescription,
-            cancellationToken
-        );
-
         // API Test doesn't run in a separate container, it is always active in the centralize api
         var apiTest = new ContainerStatusDto(
             settings.MockApiContainerName,
@@ -39,6 +31,6 @@ public sealed class GetEnvironmentsQueryHandler(IDockerService dockerService, De
             DateTime.UtcNow
         );
 
-        return new List<ContainerStatusDto> { mail, sftp, apiTest };
+        return new List<ContainerStatusDto> { mail, apiTest };
     }
 }
